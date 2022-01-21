@@ -1,8 +1,8 @@
 CREATE TABLE dbo.Employee(
-	Id bigint PRIMARY KEY Identity(1,1) NOT NULL,
-    Username varchar(32) not null,
-	Password varbinary(max) not null,
-	Role varchar(25) not null,
-	FirstLoggedIn bit default 0 not null,
-	Active bit default 1 not null
+	Id BIGINT PRIMARY KEY IDENTITY(1,1) NOT NULL,
+    Username VARCHAR(32) NOT NULL,
+	Password VARBINARY(max) NOT NULL,
+	Role VARCHAR(25) NOT NULL,
+	FirstLoggedIn BIT DEFAULT 0 NOT NULL,
+	Active BIT DEFAULT 1 NOT NULL
 );
