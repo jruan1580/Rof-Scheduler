@@ -40,6 +40,16 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .IsRequired()
                     .HasDefaultValueSql("((1))");
 
+                entity.Property(e => e.FirstName)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LastName)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Password).IsRequired();
 
                 entity.Property(e => e.Role)
