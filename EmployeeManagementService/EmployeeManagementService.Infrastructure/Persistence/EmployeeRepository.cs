@@ -1,9 +1,7 @@
 ﻿using EmployeeManagementService.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Infrastructure.Persistence
@@ -18,7 +16,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task CreateEmployee( string firstName, string lastName, string username, byte[] password, string role)
+        public async Task CreateEmployee( string firstName, string lastName, string username, byte[] password, string role, bool active)
         {
             using (var context = new RofSchedulerContext())
             {
@@ -28,7 +26,8 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                     LastName = lastName,
                     Username = username,
                     Password = password,
-                    Role = role
+                    Role = role,
+                    Active = true   
                 };
 
                 context.Employees.Add(employee);
