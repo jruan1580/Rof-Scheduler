@@ -56,5 +56,22 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 await context.SaveChangesAsync();
             }
         }
+
+        public async Task UpdatePassword(long id, byte[] newPassword)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
+
+                if (employee == null)
+                {
+                    throw new ArgumentException("No employee found.");
+                }
+
+                employee.Password = newPassword;
+
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }
