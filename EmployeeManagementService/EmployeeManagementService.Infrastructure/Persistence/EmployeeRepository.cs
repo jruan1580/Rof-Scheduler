@@ -26,7 +26,8 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                     LastName = lastName,
                     Username = username,
                     Password = password,
-                    Role = role  
+                    Role = role,
+                    Active = active
                 };
 
                 context.Employees.Add(employee);
