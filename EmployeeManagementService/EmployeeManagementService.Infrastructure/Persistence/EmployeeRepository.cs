@@ -16,7 +16,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task CreateEmployee( string firstName, string lastName, string username, byte[] password, string role, bool active)
+        public async Task CreateEmployee( string firstName, string lastName, string username, byte[] password, string role, bool active = true)
         {
             using (var context = new RofSchedulerContext())
             {
@@ -26,8 +26,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                     LastName = lastName,
                     Username = username,
                     Password = password,
-                    Role = role,
-                    Active = true   
+                    Role = role  
                 };
 
                 context.Employees.Add(employee);
