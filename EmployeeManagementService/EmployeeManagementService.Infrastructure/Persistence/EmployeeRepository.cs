@@ -9,11 +9,29 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 {
     public class EmployeeRepository
     {
-        public async Task<List<Employee>> GetAllEmployees()
+        public async Task<List<Employee>> GetAllEmployees(int page = 1)
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Employees.Select(e => new Employee() { FirstName  = e.FirstName, LastName = e.LastName, Role = e.Role, Username = e.Username, Active = e.Active }).ToListAsync();
+                var employees = await context.Employees.Select(e => new Employee() { FirstName  = e.FirstName, LastName = e.LastName, Role = e.Role, Username = e.Username, Active = e.Active }).ToListAsync();
+
+                var eeList = new List<Employee>();
+
+                foreach(var ee in employees)
+                {
+                    eeList.Add(ee);
+                }
+
+                var skip = (page - 1) * 10;
+                
+                var totalPages = Math.Ceiling((eeList.Count / 10m));
+
+                if(page > totalPages)
+                {
+                    throw new ArgumentException("No more employees.");
+                }
+
+                return eeList.Skip(skip).Take(10).ToList();
             }
         }
 
