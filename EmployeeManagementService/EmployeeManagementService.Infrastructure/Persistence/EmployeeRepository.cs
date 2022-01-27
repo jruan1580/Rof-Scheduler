@@ -15,7 +15,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             {
                 var count = await context.Employees.CountAsync();
 
-                var totalPages = Math.Ceiling((count / 10m));
+                var totalPages = Math.Ceiling(count / (double)offset);
 
                 if (page > totalPages)
                 {
