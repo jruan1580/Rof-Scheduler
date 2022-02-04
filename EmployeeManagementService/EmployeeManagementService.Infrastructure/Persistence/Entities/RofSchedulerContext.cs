@@ -57,6 +57,12 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Ssn)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("SSN");
+
                 entity.Property(e => e.Username)
                     .IsRequired()
                     .HasMaxLength(32)
