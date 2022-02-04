@@ -17,6 +17,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
         public bool IsLocked { get; set; }
         public short FailedLoginAttempts { get; set; }
         public bool FirstLoggedIn { get; set; }
+        public bool Status { get; set; }
         public bool? Active { get; set; }
     }
 }
