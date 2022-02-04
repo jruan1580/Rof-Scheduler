@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using EmployeeManagementService.Domain.Mappers;
 using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Infrastructure.Persistence;
 using System;
@@ -11,12 +11,10 @@ namespace EmployeeManagementService.Domain.Services
     public class EmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IMapper _mapper;
 
-        public EmployeeService(IEmployeeRepository employeeRepository, IMapper mapper)
+        public EmployeeService(IEmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
-            _mapper = mapper;
         }
 
         public async Task<List<Employee>> GetAllEmployees(int page, int offset)
@@ -32,7 +30,7 @@ namespace EmployeeManagementService.Domain.Services
 
             foreach (var employee in employees)
             {
-                employeeList.Add(_mapper.Map<Employee>(employee));
+                employeeList.Add(EmployeeMapper.DbEmployeeToCoreEmployee(employee));
             }
 
             return employeeList;

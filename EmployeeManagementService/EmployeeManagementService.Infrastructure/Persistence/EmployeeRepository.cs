@@ -24,7 +24,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 var skip = (page - 1) * offset;
 
-                return await context.Employees.Select(e => new Employee() { FirstName = e.FirstName, LastName = e.LastName, Role = e.Role, Username = e.Username, Active = e.Active })
+                return await context.Employees.Select(e => new Employee() { FirstName = e.FirstName, LastName = e.LastName, Ssn = e.Ssn,Role = e.Role, Username = e.Username, Active = e.Active })
                                         .Skip(skip)
                                         .Take(offset)
                                         .ToListAsync();
