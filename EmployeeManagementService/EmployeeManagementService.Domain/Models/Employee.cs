@@ -12,14 +12,22 @@ namespace EmployeeManagementService.Domain.Models
         
         public string LastName { get; set; }
         
+        public string Ssn { get; set; }
+        
         public string Username { get; set; }
         
         public byte[] Password { get; set; }
         
         public string Role { get; set; }
         
+        public bool IsLocked { get; set; }
+        
+        public short FailedLoginAttempts { get; set; }
+        
         public bool FirstLoggedIn { get; set; }
         
-        public bool Active { get; set; }
+        public bool Status { get; set; }
+        
+        public bool? Active { get; set; }
     }
 }
