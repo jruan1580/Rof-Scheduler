@@ -18,7 +18,7 @@ namespace EmployeeManagementService.Domain.Mappers
             coreEmp.Role = dbEmployee.Role;
             coreEmp.IsLocked = dbEmployee.IsLocked;
             coreEmp.FailedLoginAttempts = dbEmployee.FailedLoginAttempts;
-            coreEmp.FirstLoggedIn = dbEmployee.FirstLoggedIn;
+            coreEmp.TempPasswordChanged = dbEmployee.TempPasswordChanged;
             coreEmp.Status = dbEmployee.Status;
             coreEmp.Active = dbEmployee.Active;
 
