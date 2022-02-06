@@ -3,7 +3,7 @@ using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Domain.Services
@@ -21,19 +21,7 @@ namespace EmployeeManagementService.Domain.Services
         {
             var employees = await _employeeRepository.GetAllEmployees(page, offset);
 
-            if(employees == null)
-            {
-                throw new ArgumentException("No employees found");
-            }
-
-            var employeeList = new List<Employee>();
-
-            foreach (var employee in employees)
-            {
-                employeeList.Add(EmployeeMapper.DbEmployeeToCoreEmployee(employee));
-            }
-
-            return employeeList;
+            return employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();        
         }
     }
 }
