@@ -22,7 +22,7 @@ namespace EmployeeManagementService.Test.Service
         }
 
         [Test]
-        public void GetAllEmployees_NoEmployeesFound()
+        public void GetAllEmployees_ExtraPagesReturned()
         {
             _employeeRepository.Setup(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()))
                 .ThrowsAsync(new ArgumentException());
