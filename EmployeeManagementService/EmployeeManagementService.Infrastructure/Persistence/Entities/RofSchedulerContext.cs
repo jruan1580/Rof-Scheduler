@@ -36,6 +36,9 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
             {
                 entity.ToTable("Employee");
 
+                entity.HasIndex(e => e.Ssn, "UC_SSN")
+                    .IsUnique();
+
                 entity.Property(e => e.Active)
                     .IsRequired()
                     .HasDefaultValueSql("((1))");

@@ -5,24 +5,48 @@ namespace EmployeeManagementService.Domain.Mappers
 {
     public class EmployeeMapper
     {
-        public static CoreEmployee DbEmployeeToCoreEmployee(DbEmployee dbEmployee)
+        public static CoreEmployee ToCoreEmployee(DbEmployee dbEmployee)
         {
             var coreEmp = new CoreEmployee();
 
             coreEmp.Id = dbEmployee.Id;
             coreEmp.FirstName = dbEmployee.FirstName;
-            coreEmp.LastName = dbEmployee.LastName;
-            coreEmp.Ssn = dbEmployee.Ssn;
+            coreEmp.LastName = dbEmployee.LastName;           
             coreEmp.Username = dbEmployee.Username;
             coreEmp.Password = dbEmployee.Password;
             coreEmp.Role = dbEmployee.Role;
             coreEmp.IsLocked = dbEmployee.IsLocked;
             coreEmp.FailedLoginAttempts = dbEmployee.FailedLoginAttempts;
-            coreEmp.FirstLoggedIn = dbEmployee.FirstLoggedIn;
+            coreEmp.TempPasswordChanged = dbEmployee.TempPasswordChanged;
             coreEmp.Status = dbEmployee.Status;
             coreEmp.Active = dbEmployee.Active;
 
+            coreEmp.SetSSN(dbEmployee.Ssn);
+
+            coreEmp.SetFullName();
+
             return coreEmp;
+        }
+
+        public static DbEmployee FromCoreEmployee(CoreEmployee coreEmployee)
+        {
+            var entity = new DbEmployee();
+
+            entity.Id = coreEmployee.Id;
+            entity.FirstName = coreEmployee.FirstName;
+            entity.LastName = coreEmployee.LastName;
+            entity.Username = coreEmployee.Username;
+            entity.Password = coreEmployee.Password;
+            entity.Role = coreEmployee.Role;
+            entity.IsLocked = coreEmployee.IsLocked;
+            entity.FailedLoginAttempts = coreEmployee.FailedLoginAttempts;
+            entity.TempPasswordChanged = coreEmployee.TempPasswordChanged;
+            entity.Status = coreEmployee.Status;
+            entity.Active = coreEmployee.Active;
+
+            entity.Ssn = coreEmployee.GetNotSanitizedSSN();
+
+            return entity;
         }
     }
 }
