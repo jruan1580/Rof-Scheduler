@@ -33,6 +33,7 @@ namespace EmployeeManagementService.Test.Mapper
             Assert.AreEqual("John", entity.FirstName);
             Assert.AreEqual("Doe", entity.LastName);
             Assert.AreEqual("123-45-6789", entity.GetNotSanitizedSSN());
+            Assert.AreEqual("***-**-6789", entity.Ssn);
             Assert.AreEqual("jdoe", entity.Username);
             Assert.AreEqual(new byte[32], entity.Password);
             Assert.AreEqual("Admin", entity.Role);

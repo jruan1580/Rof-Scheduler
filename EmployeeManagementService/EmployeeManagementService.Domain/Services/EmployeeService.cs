@@ -21,6 +21,11 @@ namespace EmployeeManagementService.Domain.Services
         {
             var employees = await _employeeRepository.GetAllEmployees(page, offset);
 
+            if(employees == null || employees.Count == 0)
+            {
+                return new List<Employee>();
+            }
+
             return employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();        
         }
     }
