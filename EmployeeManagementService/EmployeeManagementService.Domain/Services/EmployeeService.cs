@@ -28,5 +28,43 @@ namespace EmployeeManagementService.Domain.Services
 
             return employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();        
         }
+
+        public async Task<Employee> GetEmployeeById(long id)
+        {
+            var employee = await _employeeRepository.GetEmployeeById(id);
+
+            if (employee == null)
+            {
+                throw new ArgumentException("Employee does not exist.");
+            }
+
+            return EmployeeMapper.ToCoreEmployee(employee);
+        }
+
+        public async Task IncrementEmployeeFailedLoginAttempt(long id)
+        {
+            var employee = await GetEmployeeById(id);
+
+            if (employee.IsLocked)
+            {
+                return;
+            }
+          
+            var attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(id);
+            
+            if (attempts != 3)
+            {
+                return;
+            }
+          
+            await _employeeRepository.UpdateEmployeeIsLockedStatus(id, true);            
+        }
+
+        public async Task ResetEmployeeFailedLoginAttempt(long id)
+        {            
+            await _employeeRepository.ResetEmployeeFailedLoginAttempt(id);
+
+            await _employeeRepository.UpdateEmployeeIsLockedStatus(id, false);
+        }
     }
 }

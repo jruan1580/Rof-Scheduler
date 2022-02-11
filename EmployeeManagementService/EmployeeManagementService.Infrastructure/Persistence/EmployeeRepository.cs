@@ -11,7 +11,8 @@ namespace EmployeeManagementService.Infrastructure.Persistence
     {
         Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool active = true);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
-        Task IncrementEmployeeFailedLoginAttempt(long id);
+        Task<Employee> GetEmployeeById(long id);
+        Task<int> IncrementEmployeeFailedLoginAttempt(long id);
         Task ResetEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployeeActiveStatus(long id, bool active);
         Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn);
@@ -37,10 +38,15 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 var skip = (page - 1) * offset;
 
-                return await context.Employees.Select(e => new Employee() { FirstName = e.FirstName, LastName = e.LastName, Ssn = e.Ssn, Role = e.Role, Username = e.Username, Active = e.Active })
-                                        .Skip(skip)
-                                        .Take(offset)
-                                        .ToListAsync();
+                return await context.Employees.Select(e => CreateGetAllEmployeeObj(e)).Skip(skip).Take(offset).ToListAsync();
+            }
+        }
+
+        public async Task<Employee> GetEmployeeById(long id)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Employees.Select(e => CreateGetEmployeeByIdObj(e)).FirstOrDefaultAsync(e => e.Id == id);
             }
         }
 
@@ -120,7 +126,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task IncrementEmployeeFailedLoginAttempt(long id)
+        public async Task<int> IncrementEmployeeFailedLoginAttempt(long id)
         {
             using (var context = new RofSchedulerContext())
             {
@@ -132,8 +138,10 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 }
 
                 employee.FailedLoginAttempts += 1;
-
+                
                 await context.SaveChangesAsync();
+
+                return employee.FailedLoginAttempts;
             }
         }
 
@@ -186,6 +194,34 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 await context.SaveChangesAsync();
             }
+        }
+
+        private Employee CreateGetAllEmployeeObj(Employee e)
+        {
+            return new Employee()
+            {
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Ssn = e.Ssn,
+                Role = e.Role,
+                Username = e.Username,
+                Active = e.Active
+            };
+        }
+
+        private Employee CreateGetEmployeeByIdObj(Employee e)
+        {
+            return new Employee()
+            {
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Ssn = e.Ssn,
+                Role = e.Role,
+                Username = e.Username,
+                Active = e.Active,
+                IsLocked = e.IsLocked,
+                FailedLoginAttempts = e.FailedLoginAttempts
+            };
         }
     }
 }
