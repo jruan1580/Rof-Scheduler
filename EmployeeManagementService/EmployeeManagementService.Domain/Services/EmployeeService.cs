@@ -43,36 +43,28 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task IncrementEmployeeFailedLoginAttempt(long id)
         {
-            var attempts = 0;
-            var employee = await _employeeRepository.GetEmployeeById(id);
+            var employee = await GetEmployeeById(id);
 
-            if (employee == null)
+            if (employee.IsLocked)
             {
-                throw new ArgumentException("Employee does not exist.");
+                return;
             }
-
-            if (employee.FailedLoginAttempts < 3)
+          
+            var attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(id);
+            
+            if (attempts != 3)
             {
-                attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(employee.Id);
+                return;
             }
-
-            if (attempts == 3)
-            {
-                await _employeeRepository.UpdateEmployeeIsLockedStatus(employee.Id, true);
-            }
+          
+            await _employeeRepository.UpdateEmployeeIsLockedStatus(id, true);            
         }
 
         public async Task ResetEmployeeFailedLoginAttempt(long id)
-        {
-            var employee = await _employeeRepository.GetEmployeeById(id);
+        {            
+            await _employeeRepository.ResetEmployeeFailedLoginAttempt(id);
 
-            if (employee == null)
-            {
-                throw new ArgumentException("Employee does not exist.");
-            }
-
-            await _employeeRepository.ResetEmployeeFailedLoginAttempt(employee.Id);
-            await _employeeRepository.UpdateEmployeeIsLockedStatus(employee.Id, false);
+            await _employeeRepository.UpdateEmployeeIsLockedStatus(id, false);
         }
     }
 }

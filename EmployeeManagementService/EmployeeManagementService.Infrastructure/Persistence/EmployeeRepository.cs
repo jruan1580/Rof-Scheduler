@@ -38,10 +38,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 var skip = (page - 1) * offset;
 
-                return await context.Employees.Select(e => new Employee() { FirstName = e.FirstName, LastName = e.LastName, Ssn = e.Ssn, Role = e.Role, Username = e.Username, Active = e.Active })
-                                        .Skip(skip)
-                                        .Take(offset)
-                                        .ToListAsync();
+                return await context.Employees.Select(e => CreateGetAllEmployeeObj(e)).Skip(skip).Take(offset).ToListAsync();
             }
         }
 
@@ -49,8 +46,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Employees.Select(e => new Employee() { FirstName = e.FirstName, LastName = e.LastName, Ssn = e.Ssn, Role = e.Role, Username = e.Username, Active = e.Active, IsLocked = e.IsLocked })
-                                        .FirstOrDefaultAsync(e => e.Id == id);
+                return await context.Employees.Select(e => CreateGetEmployeeByIdObj(e)).FirstOrDefaultAsync(e => e.Id == id);
             }
         }
 
@@ -141,11 +137,11 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                     throw new ArgumentException("No employee found.");
                 }
 
-                var attempts = employee.FailedLoginAttempts += 1;
-
+                employee.FailedLoginAttempts += 1;
+                
                 await context.SaveChangesAsync();
 
-                return attempts;
+                return employee.FailedLoginAttempts;
             }
         }
 
@@ -198,6 +194,34 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 await context.SaveChangesAsync();
             }
+        }
+
+        private Employee CreateGetAllEmployeeObj(Employee e)
+        {
+            return new Employee()
+            {
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Ssn = e.Ssn,
+                Role = e.Role,
+                Username = e.Username,
+                Active = e.Active
+            };
+        }
+
+        private Employee CreateGetEmployeeByIdObj(Employee e)
+        {
+            return new Employee()
+            {
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Ssn = e.Ssn,
+                Role = e.Role,
+                Username = e.Username,
+                Active = e.Active,
+                IsLocked = e.IsLocked,
+                FailedLoginAttempts = e.FailedLoginAttempts
+            };
         }
     }
 }
