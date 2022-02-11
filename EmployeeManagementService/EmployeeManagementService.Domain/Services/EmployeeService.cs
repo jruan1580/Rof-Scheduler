@@ -43,6 +43,7 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task IncrementEmployeeFailedLoginAttempt(long id)
         {
+            var attempts = 0;
             var employee = await _employeeRepository.GetEmployeeById(id);
 
             if (employee == null)
@@ -52,12 +53,12 @@ namespace EmployeeManagementService.Domain.Services
 
             if (employee.FailedLoginAttempts < 3)
             {
-                await _employeeRepository.IncrementEmployeeFailedLoginAttempt(employee.Id);
+                attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(employee.Id);
             }
 
-            if (employee.FailedLoginAttempts == 3)
+            if (attempts == 3)
             {
-                employee.IsLocked = true;
+                await _employeeRepository.UpdateEmployeeIsLockedStatus(employee.Id, true);
             }
         }
 
@@ -71,8 +72,7 @@ namespace EmployeeManagementService.Domain.Services
             }
 
             await _employeeRepository.ResetEmployeeFailedLoginAttempt(employee.Id);
-
-            employee.IsLocked = false;
+            await _employeeRepository.UpdateEmployeeIsLockedStatus(employee.Id, false);
         }
     }
 }

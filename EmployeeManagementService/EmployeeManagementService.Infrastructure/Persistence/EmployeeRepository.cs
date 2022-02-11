@@ -12,7 +12,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool active = true);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
         Task<Employee> GetEmployeeById(long id);
-        Task IncrementEmployeeFailedLoginAttempt(long id);
+        Task<int> IncrementEmployeeFailedLoginAttempt(long id);
         Task ResetEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployeeActiveStatus(long id, bool active);
         Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn);
@@ -130,7 +130,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task IncrementEmployeeFailedLoginAttempt(long id)
+        public async Task<int> IncrementEmployeeFailedLoginAttempt(long id)
         {
             using (var context = new RofSchedulerContext())
             {
@@ -141,9 +141,11 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                     throw new ArgumentException("No employee found.");
                 }
 
-                employee.FailedLoginAttempts += 1;
+                var attempts = employee.FailedLoginAttempts += 1;
 
                 await context.SaveChangesAsync();
+
+                return attempts;
             }
         }
 
