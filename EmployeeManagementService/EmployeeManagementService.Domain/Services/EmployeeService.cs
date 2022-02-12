@@ -66,5 +66,40 @@ namespace EmployeeManagementService.Domain.Services
 
             await _employeeRepository.UpdateEmployeeIsLockedStatus(id, false);
         }
+
+        public async Task UpdateEmployeeActiveStatus(long id, bool active)
+        {
+            await _employeeRepository.UpdateEmployeeActiveStatus(id, active);
+        }
+
+        public async Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentException("Username cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(firstName))
+            {
+                throw new ArgumentException("First name cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(lastName))
+            {
+                throw new ArgumentException("Last name cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(role))
+            {
+                throw new ArgumentException("Role cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(ssn))
+            {
+                throw new ArgumentException("SSN cannot be empty");
+            }
+
+            await _employeeRepository.UpdateEmployeeInformation(id, username, firstName, lastName, role, ssn);
+        }
     }
 }
