@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace EmployeeManagementService.Domain.Services
@@ -11,12 +12,14 @@ namespace EmployeeManagementService.Domain.Services
 
     public class PasswordService : IPasswordService
     {
-        private const string _saltString = "cmaqdcuzyidmmlfobtwduukqexizuflvwvzgwhdozhsuuadovmkgtogqjphrcbrwvkdhucpokstwgoff";
+        private readonly string _saltString;
         private readonly byte[] _salt;
 
-        public PasswordService()
+        public PasswordService(IConfiguration config)
         {
             _salt = Encoding.UTF8.GetBytes(_saltString);
+
+            _saltString = config.GetSection("PasswordSalt").Value;
         }
 
         /// <summary>
