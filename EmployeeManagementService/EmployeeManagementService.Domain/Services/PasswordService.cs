@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -54,6 +55,31 @@ namespace EmployeeManagementService.Domain.Services
             }
 
             return true;
-        }        
+        }
+        
+        public bool VerifyPasswordRequirements(string password)
+        {
+            if(password.Length < 8 || password.Length > 32)
+            {
+                return false;
+            }
+
+            if(!password.Any(char.IsUpper) || !password.Any(char.IsLower))
+            {
+                return false;
+            }
+
+            if (!password.Any(char.IsDigit))
+            {
+                return false;
+            }
+
+            if (!password.Any(ch => !char.IsLetterOrDigit(ch)))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
