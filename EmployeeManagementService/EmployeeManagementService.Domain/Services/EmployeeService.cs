@@ -72,34 +72,18 @@ namespace EmployeeManagementService.Domain.Services
             await _employeeRepository.UpdateEmployeeActiveStatus(id, active);
         }
 
-        public async Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn)
+        public async Task UpdateEmployeeInformation(Employee employee)
         {
-            if (string.IsNullOrEmpty(username))
+            var invalidErrors = employee.IsValidEmployeeForUpdate().ToArray();
+
+            if (invalidErrors.Length > 0)
             {
-                throw new ArgumentException("Username cannot be empty");
+                var errorMessage = string.Join("\n", invalidErrors);
+
+                throw new ArgumentException(errorMessage);
             }
 
-            if (string.IsNullOrEmpty(firstName))
-            {
-                throw new ArgumentException("First name cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(lastName))
-            {
-                throw new ArgumentException("Last name cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(role))
-            {
-                throw new ArgumentException("Role cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(ssn))
-            {
-                throw new ArgumentException("SSN cannot be empty");
-            }
-
-            await _employeeRepository.UpdateEmployeeInformation(id, username, firstName, lastName, role, ssn);
+            await _employeeRepository.UpdateEmployeeInformation(employee.Id, employee.Username, employee.FirstName, employee.LastName, employee.Role, employee.Ssn);
         }
     }
 }
