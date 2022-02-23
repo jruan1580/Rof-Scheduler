@@ -69,12 +69,12 @@ namespace EmployeeManagementService.Domain.Services
                 return false;
             }
 
-            if(!password.Any(char.IsUpper) || !password.Any(char.IsLower))
+            if(!password.Any(ch => char.IsUpper(ch)) || !password.Any(ch => char.IsLower(ch)))
             {
                 return false;
             }
 
-            if (!password.Any(char.IsDigit))
+            if (!password.Any(ch =>char.IsDigit(ch)))
             {
                 return false;
             }
