@@ -64,6 +64,11 @@ namespace EmployeeManagementService.Domain.Services
                 return false;
             }
 
+            if (password.Contains(' '))
+            {
+                return false;
+            }
+
             if(!password.Any(char.IsUpper) || !password.Any(char.IsLower))
             {
                 return false;
