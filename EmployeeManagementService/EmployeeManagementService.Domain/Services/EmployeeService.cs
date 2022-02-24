@@ -88,6 +88,13 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException(errorMessage);
             }
 
+            var roles = _roles.Split(", ");
+
+            if (!roles.Contains(employee.Role))
+            {
+                throw new ArgumentException("Invalid role assigned");
+            }
+
             await _employeeRepository.UpdateEmployeeInformation(employee.Id, employee.Username, employee.FirstName, employee.LastName, employee.Role, employee.Ssn);
         }
 
@@ -138,6 +145,18 @@ namespace EmployeeManagementService.Domain.Services
             }
 
             await _employeeRepository.CreateEmployee(firstName, lastName, username, ssn, encryptedPass, role, active);
+        }
+
+        public async Task UpdateEmployeeLoginStatus(long id, bool status)
+        {
+            var employee = await GetEmployeeById(id);
+
+            if (employee.Status == status)
+            {
+                return;
+            }
+
+            await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, status);
         }
     }
 }
