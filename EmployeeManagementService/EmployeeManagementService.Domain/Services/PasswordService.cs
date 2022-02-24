@@ -8,7 +8,8 @@ namespace EmployeeManagementService.Domain.Services
     public interface IPasswordService
     {
         byte[] EncryptPassword(string password);
-        bool VerifyPasswordHash(string password, byte[] passwordHash);        
+        bool VerifyPasswordHash(string password, byte[] passwordHash);
+        bool VerifyPasswordRequirements(string password);
     }
 
     public class PasswordService : IPasswordService
