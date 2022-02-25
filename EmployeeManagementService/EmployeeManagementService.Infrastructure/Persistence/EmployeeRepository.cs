@@ -9,7 +9,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 {
     public interface IEmployeeRepository
     {
-        Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool active = true);
+        Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool? active = true);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
         Task<Employee> GetEmployeeById(long id);
         Task<int> IncrementEmployeeFailedLoginAttempt(long id);
@@ -50,7 +50,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool active = true)
+        public async Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool? active = true)
         {
             using (var context = new RofSchedulerContext())
             {

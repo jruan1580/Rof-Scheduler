@@ -88,7 +88,7 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException(errorMessage);
             }
 
-            var roles = _roles.Split(", ");
+            var roles = _roles.Split(",");
 
             if (!roles.Contains(employee.Role))
             {
@@ -98,36 +98,15 @@ namespace EmployeeManagementService.Domain.Services
             await _employeeRepository.UpdateEmployeeInformation(employee.Id, employee.Username, employee.FirstName, employee.LastName, employee.Role, employee.Ssn);
         }
 
-        public async Task CreateEmployee(string firstName, string lastName, string username, string ssn, string password, string role, bool active)
+        public async Task CreateEmployee(Employee newEmployee, string password)
         {
-            if (string.IsNullOrEmpty(firstName))
-            {
-                throw new ArgumentException("First name cannot be empty");
-            }
+            var invalidErrors = newEmployee.IsValidEmployeeToCreate().ToArray();
 
-            if (string.IsNullOrEmpty(lastName))
+            if (invalidErrors.Length > 0)
             {
-                throw new ArgumentException("Last name cannot be empty");
-            }
+                var errorMessage = string.Join("\n", invalidErrors);
 
-            if (string.IsNullOrEmpty(username))
-            {
-                throw new ArgumentException("Username cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(ssn))
-            {
-                throw new ArgumentException("SSN cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(password))
-            {
-                throw new ArgumentException("Password cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(role))
-            {
-                throw new ArgumentException("Role cannot be empty");
+                throw new ArgumentException(errorMessage);
             }
 
             byte[] encryptedPass = null;
@@ -137,26 +116,44 @@ namespace EmployeeManagementService.Domain.Services
                 encryptedPass = _passwordService.EncryptPassword(password);
             }
 
-            var roles = _roles.Split(", ");
+            var roles = _roles.Split(",");
 
-            if(!roles.Contains(role))
+            if(!roles.Contains(newEmployee.Role))
             {
                 throw new ArgumentException("Invalid role assigned");
             }
 
-            await _employeeRepository.CreateEmployee(firstName, lastName, username, ssn, encryptedPass, role, active);
+            await _employeeRepository.CreateEmployee(newEmployee.FirstName, newEmployee.LastName, newEmployee.Username, newEmployee.Ssn, encryptedPass, newEmployee.Role, newEmployee.Active);
         }
 
-        public async Task UpdateEmployeeLoginStatus(long id, bool status)
+        public async Task EmployeeLogIn(string username, string password)
         {
-            var employee = await GetEmployeeById(id);
+            //get employee by username
+            var employee = new Employee();
 
-            if (employee.Status == status)
+            if(!_passwordService.VerifyPasswordHash(password, employee.Password))
+            {
+                throw new ArgumentException("Incorrect password");
+            }
+
+            if(employee.Status == true)
             {
                 return;
             }
 
-            await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, status);
+            await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, true);
+        }
+
+        public async Task EmployeeLogout(long id)
+        {
+            var employee = await GetEmployeeById(id);
+
+            if (employee.Status == false)
+            {
+                return;
+            }
+
+            await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, false);
         }
     }
 }
