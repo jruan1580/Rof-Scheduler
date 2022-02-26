@@ -173,5 +173,24 @@ namespace EmployeeManagementService.Domain.Services
 
             await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, false);
         }
+
+        public async Task UpdatePassword(long id, string newPassword)
+        {
+            var employee = await GetEmployeeById(id);
+
+            if (!_passwordService.VerifyPasswordRequirements(newPassword))
+            {
+                throw new ArgumentException("New password does not meet all requirements.");
+            }
+
+            if (_passwordService.VerifyPasswordHash(newPassword, employee.Password))
+            {
+                throw new ArgumentException("New password cannot be the same as current password.");
+            }
+
+            var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
+
+            await _employeeRepository.UpdatePassword(employee.Id, newEncryptedPass);
+        }
     }
 }
