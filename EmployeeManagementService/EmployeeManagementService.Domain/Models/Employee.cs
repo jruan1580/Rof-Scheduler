@@ -98,5 +98,37 @@ namespace EmployeeManagementService.Domain.Models
 
             return invalidErrors;
         }
+
+        public List<string> IsValidEmployeeToCreate()
+        {
+            var invalidErrors = new List<string>();
+            
+            if (string.IsNullOrEmpty(Username))
+            {
+                invalidErrors.Add("Username cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(FirstName))
+            {
+                invalidErrors.Add("First name cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(LastName))
+            {
+                invalidErrors.Add("Last name cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(Role))
+            {
+                invalidErrors.Add("Role cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(Ssn))
+            {
+                invalidErrors.Add("SSN cannot be empty");
+            }
+
+            return invalidErrors;
+        }
     }
 }
