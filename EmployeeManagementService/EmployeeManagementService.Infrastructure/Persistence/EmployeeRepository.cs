@@ -12,6 +12,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool? active = true);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
         Task<Employee> GetEmployeeById(long id);
+        Task<Employee> GetEmployeeByUsername(string username);
         Task<int> IncrementEmployeeFailedLoginAttempt(long id);
         Task ResetEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployeeActiveStatus(long id, bool active);
@@ -47,6 +48,14 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             using (var context = new RofSchedulerContext())
             {
                 return await context.Employees.Select(e => CreateGetEmployeeByIdObj(e)).FirstOrDefaultAsync(e => e.Id == id);
+            }
+        }
+
+        public async Task<Employee> GetEmployeeByUsername(string username)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Employees.FirstOrDefaultAsync(e => e.Username == username);
             }
         }
 

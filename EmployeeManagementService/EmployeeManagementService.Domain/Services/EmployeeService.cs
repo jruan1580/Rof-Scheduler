@@ -46,6 +46,18 @@ namespace EmployeeManagementService.Domain.Services
             return EmployeeMapper.ToCoreEmployee(employee);
         }
 
+        public async Task<Employee> GetEmployeeByUsername(string username)
+        {
+            var employee = await _employeeRepository.GetEmployeeByUsername(username);
+
+            if (employee == null)
+            {
+                throw new ArgumentException("Employee does not exist.");
+            }
+
+            return EmployeeMapper.ToCoreEmployee(employee);
+        }
+
         public async Task IncrementEmployeeFailedLoginAttempt(long id)
         {
             var employee = await GetEmployeeById(id);
@@ -109,6 +121,13 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException(errorMessage);
             }
 
+            var employeeCheck = await GetEmployeeByUsername(newEmployee.Username);
+
+            if(newEmployee.Username == employeeCheck.Username)
+            {
+                throw new ArgumentException("Username already exists");
+            }
+
             byte[] encryptedPass = null;
 
             if (_passwordService.VerifyPasswordRequirements(password))
@@ -128,8 +147,7 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task EmployeeLogIn(string username, string password)
         {
-            //get employee by username
-            var employee = new Employee();
+            var employee = await GetEmployeeByUsername(username);
 
             if(!_passwordService.VerifyPasswordHash(password, employee.Password))
             {
