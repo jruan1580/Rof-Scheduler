@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -7,7 +8,8 @@ namespace EmployeeManagementService.Domain.Services
     public interface IPasswordService
     {
         byte[] EncryptPassword(string password);
-        bool VerifyPasswordHash(string password, byte[] passwordHash);        
+        bool VerifyPasswordHash(string password, byte[] passwordHash);
+        bool VerifyPasswordRequirements(string password);
     }
 
     public class PasswordService : IPasswordService
@@ -54,6 +56,36 @@ namespace EmployeeManagementService.Domain.Services
             }
 
             return true;
-        }        
+        }
+        
+        public bool VerifyPasswordRequirements(string password)
+        {
+            if(password.Length < 8 || password.Length > 32)
+            {
+                return false;
+            }
+
+            if (password.Contains(' '))
+            {
+                return false;
+            }
+
+            if(!password.Any(ch => char.IsUpper(ch)) || !password.Any(ch => char.IsLower(ch)))
+            {
+                return false;
+            }
+
+            if (!password.Any(ch =>char.IsDigit(ch)))
+            {
+                return false;
+            }
+
+            if (!password.Any(ch => !char.IsLetterOrDigit(ch)))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using CoreEmployee = EmployeeManagementService.Domain.Models.Employee;
 using DbEmployee = EmployeeManagementService.Infrastructure.Persistence.Entities.Employee;
 
-namespace EmployeeManagementService.Domain.Mappers
+namespace EmployeeManagementService.Domain.Mappers.Database
 {
     public class EmployeeMapper
     {
