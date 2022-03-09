@@ -177,5 +177,127 @@ namespace EmployeeManagementService.Test.Service
 
             _employeeRepository.Verify(e => e.UpdateEmployeeActiveStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Once);
         }
+
+        [Test]
+        public void UpdateEmployeeInformation_InvalidInput()
+        {
+            _employeeRepository.Setup(e => e.UpdateEmployeeInformation(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new ArgumentException());
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+
+            Assert.ThrowsAsync<ArgumentException>(() => employeeService.UpdateEmployeeInformation(new Domain.Models.Employee()));
+        }
+
+        [Test]
+        public async Task UpdateEmployeeInformation_Success()
+        {
+            _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
+                .ReturnsAsync(new Employee());
+
+            _employeeRepository.Setup(e => e.UpdateEmployeeInformation(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+
+            await employeeService.UpdateEmployeeInformation(new Domain.Models.Employee() { Id = 1, Username = "jdoe", FirstName = "John", LastName = "Doe", Role = "Employee", Ssn = "123-45-6789"});
+
+            _employeeRepository.Verify(e => e.UpdateEmployeeInformation(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Test]
+        public void CreateEmployee_InvalidInput()
+        {
+            _employeeRepository.Setup(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()))
+                .ThrowsAsync(new ArgumentException());
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+
+            Assert.ThrowsAsync<ArgumentException>(() => employeeService.CreateEmployee(new Domain.Models.Employee(), "tE$t1234"));
+        }
+
+        [Test]
+        public void CreateEmployee_UsernameNotUnique()
+        {
+            var newEmployee = new Employee()
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Username = "jdoe",
+                Ssn = "123-45-6789",
+                Password = new byte[32],
+                Role = "Employee",
+                Active = true
+            };
+
+            _employeeRepository.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
+                .ReturnsAsync(new Employee() { Username = "Jdoe" });
+
+            _employeeRepository.Setup(e => e.CreateEmployee(It.Is<string>(f => f.Equals(newEmployee.FirstName)), It.Is<string>(l => l.Equals(newEmployee.LastName)), It.Is<string>(u => u.Equals(newEmployee.Username)), 
+                It.Is<string>(s => s.Equals(newEmployee.Ssn)), It.Is<byte[]>(p => p.Equals(newEmployee.Password)), It.Is<string>(r => r.Equals(newEmployee.Role)), It.Is<bool?>(a => a.Equals(newEmployee.Active))))
+                .ThrowsAsync(new ArgumentException());
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+
+            Assert.ThrowsAsync<ArgumentException>(() => employeeService.CreateEmployee(new Domain.Models.Employee(), "tE$t1234"));
+        }
+
+        [Test]
+        public void CreateEmployee_PasswordRequirementNotMet()
+        {
+            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.Is<string>(p => p.Equals("tE$t1"))))
+                .Returns(false);
+
+            _employeeRepository.Setup(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(u => u.Equals("Jdoe")), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()))
+                .ThrowsAsync(new ArgumentException());
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+
+            Assert.ThrowsAsync<ArgumentException>(() => employeeService.CreateEmployee(new Domain.Models.Employee(), "abc123"));
+        }
+
+        [Test]
+        public void CreateEmployee_PasswordEncryptionFail()
+        {
+            _passwordService.Setup(p => p.EncryptPassword(It.Is<string>(p => p.Equals("tE$t1234"))))
+                .Throws(new Exception());
+
+            _employeeRepository.Setup(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(u => u.Equals("Jdoe")), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()))
+                .ThrowsAsync(new ArgumentException());
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+
+            Assert.ThrowsAsync<ArgumentException>(() => employeeService.CreateEmployee(new Domain.Models.Employee(), "tE$t1234"));
+        }
+
+        [Test]
+        public async Task CreateEmployee_Success()
+        {
+            var newEmployee = new Domain.Models.Employee()
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                Username = "jdoe",
+                Ssn = "123-45-6789",
+                Password = new byte[32],
+                Role = "Employee",
+                Active = true
+            };
+
+            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.Is<string>(p => p.Equals("tE$t1234"))))
+                .Returns(true);
+
+            _passwordService.Setup(p => p.EncryptPassword(It.Is<string>(p => p.Equals("tE$t1234"))))
+                .Returns(new byte[32]);
+
+            _employeeRepository.Setup(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(u => u.Equals("Jdoe")), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()))
+                .Returns(Task.CompletedTask);
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+
+            await employeeService.CreateEmployee(newEmployee, "tE$t1234");
+
+            _employeeRepository.Verify(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(u => u.Equals("Jdoe")), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()), Times.Once);
+        }
     }
 }
