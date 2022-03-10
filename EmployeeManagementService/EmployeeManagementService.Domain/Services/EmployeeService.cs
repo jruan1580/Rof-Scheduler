@@ -9,7 +9,22 @@ using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Domain.Services
 {
-    public class EmployeeService
+    public interface IEmployeeService
+    {
+        Task CreateEmployee(Employee newEmployee, string password);
+        Task EmployeeLogIn(string username, string password);
+        Task EmployeeLogout(long id);
+        Task<List<Employee>> GetAllEmployees(int page, int offset);
+        Task<Employee> GetEmployeeById(long id);
+        Task<Employee> GetEmployeeByUsername(string username);
+        Task IncrementEmployeeFailedLoginAttempt(long id);
+        Task ResetEmployeeFailedLoginAttempt(long id);
+        Task UpdateEmployeeActiveStatus(long id, bool active);
+        Task UpdateEmployeeInformation(Employee employee);
+        Task UpdatePassword(long id, string newPassword);
+    }
+
+    public class EmployeeService : IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IPasswordService _passwordService;
@@ -26,12 +41,12 @@ namespace EmployeeManagementService.Domain.Services
         {
             var employees = await _employeeRepository.GetAllEmployees(page, offset);
 
-            if(employees == null || employees.Count == 0)
+            if (employees == null || employees.Count == 0)
             {
                 return new List<Employee>();
             }
 
-            return employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();        
+            return employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();
         }
 
         public async Task<Employee> GetEmployeeById(long id)
@@ -66,19 +81,19 @@ namespace EmployeeManagementService.Domain.Services
             {
                 return;
             }
-          
+
             var attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(id);
-            
+
             if (attempts != 3)
             {
                 return;
             }
-          
-            await _employeeRepository.UpdateEmployeeIsLockedStatus(id, true);            
+
+            await _employeeRepository.UpdateEmployeeIsLockedStatus(id, true);
         }
 
         public async Task ResetEmployeeFailedLoginAttempt(long id)
-        {            
+        {
             await _employeeRepository.ResetEmployeeFailedLoginAttempt(id);
 
             await _employeeRepository.UpdateEmployeeIsLockedStatus(id, false);
@@ -123,7 +138,7 @@ namespace EmployeeManagementService.Domain.Services
 
             var employeeCheck = await GetEmployeeByUsername(newEmployee.Username);
 
-            if(newEmployee.Username == employeeCheck.Username)
+            if (newEmployee.Username == employeeCheck.Username)
             {
                 throw new ArgumentException("Username already exists");
             }
@@ -137,7 +152,7 @@ namespace EmployeeManagementService.Domain.Services
 
             var roles = _roles.Split(",");
 
-            if(!roles.Contains(newEmployee.Role))
+            if (!roles.Contains(newEmployee.Role))
             {
                 throw new ArgumentException("Invalid role assigned");
             }
@@ -149,12 +164,12 @@ namespace EmployeeManagementService.Domain.Services
         {
             var employee = await GetEmployeeByUsername(username);
 
-            if(!_passwordService.VerifyPasswordHash(password, employee.Password))
+            if (!_passwordService.VerifyPasswordHash(password, employee.Password))
             {
                 throw new ArgumentException("Incorrect password");
             }
 
-            if(employee.Status == true)
+            if (employee.Status == true)
             {
                 return;
             }
