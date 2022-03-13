@@ -19,9 +19,9 @@ namespace EmployeeManagementService.Domain.Services
 
         public PasswordService(IConfiguration config)
         {
-            _salt = Encoding.UTF8.GetBytes(_saltString);
-
             _saltString = config.GetSection("PasswordSalt").Value;
+
+            _salt = Encoding.UTF8.GetBytes(_saltString);
         }
 
         /// <summary>

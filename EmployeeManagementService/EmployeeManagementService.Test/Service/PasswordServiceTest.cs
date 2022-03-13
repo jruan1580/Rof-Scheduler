@@ -2,155 +2,108 @@
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EmployeeManagementService.Test.Service
 {
     [TestFixture]
     public class PasswordServiceTest
     {
-        private Mock<IPasswordService> _passwordService;
         private Mock<IConfiguration> _config;
+        private IPasswordService _passwordService;
 
         [SetUp]
         public void Setup()
         {
-            _passwordService = new Mock<IPasswordService>();
             _config = new Mock<IConfiguration>();
             _config.Setup(c => c.GetSection(It.Is<string>(r => r.Equals("PasswordSalt"))).Value)
                 .Returns("arandomstringforlocaldev");
+
+            _passwordService = new PasswordService(_config.Object);
         }
 
         [Test]
         public void EncrptyPassword_Success()
         {
-            _passwordService.Setup(p => p.EncryptPassword(It.IsAny<string>()))
-                .Returns(new byte[32]);
+            var encryptedPass =  _passwordService.EncryptPassword("tE$t1234");
 
-            var passwordService = new PasswordService(_config.Object);
-
-            passwordService.EncryptPassword("tE$t1234");
-
-            _passwordService.Verify(p => p.EncryptPassword(It.IsAny<string>()), Times.Once);
+            Assert.IsNotNull(encryptedPass);
+            Assert.Greater(encryptedPass.Length, 0);
         }
 
         [Test]
         public void VerifyPasswordHash_Fail()
         {
-            _passwordService.Setup(p => p.VerifyPasswordHash(It.IsAny<string>(), It.IsAny<byte[]>()))
-                .Returns(false);
+            var encryptedPass = _passwordService.EncryptPassword("tE$t1234123");
 
-            var passwordService = new PasswordService(_config.Object);
+            var result = _passwordService.VerifyPasswordHash("tE$t1234", encryptedPass);
 
-            passwordService.VerifyPasswordHash("tE$t1234", new byte[32]);
-
-            _passwordService.Verify(p => p.EncryptPassword(It.IsAny<string>()), Times.Once);
+            Assert.IsFalse(result);
         }
 
         [Test]
         public void VerifyPasswordHash_Success()
         {
-            _passwordService.Setup(p => p.VerifyPasswordHash(It.IsAny<string>(), It.IsAny<byte[]>()))
-                .Returns(true);
+            var encryptedPass = _passwordService.EncryptPassword("tE$t1234");
 
-            var passwordService = new PasswordService(_config.Object);
+            var result = _passwordService.VerifyPasswordHash("tE$t1234", encryptedPass);
 
-            passwordService.VerifyPasswordHash("tE$t1234", new byte[32]);
-
-            _passwordService.Verify(p => p.VerifyPasswordHash(It.IsAny<string>(), It.IsAny<byte[]>()), Times.Once);
+            Assert.IsTrue(result);
         }
 
         [Test]
         public void VerifyPasswordReq_LengthIncorrect()
         {
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(false);
+            var result = _passwordService.VerifyPasswordRequirements("t3$T");
 
-            var passwordService = new PasswordService(_config.Object);
-
-            passwordService.VerifyPasswordRequirements("tE$t123");
-
-            _passwordService.Verify(p => p.VerifyPasswordRequirements(It.IsAny<string>()), Times.Once);
+            Assert.IsFalse(result);
         }
 
         [Test]
         public void VerifyPasswordReq_HasSpace()
         {
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(false);
+            var result = _passwordService.VerifyPasswordRequirements("t3 $T1234");
 
-            var passwordService = new PasswordService(_config.Object);
-
-            passwordService.VerifyPasswordRequirements("tE$t1 234");
-
-            _passwordService.Verify(p => p.VerifyPasswordRequirements(It.IsAny<string>()), Times.Once);
+            Assert.IsFalse(result);
         }
 
         [Test]
         public void VerifyPasswordReq_MissingUpper()
         {
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(false);
-
-            var passwordService = new PasswordService(_config.Object);
-
-            passwordService.VerifyPasswordRequirements("te$t1234");
-
-            _passwordService.Verify(p => p.VerifyPasswordRequirements(It.IsAny<string>()), Times.Once);
+            var result = _passwordService.VerifyPasswordRequirements("te$t1234");
+            
+            Assert.IsFalse(result);
         }
 
         [Test]
         public void VerifyPasswordReq_MissingLower()
         {
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(false);
+            var result = _passwordService.VerifyPasswordRequirements("TE$T1234");
 
-            var passwordService = new PasswordService(_config.Object);
-
-            passwordService.VerifyPasswordRequirements("TE$T1234");
-
-            _passwordService.Verify(p => p.VerifyPasswordRequirements(It.IsAny<string>()), Times.Once);
+            Assert.IsFalse(result);
         }
 
         [Test]
         public void VerifyPasswordReq_MissingNum()
         {
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(false);
+            var result = _passwordService.VerifyPasswordRequirements("tE$tabcd");
 
-            var passwordService = new PasswordService(_config.Object);
-
-            passwordService.VerifyPasswordRequirements("tE$tabcd");
-
-            _passwordService.Verify(p => p.VerifyPasswordRequirements(It.IsAny<string>()), Times.Once);
+            Assert.IsFalse(result);
         }
 
         [Test]
         public void VerifyPasswordReq_MissingSpecial()
         {
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(false);
+            var result = _passwordService.VerifyPasswordRequirements("tESt1234");
 
-            var passwordService = new PasswordService(_config.Object);
-
-            passwordService.VerifyPasswordRequirements("tESt1234");
-
-            _passwordService.Verify(p => p.VerifyPasswordRequirements(It.IsAny<string>()), Times.Once);
+            Assert.IsFalse(result);
         }
 
         [Test]
         public void VerifyPasswordReq_Success()
         {
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(true);
+            var result = _passwordService.VerifyPasswordRequirements("tE$t1234");
 
-            var passwordService = new PasswordService(_config.Object);
-
-            passwordService.VerifyPasswordRequirements("tE$t1234");
-
-            _passwordService.Verify(p => p.VerifyPasswordRequirements(It.IsAny<string>()), Times.Once);
+            Assert.IsTrue(result);
         }
     }
 }
