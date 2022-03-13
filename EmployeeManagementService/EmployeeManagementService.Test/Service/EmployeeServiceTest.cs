@@ -6,7 +6,6 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Test.Service
@@ -15,114 +14,280 @@ namespace EmployeeManagementService.Test.Service
     public class EmployeeServiceTest
     {
         private Mock<IEmployeeRepository> _employeeRepository;
-        private Mock<IPasswordService> _passwordService;
+        private IPasswordService _passwordService;
         private Mock<IConfiguration> _config;
 
         [SetUp]
         public void Setup()
         {
             _employeeRepository = new Mock<IEmployeeRepository>();
-            _passwordService = new Mock<IPasswordService>();
+
             _config = new Mock<IConfiguration>();
             _config.Setup(c => c.GetSection(It.Is<string>(r => r.Equals("Roles"))).Value)
                 .Returns("Administrator,Employee");
+            _config.Setup(c => c.GetSection(It.Is<string>(r => r.Equals("PasswordSalt"))).Value)
+                .Returns("arandomstringforlocaldev");
+            _passwordService = new PasswordService(_config.Object);
         }
 
         [Test]
-        public void GetAllEmployees_ExtraPagesReturned()
+        public async Task GetAllEmployees_NoEmployees()
         {
             _employeeRepository.Setup(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()))
-                .ThrowsAsync(new ArgumentException());
+                .ReturnsAsync(new List<Employee>());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            Assert.ThrowsAsync<ArgumentException>(() => employeeService.GetAllEmployees(1, 10));
+            var employees = await employeeService.GetAllEmployees(1, 10);
+
+            Assert.IsEmpty(employees);
         }
 
         [Test]
         public async Task GetAllEmployees_Success()
         {
+            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
+
             _employeeRepository.Setup(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(new List<Employee>());
+                .ReturnsAsync(new List<Employee>()
+                {
+                    new Employee()
+                    {
+                        Id = 1,
+                        FirstName = "John",
+                        LastName = "Doe",
+                        Ssn = "123-45-6789",
+                        Username = "jdoe",
+                        Password = encryptedPass,
+                        Role = "Employee",
+                        IsLocked = false,
+                        FailedLoginAttempts = 0,
+                        TempPasswordChanged = false,
+                        Status = false,
+                        Active = true
+                    }
+                });
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            await employeeService.GetAllEmployees(1, 10);
+            var employees = await employeeService.GetAllEmployees(1, 10);
 
-            _employeeRepository.Verify(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            Assert.IsNotEmpty(employees);
+            Assert.AreEqual("John", employees[0].FirstName);
+            Assert.AreEqual("Doe", employees[0].LastName);
+            Assert.AreEqual("123-45-6789", employees[0].GetNotSanitizedSSN());
+            Assert.AreEqual("***-**-6789", employees[0].Ssn);
+            Assert.AreEqual("Employee", employees[0].Role);
+            Assert.AreEqual("jdoe", employees[0].Username);
+            Assert.IsTrue(employees[0].Active);
         }
 
         [Test]
         public void GetEmployeeById_EmployeeDoesNotExist()
         {
             _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
-                .ThrowsAsync(new ArgumentException());
+                .ReturnsAsync((Employee)null);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
-
-            Assert.ThrowsAsync<ArgumentException>(() => employeeService.GetEmployeeById(0));
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
+            
+            Assert.ThrowsAsync<ArgumentException>(() => employeeService.GetEmployeeById(2));
         }
 
         [Test]
         public async Task GetEmployeeById_Success()
         {
+            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
+
             _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
-                .ReturnsAsync(new Employee());
+                .ReturnsAsync(new Employee() 
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Ssn = "123-45-6789",
+                    Username = "jdoe",
+                    Password = encryptedPass,
+                    Role = "Employee",
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false,
+                    Status = false,
+                    Active = true
+                });
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            await employeeService.GetEmployeeById(1);
+            var employee = await employeeService.GetEmployeeById(1);
 
-            _employeeRepository.Verify(e => e.GetEmployeeById(It.IsAny<long>()), Times.Once);
+            Assert.IsNotNull(employee);
+            Assert.AreEqual("John", employee.FirstName);
+            Assert.AreEqual("Doe", employee.LastName);
+            Assert.AreEqual("123-45-6789", employee.GetNotSanitizedSSN());
+            Assert.AreEqual("***-**-6789", employee.Ssn);
+            Assert.AreEqual("Employee", employee.Role);
+            Assert.AreEqual("jdoe", employee.Username);
+            Assert.IsTrue(employee.Active);
+            Assert.IsFalse(employee.IsLocked);
+            Assert.AreEqual(0, employee.FailedLoginAttempts);
         }
 
         [Test]
         public void GetEmployeeByUsername_EmployeeDoesNotExist()
         {
             _employeeRepository.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
-                .ThrowsAsync(new ArgumentException());
+                .ReturnsAsync((Employee)null);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            Assert.ThrowsAsync<ArgumentException>(() => employeeService.GetEmployeeByUsername("JDoe"));
+            Assert.ThrowsAsync<ArgumentException>(() => employeeService.GetEmployeeByUsername("jdoe"));
         }
 
         [Test]
         public async Task GetEmployeeByUsername_Success()
         {
+            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
+
             _employeeRepository.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
-                .ReturnsAsync(new Employee());
+                .ReturnsAsync(new Employee()
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Ssn = "123-45-6789",
+                    Username = "jdoe",
+                    Password = encryptedPass,
+                    Role = "Employee",
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false,
+                    Status = false,
+                    Active = true
+                });
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            await employeeService.GetEmployeeByUsername("JDoe");
+            var employee = await employeeService.GetEmployeeByUsername("jdoe");
 
-            _employeeRepository.Verify(e => e.GetEmployeeByUsername(It.IsAny<string>()), Times.Once);
+            Assert.IsNotNull(employee);
+            Assert.AreEqual("John", employee.FirstName);
+            Assert.AreEqual("Doe", employee.LastName);
+            Assert.AreEqual("123-45-6789", employee.GetNotSanitizedSSN());
+            Assert.AreEqual("***-**-6789", employee.Ssn);
+            Assert.AreEqual("Employee", employee.Role);
+            Assert.AreEqual("jdoe", employee.Username);
+            Assert.AreEqual(encryptedPass, employee.Password);
+            Assert.IsTrue(employee.Active);
+            Assert.IsFalse(employee.IsLocked);
+            Assert.AreEqual(0, employee.FailedLoginAttempts);
+            Assert.IsFalse(employee.TempPasswordChanged);
+            Assert.IsFalse(employee.Status);
         }
 
         [Test]
         public void IncrementEmployeeFailedLoginAttempt_EmployeeDoesNotExist()
         {
             _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
-                .ThrowsAsync(new ArgumentException());
+                .ReturnsAsync((Employee)null);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.IncrementEmployeeFailedLoginAttempt(0));
         }
 
         [Test]
+        public async Task IncrementEmployeeFailedLoginAttempt_AccountAlreadyLocked()
+        {
+            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
+
+            _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
+                .ReturnsAsync(new Employee()
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Ssn = "123-45-6789",
+                    Username = "jdoe",
+                    Password = encryptedPass,
+                    Role = "Employee",
+                    IsLocked = true,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false,
+                    Status = false,
+                    Active = true
+                });
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
+
+            var employee = await employeeService.GetEmployeeById(1);
+            await employeeService.IncrementEmployeeFailedLoginAttempt(employee.Id);
+
+            Assert.IsTrue(employee.IsLocked);
+        }
+
+        [Test]
+        public async Task IncrementEmployeeFailedLoginAttempt_AttemptsNot3()
+        {
+            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
+
+            _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
+                .ReturnsAsync(new Employee()
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Ssn = "123-45-6789",
+                    Username = "jdoe",
+                    Password = encryptedPass,
+                    Role = "Employee",
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false,
+                    Status = false,
+                    Active = true
+                });
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
+
+            var employee = await employeeService.GetEmployeeById(1);
+
+            _employeeRepository.Setup(e => e.IncrementEmployeeFailedLoginAttempt(It.Is<long>(i => i.Equals(employee.Id))))
+                .ReturnsAsync(employee.FailedLoginAttempts + 1);
+                
+            await employeeService.IncrementEmployeeFailedLoginAttempt(employee.Id);
+
+            Assert.AreNotEqual(3, employee.FailedLoginAttempts);
+        }
+
+        [Test]
         public async Task IncrementEmployeeFailedLoginAttempt_Success()
         {
+            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
+
             _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
-                .ReturnsAsync(new Employee());
+                .ReturnsAsync(new Employee()
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Ssn = "123-45-6789",
+                    Username = "jdoe",
+                    Password = encryptedPass,
+                    Role = "Employee",
+                    IsLocked = false,
+                    FailedLoginAttempts = 2,
+                    TempPasswordChanged = false,
+                    Status = false,
+                    Active = true
+                });
 
-            _employeeRepository.Setup(e => e.IncrementEmployeeFailedLoginAttempt(It.IsAny<long>()))
-                .ReturnsAsync(1);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employee = await employeeService.GetEmployeeById(1);
 
-            await employeeService.IncrementEmployeeFailedLoginAttempt(1);
+            _employeeRepository.Setup(e => e.IncrementEmployeeFailedLoginAttempt(It.Is<long>(i => i.Equals(employee.Id))))
+                .ReturnsAsync(employee.FailedLoginAttempts + 1);
+
+            await employeeService.IncrementEmployeeFailedLoginAttempt(employee.Id);
 
             _employeeRepository.Verify(e => e.IncrementEmployeeFailedLoginAttempt(It.IsAny<long>()), Times.Once);
         }
@@ -133,7 +298,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.ResetEmployeeFailedLoginAttempt(It.IsAny<long>()))
                 .ThrowsAsync(new ArgumentException());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.ResetEmployeeFailedLoginAttempt(0));
         }
@@ -147,7 +312,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.UpdateEmployeeIsLockedStatus(It.IsAny<long>(), It.Is<bool>(l => l.Equals(false))))
                 .Returns(Task.CompletedTask);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             await employeeService.ResetEmployeeFailedLoginAttempt(1);
 
@@ -160,7 +325,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.UpdateEmployeeActiveStatus(It.IsAny<long>(), It.IsAny<bool>()))
                 .ThrowsAsync(new ArgumentException());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.UpdateEmployeeActiveStatus(0, It.IsAny<bool>()));
         }
@@ -171,7 +336,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.UpdateEmployeeActiveStatus(It.IsAny<long>(), It.IsAny<bool>()))
                 .Returns(Task.CompletedTask);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             await employeeService.UpdateEmployeeActiveStatus(1, false);
 
@@ -184,7 +349,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.UpdateEmployeeInformation(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new ArgumentException());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.UpdateEmployeeInformation(new Domain.Models.Employee()));
         }
@@ -198,7 +363,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.UpdateEmployeeInformation(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             await employeeService.UpdateEmployeeInformation(new Domain.Models.Employee() { Id = 1, Username = "jdoe", FirstName = "John", LastName = "Doe", Role = "Employee", Ssn = "123-45-6789"});
 
@@ -211,7 +376,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()))
                 .ThrowsAsync(new ArgumentException());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.CreateEmployee(new Domain.Models.Employee(), "tE$t1234"));
         }
@@ -237,7 +402,7 @@ namespace EmployeeManagementService.Test.Service
                 It.Is<string>(s => s.Equals(newEmployee.Ssn)), It.Is<byte[]>(p => p.Equals(newEmployee.Password)), It.Is<string>(r => r.Equals(newEmployee.Role)), It.Is<bool?>(a => a.Equals(newEmployee.Active))))
                 .ThrowsAsync(new ArgumentException());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.CreateEmployee(new Domain.Models.Employee(), "tE$t1234"));
         }
@@ -245,13 +410,10 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public void CreateEmployee_PasswordRequirementNotMet()
         {
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.Is<string>(p => p.Equals("tE$t1"))))
-                .Returns(false);
-
             _employeeRepository.Setup(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(u => u.Equals("Jdoe")), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()))
                 .ThrowsAsync(new ArgumentException());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.CreateEmployee(new Domain.Models.Employee(), "abc123"));
         }
@@ -259,13 +421,10 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public void CreateEmployee_PasswordEncryptionFail()
         {
-            _passwordService.Setup(p => p.EncryptPassword(It.Is<string>(p => p.Equals("tE$t1234"))))
-                .Throws(new Exception());
-
             _employeeRepository.Setup(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(u => u.Equals("Jdoe")), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()))
                 .ThrowsAsync(new ArgumentException());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.CreateEmployee(new Domain.Models.Employee(), "tE$t1234"));
         }
@@ -284,16 +443,10 @@ namespace EmployeeManagementService.Test.Service
                 Active = true
             };
 
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.Is<string>(p => p.Equals("tE$t1234"))))
-                .Returns(true);
-
-            _passwordService.Setup(p => p.EncryptPassword(It.Is<string>(p => p.Equals("tE$t1234"))))
-                .Returns(new byte[32]);
-
             _employeeRepository.Setup(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(u => u.Equals("Jdoe")), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()))
                 .Returns(Task.CompletedTask);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             await employeeService.CreateEmployee(newEmployee, "tE$t1234");
 
@@ -309,7 +462,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.UpdateEmployeeLoginStatus(It.IsAny<long>(), It.Is<bool>(s => s.Equals(true))))
                 .ThrowsAsync(new Exception());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.EmployeeLogIn("jdoe", "tE$t1234"));
         }
@@ -320,10 +473,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
                 .ReturnsAsync(new Employee());
 
-            _passwordService.Setup(p => p.VerifyPasswordHash(It.IsAny<string>(), It.IsAny<byte[]>()))
-                .Throws(new ArgumentException());
-
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.EmployeeLogIn("jdoe", "tE$t1234"));
         }
@@ -334,13 +484,10 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
                 .ReturnsAsync(new Employee());
 
-            _passwordService.Setup(p => p.VerifyPasswordHash(It.IsAny<string>(), It.IsAny<byte[]>()))
-                .Returns(true);
-
             _employeeRepository.Setup(e => e.UpdateEmployeeLoginStatus(It.IsAny<long>(), It.Is<bool>(s => s.Equals(true))))
                 .Returns(Task.CompletedTask);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             await employeeService.EmployeeLogIn("jdoe", "tE$t1234");
 
@@ -356,7 +503,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.UpdateEmployeeLoginStatus(It.IsAny<long>(), It.Is<bool>(s => s.Equals(false))))
                 .ThrowsAsync(new Exception());
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.EmployeeLogout(1));
         }
@@ -370,7 +517,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.UpdateEmployeeLoginStatus(It.IsAny<long>(), It.Is<bool>(s => s.Equals(false))))
                 .Returns(Task.CompletedTask);
 
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             await employeeService.EmployeeLogout(1);
 
@@ -383,10 +530,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
                 .ReturnsAsync(new Employee());
 
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(false);
-
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.UpdatePassword(1, "tE$t1234"));
         }
@@ -397,13 +541,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
                 .ReturnsAsync(new Employee());
 
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(true);
-
-            _passwordService.Setup(p => p.VerifyPasswordHash(It.IsAny<string>(), It.IsAny<byte[]>()))
-                .Returns(true);
-
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.UpdatePassword(1, "tE$t1234"));
         }
@@ -414,13 +552,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
                 .ReturnsAsync(new Employee());
 
-            _passwordService.Setup(p => p.VerifyPasswordRequirements(It.IsAny<string>()))
-                .Returns(true);
-
-            _passwordService.Setup(p => p.VerifyPasswordHash(It.IsAny<string>(), It.IsAny<byte[]>()))
-                .Returns(false);
-
-            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService.Object, _config.Object);
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             await employeeService.UpdatePassword(1, "tE$t1234");
 
