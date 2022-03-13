@@ -143,12 +143,14 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException("Username already exists");
             }
 
+            if (!_passwordService.VerifyPasswordRequirements(password))
+            {
+                throw new ArgumentException("Password does not meet requirements");
+            }
+
             byte[] encryptedPass = null;
 
-            if (_passwordService.VerifyPasswordRequirements(password))
-            {
-                encryptedPass = _passwordService.EncryptPassword(password);
-            }
+            encryptedPass = _passwordService.EncryptPassword(password);
 
             var roles = _roles.Split(",");
 
@@ -171,7 +173,7 @@ namespace EmployeeManagementService.Domain.Services
 
             if (employee.Status == true)
             {
-                return;
+                throw new ArgumentException("Employee already logged in");
             }
 
             await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, true);
@@ -183,7 +185,7 @@ namespace EmployeeManagementService.Domain.Services
 
             if (employee.Status == false)
             {
-                return;
+                throw new ArgumentException("Employee already logged out");
             }
 
             await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, false);
