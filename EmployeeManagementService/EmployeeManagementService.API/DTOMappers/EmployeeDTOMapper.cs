@@ -25,7 +25,7 @@ namespace EmployeeManagementService.API.DTOMappers
             return dtoEmp;
         }
 
-        public static CoreEmployee FromCoreEmployee(DTOEmployee dtoEmp)
+        public static CoreEmployee FromDTOEmployee(DTOEmployee dtoEmp)
         {
             var coreEmp = new CoreEmployee();
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using EmployeeManagementService.API.DTO;
+using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagementService.API.Controllers
@@ -24,7 +24,16 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                return Ok(await _employeeService.GetAllEmployees(page, offset));
+                var employeeList = new List<EmployeeDTO>();
+
+                var employees = await _employeeService.GetAllEmployees(page, offset);
+
+                foreach(var employee in employees)
+                {
+                    employeeList.Add(EmployeeDTOMapper.ToDTOEmployee(employee));
+                }
+
+                return Ok(employeeList);
             }
             catch (Exception ex)
             {
@@ -37,7 +46,9 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                return Ok(await _employeeService.GetEmployeeById(id));
+                var employee = await _employeeService.GetEmployeeById(id);
+
+                return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
             }
             catch (Exception ex)
             {
@@ -50,7 +61,9 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                return Ok(await _employeeService.GetEmployeeByUsername(username));
+                var employee = await _employeeService.GetEmployeeByUsername(username);
+
+                return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
             }
             catch (Exception ex)
             {
