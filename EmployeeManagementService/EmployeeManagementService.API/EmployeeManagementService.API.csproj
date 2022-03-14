@@ -12,9 +12,5 @@
     <ProjectReference Include="..\EmployeeManagementService.Domain\EmployeeManagementService.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOMappers\" />
-  </ItemGroup>
-
 
 </Project>
