@@ -70,5 +70,35 @@ namespace EmployeeManagementService.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateEmployee([FromBody] EmployeeDTO employee)
+        {
+            try
+            {
+                await _employeeService.CreateEmployee(EmployeeDTOMapper.FromDTOEmployee(employee), employee.Password);
+
+                return StatusCode(201);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPut("info")]
+        public async Task<IActionResult> UpdateEmployeeInformation([FromBody] EmployeeDTO employee)
+        {
+            try
+            {
+                await _employeeService.UpdateEmployeeInformation(EmployeeDTOMapper.FromDTOEmployee(employee));
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

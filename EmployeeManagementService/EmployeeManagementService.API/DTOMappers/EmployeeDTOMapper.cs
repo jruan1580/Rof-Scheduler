@@ -14,7 +14,6 @@ namespace EmployeeManagementService.API.DTOMappers
             dtoEmp.LastName = coreEmp.LastName;
             dtoEmp.Ssn = coreEmp.Ssn;
             dtoEmp.Username = coreEmp.Username;
-            dtoEmp.Password = coreEmp.Password;
             dtoEmp.Role = coreEmp.Role;
             dtoEmp.IsLocked = coreEmp.IsLocked;
             dtoEmp.FailedLoginAttempts = coreEmp.FailedLoginAttempts;
@@ -34,7 +33,6 @@ namespace EmployeeManagementService.API.DTOMappers
             coreEmp.LastName = dtoEmp.LastName;
             coreEmp.Ssn = dtoEmp.Ssn;
             coreEmp.Username = dtoEmp.Username;
-            coreEmp.Password = dtoEmp.Password;
             coreEmp.Role = dtoEmp.Role;
             coreEmp.IsLocked = dtoEmp.IsLocked;
             coreEmp.FailedLoginAttempts = dtoEmp.FailedLoginAttempts;
