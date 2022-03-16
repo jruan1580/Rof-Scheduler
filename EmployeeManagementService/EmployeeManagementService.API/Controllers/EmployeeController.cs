@@ -86,7 +86,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpPut("update/info")]
+        [HttpPut("info")]
         public async Task<IActionResult> UpdateEmployeeInformation([FromBody] EmployeeDTO employee)
         {
             try
