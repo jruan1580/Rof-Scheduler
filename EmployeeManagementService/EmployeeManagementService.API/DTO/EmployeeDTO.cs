@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace EmployeeManagementService.API.DTO
+﻿namespace EmployeeManagementService.API.DTO
 {
     public class EmployeeDTO
     {
@@ -19,7 +14,7 @@ namespace EmployeeManagementService.API.DTO
 
         public string Username { get; set; }
 
-        public byte[] Password { get; set; }
+        public string Password { get; set; }
 
         public string Role { get; set; }
 
