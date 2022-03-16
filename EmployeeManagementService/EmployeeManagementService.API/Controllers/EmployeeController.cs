@@ -100,5 +100,50 @@ namespace EmployeeManagementService.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPatch("login")]
+        public async Task<IActionResult> EmployeeLogin([FromBody] EmployeeDTO employee)
+        {
+            try
+            {
+                await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
+
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPatch("logout/{id}")]
+        public async Task<IActionResult> EmployeeLogput(long id)
+        {
+            try
+            {
+                await _employeeService.EmployeeLogout(id);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPatch("reset/locked/{id}")]
+        public async Task<IActionResult> ResetLockedStatus(long id)
+        {
+            try
+            {
+                await _employeeService.ResetEmployeeFailedLoginAttempt(id);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
