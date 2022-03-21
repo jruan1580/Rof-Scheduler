@@ -159,7 +159,8 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException("Invalid role assigned");
             }
 
-            await _employeeRepository.CreateEmployee(newEmployee.FirstName, newEmployee.LastName, newEmployee.Username, newEmployee.Ssn, encryptedPass, newEmployee.Role, newEmployee.Active);
+            await _employeeRepository.CreateEmployee(newEmployee.FirstName, newEmployee.LastName, newEmployee.Username, newEmployee.Ssn, encryptedPass, newEmployee.Role, 
+                newEmployee.AddressLine1, newEmployee.AddressLine2, newEmployee.City, newEmployee.State, newEmployee.ZipCode, newEmployee.Active);
         }
 
         public async Task EmployeeLogIn(string username, string password)

@@ -9,12 +9,14 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 {
     public interface IEmployeeRepository
     {
-        Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool? active = true);
+        Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, string a1, string a2, string city, string state, string zip, bool? active = true);
+        Task<Employee> GetAddressById(long id);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
         Task<Employee> GetEmployeeById(long id);
         Task<Employee> GetEmployeeByUsername(string username);
         Task<int> IncrementEmployeeFailedLoginAttempt(long id);
         Task ResetEmployeeFailedLoginAttempt(long id);
+        Task UpdateAddress(string a1, string a2, string city, string state, string zip);
         Task UpdateEmployeeActiveStatus(long id, bool active);
         Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn);
         Task UpdateEmployeeIsLockedStatus(long id, bool isLocked);
@@ -59,7 +61,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool? active = true)
+        public async Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, string a1, string a2, string city, string state, string zip, bool? active = true)
         {
             using (var context = new RofSchedulerContext())
             {
@@ -71,7 +73,12 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                     Password = password,
                     Role = role,
                     Ssn = ssn,
-                    Active = active
+                    Active = active,
+                    AddressLine1 = a1,
+                    AddressLine2 = a2,
+                    City = city,
+                    State = state,
+                    ZipCode = zip
                 };
 
                 context.Employees.Add(employee);
@@ -147,7 +154,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 }
 
                 employee.FailedLoginAttempts += 1;
-                
+
                 await context.SaveChangesAsync();
 
                 return employee.FailedLoginAttempts;
@@ -205,6 +212,24 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
+        public async Task<Employee> GetAddressById(long id)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Employees.Select(e => CreateGetEmployeeAddressObj(e)).FirstOrDefaultAsync(e => e.Id == id);
+            }
+        }
+
+        public async Task UpdateAddress(string a1, string a2, string city, string state, string zip)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+
+
+                await context.SaveChangesAsync();
+            }
+        }
+
         private Employee CreateGetAllEmployeeObj(Employee e)
         {
             return new Employee()
@@ -230,6 +255,18 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 Active = e.Active,
                 IsLocked = e.IsLocked,
                 FailedLoginAttempts = e.FailedLoginAttempts
+            };
+        }
+
+        private Employee CreateGetEmployeeAddressObj(Employee e)
+        {
+            return new Employee()
+            {
+                AddressLine1 = e.AddressLine1,
+                AddressLine2 = e.AddressLine2,
+                City = e.City,
+                State = e.State,
+                ZipCode = e.ZipCode
             };
         }
     }

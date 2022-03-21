@@ -1,3 +1,5 @@
+using EmployeeManagementService.Domain.Services;
+using EmployeeManagementService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -25,7 +27,12 @@ namespace EmployeeManagementService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
+            services.AddTransient<IEmployeeService, EmployeeService>();
+            services.AddTransient<IPasswordService, PasswordService>();
+            services.AddMvc();
             services.AddControllers();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +46,10 @@ namespace EmployeeManagementService.API
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
