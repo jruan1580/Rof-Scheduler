@@ -10,13 +10,13 @@ namespace EmployeeManagementService.Infrastructure.Persistence
     public interface IEmployeeRepository
     {
         Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, string a1, string a2, string city, string state, string zip, bool? active = true);
-        Task<Employee> GetAddressById(long id);
+        Task<Employee> GetAddressByEmployeeId(long id);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
         Task<Employee> GetEmployeeById(long id);
         Task<Employee> GetEmployeeByUsername(string username);
         Task<int> IncrementEmployeeFailedLoginAttempt(long id);
         Task ResetEmployeeFailedLoginAttempt(long id);
-        Task UpdateAddress(string a1, string a2, string city, string state, string zip);
+        Task UpdateAddress(long id, string a1, string a2, string city, string state, string zip);
         Task UpdateEmployeeActiveStatus(long id, bool active);
         Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn);
         Task UpdateEmployeeIsLockedStatus(long id, bool isLocked);
@@ -212,7 +212,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<Employee> GetAddressById(long id)
+        public async Task<Employee> GetAddressByEmployeeId(long id)
         {
             using (var context = new RofSchedulerContext())
             {
@@ -220,11 +220,22 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task UpdateAddress(string a1, string a2, string city, string state, string zip)
+        public async Task UpdateAddress(long id, string a1, string a2, string city, string state, string zip)
         {
             using (var context = new RofSchedulerContext())
             {
+                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
 
+                if (employee == null)
+                {
+                    throw new ArgumentException("No employee found.");
+                }
+
+                employee.AddressLine1 = a1;
+                employee.AddressLine2 = a2;
+                employee.City = city;
+                employee.State = state;
+                employee.ZipCode = zip;
 
                 await context.SaveChangesAsync();
             }

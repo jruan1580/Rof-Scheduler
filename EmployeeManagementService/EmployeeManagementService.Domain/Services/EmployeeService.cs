@@ -14,11 +14,13 @@ namespace EmployeeManagementService.Domain.Services
         Task CreateEmployee(Employee newEmployee, string password);
         Task EmployeeLogIn(string username, string password);
         Task EmployeeLogout(long id);
+        Task<Employee> GetAddressByEmployeeId(long id);
         Task<List<Employee>> GetAllEmployees(int page, int offset);
         Task<Employee> GetEmployeeById(long id);
         Task<Employee> GetEmployeeByUsername(string username);
         Task IncrementEmployeeFailedLoginAttempt(long id);
         Task ResetEmployeeFailedLoginAttempt(long id);
+        Task UpdateAddress(long id, string a1, string a2, string city, string state, string zip);
         Task UpdateEmployeeActiveStatus(long id, bool active);
         Task UpdateEmployeeInformation(Employee employee);
         Task UpdatePassword(long id, string newPassword);
@@ -159,7 +161,7 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException("Invalid role assigned");
             }
 
-            await _employeeRepository.CreateEmployee(newEmployee.FirstName, newEmployee.LastName, newEmployee.Username, newEmployee.Ssn, encryptedPass, newEmployee.Role, 
+            await _employeeRepository.CreateEmployee(newEmployee.FirstName, newEmployee.LastName, newEmployee.Username, newEmployee.Ssn, encryptedPass, newEmployee.Role,
                 newEmployee.AddressLine1, newEmployee.AddressLine2, newEmployee.City, newEmployee.State, newEmployee.ZipCode, newEmployee.Active);
         }
 
@@ -209,6 +211,25 @@ namespace EmployeeManagementService.Domain.Services
             var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
 
             await _employeeRepository.UpdatePassword(employee.Id, newEncryptedPass);
+        }
+
+        public async Task<Employee> GetAddressByEmployeeId(long id)
+        {
+            var employeeAddress = await _employeeRepository.GetAddressByEmployeeId(id);
+
+            if (employeeAddress == null)
+            {
+                throw new ArgumentException("Employee does not exist.");
+            }
+
+            return EmployeeMapper.ToCoreEmployee(employeeAddress);
+        }
+
+        public async Task UpdateAddress(long id, string a1, string a2, string city, string state, string zip)
+        {
+            var employeeAddress = await GetAddressByEmployeeId(id);
+
+            await _employeeRepository.UpdateAddress(employeeAddress.Id, a1, a2, city, state, zip);
         }
     }
 }
