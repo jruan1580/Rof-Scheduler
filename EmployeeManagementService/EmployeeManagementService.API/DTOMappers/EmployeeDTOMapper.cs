@@ -20,6 +20,12 @@ namespace EmployeeManagementService.API.DTOMappers
             dtoEmp.TempPasswordChanged = coreEmp.TempPasswordChanged;
             dtoEmp.Status = coreEmp.Status;
             dtoEmp.Active = coreEmp.Active;
+            dtoEmp.Address.AddressLine1 = coreEmp.Address.AddressLine1;
+            dtoEmp.Address.AddressLine2 = coreEmp.Address.AddressLine2;
+            dtoEmp.Address.City = coreEmp.Address.City;
+            dtoEmp.Address.State = coreEmp.Address.State;
+            dtoEmp.Address.ZipCode = coreEmp.Address.ZipCode;
+
 
             return dtoEmp;
         }
@@ -39,6 +45,11 @@ namespace EmployeeManagementService.API.DTOMappers
             coreEmp.TempPasswordChanged = dtoEmp.TempPasswordChanged;
             coreEmp.Status = dtoEmp.Status;
             coreEmp.Active = dtoEmp.Active;
+            coreEmp.Address.AddressLine1 = dtoEmp.Address.AddressLine1;
+            coreEmp.Address.AddressLine2 = dtoEmp.Address.AddressLine2;
+            coreEmp.Address.City = dtoEmp.Address.City;
+            coreEmp.Address.State = dtoEmp.Address.State;
+            coreEmp.Address.ZipCode = dtoEmp.Address.ZipCode;
 
             return coreEmp;
         }

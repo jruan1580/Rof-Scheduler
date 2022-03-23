@@ -20,11 +20,11 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             coreEmp.TempPasswordChanged = dbEmployee.TempPasswordChanged;
             coreEmp.Status = dbEmployee.Status;
             coreEmp.Active = dbEmployee.Active;
-            coreEmp.AddressLine1 = dbEmployee.AddressLine1;
-            coreEmp.AddressLine2 = dbEmployee.AddressLine2;
-            coreEmp.City = dbEmployee.City;
-            coreEmp.State = dbEmployee.State;
-            coreEmp.ZipCode = dbEmployee.ZipCode;
+            coreEmp.Address.AddressLine1 = dbEmployee.AddressLine1;
+            coreEmp.Address.AddressLine2 = dbEmployee.AddressLine2;
+            coreEmp.Address.City = dbEmployee.City;
+            coreEmp.Address.State = dbEmployee.State;
+            coreEmp.Address.ZipCode = dbEmployee.ZipCode;
 
             coreEmp.SetSSN(dbEmployee.Ssn);
 
@@ -48,11 +48,11 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             entity.TempPasswordChanged = coreEmployee.TempPasswordChanged;
             entity.Status = coreEmployee.Status;
             entity.Active = coreEmployee.Active;
-            entity.AddressLine1 = coreEmployee.AddressLine1;
-            entity.AddressLine2 = coreEmployee.AddressLine2;
-            entity.City = coreEmployee.City;
-            entity.State = coreEmployee.State;
-            entity.ZipCode = coreEmployee.ZipCode;
+            entity.AddressLine1 = coreEmployee.Address.AddressLine1;
+            entity.AddressLine2 = coreEmployee.Address.AddressLine2;
+            entity.City = coreEmployee.Address.City;
+            entity.State = coreEmployee.Address.State;
+            entity.ZipCode = coreEmployee.Address.ZipCode;
 
             entity.Ssn = coreEmployee.GetNotSanitizedSSN();
 
