@@ -131,7 +131,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpPatch("reset/locked/{id}")]
+        [HttpPatch("reset/{id}/locked")]
         public async Task<IActionResult> ResetLockedStatus(long id)
         {
             try
