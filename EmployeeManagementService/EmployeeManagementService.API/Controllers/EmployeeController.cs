@@ -10,84 +10,18 @@ namespace EmployeeManagementService.API.Controllers
 {
     [Route("api/employee")]
     [ApiController]
-    public class EmployeeController : ControllerBase
+    public class EmployeeController : AEmployeeController
     {
         private readonly IEmployeeService _employeeService;
 
-        public EmployeeController(IEmployeeService employeeService)
+        public EmployeeController(IEmployeeService employeeService) : base(employeeService)
         {
             _employeeService = employeeService;
         }
-
-        [HttpGet("all/{page}/{offset}")]
-        public async Task<IActionResult> GetAllEmployees(int page, int offset)
-        {
-            try
-            {
-                var employeeList = new List<EmployeeDTO>();
-
-                var employees = await _employeeService.GetAllEmployees(page, offset);
-
-                foreach(var employee in employees)
-                {
-                    employeeList.Add(EmployeeDTOMapper.ToDTOEmployee(employee));
-                }
-
-                return Ok(employeeList);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        [HttpGet("one/{id}")]
-        public async Task<IActionResult> GetEmployeeById(long id)
-        {
-            try
-            {
-                var employee = await _employeeService.GetEmployeeById(id);
-
-                return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        [HttpGet("one/{username}")]
-        public async Task<IActionResult> GetEmployeeById(string username)
-        {
-            try
-            {
-                var employee = await _employeeService.GetEmployeeByUsername(username);
-
-                return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateEmployee([FromBody] EmployeeDTO employee)
-        {
-            try
-            {
-                await _employeeService.CreateEmployee(EmployeeDTOMapper.FromDTOEmployee(employee), employee.Password);
-
-                return StatusCode(201);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
+            
 
         [HttpPut("info")]
-        public async Task<IActionResult> UpdateEmployeeInformation([FromBody] EmployeeDTO employee)
+        public override async Task<IActionResult> UpdateEmployeeInformation([FromBody] EmployeeDTO employee)
         {
             try
             {
@@ -99,51 +33,6 @@ namespace EmployeeManagementService.API.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
-        }
-
-        [HttpPatch("login")]
-        public async Task<IActionResult> EmployeeLogin([FromBody] EmployeeDTO employee)
-        {
-            try
-            {
-                await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
-
-                return Ok();
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        [HttpPatch("logout/{id}")]
-        public async Task<IActionResult> EmployeeLogput(long id)
-        {
-            try
-            {
-                await _employeeService.EmployeeLogout(id);
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        [HttpPatch("reset/{id}/locked")]
-        public async Task<IActionResult> ResetLockedStatus(long id)
-        {
-            try
-            {
-                await _employeeService.ResetEmployeeFailedLoginAttempt(id);
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
+        }              
     }
 }

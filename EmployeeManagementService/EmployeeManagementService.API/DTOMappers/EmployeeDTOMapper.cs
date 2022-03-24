@@ -1,13 +1,13 @@
-﻿using DTOEmployee = EmployeeManagementService.API.DTO.EmployeeDTO;
-using CoreEmployee = EmployeeManagementService.Domain.Models.Employee;
+﻿using CoreEmployee = EmployeeManagementService.Domain.Models.Employee;
+using EmployeeManagementService.API.DTO;
 
 namespace EmployeeManagementService.API.DTOMappers
 {
     public class EmployeeDTOMapper
     {
-        public static DTOEmployee ToDTOEmployee(CoreEmployee coreEmp)
+        public static EmployeeDTO ToDTOEmployee(CoreEmployee coreEmp)
         {
-            var dtoEmp = new DTOEmployee();
+            var dtoEmp = new EmployeeDTO();
 
             dtoEmp.Id = coreEmp.Id;
             dtoEmp.FirstName = coreEmp.FirstName;
@@ -21,17 +21,27 @@ namespace EmployeeManagementService.API.DTOMappers
             dtoEmp.Status = coreEmp.Status;
             dtoEmp.Active = coreEmp.Active;
 
+            dtoEmp.Address = new AddressDTO();
+            dtoEmp.Address.AddressLine1 = coreEmp.Address?.AddressLine1;
+            dtoEmp.Address.AddressLine2 = coreEmp.Address?.AddressLine2;
+            dtoEmp.Address.City = coreEmp.Address?.City;
+            dtoEmp.Address.State = coreEmp.Address?.State;
+            dtoEmp.Address.ZipCode = coreEmp.Address?.ZipCode;
+
+
             return dtoEmp;
         }
 
-        public static CoreEmployee FromDTOEmployee(DTOEmployee dtoEmp)
+        public static CoreEmployee FromDTOEmployee(EmployeeDTO dtoEmp)
         {
             var coreEmp = new CoreEmployee();
 
             coreEmp.Id = dtoEmp.Id;
             coreEmp.FirstName = dtoEmp.FirstName;
             coreEmp.LastName = dtoEmp.LastName;
-            coreEmp.Ssn = dtoEmp.Ssn;
+            
+            coreEmp.SetSSN(dtoEmp.Ssn);
+            
             coreEmp.Username = dtoEmp.Username;
             coreEmp.Role = dtoEmp.Role;
             coreEmp.IsLocked = dtoEmp.IsLocked;
@@ -39,6 +49,8 @@ namespace EmployeeManagementService.API.DTOMappers
             coreEmp.TempPasswordChanged = dtoEmp.TempPasswordChanged;
             coreEmp.Status = dtoEmp.Status;
             coreEmp.Active = dtoEmp.Active;
+
+            coreEmp.SetAddress(dtoEmp.Address?.AddressLine1, dtoEmp.Address?.AddressLine2, dtoEmp.Address?.City, dtoEmp.Address?.State, dtoEmp.Address?.ZipCode);          
 
             return coreEmp;
         }

@@ -243,7 +243,12 @@ namespace EmployeeManagementService.Test.Service
                     FailedLoginAttempts = 0,
                     TempPasswordChanged = false,
                     Status = false,
-                    Active = true
+                    Active = true,
+                    AddressLine1 = "123 Abc St",
+                    AddressLine2 = "",
+                    City = "Oakland",
+                    State = "CA",
+                    ZipCode = "12345"
                 });
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
@@ -277,7 +282,12 @@ namespace EmployeeManagementService.Test.Service
                     FailedLoginAttempts = 2,
                     TempPasswordChanged = false,
                     Status = false,
-                    Active = true
+                    Active = true,
+                    AddressLine1 = "123 Abc St",
+                    AddressLine2 = "",
+                    City = "Oakland",
+                    State = "CA",
+                    ZipCode = "12345"
                 });
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
@@ -322,7 +332,12 @@ namespace EmployeeManagementService.Test.Service
                     FailedLoginAttempts = 3,
                     TempPasswordChanged = false,
                     Status = false,
-                    Active = true
+                    Active = true,
+                    AddressLine1 = "123 Abc St",
+                    AddressLine2 = "",
+                    City = "Oakland",
+                    State = "CA",
+                    ZipCode = "12345"
                 }); ;
             
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
@@ -362,7 +377,12 @@ namespace EmployeeManagementService.Test.Service
                     FailedLoginAttempts = 0,
                     TempPasswordChanged = false,
                     Status = false,
-                    Active = true
+                    Active = true,
+                    AddressLine1 = "123 Abc St", 
+                    AddressLine2 = "", 
+                    City = "Oakland", 
+                    State = "CA", 
+                    ZipCode = "12345"
                 }); ;
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
@@ -420,14 +440,21 @@ namespace EmployeeManagementService.Test.Service
                 LastName = "Doe",
                 Ssn = "123-45-6789",
                 Username = "jdoe",
-                Role = "Employee"
+                Role = "Employee",
+                Address = new Domain.Models.Address {AddressLine1 = "123 Abc St", AddressLine2 = "", City = "Oakland", State = "CA", ZipCode = "12345"}
             };
+
+            _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
+                .ReturnsAsync(new Employee()
+                {
+                    Id = 1                   
+                });
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             await employeeService.UpdateEmployeeInformation(employee);
 
-            _employeeRepository.Verify(e => e.UpdateEmployeeInformation(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _employeeRepository.Verify(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()), Times.Once);
         }
 
         [Test]
@@ -514,7 +541,7 @@ namespace EmployeeManagementService.Test.Service
 
             await employeeService.CreateEmployee(newEmployee, "tE$t1234");
 
-            _employeeRepository.Verify(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), It.IsAny<bool?>()), Times.Once);
+            _employeeRepository.Verify(e => e.CreateEmployee(It.IsAny<Employee>()), Times.Once);
         }
 
         [Test]

@@ -21,6 +21,8 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             coreEmp.Status = dbEmployee.Status;
             coreEmp.Active = dbEmployee.Active;
 
+            coreEmp.SetAddress(dbEmployee.AddressLine1, dbEmployee.AddressLine2, dbEmployee.City, dbEmployee.State, dbEmployee.ZipCode);
+
             coreEmp.SetSSN(dbEmployee.Ssn);
 
             coreEmp.SetFullName();
@@ -42,7 +44,13 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             entity.FailedLoginAttempts = coreEmployee.FailedLoginAttempts;
             entity.TempPasswordChanged = coreEmployee.TempPasswordChanged;
             entity.Status = coreEmployee.Status;
-            entity.Active = coreEmployee.Active;
+            entity.Active = coreEmployee.Active;            
+
+            entity.AddressLine1 = coreEmployee.Address?.AddressLine1;
+            entity.AddressLine2 = coreEmployee.Address?.AddressLine2;
+            entity.City = coreEmployee.Address?.City;
+            entity.State = coreEmployee.Address?.State;
+            entity.ZipCode = coreEmployee.Address?.ZipCode;
 
             entity.Ssn = coreEmployee.GetNotSanitizedSSN();
 
