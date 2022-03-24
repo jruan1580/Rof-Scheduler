@@ -71,5 +71,20 @@ namespace EmployeeManagementService.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPatch("reset/{id}/locked")]
+        public async Task<IActionResult> ResetLockedStatus(long id)
+        {
+            try
+            {
+                await _employeeService.ResetEmployeeFailedLoginAttempt(id);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

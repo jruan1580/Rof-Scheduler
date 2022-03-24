@@ -47,6 +47,36 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
+        [HttpPatch("login")]
+        public async Task<IActionResult> EmployeeLogin([FromBody] EmployeeDTO employee)
+        {
+            try
+            {
+                await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPatch("logout/{id}")]
+        public async Task<IActionResult> EmployeeLogout(long id)
+        {
+            try
+            {
+                await _employeeService.EmployeeLogout(id);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         public abstract Task<IActionResult> UpdateEmployeeInformation([FromBody] EmployeeDTO employee);
     }
 }
