@@ -60,6 +60,20 @@ namespace EmployeeManagementService.Domain.Models
             FullName = $"{FirstName} {LastName}"; 
         }
 
+        public void SetAddress(string addressline1, string addressLine2, string city, string state, string zipcode)
+        {
+            if (Address == null)
+            {
+                Address = new Address();
+            }
+
+            Address.AddressLine1 = addressline1;
+            Address.AddressLine2 = addressLine2;
+            Address.City = city;
+            Address.State = state;
+            Address.ZipCode = zipcode;
+        }
+
         /// <summary>
         /// Validates whether or not all fields are present for employee information update.
         /// </summary>

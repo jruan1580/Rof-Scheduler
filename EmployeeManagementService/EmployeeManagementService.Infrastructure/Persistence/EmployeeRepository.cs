@@ -9,14 +9,14 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 {
     public interface IEmployeeRepository
     {
-        Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, string a1, string a2, string city, string state, string zip, bool? active = true);
+        Task CreateEmployee(Employee newEmployee);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
         Task<Employee> GetEmployeeById(long id);
         Task<Employee> GetEmployeeByUsername(string username);
         Task<int> IncrementEmployeeFailedLoginAttempt(long id);
         Task ResetEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployeeActiveStatus(long id, bool active);
-        Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn, string a1, string a2, string city, string state, string zip);
+        Task UpdateEmployeeInformation(Employee employeeToUpdate);
         Task UpdateEmployeeIsLockedStatus(long id, bool isLocked);
         Task UpdateEmployeeLoginStatus(long id, bool status);
         Task UpdatePassword(long id, byte[] newPassword);
@@ -59,53 +59,21 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, string a1, string a2, string city, string state, string zip, bool? active = true)
+        public async Task CreateEmployee(Employee newEmployee)
         {
             using (var context = new RofSchedulerContext())
-            {
-                var employee = new Employee()
-                {
-                    FirstName = firstName,
-                    LastName = lastName,
-                    Username = username,
-                    Password = password,
-                    Role = role,
-                    Ssn = ssn,
-                    Active = active,
-                    AddressLine1 = a1,
-                    AddressLine2 = a2,
-                    City = city,
-                    State = state,
-                    ZipCode = zip
-                };
-
-                context.Employees.Add(employee);
+            {                
+                context.Employees.Add(newEmployee);
 
                 await context.SaveChangesAsync();
             }
         }
 
-        public async Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn, string a1, string a2, string city, string state, string zip)
+        public async Task UpdateEmployeeInformation(Employee employeeToUpdate)
         {
             using (var context = new RofSchedulerContext())
             {
-                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
-
-                if (employee == null)
-                {
-                    throw new ArgumentException("No employee found.");
-                }
-
-                employee.Username = username;
-                employee.FirstName = firstName;
-                employee.LastName = lastName;
-                employee.Role = role;
-                employee.Ssn = ssn;
-                employee.AddressLine1 = a1;
-                employee.AddressLine2 = a2;
-                employee.City = city;
-                employee.State = state;
-                employee.ZipCode = zip;
+                context.Employees.Update(employeeToUpdate);
 
                 await context.SaveChangesAsync();
             }

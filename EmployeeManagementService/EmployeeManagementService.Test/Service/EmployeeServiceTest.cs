@@ -441,15 +441,20 @@ namespace EmployeeManagementService.Test.Service
                 Ssn = "123-45-6789",
                 Username = "jdoe",
                 Role = "Employee",
-                Address = {AddressLine1 = "123 Abc St", AddressLine2 = "", City = "Oakland", State = "CA", ZipCode = "12345"}
+                Address = new Domain.Models.Address {AddressLine1 = "123 Abc St", AddressLine2 = "", City = "Oakland", State = "CA", ZipCode = "12345"}
             };
+
+            _employeeRepository.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
+                .ReturnsAsync(new Employee()
+                {
+                    Id = 1                   
+                });
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             await employeeService.UpdateEmployeeInformation(employee);
 
-            _employeeRepository.Verify(e => e.UpdateEmployeeInformation(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _employeeRepository.Verify(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()), Times.Once);
         }
 
         [Test]
@@ -536,8 +541,7 @@ namespace EmployeeManagementService.Test.Service
 
             await employeeService.CreateEmployee(newEmployee, "tE$t1234");
 
-            _employeeRepository.Verify(e => e.CreateEmployee(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<string>(), 
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool?>()), Times.Once);
+            _employeeRepository.Verify(e => e.CreateEmployee(It.IsAny<Employee>()), Times.Once);
         }
 
         [Test]
