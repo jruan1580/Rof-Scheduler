@@ -122,7 +122,24 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException("Invalid role assigned");
             }
 
-            await _employeeRepository.UpdateEmployeeInformation(employee.Id, employee.Username, employee.FirstName, employee.LastName, employee.Role, employee.Ssn);
+            var originalEmployee = await _employeeRepository.GetEmployeeById(employee.Id);
+            if (originalEmployee == null)
+            {
+                throw new ArgumentException($"Employee with id: {employee.Id} does not exist");
+            }
+
+            originalEmployee.Username = employee.Username;
+            originalEmployee.FirstName = employee.FirstName;
+            originalEmployee.LastName = employee.LastName;
+            originalEmployee.Role = (string.IsNullOrEmpty(employee.Role)) ? originalEmployee.Role : employee.Role;
+            originalEmployee.Ssn = employee.Ssn;
+            originalEmployee.AddressLine1 = employee.Address?.AddressLine1;
+            originalEmployee.AddressLine2 = employee.Address?.AddressLine2;
+            originalEmployee.State = employee.Address?.State;
+            originalEmployee.City = employee.Address?.City;
+            originalEmployee.ZipCode = employee.Address?.ZipCode;
+
+            await _employeeRepository.UpdateEmployeeInformation(originalEmployee);
         }
 
         public async Task CreateEmployee(Employee newEmployee, string password)
@@ -148,10 +165,6 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException("Password does not meet requirements");
             }
 
-            byte[] encryptedPass = null;
-
-            encryptedPass = _passwordService.EncryptPassword(password);
-
             var roles = _roles.Split(",");
 
             if (!roles.Contains(newEmployee.Role))
@@ -159,7 +172,12 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException("Invalid role assigned");
             }
 
-            await _employeeRepository.CreateEmployee(newEmployee.FirstName, newEmployee.LastName, newEmployee.Username, newEmployee.Ssn, encryptedPass, newEmployee.Role, newEmployee.Active);
+            var encryptedPass = _passwordService.EncryptPassword(password);
+            newEmployee.Password = encryptedPass;
+
+            var newEmployeeEntity = EmployeeMapper.FromCoreEmployee(newEmployee);
+
+            await _employeeRepository.CreateEmployee(newEmployeeEntity);            
         }
 
         public async Task EmployeeLogIn(string username, string password)

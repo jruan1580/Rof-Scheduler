@@ -27,5 +27,7 @@
         public bool Status { get; set; }
 
         public bool? Active { get; set; }
+
+        public AddressDTO Address { get; set; }
     }
 }

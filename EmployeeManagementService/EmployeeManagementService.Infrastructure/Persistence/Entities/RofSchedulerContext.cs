@@ -43,6 +43,21 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .IsRequired()
                     .HasDefaultValueSql("((1))");
 
+                entity.Property(e => e.AddressLine1)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AddressLine2)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.City)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasMaxLength(25)
@@ -66,9 +81,19 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .IsUnicode(false)
                     .HasColumnName("SSN");
 
+                entity.Property(e => e.State)
+                    .IsRequired()
+                    .HasMaxLength(2)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Username)
                     .IsRequired()
                     .HasMaxLength(32)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ZipCode)
+                    .IsRequired()
+                    .HasMaxLength(10)
                     .IsUnicode(false);
             });
 

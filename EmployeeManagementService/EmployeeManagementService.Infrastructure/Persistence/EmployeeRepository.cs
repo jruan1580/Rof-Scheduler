@@ -9,14 +9,14 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 {
     public interface IEmployeeRepository
     {
-        Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool? active = true);
+        Task CreateEmployee(Employee newEmployee);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
         Task<Employee> GetEmployeeById(long id);
         Task<Employee> GetEmployeeByUsername(string username);
         Task<int> IncrementEmployeeFailedLoginAttempt(long id);
         Task ResetEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployeeActiveStatus(long id, bool active);
-        Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn);
+        Task UpdateEmployeeInformation(Employee employeeToUpdate);
         Task UpdateEmployeeIsLockedStatus(long id, bool isLocked);
         Task UpdateEmployeeLoginStatus(long id, bool status);
         Task UpdatePassword(long id, byte[] newPassword);
@@ -59,43 +59,21 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task CreateEmployee(string firstName, string lastName, string username, string ssn, byte[] password, string role, bool? active = true)
+        public async Task CreateEmployee(Employee newEmployee)
         {
             using (var context = new RofSchedulerContext())
-            {
-                var employee = new Employee()
-                {
-                    FirstName = firstName,
-                    LastName = lastName,
-                    Username = username,
-                    Password = password,
-                    Role = role,
-                    Ssn = ssn,
-                    Active = active
-                };
-
-                context.Employees.Add(employee);
+            {                
+                context.Employees.Add(newEmployee);
 
                 await context.SaveChangesAsync();
             }
         }
 
-        public async Task UpdateEmployeeInformation(long id, string username, string firstName, string lastName, string role, string ssn)
+        public async Task UpdateEmployeeInformation(Employee employeeToUpdate)
         {
             using (var context = new RofSchedulerContext())
             {
-                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
-
-                if (employee == null)
-                {
-                    throw new ArgumentException("No employee found.");
-                }
-
-                employee.Username = username;
-                employee.FirstName = firstName;
-                employee.LastName = lastName;
-                employee.Role = role;
-                employee.Ssn = ssn;
+                context.Employees.Update(employeeToUpdate);
 
                 await context.SaveChangesAsync();
             }
@@ -147,7 +125,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 }
 
                 employee.FailedLoginAttempts += 1;
-                
+
                 await context.SaveChangesAsync();
 
                 return employee.FailedLoginAttempts;
@@ -214,7 +192,12 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 Ssn = e.Ssn,
                 Role = e.Role,
                 Username = e.Username,
-                Active = e.Active
+                Active = e.Active,
+                AddressLine1 = e.AddressLine1,
+                AddressLine2 = e.AddressLine2,
+                City = e.City,
+                State = e.State,
+                ZipCode = e.ZipCode
             };
         }
 
@@ -229,7 +212,12 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 Username = e.Username,
                 Active = e.Active,
                 IsLocked = e.IsLocked,
-                FailedLoginAttempts = e.FailedLoginAttempts
+                FailedLoginAttempts = e.FailedLoginAttempts,
+                AddressLine1 = e.AddressLine1,
+                AddressLine2 = e.AddressLine2,
+                City = e.City,
+                State = e.State,
+                ZipCode = e.ZipCode
             };
         }
     }
