@@ -1,4 +1,5 @@
-﻿using EmployeeManagementService.API.DTO;
+﻿using EmployeeManagementService.API.Authentication;
+using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,8 @@ namespace EmployeeManagementService.API.Controllers
     {
         private readonly IEmployeeService _employeeService;
 
-        public AdminController(IEmployeeService employeeService) : base(employeeService)
+        public AdminController(IEmployeeService employeeService, ITokenHandler tokenHandler) 
+            : base(employeeService, tokenHandler)
         {
             _employeeService = employeeService;
         }

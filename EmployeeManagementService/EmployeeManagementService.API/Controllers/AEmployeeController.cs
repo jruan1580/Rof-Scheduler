@@ -1,4 +1,5 @@
-﻿using EmployeeManagementService.API.DTO;
+﻿using EmployeeManagementService.API.Authentication;
+using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace EmployeeManagementService.API.Controllers
     public abstract class AEmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
+        private readonly ITokenHandler _tokenHandler;
 
-        public AEmployeeController(IEmployeeService employeeService)
+        public AEmployeeController(IEmployeeService employeeService, ITokenHandler tokenHandler)
         {
             _employeeService = employeeService;
+            _tokenHandler = tokenHandler;
         }
         
         [HttpGet("{id}")]
@@ -52,9 +55,11 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
+                var loginEmployee = await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
 
-                return Ok();
+                var token = _tokenHandler.GenerateTokenForUserAndRole(loginEmployee.Role);
+
+                return Ok(new { accessToken = token });
             }
             catch (Exception ex)
             {

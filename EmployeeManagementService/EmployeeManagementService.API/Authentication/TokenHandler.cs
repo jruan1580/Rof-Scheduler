@@ -8,7 +8,12 @@ using System.Text;
 
 namespace EmployeeManagementService.API.Authentication
 {
-    public class TokenHandler
+    public interface ITokenHandler
+    {
+        string GenerateTokenForUserAndRole(string role, int minTokenIsValid = 30);
+    }
+
+    public class TokenHandler : ITokenHandler
     {
         private readonly string _jwtKey;
         private readonly string _jwtIssuer;
@@ -27,7 +32,7 @@ namespace EmployeeManagementService.API.Authentication
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            
+
             var token = new JwtSecurityToken(
                 _jwtIssuer,
                 _jwtAudience,

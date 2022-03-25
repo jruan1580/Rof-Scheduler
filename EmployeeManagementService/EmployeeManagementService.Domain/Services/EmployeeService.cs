@@ -12,7 +12,7 @@ namespace EmployeeManagementService.Domain.Services
     public interface IEmployeeService
     {
         Task CreateEmployee(Employee newEmployee, string password);
-        Task EmployeeLogIn(string username, string password);
+        Task<Employee> EmployeeLogIn(string username, string password);
         Task EmployeeLogout(long id);
         Task<List<Employee>> GetAllEmployees(int page, int offset);
         Task<Employee> GetEmployeeById(long id);
@@ -180,7 +180,7 @@ namespace EmployeeManagementService.Domain.Services
             await _employeeRepository.CreateEmployee(newEmployeeEntity);            
         }
 
-        public async Task EmployeeLogIn(string username, string password)
+        public async Task<Employee> EmployeeLogIn(string username, string password)
         {
             var employee = await GetEmployeeByUsername(username);
 
@@ -195,6 +195,9 @@ namespace EmployeeManagementService.Domain.Services
             }
 
             await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, true);
+            employee.Status = true;
+
+            return employee;
         }
 
         public async Task EmployeeLogout(long id)
