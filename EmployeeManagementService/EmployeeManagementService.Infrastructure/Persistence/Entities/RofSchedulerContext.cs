@@ -17,6 +17,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
         {
         }
 
+        public virtual DbSet<Country> Countries { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -31,6 +32,16 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<Country>(entity =>
+            {
+                entity.ToTable("Country");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
 
             modelBuilder.Entity<Employee>(entity =>
             {
