@@ -60,7 +60,6 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.AddressLine2)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -106,6 +105,12 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .IsRequired()
                     .HasMaxLength(10)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Country)
+                    .WithMany(p => p.Employees)
+                    .HasForeignKey(d => d.CountryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Employee__Countr__2A164134");
             });
 
             OnModelCreatingPartial(modelBuilder);
