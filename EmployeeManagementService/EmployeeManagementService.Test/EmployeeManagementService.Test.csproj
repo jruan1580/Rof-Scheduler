@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EmployeeManagementService.API\EmployeeManagementService.API.csproj" />
     <ProjectReference Include="..\EmployeeManagementService.Domain\EmployeeManagementService.Domain.csproj" />
     <ProjectReference Include="..\EmployeeManagementService.Infrastructure\EmployeeManagementService.Infrastructure.csproj" />
   </ItemGroup>
