@@ -5,9 +5,9 @@ CREATE TABLE dbo.Client(
 	LastName VARCHAR(50) NOT NULL,
 	EmailAddress VARCHAR(50) NOT NULL,
     PrimaryPhoneNum VARCHAR(25) NOT NULL,
-	SecondaryPhoneNum VARCHAR(25) NOT NULL,
+	SecondaryPhoneNum VARCHAR(25),
 	AddressLine1 VARCHAR(255) NOT NULL,
-	AddressLine2 VARCHAR(50) NOT NULL,
+	AddressLine2 VARCHAR(50),
 	City VARCHAR(50) NOT NULL,
 	State VARCHAR(2) NOT NULL,
 	ZipCode VARCHAR(10) NOT NULL
