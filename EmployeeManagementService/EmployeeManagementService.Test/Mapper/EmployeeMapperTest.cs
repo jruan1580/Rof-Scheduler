@@ -14,6 +14,7 @@ namespace EmployeeManagementService.Test.Mapper
             var dbEmployee = new DbEmployee();
 
             dbEmployee.Id = 1;
+            dbEmployee.CountryId = 1;
             dbEmployee.FirstName = "John";
             dbEmployee.LastName = "Doe";
             dbEmployee.Ssn = "123-45-6789";
@@ -34,6 +35,7 @@ namespace EmployeeManagementService.Test.Mapper
 
             Assert.IsNotNull(core);
             Assert.AreEqual(1, core.Id);
+            Assert.AreEqual(1, core.CountryId);
             Assert.AreEqual("John", core.FirstName);
             Assert.AreEqual("Doe", core.LastName);
             Assert.AreEqual("123-45-6789", core.GetNotSanitizedSSN());
@@ -59,6 +61,7 @@ namespace EmployeeManagementService.Test.Mapper
             var coreEmployee = new CoreEmployee();
 
             coreEmployee.Id = 1;
+            coreEmployee.CountryId = 1;
             coreEmployee.FirstName = "John";
             coreEmployee.LastName = "Doe";
             coreEmployee.SetSSN("123-45-6789");
@@ -75,6 +78,7 @@ namespace EmployeeManagementService.Test.Mapper
 
             Assert.IsNotNull(entity);
             Assert.AreEqual(1, entity.Id);
+            Assert.AreEqual(1, entity.CountryId);
             Assert.AreEqual("John", entity.FirstName);
             Assert.AreEqual("Doe", entity.LastName);
             Assert.AreEqual("123-45-6789", entity.Ssn);
@@ -99,6 +103,7 @@ namespace EmployeeManagementService.Test.Mapper
             var coreEmployee = new CoreEmployee();
 
             coreEmployee.Id = 1;
+            coreEmployee.CountryId = 1;
             coreEmployee.FirstName = "John";
             coreEmployee.LastName = "Doe";
             coreEmployee.SetSSN("123-45-6789");
@@ -117,6 +122,7 @@ namespace EmployeeManagementService.Test.Mapper
 
             Assert.IsNotNull(entity);
             Assert.AreEqual(1, entity.Id);
+            Assert.AreEqual(1, entity.CountryId);
             Assert.AreEqual("John", entity.FirstName);
             Assert.AreEqual("Doe", entity.LastName);
             Assert.AreEqual("123-45-6789", entity.Ssn);

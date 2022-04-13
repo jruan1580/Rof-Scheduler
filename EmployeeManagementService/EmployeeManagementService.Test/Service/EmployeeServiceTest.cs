@@ -54,6 +54,7 @@ namespace EmployeeManagementService.Test.Service
                     new Employee()
                     {
                         Id = 1,
+                        CountryId = 1,
                         FirstName = "John",
                         LastName = "Doe",
                         Ssn = "123-45-6789",
@@ -102,6 +103,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee() 
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -151,6 +153,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -203,6 +206,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -233,6 +237,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -272,6 +277,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -322,6 +328,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -367,6 +374,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -400,6 +408,7 @@ namespace EmployeeManagementService.Test.Service
             var employee = new Domain.Models.Employee()
             {
                 Id = 0,
+                CountryId = 1,
                 FirstName = "",
                 LastName = "",
                 Ssn = "",
@@ -418,6 +427,7 @@ namespace EmployeeManagementService.Test.Service
             var employee = new Domain.Models.Employee()
             {
                 Id = 1,
+                CountryId = 1,
                 FirstName = "John",
                 LastName = "Doe",
                 Ssn = "123-45-6789",
@@ -436,6 +446,7 @@ namespace EmployeeManagementService.Test.Service
             var employee = new Domain.Models.Employee()
             {
                 Id = 1,
+                CountryId = 1,
                 FirstName = "John",
                 LastName = "Doe",
                 Ssn = "123-45-6789",
@@ -553,6 +564,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -580,6 +592,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -607,6 +620,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -636,6 +650,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -663,6 +678,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -692,6 +708,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -719,6 +736,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",
@@ -746,6 +764,7 @@ namespace EmployeeManagementService.Test.Service
                 .ReturnsAsync(new Employee()
                 {
                     Id = 1,
+                    CountryId = 1,
                     FirstName = "John",
                     LastName = "Doe",
                     Ssn = "123-45-6789",

@@ -39,7 +39,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 var skip = (page - 1) * offset;
 
-                return await context.Employees.Select(e => CreateGetAllEmployeeObj(e)).Skip(skip).Take(offset).ToListAsync();
+                return await context.Employees.Select(e => CreateGetAllEmployeeObj(e)).Skip(skip).Take(offset).Include(c => c.Country).ToListAsync();
             }
         }
 
@@ -47,7 +47,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Employees.Select(e => CreateGetEmployeeByIdObj(e)).FirstOrDefaultAsync(e => e.Id == id);
+                return await context.Employees.Select(e => CreateGetEmployeeByIdObj(e)).Include(c => c.Country).FirstOrDefaultAsync(e => e.Id == id);
             }
         }
 
@@ -55,7 +55,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Employees.FirstOrDefaultAsync(e => e.Username == username);
+                return await context.Employees.Include(c => c.Country).FirstOrDefaultAsync(e => e.Username == username);
             }
         }
 
@@ -197,7 +197,8 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 AddressLine2 = e.AddressLine2,
                 City = e.City,
                 State = e.State,
-                ZipCode = e.ZipCode
+                ZipCode = e.ZipCode,
+                CountryId = e.CountryId
             };
         }
 
@@ -217,7 +218,8 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 AddressLine2 = e.AddressLine2,
                 City = e.City,
                 State = e.State,
-                ZipCode = e.ZipCode
+                ZipCode = e.ZipCode,
+                CountryId = e.CountryId
             };
         }
     }
