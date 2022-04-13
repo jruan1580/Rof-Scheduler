@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace EmployeeManagementService.Infrastructure.Persistence.Entities
+namespace ClientManagementService.Infrastructure.Persistence.Entities
 {
     public partial class RofSchedulerContext : DbContext
     {
@@ -17,8 +17,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
         {
         }
 
-        public virtual DbSet<Country> Countries { get; set; }
-        public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<Client> Clients { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -33,26 +32,9 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
-            modelBuilder.Entity<Country>(entity =>
+            modelBuilder.Entity<Client>(entity =>
             {
-                entity.ToTable("Country");
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<Employee>(entity =>
-            {
-                entity.ToTable("Employee");
-
-                entity.HasIndex(e => e.Ssn, "UC_SSN")
-                    .IsUnique();
-
-                entity.Property(e => e.Active)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
+                entity.ToTable("Client");
 
                 entity.Property(e => e.AddressLine1)
                     .IsRequired()
@@ -69,37 +51,34 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.EmailAddress)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.FirstName)
                     .IsRequired()
-                    .HasMaxLength(25)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.LastName)
                     .IsRequired()
-                    .HasMaxLength(25)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Password).IsRequired();
-
-                entity.Property(e => e.Role)
+                entity.Property(e => e.PrimaryPhoneNum)
                     .IsRequired()
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Ssn)
+                entity.Property(e => e.SecondaryPhoneNum)
                     .IsRequired()
                     .HasMaxLength(25)
-                    .IsUnicode(false)
-                    .HasColumnName("SSN");
+                    .IsUnicode(false);
 
                 entity.Property(e => e.State)
                     .IsRequired()
                     .HasMaxLength(2)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Username)
-                    .IsRequired()
-                    .HasMaxLength(32)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ZipCode)
