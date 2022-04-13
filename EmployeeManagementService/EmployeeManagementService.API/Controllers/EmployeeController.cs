@@ -5,10 +5,12 @@ using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagementService.API.Controllers
 {
+    [Authorize(Roles = "Employee")]
     [Route("api/employee")]
     [ApiController]
     public class EmployeeController : AEmployeeController

@@ -67,7 +67,7 @@ namespace EmployeeManagementService.Domain.Services
 
             if (employee == null)
             {
-                throw new ArgumentException("Employee does not exist.");
+                return null;
             }
 
             return EmployeeMapper.ToCoreEmployee(employee);
@@ -156,7 +156,7 @@ namespace EmployeeManagementService.Domain.Services
 
             var employeeCheck = await GetEmployeeByUsername(newEmployee.Username);
 
-            if (newEmployee.Username == employeeCheck.Username)
+            if (employeeCheck != null && newEmployee.Username == employeeCheck.Username)
             {
                 throw new ArgumentException("Username already exists");
             }
@@ -184,6 +184,11 @@ namespace EmployeeManagementService.Domain.Services
         public async Task<Employee> EmployeeLogIn(string username, string password)
         {
             var employee = await GetEmployeeByUsername(username);
+
+            if (employee == null)
+            {
+                throw new ArgumentException($"Username not found: {username}");
+            }
 
             if (!_passwordService.VerifyPasswordHash(password, employee.Password))
             {

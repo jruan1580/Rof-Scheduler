@@ -2,6 +2,7 @@
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -42,6 +43,11 @@ namespace EmployeeManagementService.API.Controllers
             {
                 var employee = await _employeeService.GetEmployeeByUsername(username);
 
+                if (employee == null)
+                {
+                    return NotFound($"Employee with username: {username} not found.");
+                }
+
                 return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
             }
             catch (Exception ex)
@@ -50,6 +56,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPatch("login")]
         public async Task<IActionResult> EmployeeLogin([FromBody] EmployeeDTO employee)
         {
