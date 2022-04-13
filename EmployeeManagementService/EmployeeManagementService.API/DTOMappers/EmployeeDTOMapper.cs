@@ -20,6 +20,7 @@ namespace EmployeeManagementService.API.DTOMappers
             dtoEmp.TempPasswordChanged = coreEmp.TempPasswordChanged;
             dtoEmp.Status = coreEmp.Status;
             dtoEmp.Active = coreEmp.Active;
+            dtoEmp.FullName = coreEmp.FullName;
 
             dtoEmp.Address = new AddressDTO();
             dtoEmp.Address.AddressLine1 = coreEmp.Address?.AddressLine1;
@@ -39,6 +40,8 @@ namespace EmployeeManagementService.API.DTOMappers
             coreEmp.Id = dtoEmp.Id;
             coreEmp.FirstName = dtoEmp.FirstName;
             coreEmp.LastName = dtoEmp.LastName;
+
+            coreEmp.SetFullName();
             
             coreEmp.SetSSN(dtoEmp.Ssn);
             
