@@ -138,6 +138,7 @@ namespace EmployeeManagementService.Domain.Services
             originalEmployee.State = employee.Address?.State;
             originalEmployee.City = employee.Address?.City;
             originalEmployee.ZipCode = employee.Address?.ZipCode;
+            originalEmployee.CountryId = employee.CountryId;
 
             await _employeeRepository.UpdateEmployeeInformation(originalEmployee);
         }

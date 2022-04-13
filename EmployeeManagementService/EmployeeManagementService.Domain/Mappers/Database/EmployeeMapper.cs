@@ -10,6 +10,7 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             var coreEmp = new CoreEmployee();
 
             coreEmp.Id = dbEmployee.Id;
+            coreEmp.CountryId = dbEmployee.CountryId;
             coreEmp.FirstName = dbEmployee.FirstName;
             coreEmp.LastName = dbEmployee.LastName;           
             coreEmp.Username = dbEmployee.Username;
@@ -35,6 +36,7 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             var entity = new DbEmployee();
 
             entity.Id = coreEmployee.Id;
+            entity.CountryId = coreEmployee.CountryId;
             entity.FirstName = coreEmployee.FirstName;
             entity.LastName = coreEmployee.LastName;
             entity.Username = coreEmployee.Username;

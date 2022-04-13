@@ -8,6 +8,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
     public partial class Employee
     {
         public long Id { get; set; }
+        public long CountryId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Ssn { get; set; }
@@ -24,5 +25,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
         public string City { get; set; }
         public string State { get; set; }
         public string ZipCode { get; set; }
+
+        public virtual Country Country { get; set; }
     }
 }

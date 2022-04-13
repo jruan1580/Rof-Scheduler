@@ -10,6 +10,7 @@ namespace EmployeeManagementService.API.DTOMappers
             var dtoEmp = new EmployeeDTO();
 
             dtoEmp.Id = coreEmp.Id;
+            dtoEmp.CountryId = coreEmp.CountryId;
             dtoEmp.FirstName = coreEmp.FirstName;
             dtoEmp.LastName = coreEmp.LastName;
             dtoEmp.Ssn = coreEmp.Ssn;
@@ -38,6 +39,7 @@ namespace EmployeeManagementService.API.DTOMappers
             var coreEmp = new CoreEmployee();
 
             coreEmp.Id = dtoEmp.Id;
+            coreEmp.CountryId = dtoEmp.CountryId;
             coreEmp.FirstName = dtoEmp.FirstName;
             coreEmp.LastName = dtoEmp.LastName;
 
