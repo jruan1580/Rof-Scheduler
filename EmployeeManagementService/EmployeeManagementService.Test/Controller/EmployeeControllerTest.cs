@@ -33,6 +33,9 @@ namespace EmployeeManagementService.Test.Controller
                 Address = new API.DTO.AddressDTO { AddressLine1 = "123 Abc St", AddressLine2 = "", City = "Oakland", State = "CA", ZipCode = "12345" }
             };
 
+            _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Domain.Models.Employee>()))
+                .Returns(Task.CompletedTask);
+
             var controller = new EmployeeController(_employeeService.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);
@@ -58,6 +61,9 @@ namespace EmployeeManagementService.Test.Controller
                 Role = "",
                 Address = new API.DTO.AddressDTO { AddressLine1 = "", AddressLine2 = "", City = "", State = "", ZipCode = "" }
             };
+
+            _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Domain.Models.Employee>()))
+                .ThrowsAsync(new Exception());
 
             var controller = new EmployeeController(_employeeService.Object);
 
