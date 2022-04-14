@@ -36,7 +36,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpGet("{username}")]
+        [HttpGet("{username}/username")]
         public async Task<IActionResult> GetEmployeeByUsername(string username)
         {
             try
@@ -66,7 +66,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 var token = _tokenHandler.GenerateTokenForUserAndRole(loginEmployee.Role);
 
-                return Ok(new { accessToken = token });
+                return Ok(new { accessToken = token, Id = loginEmployee.Id });
             }
             catch (Exception ex)
             {
