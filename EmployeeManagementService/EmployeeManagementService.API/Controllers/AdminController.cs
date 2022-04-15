@@ -1,6 +1,8 @@
-﻿using EmployeeManagementService.API.DTO;
+using EmployeeManagementService.API.Authentication;
+using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,13 +10,15 @@ using System.Threading.Tasks;
 
 namespace EmployeeManagementService.API.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     [Route("api/admin")]
     [ApiController]
     public class AdminController : AEmployeeController
     {
         private readonly IEmployeeService _employeeService;
 
-        public AdminController(IEmployeeService employeeService) : base(employeeService)
+        public AdminController(IEmployeeService employeeService, ITokenHandler tokenHandler) 
+            : base(employeeService, tokenHandler)
         {
             _employeeService = employeeService;
         }

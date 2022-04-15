@@ -134,14 +134,16 @@ namespace EmployeeManagementService.Test.Service
         }
 
         [Test]
-        public void GetEmployeeByUsername_EmployeeDoesNotExist()
+        public async Task GetEmployeeByUsername_EmployeeDoesNotExist()
         {
             _employeeRepository.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
                 .ReturnsAsync((Employee)null);
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            Assert.ThrowsAsync<ArgumentException>(() => employeeService.GetEmployeeByUsername("jdoe"));
+            var employee = await employeeService.GetEmployeeByUsername("jdoe");
+
+            Assert.IsNull(employee);
         }
 
         [Test]
@@ -544,9 +546,6 @@ namespace EmployeeManagementService.Test.Service
                 Role = "Employee",
                 Active = true
             };
-
-            _employeeRepository.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
-                .ReturnsAsync(new Employee());
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 

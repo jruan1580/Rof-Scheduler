@@ -1,6 +1,8 @@
-﻿using EmployeeManagementService.API.Controllers;
+﻿using EmployeeManagementService.API.Authentication;
+using EmployeeManagementService.API.Controllers;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -12,11 +14,17 @@ namespace EmployeeManagementService.Test.Controller
     public class EmployeeControllerTest
     {
         private Mock<IEmployeeService> _employeeService;
+        private Mock<ITokenHandler> _tokenHandler;
 
         [SetUp]
         public void Setup()
         {
             _employeeService = new Mock<IEmployeeService>();
+
+            _tokenHandler = new Mock<ITokenHandler>();
+
+            _tokenHandler.Setup(t => t.GenerateTokenForUserAndRole(It.IsAny<string>(), It.IsAny<int>()))
+                .Returns("randomgeneratedtokenstring");
         }
 
         [Test]
@@ -36,7 +44,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Domain.Models.Employee>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);
 
@@ -65,7 +73,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Domain.Models.Employee>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);
 
@@ -97,7 +105,7 @@ namespace EmployeeManagementService.Test.Controller
                     Active = true
                 });
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.GetEmployeeById(1);
 
@@ -115,7 +123,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
                 .ReturnsAsync((Domain.Models.Employee)null);
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.GetEmployeeById(1);
 
@@ -147,7 +155,7 @@ namespace EmployeeManagementService.Test.Controller
                     Active = true
                 });
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.GetEmployeeByUsername("jdoe");
 
@@ -165,25 +173,28 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
                 .ReturnsAsync((Domain.Models.Employee)null);
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.GetEmployeeByUsername("jdoe");
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(response.GetType(), typeof(NotFoundObjectResult));
 
-            var obj = (ObjectResult)response;
+            var obj = (NotFoundObjectResult)response;
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(obj.StatusCode, 404);
         }
 
         [Test]
         public async Task EmployeeLogin_Success()
         {
             _employeeService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(new Domain.Models.Employee()
+                {
+                    Role = "Employee"
+                });
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
             {
@@ -192,9 +203,9 @@ namespace EmployeeManagementService.Test.Controller
             });
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
 
-            var ok = (OkResult)response;
+            var ok = (OkObjectResult)response;
 
             Assert.AreEqual(ok.StatusCode, 200);
         }
@@ -205,7 +216,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
             {
@@ -227,7 +238,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.EmployeeLogout(1);
 
@@ -245,7 +256,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.EmployeeLogout(1);
 

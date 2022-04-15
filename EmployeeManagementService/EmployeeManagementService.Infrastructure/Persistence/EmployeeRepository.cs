@@ -39,7 +39,25 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 var skip = (page - 1) * offset;
 
-                return await context.Employees.Select(e => CreateGetAllEmployeeObj(e)).Skip(skip).Take(offset).Include(c => c.Country).ToListAsync();
+                return await context.Employees
+                    .Select(e => new Employee()
+                    {
+                        FirstName = e.FirstName,
+                        LastName = e.LastName,
+                        Ssn = e.Ssn,
+                        Role = e.Role,
+                        Username = e.Username,
+                        Active = e.Active,
+                        AddressLine1 = e.AddressLine1,
+                        AddressLine2 = e.AddressLine2,
+                        City = e.City,
+                        State = e.State,
+                        ZipCode = e.ZipCode,
+                        CountryId = e.CountryId
+                    })
+                    .Skip(skip)
+                    .Take(offset)
+                    .ToListAsync();
             }
         }
 
@@ -47,7 +65,28 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Employees.Select(e => CreateGetEmployeeByIdObj(e)).Include(c => c.Country).FirstOrDefaultAsync(e => e.Id == id);
+                return await context.Employees
+                    .Where(e => e.Id == id)
+                    .Select(e => new Employee()
+                    {
+                        Id = e.Id,
+                        FirstName = e.FirstName,
+                        LastName = e.LastName,
+                        Ssn = e.Ssn,
+                        Role = e.Role,
+                        Username = e.Username,
+                        Active = e.Active,
+                        IsLocked = e.IsLocked,
+                        FailedLoginAttempts = e.FailedLoginAttempts,
+                        AddressLine1 = e.AddressLine1,
+                        AddressLine2 = e.AddressLine2,
+                        City = e.City,
+                        State = e.State,
+                        ZipCode = e.ZipCode,
+                        CountryId = e.CountryId,
+                        Status = e.Status
+                    })
+                    .FirstOrDefaultAsync();
             }
         }
 
@@ -181,46 +220,6 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 await context.SaveChangesAsync();
             }
-        }
-
-        private Employee CreateGetAllEmployeeObj(Employee e)
-        {
-            return new Employee()
-            {
-                FirstName = e.FirstName,
-                LastName = e.LastName,
-                Ssn = e.Ssn,
-                Role = e.Role,
-                Username = e.Username,
-                Active = e.Active,
-                AddressLine1 = e.AddressLine1,
-                AddressLine2 = e.AddressLine2,
-                City = e.City,
-                State = e.State,
-                ZipCode = e.ZipCode,
-                CountryId = e.CountryId
-            };
-        }
-
-        private Employee CreateGetEmployeeByIdObj(Employee e)
-        {
-            return new Employee()
-            {
-                FirstName = e.FirstName,
-                LastName = e.LastName,
-                Ssn = e.Ssn,
-                Role = e.Role,
-                Username = e.Username,
-                Active = e.Active,
-                IsLocked = e.IsLocked,
-                FailedLoginAttempts = e.FailedLoginAttempts,
-                AddressLine1 = e.AddressLine1,
-                AddressLine2 = e.AddressLine2,
-                City = e.City,
-                State = e.State,
-                ZipCode = e.ZipCode,
-                CountryId = e.CountryId
-            };
         }
     }
 }

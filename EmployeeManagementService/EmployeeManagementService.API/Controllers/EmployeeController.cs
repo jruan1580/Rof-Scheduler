@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagementService.API.Controllers
 {
+    [Authorize(Roles = "Employee")]
     [Route("api/employee")]
     [ApiController]
     public class EmployeeController : AEmployeeController
     {
         private readonly IEmployeeService _employeeService;
 
-        public EmployeeController(IEmployeeService employeeService) : base(employeeService)
+        public EmployeeController(IEmployeeService employeeService, ITokenHandler tokenHandler) 
+            : base(employeeService, tokenHandler)
         {
             _employeeService = employeeService;
         }

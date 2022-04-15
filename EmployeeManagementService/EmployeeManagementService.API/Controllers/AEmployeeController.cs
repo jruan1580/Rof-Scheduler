@@ -1,6 +1,8 @@
-﻿using EmployeeManagementService.API.DTO;
+﻿using EmployeeManagementService.API.Authentication;
+using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -11,10 +13,12 @@ namespace EmployeeManagementService.API.Controllers
     public abstract class AEmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
+        private readonly ITokenHandler _tokenHandler;
 
-        public AEmployeeController(IEmployeeService employeeService)
+        public AEmployeeController(IEmployeeService employeeService, ITokenHandler tokenHandler)
         {
             _employeeService = employeeService;
+            _tokenHandler = tokenHandler;
         }
         
         [HttpGet("{id}")]
@@ -32,12 +36,17 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpGet("{username}")]
+        [HttpGet("{username}/username")]
         public async Task<IActionResult> GetEmployeeByUsername(string username)
         {
             try
             {
                 var employee = await _employeeService.GetEmployeeByUsername(username);
+
+                if (employee == null)
+                {
+                    return NotFound($"Employee with username: {username} not found.");
+                }
 
                 return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
             }
@@ -47,14 +56,17 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPatch("login")]
         public async Task<IActionResult> EmployeeLogin([FromBody] EmployeeDTO employee)
         {
             try
             {
-                await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
+                var loginEmployee = await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
 
-                return Ok();
+                var token = _tokenHandler.GenerateTokenForUserAndRole(loginEmployee.Role);
+
+                return Ok(new { accessToken = token, Id = loginEmployee.Id });
             }
             catch (Exception ex)
             {
