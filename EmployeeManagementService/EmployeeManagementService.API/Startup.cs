@@ -49,9 +49,14 @@ namespace EmployeeManagementService.API
                    {
                        OnMessageReceived = context =>
                        {
-                           if (context.Request.Cookies.ContainsKey("X-Access-Token"))
+                           if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
                            {
-                               context.Token = context.Request.Cookies["X-Access-Token"];
+                               context.Token = context.Request.Cookies["X-Access-Token-Admin"];
+                           }
+
+                           if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
+                           {
+                               context.Token = context.Request.Cookies["X-Access-Token-Employee"];
                            }
 
                            return Task.CompletedTask;
