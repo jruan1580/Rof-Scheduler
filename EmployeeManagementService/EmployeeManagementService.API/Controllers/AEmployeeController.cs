@@ -3,6 +3,7 @@ using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -65,6 +66,8 @@ namespace EmployeeManagementService.API.Controllers
                 var loginEmployee = await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
 
                 var token = _tokenHandler.GenerateTokenForUserAndRole(loginEmployee.Role);
+
+                Response.Cookies.Append("X-Access-Token", token, new CookieOptions() { HttpOnly = true, Expires = DateTimeOffset.Now.AddMinutes(30) });
 
                 return Ok(new { accessToken = token, Id = loginEmployee.Id });
             }
