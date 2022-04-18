@@ -49,15 +49,23 @@ namespace EmployeeManagementService.API
                    {
                        OnMessageReceived = context =>
                        {
-                           if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
+                           //it is postman, token is in headers.
+                           if (context.Request.Headers.TryGetValue("User-Agent", out var agent) && !agent.ToString().Contains("Postman"))
                            {
-                               context.Token = context.Request.Cookies["X-Access-Token-Admin"];
-                           }
+                               //if (context.Request.Headers.TryGetValue("Authorization", out var token))
+                               //{
+                               //    context.Token = token.ToString();
+                               //}
+                               if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
+                               {
+                                   context.Token = context.Request.Cookies["X-Access-Token-Admin"];
+                               }
 
-                           if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
-                           {
-                               context.Token = context.Request.Cookies["X-Access-Token-Employee"];
-                           }
+                               if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
+                               {
+                                   context.Token = context.Request.Cookies["X-Access-Token-Employee"];
+                               }
+                           }                     
 
                            return Task.CompletedTask;
                        }

@@ -67,14 +67,17 @@ namespace EmployeeManagementService.API.Controllers
 
                 var token = _tokenHandler.GenerateTokenForUserAndRole(loginEmployee.Role);
 
-                if (loginEmployee.Role == "Administrator")
+                if (Request.Headers.TryGetValue("User-Agent", out var agent) && !agent.ToString().Contains("Postman"))
                 {
-                    Response.Cookies.Append("X-Access-Token-Admin", token, new CookieOptions() { HttpOnly = true, Expires = DateTimeOffset.Now.AddMinutes(30) });
-                }
-                else
-                {
-                    Response.Cookies.Append("X-Access-Token-Employee", token, new CookieOptions() { HttpOnly = true, Expires = DateTimeOffset.Now.AddMinutes(30) });
-                }                
+                    if (loginEmployee.Role == "Administrator")
+                    {
+                        Response.Cookies.Append("X-Access-Token-Admin", token, new CookieOptions() { HttpOnly = true, Expires = DateTimeOffset.Now.AddMinutes(30) });
+                    }
+                    else
+                    {
+                        Response.Cookies.Append("X-Access-Token-Employee", token, new CookieOptions() { HttpOnly = true, Expires = DateTimeOffset.Now.AddMinutes(30) });
+                    }
+                }                      
 
                 return Ok(new { accessToken = token, Id = loginEmployee.Id });
             }
