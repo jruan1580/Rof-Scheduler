@@ -783,5 +783,29 @@ namespace EmployeeManagementService.Test.Service
 
             _employeeRepository.Verify(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<byte[]>()), Times.Once);
         }
+
+        [Test]
+        public void DeleteEmployeeById_NoEmployee()
+        {
+            _employeeRepository.Setup(e => e.DeleteEmployeeById(It.IsAny<long>()))
+                .ThrowsAsync(new ArgumentException());
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
+
+            Assert.ThrowsAsync<ArgumentException>(() => employeeService.DeleteEmployeeById(1));
+        }
+
+        [Test]
+        public async Task DeleteEmployeeById_Success()
+        {
+            _employeeRepository.Setup(e => e.DeleteEmployeeById(It.IsAny<long>()))
+                .Returns(Task.CompletedTask);
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
+
+            await employeeService.DeleteEmployeeById(1);
+
+            _employeeRepository.Verify(e => e.DeleteEmployeeById(It.IsAny<long>()), Times.Once);
+        }
     }
 }

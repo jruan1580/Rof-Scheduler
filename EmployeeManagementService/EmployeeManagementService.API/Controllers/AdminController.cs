@@ -89,5 +89,20 @@ namespace EmployeeManagementService.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteEmployeeById(long id)
+        {
+            try
+            {
+                await _employeeService.DeleteEmployeeById(id);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
