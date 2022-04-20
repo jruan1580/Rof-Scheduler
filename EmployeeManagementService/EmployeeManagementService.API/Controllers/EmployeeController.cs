@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace EmployeeManagementService.API.Controllers
 {
     [Authorize(Roles = "Employee")]
-    [Route("api/employee")]
     [ApiController]
     public class EmployeeController : AEmployeeController
     {

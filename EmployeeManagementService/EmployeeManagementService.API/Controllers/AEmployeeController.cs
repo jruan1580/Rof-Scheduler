@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace EmployeeManagementService.API.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")]
     public abstract class AEmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
