@@ -20,6 +20,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         Task UpdateEmployeeIsLockedStatus(long id, bool isLocked);
         Task UpdateEmployeeLoginStatus(long id, bool status);
         Task UpdatePassword(long id, byte[] newPassword);
+        Task DeleteEmployeeById(long id);
     }
 
     public class EmployeeRepository : IEmployeeRepository
@@ -217,6 +218,23 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 }
 
                 employee.Password = newPassword;
+
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteEmployeeById(long id)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
+
+                if (employee == null)
+                {
+                    throw new ArgumentException("Employee does not exist.");
+                }
+
+                context.Remove(employee);
 
                 await context.SaveChangesAsync();
             }

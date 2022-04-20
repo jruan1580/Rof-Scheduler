@@ -22,6 +22,7 @@ namespace EmployeeManagementService.Domain.Services
         Task UpdateEmployeeActiveStatus(long id, bool active);
         Task UpdateEmployeeInformation(Employee employee);
         Task UpdatePassword(long id, string newPassword);
+        Task DeleteEmployeeById(long id);
     }
 
     public class EmployeeService : IEmployeeService
@@ -235,6 +236,11 @@ namespace EmployeeManagementService.Domain.Services
             var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
 
             await _employeeRepository.UpdatePassword(employee.Id, newEncryptedPass);
+        }
+
+        public async Task DeleteEmployeeById(long id)
+        {
+            await _employeeRepository.DeleteEmployeeById(id);
         }
     }
 }
