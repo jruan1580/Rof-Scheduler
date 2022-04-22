@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EmployeeManagementService.API
 {
@@ -44,6 +45,27 @@ namespace EmployeeManagementService.API
                        ValidAudience = Configuration.GetSection("Jwt:Audience").Value,
                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("Jwt:Key").Value))
                    };
+                   options.Events = new JwtBearerEvents()
+                   {
+                       OnMessageReceived = context =>
+                       {
+                           //it is postman, token is in headers.
+                           if (context.Request.Headers.TryGetValue("User-Agent", out var agent) && !agent.ToString().Contains("Postman"))
+                           {
+                               if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
+                               {
+                                   context.Token = context.Request.Cookies["X-Access-Token-Admin"];
+                               }
+
+                               if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
+                               {
+                                   context.Token = context.Request.Cookies["X-Access-Token-Employee"];
+                               }
+                           }                     
+
+                           return Task.CompletedTask;
+                       }
+                   };                 
                });
 
             services.AddControllers();

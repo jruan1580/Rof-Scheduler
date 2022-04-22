@@ -3,6 +3,7 @@ using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace EmployeeManagementService.API.Controllers
     public abstract class AEmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
-        private readonly ITokenHandler _tokenHandler;
+        private readonly ITokenHandler _tokenHandler;        
 
         public AEmployeeController(IEmployeeService employeeService, ITokenHandler tokenHandler)
         {
@@ -65,6 +66,18 @@ namespace EmployeeManagementService.API.Controllers
                 var loginEmployee = await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
 
                 var token = _tokenHandler.GenerateTokenForUserAndRole(loginEmployee.Role);
+
+                if (Request.Headers.TryGetValue("User-Agent", out var agent) && !agent.ToString().Contains("Postman"))
+                {
+                    if (loginEmployee.Role == "Administrator")
+                    {
+                        Response.Cookies.Append("X-Access-Token-Admin", token, new CookieOptions() { HttpOnly = true, Expires = DateTimeOffset.Now.AddMinutes(30) });
+                    }
+                    else
+                    {
+                        Response.Cookies.Append("X-Access-Token-Employee", token, new CookieOptions() { HttpOnly = true, Expires = DateTimeOffset.Now.AddMinutes(30) });
+                    }
+                }                      
 
                 return Ok(new { accessToken = token, Id = loginEmployee.Id });
             }
