@@ -73,7 +73,7 @@ namespace EmployeeManagementService.API.Controllers
                 {
                     if (loginEmployee.Role == "Administrator")
                     {
-                        Response.Cookies.Append("X-Access-Token-Admin", token, new CookieOptions() { Domain = null, HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });                        
+                        Response.Cookies.Append("X-Access-Token-Admin", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });                        
                     }
                     else
                     {
