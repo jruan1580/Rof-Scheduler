@@ -1,12 +1,13 @@
-import { Form, Button, Row, Col, Spinner, Card, Container } from 'react-bootstrap';
+import { Form, Button, Row, Col, Spinner, Card, Container, Alert } from 'react-bootstrap';
 import { useState } from 'react';
-import { validateLoginPassword } from '../Services/inputValidationService';
-import { login } from '../Services/employeeManagementService';
+import { validateLoginPassword } from './inputValidationService';
+import { login } from '../SharedServices/employeeManagementService';
 
-function Login(){
+function Login({handleLoginState}){
     const [loading, setLoading] = useState(false);
     const [passwordErrMsg, setPasswordErrMsg] = useState('');
     const [usernameError, setUsernameError] = useState(false);
+    const [loginErrMsg, setLoginErrMsg] = useState('');
 
     const handleSubmit = (submitEvent) => {
         //prevents reload when submit
@@ -30,10 +31,11 @@ function Login(){
             (async function(){
                 try{
                     const resp = await login(username, password);
-
-                    
+                    localStorage.setItem("Id", resp.id);
+                    handleLoginState(true);
+                    setLoginErrMsg('');
                 }catch(e){
-                    alert('Failed to add movie with error: ' + e.message);
+                    setLoginErrMsg(e.message);                    
                 }finally{
                     setLoading(false);
                 }     
@@ -52,6 +54,13 @@ function Login(){
                             <Card.Header>Login</Card.Header>
                             <Card.Body>
                                 <Form noValidate onSubmit={handleSubmit}>
+                                    {
+                                        loginErrMsg !== '' &&
+                                        <Alert variant="danger">
+                                            {loginErrMsg}
+                                        </Alert>
+                                    }
+                                   
                                     <Form.Group className="mb-3">
                                         <Form.Label>Username</Form.Label>
                                         <Form.Control type="text" placeholder="Enter username" name="username" isInvalid={usernameError}/>   

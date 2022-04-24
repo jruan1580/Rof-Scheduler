@@ -7,7 +7,8 @@ export const login = async function(username, password){
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data) // body data type must match "Content-Type" header
+        body: JSON.stringify(data), // body data type must match "Content-Type" header
+        credentials: 'include'
     });
 
     if (response.status !== 200){
