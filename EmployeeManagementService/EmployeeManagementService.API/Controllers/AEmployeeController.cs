@@ -77,7 +77,7 @@ namespace EmployeeManagementService.API.Controllers
                     }
                     else
                     {
-                        Response.Cookies.Append("X-Access-Token-Employee", token, new CookieOptions() { HttpOnly = true, Secure = false, Expires = DateTimeOffset.Now.AddMinutes(30) });
+                        Response.Cookies.Append("X-Access-Token-Employee", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });
                     }
                 }                      
 
