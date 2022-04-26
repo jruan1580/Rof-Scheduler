@@ -3,6 +3,7 @@ using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 namespace EmployeeManagementService.API.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")]
     public abstract class AEmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
@@ -71,11 +73,11 @@ namespace EmployeeManagementService.API.Controllers
                 {
                     if (loginEmployee.Role == "Administrator")
                     {
-                        Response.Cookies.Append("X-Access-Token-Admin", token, new CookieOptions() { HttpOnly = true, Expires = DateTimeOffset.Now.AddMinutes(30) });
+                        Response.Cookies.Append("X-Access-Token-Admin", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });                        
                     }
                     else
                     {
-                        Response.Cookies.Append("X-Access-Token-Employee", token, new CookieOptions() { HttpOnly = true, Expires = DateTimeOffset.Now.AddMinutes(30) });
+                        Response.Cookies.Append("X-Access-Token-Employee", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });
                     }
                 }                      
 

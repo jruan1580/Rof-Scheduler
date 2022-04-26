@@ -30,46 +30,53 @@ namespace EmployeeManagementService.API
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddTransient<ITokenHandler, Authentication.TokenHandler>();
 
-            services.AddMvc();
+            services.AddMvc();           
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-               .AddJwtBearer(options =>
-               {
-                   options.TokenValidationParameters = new TokenValidationParameters
-                   {
-                       ValidateIssuer = true,
-                       ValidateAudience = true,
-                       ValidateLifetime = true,
-                       ValidateIssuerSigningKey = true,
-                       ValidIssuer = Configuration.GetSection("Jwt:Issuer").Value,
-                       ValidAudience = Configuration.GetSection("Jwt:Audience").Value,
-                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("Jwt:Key").Value))
-                   };
-                   options.Events = new JwtBearerEvents()
-                   {
-                       OnMessageReceived = context =>
-                       {
-                           //it is postman, token is in headers.
-                           if (context.Request.Headers.TryGetValue("User-Agent", out var agent) && !agent.ToString().Contains("Postman"))
-                           {
-                               if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
-                               {
-                                   context.Token = context.Request.Cookies["X-Access-Token-Admin"];
-                               }
-
-                               if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
-                               {
-                                   context.Token = context.Request.Cookies["X-Access-Token-Employee"];
-                               }
-                           }                     
-
-                           return Task.CompletedTask;
-                       }
-                   };                 
-               });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.WithOrigins("http://localhost:3000", "http://localhost:44349")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+                //.AllowCredentials());
+            });
 
             services.AddControllers();
-            services.AddCors();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+              .AddJwtBearer(options =>
+              {
+                  options.TokenValidationParameters = new TokenValidationParameters
+                  {
+                      ValidateIssuer = true,
+                      ValidateAudience = true,
+                      ValidateLifetime = true,
+                      ValidateIssuerSigningKey = true,
+                      ValidIssuer = Configuration.GetSection("Jwt:Issuer").Value,
+                      ValidAudience = Configuration.GetSection("Jwt:Audience").Value,
+                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("Jwt:Key").Value))
+                  };
+                  options.Events = new JwtBearerEvents()
+                  {
+                      OnMessageReceived = context =>
+                      {
+                           //it is postman, token is in headers.
+                            if (context.Request.Headers.TryGetValue("User-Agent", out var agent) && !agent.ToString().Contains("Postman"))
+                          {
+                              if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
+                              {
+                                  context.Token = context.Request.Cookies["X-Access-Token-Admin"];
+                              }
+
+                              if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
+                              {
+                                  context.Token = context.Request.Cookies["X-Access-Token-Employee"];
+                              }
+                          }
+
+                          return Task.CompletedTask;
+                      }
+                  };
+              });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -84,7 +91,12 @@ namespace EmployeeManagementService.API
 
             app.UseRouting();
 
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCors(x => x
+                .WithOrigins("http://localhost:3000", "https://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()); // allow credentials
+
 
             app.UseAuthentication();
 

@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 namespace EmployeeManagementService.API.Controllers
 {
     [Authorize(Roles = "Administrator")]
-    [Route("api/admin")]
     [ApiController]
     public class AdminController : AEmployeeController
     {
