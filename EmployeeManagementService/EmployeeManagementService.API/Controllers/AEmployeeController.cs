@@ -81,7 +81,7 @@ namespace EmployeeManagementService.API.Controllers
                     }
                 }                      
 
-                return Ok(new { accessToken = token, Id = loginEmployee.Id });
+                return Ok(new { accessToken = token, Id = loginEmployee.Id, FirstName = loginEmployee.FirstName });
             }
             catch (Exception ex)
             {

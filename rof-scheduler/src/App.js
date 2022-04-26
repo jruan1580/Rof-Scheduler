@@ -4,13 +4,14 @@ import { Container } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import FullCalendar from './FullCalendar';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import AccountSettings from './AccountSettings';
 function App() {
   const [login, setLogin] = useState(false);
 
   useEffect(() => {
     console.log(localStorage.getItem("Id"));
 
-    if (localStorage.getItem("Id") != undefined){
+    if (localStorage.getItem("id") != undefined && localStorage.getItem("firstName") != undefined){
       setLogin(true);
     }
   }, []);
@@ -19,12 +20,15 @@ function App() {
     <>
       <BrowserRouter>
         <NavigationBar loginState={login} handleLoginState={setLogin}/>
+        <br/>
         <Container>
           <Routes>
             {!login &&  <Route exact path="/" element={<Login handleLoginState={setLogin}/>}/>}
             {login &&  <Route exact path="/" element={<FullCalendar/>}/>}           
           </Routes>
-               
+          <Routes>
+            <Route exact path="/accountsettings" element={<AccountSettings/>}/>
+          </Routes>
         </Container>      
       </BrowserRouter>     
     </>

@@ -31,7 +31,8 @@ function Login({handleLoginState}){
             (async function(){
                 try{
                     const resp = await login(username, password);
-                    localStorage.setItem("Id", resp.id);
+                    localStorage.setItem("id", resp.id);
+                    localStorage.setItem("firstName", resp.firstName);
                     handleLoginState(true);
                     setLoginErrMsg('');
                 }catch(e){
@@ -46,7 +47,6 @@ function Login({handleLoginState}){
     return(
         <>           
             <Container>
-                <br />
                 <Row>
                     <Col lg="4"></Col>
                     <Col lg="4">
