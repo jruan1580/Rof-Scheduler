@@ -102,12 +102,12 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpPatch("password/{id}/update")]
-        public async Task<IActionResult> UpdatePassword(long id, string newPassword)
+        [HttpPatch("password/update")]
+        public async Task<IActionResult> UpdatePassword([FromBody] PasswordDTO newPassword)
         {
             try
             {
-                await _employeeService.UpdatePassword(id, newPassword);
+                await _employeeService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
 
                 return Ok();
             }

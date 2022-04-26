@@ -271,12 +271,18 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task UpdatePassword_Success()
         {
+            var password = new API.DTO.PasswordDTO()
+            {
+                Id = 1,
+                NewPassword = "NewTestPassword123!"
+            };
+
             _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
             var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
-            var response = await controller.UpdatePassword(1, "NewTestPassword123!");
+            var response = await controller.UpdatePassword(password);
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(OkResult));
@@ -289,12 +295,18 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task UpdatePassword_InternalServerError()
         {
+            var password = new API.DTO.PasswordDTO()
+            {
+                Id = 1,
+                NewPassword = "NewTestPassword123!"
+            };
+
             _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
             var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
-            var response = await controller.UpdatePassword(1, "NewPassword");
+            var response = await controller.UpdatePassword(password);
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(ObjectResult));
