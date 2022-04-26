@@ -193,6 +193,7 @@ namespace EmployeeManagementService.Domain.Services
 
             if (!_passwordService.VerifyPasswordHash(password, employee.Password))
             {
+                await IncrementEmployeeFailedLoginAttempt(employee.Id);
                 throw new ArgumentException("Incorrect password");
             }
 

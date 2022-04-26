@@ -102,6 +102,21 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
+        [HttpPatch("password/{id}/update")]
+        public async Task<IActionResult> UpdatePassword(long id, string newPassword)
+        {
+            try
+            {
+                await _employeeService.UpdatePassword(id, newPassword);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         public abstract Task<IActionResult> UpdateEmployeeInformation([FromBody] EmployeeDTO employee);
     }
 }

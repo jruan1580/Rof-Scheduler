@@ -267,5 +267,41 @@ namespace EmployeeManagementService.Test.Controller
 
             Assert.AreEqual(obj.StatusCode, 500);
         }
+
+        [Test]
+        public async Task UpdatePassword_Success()
+        {
+            _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
+
+            var response = await controller.UpdatePassword(1, "NewTestPassword123!");
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkResult));
+
+            var ok = (OkResult)response;
+
+            Assert.AreEqual(ok.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task UpdatePassword_InternalServerError()
+        {
+            _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
+
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
+
+            var response = await controller.UpdatePassword(1, "NewPassword");
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
     }
 }
