@@ -555,7 +555,7 @@ namespace EmployeeManagementService.Test.Service
         }
 
         [Test]
-        public void EmployeeLogIn_AlreadyLoggedIn()
+        public async Task EmployeeLogIn_AlreadyLoggedIn()
         {
             var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
 
@@ -575,11 +575,13 @@ namespace EmployeeManagementService.Test.Service
                     TempPasswordChanged = false,
                     Status = true,
                     Active = true
-                }); ;
+                });
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            Assert.ThrowsAsync<ArgumentException>(() => employeeService.EmployeeLogIn("jdoe", "t3$T1234"));
+            var employee = await employeeService.EmployeeLogIn("jdoe", "t3$T1234");
+
+            Assert.IsTrue(employee.Status);
         }
 
         [Test]
@@ -641,7 +643,7 @@ namespace EmployeeManagementService.Test.Service
         }
 
         [Test]
-        public void EmployeeLogOut_AlreadyLoggedOut()
+        public async Task EmployeeLogOut_AlreadyLoggedOut()
         {
             var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
 
@@ -665,7 +667,9 @@ namespace EmployeeManagementService.Test.Service
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            Assert.ThrowsAsync<ArgumentException>(() => employeeService.EmployeeLogout(1));
+            var employee = await employeeService.EmployeeLogout(1);
+
+            Assert.IsFalse(employee.Status);            
         }
 
         [Test]
