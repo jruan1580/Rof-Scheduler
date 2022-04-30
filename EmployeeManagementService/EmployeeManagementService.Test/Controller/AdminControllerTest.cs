@@ -1,6 +1,7 @@
 ﻿using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.Controllers;
 using EmployeeManagementService.Domain.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -341,7 +342,16 @@ namespace EmployeeManagementService.Test.Controller
                     Role = "Administrator"
                 });
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["User-Agent"] = "Chrome";
+
+            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object)
+            {
+                ControllerContext = new ControllerContext()
+                {
+                    HttpContext = httpContext
+                }
+            };
 
             var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
             {
@@ -383,9 +393,21 @@ namespace EmployeeManagementService.Test.Controller
         public async Task EmployeeLogout_Success()
         {
             _employeeService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(new Domain.Models.Employee()
+                {
+                    Role = "Administrator"
+                });
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["User-Agent"] = "Chrome";
+
+            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object)
+            {
+                ControllerContext = new ControllerContext()
+                {
+                    HttpContext = httpContext
+                }
+            };
 
             var response = await controller.EmployeeLogout(1);
 

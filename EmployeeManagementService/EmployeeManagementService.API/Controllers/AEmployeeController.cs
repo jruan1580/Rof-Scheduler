@@ -81,7 +81,7 @@ namespace EmployeeManagementService.API.Controllers
                     }
                 }                      
 
-                return Ok(new { accessToken = token, Id = loginEmployee.Id, FirstName = loginEmployee.FirstName });
+                return Ok(new { accessToken = token, Id = loginEmployee.Id, FirstName = loginEmployee.FirstName, Role = loginEmployee.Role });
             }
             catch (Exception ex)
             {
@@ -94,7 +94,19 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                await _employeeService.EmployeeLogout(id);
+                var employee = await _employeeService.EmployeeLogout(id);
+
+                if (Request.Headers.TryGetValue("User-Agent", out var agent) && !agent.ToString().Contains("Postman"))
+                {
+                    if (employee.Role == "Administrator")
+                    {
+                        Response.Cookies.Append("X-Access-Token-Admin", string.Empty, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(-30) });
+                    }
+                    else
+                    {
+                        Response.Cookies.Append("X-Access-Token-Employee", string.Empty, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(-30) });
+                    }
+                }
 
                 return Ok();
             }

@@ -13,7 +13,7 @@ namespace EmployeeManagementService.Domain.Services
     {
         Task CreateEmployee(Employee newEmployee, string password);
         Task<Employee> EmployeeLogIn(string username, string password);
-        Task EmployeeLogout(long id);
+        Task<Employee> EmployeeLogout(long id);
         Task<List<Employee>> GetAllEmployees(int page, int offset);
         Task<Employee> GetEmployeeById(long id);
         Task<Employee> GetEmployeeByUsername(string username);
@@ -198,7 +198,7 @@ namespace EmployeeManagementService.Domain.Services
 
             if (employee.Status == true)
             {
-                throw new ArgumentException("Employee already logged in");
+                return employee;
             }
 
             await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, true);
@@ -207,16 +207,19 @@ namespace EmployeeManagementService.Domain.Services
             return employee;
         }
 
-        public async Task EmployeeLogout(long id)
+        public async Task<Employee> EmployeeLogout(long id)
         {
             var employee = await GetEmployeeById(id);
 
             if (employee.Status == false)
             {
-                throw new ArgumentException("Employee already logged out");
+                return employee;
             }
 
             await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, false);
+            employee.Status = false;
+
+            return employee;
         }
 
         public async Task UpdatePassword(long id, string newPassword)
