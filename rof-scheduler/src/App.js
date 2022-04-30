@@ -10,8 +10,6 @@ function App() {
   const [isLogin, setLogin] = useState(false);
 
   useEffect(() => {
-    console.log(localStorage.getItem("Id"));
-
     if (localStorage.getItem("id") != undefined && localStorage.getItem("firstName") != undefined){
       setLogin(true);
     }
