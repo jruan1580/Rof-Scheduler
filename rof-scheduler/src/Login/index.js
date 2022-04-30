@@ -33,6 +33,7 @@ function Login({handleLoginState}){
                     const resp = await login(username, password);
                     localStorage.setItem("id", resp.id);
                     localStorage.setItem("firstName", resp.firstName);
+                    localStorage.setItem("role", resp.role);
                     handleLoginState(true);
                     setLoginErrMsg('');
                 }catch(e){

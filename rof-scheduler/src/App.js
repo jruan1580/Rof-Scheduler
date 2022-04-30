@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AccountSettings from './AccountSettings';
 
 function App() {
-  const [login, setLogin] = useState(false);
+  const [isLogin, setLogin] = useState(false);
 
   useEffect(() => {
     console.log(localStorage.getItem("Id"));
@@ -20,7 +20,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <NavigationBar loginState={login} handleLoginState={setLogin}/>
+        <NavigationBar loginState={isLogin} handleLoginState={setLogin}/>
         <br/>
         <Container>
           <Routes>
