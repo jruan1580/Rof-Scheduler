@@ -41,7 +41,7 @@ function AccountSettings() {
             <Col sm={3}>
               <Nav variant="pills" className="flex-column">
                 <Nav.Item>
-                  <Nav.Link eventKey="accountSettings" onClick={getinfo()}>
+                  <Nav.Link eventKey="accountSettings" onClick={getInfo}>
                     Account
                   </Nav.Link>
                 </Nav.Item>
@@ -82,6 +82,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Username"
+                          disabled
                           defaultValue="jruan1580"
                         />
                       </Form.Group>
