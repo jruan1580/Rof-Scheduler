@@ -3,30 +3,35 @@ import { getEmployeeById } from "../SharedServices/employeeManagementService";
 import { useEffect, useState } from "react";
 
 function AccountSettings() {
-  const [employee, setEmployee] = useState({
+  let ee = {
     firstName: "",
     lastName: "",
     ssn: "",
     role: "",
-    userName: "",
-    address1: "",
-    address2: "",
-    city: "",
-    state: "",
-    zip: "",
-  });
+    username: "",
+    address: {
+      addressLine1: "",
+      addressLine2: "",
+      city: "",
+      state: "",
+      zipCode: "",
+    },
+  };
 
-  // useEffect(() => {
-  //   (async function () {
-  //     try {
-  //       const emp = await getEmployeeById();
-  //       setEmployee(emp);
-  //     } catch (e) {
-  //       alert("Failed to fetch employee info... Try Again");
-  //       console.log(e.message);
-  //     }
-  //   })();
-  // }, []);
+  const [employee, setEmployee] = useState(ee);
+
+  useEffect(() => {
+    (async function () {
+      try {
+        const emp = await getEmployeeById();
+        setEmployee(emp);
+        console.log({ emp });
+      } catch (e) {
+        alert("Failed to fetch employee info... Try Again");
+        console.log(e.message);
+      }
+    })();
+  }, []);
 
   return (
     <>
@@ -80,7 +85,7 @@ function AccountSettings() {
                           type="text"
                           placeholder="Username"
                           disabled
-                          defaultValue={employee.userName}
+                          defaultValue={employee.username}
                         />
                       </Form.Group>
                     </Row>
@@ -123,7 +128,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Address Line 1"
-                          defaultValue={employee.address1}
+                          defaultValue={employee.address.addressLine1}
                         />
                       </Form.Group>
                       <Form.Group as={Col} md="6">
@@ -131,7 +136,7 @@ function AccountSettings() {
                         <Form.Control
                           type="text"
                           placeholder="Address Line 2"
-                          defaultValue={employee.address2}
+                          defaultValue={employee.address.addressLine2}
                         />
                       </Form.Group>
                     </Row>
@@ -143,7 +148,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="City"
-                          defaultValue={employee.address2}
+                          defaultValue={employee.address.city}
                         />
                       </Form.Group>
                       <Form.Group as={Col} md="3">
@@ -152,7 +157,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="State"
-                          defaultValue={employee.state}
+                          defaultValue={employee.address.state}
                         />
                       </Form.Group>
                       <Form.Group as={Col} md="3">
@@ -161,7 +166,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Zipcode"
-                          defaultValue={employee.zip}
+                          defaultValue={employee.address.zipCode}
                         />
                       </Form.Group>
                     </Row>

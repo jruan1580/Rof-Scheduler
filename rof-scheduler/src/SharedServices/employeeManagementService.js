@@ -65,4 +65,6 @@ export const getEmployeeById = async function () {
     var errMsg = await response.text();
     throw new Error(errMsg);
   }
+
+  return await response.json();
 };
