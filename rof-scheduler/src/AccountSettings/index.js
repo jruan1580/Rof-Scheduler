@@ -1,6 +1,33 @@
 import { Tab, Nav, Row, Col, Form, Button, Container } from "react-bootstrap";
+import { getEmployeeById } from "../SharedServices/employeeManagementService";
+import { useEffect, useState } from "react";
 
 function AccountSettings() {
+  const [employee, setEmployee] = useState({
+    firstName: "",
+    lastName: "",
+    ssn: "",
+    role: "",
+    userName: "",
+    address1: "",
+    address2: "",
+    city: "",
+    state: "",
+    zip: "",
+  });
+
+  // useEffect(() => {
+  //   (async function () {
+  //     try {
+  //       const emp = await getEmployeeById();
+  //       setEmployee(emp);
+  //     } catch (e) {
+  //       alert("Failed to fetch employee info... Try Again");
+  //       console.log(e.message);
+  //     }
+  //   })();
+  // }, []);
+
   return (
     <>
       <Container className="settingsContainer">
@@ -32,7 +59,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="First name"
-                          defaultValue="Jason"
+                          defaultValue={employee.firstName}
                         />
                       </Form.Group>
 
@@ -42,7 +69,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Last name"
-                          defaultValue="Ruan"
+                          defaultValue={employee.lastName}
                         />
                       </Form.Group>
 
@@ -52,7 +79,8 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Username"
-                          defaultValue="jruan1580"
+                          disabled
+                          defaultValue={employee.userName}
                         />
                       </Form.Group>
                     </Row>
@@ -72,7 +100,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="SSN"
-                          defaultValue="***-**-1234"
+                          defaultValue={employee.ssn}
                         />
                       </Form.Group>
 
@@ -82,6 +110,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Country"
+                          disabled
                           defaultValue="USA"
                         />
                       </Form.Group>
@@ -94,7 +123,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Address Line 1"
-                          defaultValue="123 Main St"
+                          defaultValue={employee.address1}
                         />
                       </Form.Group>
                       <Form.Group as={Col} md="6">
@@ -102,6 +131,7 @@ function AccountSettings() {
                         <Form.Control
                           type="text"
                           placeholder="Address Line 2"
+                          defaultValue={employee.address2}
                         />
                       </Form.Group>
                     </Row>
@@ -113,7 +143,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="City"
-                          defaultValue="San Diego"
+                          defaultValue={employee.address2}
                         />
                       </Form.Group>
                       <Form.Group as={Col} md="3">
@@ -122,7 +152,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="State"
-                          defaultValue="CA"
+                          defaultValue={employee.state}
                         />
                       </Form.Group>
                       <Form.Group as={Col} md="3">
@@ -131,7 +161,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Zipcode"
-                          defaultValue="12345"
+                          defaultValue={employee.zip}
                         />
                       </Form.Group>
                     </Row>
