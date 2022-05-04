@@ -289,5 +289,53 @@ namespace EmployeeManagementService.Test.Controller
 
             Assert.AreEqual(obj.StatusCode, 500);
         }
+
+        [Test]
+        public async Task UpdatePassword_Success()
+        {
+            var password = new API.DTO.PasswordDTO()
+            {
+                Id = 1,
+                NewPassword = "NewTestPassword123!"
+            };
+
+            _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
+
+            var response = await controller.UpdatePassword(password);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkResult));
+
+            var ok = (OkResult)response;
+
+            Assert.AreEqual(ok.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task UpdatePassword_InternalServerError()
+        {
+            var password = new API.DTO.PasswordDTO()
+            {
+                Id = 1,
+                NewPassword = "NewTestPassword123!"
+            };
+
+            _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
+
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
+
+            var response = await controller.UpdatePassword(password);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
     }
 }
