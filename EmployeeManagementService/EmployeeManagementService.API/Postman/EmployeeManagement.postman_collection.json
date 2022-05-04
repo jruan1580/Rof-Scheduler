@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5f4b3761-478a-41d6-b3f9-732daa252a1d",
+		"_postman_id": "2eab8054-2b32-4fac-b234-842da0c081e9",
 		"name": "EmployeeManagement",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -452,8 +452,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 500\", () => {\r",
-									"  pm.response.to.have.status(500);\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -653,8 +653,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 500\", () => {\r",
-									"  pm.response.to.have.status(500);\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2153,8 +2153,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 500\", () => {\r",
-									"  pm.response.to.have.status(500);\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2410,8 +2410,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 500\", () => {\r",
-									"  pm.response.to.have.status(500);\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
 									"});"
 								],
 								"type": "text/javascript"
