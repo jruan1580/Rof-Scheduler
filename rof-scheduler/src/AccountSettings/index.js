@@ -152,9 +152,9 @@ function AccountSettings() {
           username: submitEvent.target.username.value,
           addressLine1: submitEvent.target.address1,
           addressLine2: submitEvent.target.address2.value,
-          city: submitEvent.target.address.city.value,
-          state: submitEvent.target.address.state.value,
-          zipCode: submitEvent.target.address.zip.value,
+          city: submitEvent.target.city.value,
+          state: submitEvent.target.state.value,
+          zipCode: submitEvent.target.zip.value,
         });
         setUpdateErrMsg("");
       } catch (e) {

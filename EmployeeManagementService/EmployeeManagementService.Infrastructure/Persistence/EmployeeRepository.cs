@@ -76,6 +76,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                         Ssn = e.Ssn,
                         Role = e.Role,
                         Username = e.Username,
+                        Password = e.Password,
                         Active = e.Active,
                         IsLocked = e.IsLocked,
                         FailedLoginAttempts = e.FailedLoginAttempts,
