@@ -70,6 +70,7 @@ export const getEmployeeById = async function () {
 };
 
 export const updateEmployeeInformation = async function (
+  id,
   firstName,
   lastName,
   ssn,
@@ -83,6 +84,7 @@ export const updateEmployeeInformation = async function (
 ) {
   const baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
   const data = {
+    id,
     firstName,
     lastName,
     ssn,

@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 
 function AccountSettings() {
   const ee = {
+    id: 0,
     firstName: "",
     lastName: "",
     ssn: "",
@@ -34,7 +35,14 @@ function AccountSettings() {
   const [employee, setEmployee] = useState(ee);
   const [loading, setLoading] = useState(false);
   const [updateErrMsg, setUpdateErrMsg] = useState("");
-  const [inputError, setInputError] = useState(false);
+  const [firstNameError, setFirstNameError] = useState(false);
+  const [lastNameError, setlastNameError] = useState(false);
+  const [usernameError, setUsernameError] = useState(false);
+  const [ssnError, setSsnError] = useState(false);
+  const [address1Error, setAddress1Error] = useState(false);
+  const [cityError, setCityError] = useState(false);
+  const [stateError, setStateError] = useState(false);
+  const [zipError, setZipError] = useState(false);
 
   useEffect(() => {
     (async function () {
@@ -51,6 +59,7 @@ function AccountSettings() {
   const handleSubmit = (submitEvent) => {
     submitEvent.preventDefault();
 
+    const id = parseInt(localStorage.getItem("id"));
     const firstName = submitEvent.target.firstName.value;
     const lastName = submitEvent.target.lastName.value;
     const ssn = submitEvent.target.ssn.value;
@@ -62,10 +71,66 @@ function AccountSettings() {
     const state = submitEvent.target.state.value;
     const zipCode = submitEvent.target.zip.value;
 
+    if (firstName === undefined || firstName === "") {
+      setFirstNameError(true);
+      submitEvent.stopPropagation();
+    } else {
+      setFirstNameError(false);
+    }
+
+    if (lastName === undefined || lastName === "") {
+      setlastNameError(true);
+      submitEvent.stopPropagation();
+    } else {
+      setlastNameError(false);
+    }
+
+    if (ssn === undefined || ssn === "") {
+      setSsnError(true);
+      submitEvent.stopPropagation();
+    } else {
+      setSsnError(false);
+    }
+
+    if (username === undefined || username === "") {
+      setUsernameError(true);
+      submitEvent.stopPropagation();
+    } else {
+      setUsernameError(false);
+    }
+    if (addressLine1 === undefined || addressLine1 === "") {
+      setAddress1Error(true);
+      submitEvent.stopPropagation();
+    } else {
+      setAddress1Error(false);
+    }
+
+    if (city === undefined || city === "") {
+      setCityError(true);
+      submitEvent.stopPropagation();
+    } else {
+      setCityError(false);
+    }
+
+    if (state === undefined || state === "") {
+      setStateError(true);
+      submitEvent.stopPropagation();
+    } else {
+      setStateError(false);
+    }
+
+    if (zipCode === undefined || zipCode === "") {
+      setZipError(true);
+      submitEvent.stopPropagation();
+    } else {
+      setZipError(false);
+    }
+
     setLoading(true);
     (async function () {
       try {
         await updateEmployeeInformation(
+          id,
           firstName,
           lastName,
           ssn,
@@ -79,6 +144,7 @@ function AccountSettings() {
         );
 
         setEmployee({
+          ...employee,
           firstName: submitEvent.target.firstName.value,
           lastName: submitEvent.target.lastName.value,
           ssn: submitEvent.target.ssn.value,
@@ -136,7 +202,11 @@ function AccountSettings() {
                           type="text"
                           placeholder="First name"
                           defaultValue={employee.firstName}
+                          isInvalid={firstNameError}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter your first name.
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group as={Col} md="4">
@@ -147,7 +217,11 @@ function AccountSettings() {
                           type="text"
                           placeholder="Last name"
                           defaultValue={employee.lastName}
+                          isInvalid={lastNameError}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter your last name.
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group as={Col} md="4">
@@ -158,7 +232,11 @@ function AccountSettings() {
                           placeholder="Username"
                           name="username"
                           defaultValue={employee.username}
+                          isInvalid={usernameError}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter a username.
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Row>
 
@@ -185,7 +263,11 @@ function AccountSettings() {
                           type="text"
                           placeholder="SSN"
                           defaultValue={employee.ssn}
+                          isInvalid={ssnError}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter your SSN.
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group as={Col} md="4">
@@ -209,7 +291,11 @@ function AccountSettings() {
                           type="text"
                           placeholder="Address Line 1"
                           defaultValue={employee.address.addressLine1}
+                          isInvalid={address1Error}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter your address.
+                        </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group as={Col} md="6">
                         <Form.Label>Address Line 2</Form.Label>
@@ -231,7 +317,11 @@ function AccountSettings() {
                           type="text"
                           placeholder="City"
                           defaultValue={employee.address.city}
+                          isInvalid={cityError}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter your city.
+                        </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group as={Col} md="3">
                         <Form.Label>State</Form.Label>
@@ -241,7 +331,11 @@ function AccountSettings() {
                           type="text"
                           placeholder="State"
                           defaultValue={employee.address.state}
+                          isInvalid={stateError}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter your state.
+                        </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group as={Col} md="3">
                         <Form.Label>Zipcode</Form.Label>
@@ -251,7 +345,11 @@ function AccountSettings() {
                           type="text"
                           placeholder="Zipcode"
                           defaultValue={employee.address.zipCode}
+                          isInvalid={zipError}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter your zipcode.
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Row>
 
