@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticationService.API", "AuthenticationService.API\AuthenticationService.API.csproj", "{92FC71A0-8C33-49E6-95BB-660114B27996}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthenticationService.API", "AuthenticationService.API\AuthenticationService.API.csproj", "{92FC71A0-8C33-49E6-95BB-660114B27996}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticationService.Infrastructure", "AuthenticationService.Infrastructure\AuthenticationService.Infrastructure.csproj", "{36FF1A49-7E73-46CB-8D7A-B997C7653396}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthenticationService.Infrastructure", "AuthenticationService.Infrastructure\AuthenticationService.Infrastructure.csproj", "{36FF1A49-7E73-46CB-8D7A-B997C7653396}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticationService.Tests", "AuthenticationService.Tests\AuthenticationService.Tests.csproj", "{29238165-777C-42BA-9197-2E95EDC0AB25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthenticationService.Tests", "AuthenticationService.Tests\AuthenticationService.Tests.csproj", "{29238165-777C-42BA-9197-2E95EDC0AB25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticationService.Domain", "AuthenticationService.Domain\AuthenticationService.Domain.csproj", "{32828C7C-2A4A-44D5-89BA-7C846E9788E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{29238165-777C-42BA-9197-2E95EDC0AB25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29238165-777C-42BA-9197-2E95EDC0AB25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29238165-777C-42BA-9197-2E95EDC0AB25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32828C7C-2A4A-44D5-89BA-7C846E9788E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32828C7C-2A4A-44D5-89BA-7C846E9788E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32828C7C-2A4A-44D5-89BA-7C846E9788E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32828C7C-2A4A-44D5-89BA-7C846E9788E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

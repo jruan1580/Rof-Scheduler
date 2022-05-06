@@ -37,6 +37,81 @@ namespace AuthenticationService.Tests.Infrastructure
         }
 
         [Test]
+        public async Task CheckIfEmployeeExistsSuccess()
+        {
+            _httpMessageHandlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK
+                });
+
+            var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
+
+            _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
+             .Returns(httpClient);
+
+            var res = await _accessor.CheckIfEmployee("testUsername", "testToken");
+
+            Assert.IsTrue(res);
+        }
+
+        [Test]
+        public async Task CheckIfEmployeeExistsNotFound()
+        {
+            _httpMessageHandlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.NotFound
+                });
+
+            var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
+
+            _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
+             .Returns(httpClient);
+
+            var res = await _accessor.CheckIfEmployee("testUsername", "testToken");
+
+            Assert.IsFalse(res);
+        }
+
+        [Test]
+        public void CheckIfEmployeeExistsExceptionThrown()
+        {
+
+            _httpMessageHandlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Content = new StringContent("an internal error has occurred", Encoding.UTF8, "application/json")
+                });
+
+            var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
+
+            _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
+             .Returns(httpClient);
+
+            Assert.ThrowsAsync<Exception>(() => _accessor.CheckIfEmployee("testUsername", "testToken"));
+        }
+
+        [Test]
         public async Task LoginSuccess()
         {
             var loginResponse = new EmployeeLoginResponse()
@@ -116,7 +191,7 @@ namespace AuthenticationService.Tests.Infrastructure
             _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
              .Returns(httpClient);
 
-            var res = await _accessor.Logout(1, "Employee", "testToken");
+            var res = await _accessor.Logout(1, "/api/Employee/logout", "testToken");
 
             Assert.IsTrue(res);
         }
@@ -142,7 +217,7 @@ namespace AuthenticationService.Tests.Infrastructure
             _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
              .Returns(httpClient);
 
-            Assert.ThrowsAsync<Exception>(() => _accessor.Logout(1, "Employee", "testToken"));
+            Assert.ThrowsAsync<Exception>(() => _accessor.Logout(1, "/api/Employee/logout", "testToken"));
         }
     }
 }

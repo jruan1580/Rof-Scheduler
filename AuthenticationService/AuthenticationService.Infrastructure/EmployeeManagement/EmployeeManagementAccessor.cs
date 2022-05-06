@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -9,7 +10,14 @@ using System.Threading.Tasks;
 
 namespace AuthenticationService.Infrastructure.EmployeeManagement
 {
-    public class EmployeeManagementAccessor
+    public interface IEmployeeManagementAccessor
+    {
+        Task<bool> CheckIfEmployee(string username, string token);
+        Task<EmployeeLoginResponse> Login(string username, string password);
+        Task<bool> Logout(long userId, string relativeUrl, string token);
+    }
+
+    public class EmployeeManagementAccessor : IEmployeeManagementAccessor
     {
         private readonly string _employeeManagementBaseUrl;
         private readonly IHttpClientFactory _httpClientFactory;
@@ -20,6 +28,32 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
             _httpClientFactory = httpClientFactory;
         }
 
+        public async Task<bool> CheckIfEmployee(string username, string token)
+        {
+            using(var httpClient = _httpClientFactory.CreateClient())
+            {
+                var url = $"{_employeeManagementBaseUrl}/api/employee/exists?username={username}";
+
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await httpClient.GetAsync(url);
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return false;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errMsg = await response.Content.ReadAsStringAsync();
+
+                    throw new Exception($"Failed to check if employee exists with error message: {errMsg}");
+                }
+
+                return true;
+            }
+        }
+
         /// <summary>
         /// Makes a call to EmployeeManagementService to log an employee or admin in.
         /// </summary>
@@ -28,7 +62,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         /// <returns>returns response if successful</returns>
         public async Task<EmployeeLoginResponse> Login(string username, string password)
         {
-            using(var httpClient = _httpClientFactory.CreateClient())
+            using (var httpClient = _httpClientFactory.CreateClient())
             {
                 var url = $"{_employeeManagementBaseUrl}/api/employee/login";
 
@@ -45,7 +79,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
                 }
 
                 return JsonConvert.DeserializeObject<EmployeeLoginResponse>(contentAsStr);
-            }           
+            }
         }
 
         /// <summary>
@@ -56,13 +90,11 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         /// <param name="token"></param>
         /// <returns>returns true if successful</returns>
         /// <exception cref="Exception"></exception>
-        public async Task<bool> Logout(long userId, string role, string token)
+        public async Task<bool> Logout(long userId, string relativeUrl, string token)
         {
             using (var httpClient = _httpClientFactory.CreateClient())
             {
-                var url = (role.ToLower().Equals("employee"))
-                ? $"{_employeeManagementBaseUrl}/api/Employee/logout/{userId}"
-                : $"{_employeeManagementBaseUrl}/api/Admin/logout/{userId}";
+                var url = $"{_employeeManagementBaseUrl}{relativeUrl}";
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -76,7 +108,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
                 }
 
                 return true;
-            }            
+            }
         }
     }
 }

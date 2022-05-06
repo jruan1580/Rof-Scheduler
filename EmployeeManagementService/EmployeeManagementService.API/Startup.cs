@@ -35,7 +35,7 @@ namespace EmployeeManagementService.API
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("http://localhost:3000", "http://localhost:44349")
+                    builder => builder.WithOrigins("http://localhost:3000")
                     .AllowAnyMethod()
                     .AllowAnyHeader());
                 //.AllowCredentials());
