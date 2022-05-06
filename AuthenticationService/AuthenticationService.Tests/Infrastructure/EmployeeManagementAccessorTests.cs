@@ -1,5 +1,5 @@
-﻿using AuthorizationService.Infrastructure.EmployeeManagement;
-using AuthorizationService.Infrastructure.EmployeeManagement.Models;
+﻿using AuthenticationService.Infrastructure.EmployeeManagement;
+using AuthenticationService.Infrastructure.EmployeeManagement.Models;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AuthorizationService.Tests.Infrastructure
+namespace AuthenticationService.Tests.Infrastructure
 {
     [TestFixture]
     public class EmployeeManagementAccessorTests

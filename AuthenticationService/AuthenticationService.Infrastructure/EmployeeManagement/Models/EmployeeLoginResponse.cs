@@ -1,4 +1,4 @@
-﻿namespace AuthorizationService.Infrastructure.EmployeeManagement.Models
+﻿namespace AuthenticationService.Infrastructure.EmployeeManagement.Models
 {
     public class EmployeeLoginResponse
     {

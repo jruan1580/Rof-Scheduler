@@ -1,4 +1,4 @@
-﻿using AuthorizationService.Infrastructure.EmployeeManagement.Models;
+﻿using AuthenticationService.Infrastructure.EmployeeManagement.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -7,7 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AuthorizationService.Infrastructure.EmployeeManagement
+namespace AuthenticationService.Infrastructure.EmployeeManagement
 {
     public class EmployeeManagementAccessor
     {

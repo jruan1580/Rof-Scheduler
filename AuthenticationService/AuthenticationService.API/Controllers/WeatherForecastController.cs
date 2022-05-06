@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AuthorizationService.API.Controllers
+namespace AuthenticationService.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
