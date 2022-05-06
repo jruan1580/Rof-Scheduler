@@ -12,12 +12,10 @@ import {
 
 import {
   getEmployeeById,
-  updateEmployeeInformation
+  updateEmployeeInformation,
 } from "../SharedServices/employeeManagementService";
 
-import {
-  ensureUpdateInformationProvided
-} from "../SharedServices/inputValidationService";
+import { ensureUpdateInformationProvided } from "../SharedServices/inputValidationService";
 
 import { useEffect, useState } from "react";
 
@@ -70,11 +68,21 @@ function AccountSettings() {
     const state = submitEvent.target.state.value;
     const zipCode = submitEvent.target.zip.value;
 
-    const validationRes = ensureUpdateInformationProvided(firstName, lastName, ssn, role, username, addressLine1, city, state, zipCode);
+    const validationRes = ensureUpdateInformationProvided(
+      firstName,
+      lastName,
+      ssn,
+      role,
+      username,
+      addressLine1,
+      city,
+      state,
+      zipCode
+    );
     console.log(validationRes);
-    if (validationRes.size > 0){
+    if (validationRes.size > 0) {
       setValidationMap(validationRes);
-    }else{
+    } else {
       setValidationMap(new Map());
       setLoading(true);
 
@@ -114,7 +122,7 @@ function AccountSettings() {
           setLoading(false);
         }
       })();
-    }    
+    }
   };
 
   return (
@@ -154,10 +162,10 @@ function AccountSettings() {
                           type="text"
                           placeholder="First name"
                           defaultValue={employee.firstName}
-                          isInvalid={validationMap.has('firstName')}
+                          isInvalid={validationMap.has("firstName")}
                         />
                         <Form.Control.Feedback type="invalid">
-                          {validationMap.get('firstName')}
+                          {validationMap.get("firstName")}
                         </Form.Control.Feedback>
                       </Form.Group>
 
@@ -169,7 +177,7 @@ function AccountSettings() {
                           type="text"
                           placeholder="Last name"
                           defaultValue={employee.lastName}
-                          isInvalid={validationMap.has('lastName')}
+                          isInvalid={validationMap.has("lastName")}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please enter your last name.
@@ -184,7 +192,7 @@ function AccountSettings() {
                           placeholder="Username"
                           name="username"
                           defaultValue={employee.username}
-                          isInvalid={validationMap.has('username')}
+                          isInvalid={validationMap.has("username")}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please enter a username.
@@ -199,7 +207,7 @@ function AccountSettings() {
                           required
                           type="select"
                           placeholder="Role"
-                          name="role"                          
+                          name="role"
                         >
                           <option value="Administrator">Administrator</option>
                           <option value="Employee">Employee</option>
@@ -214,10 +222,10 @@ function AccountSettings() {
                           type="text"
                           placeholder="SSN"
                           defaultValue={employee.ssn}
-                          isInvalid={validationMap.has('ssn')}
+                          isInvalid={validationMap.has("ssn")}
                         />
                         <Form.Control.Feedback type="invalid">
-                          Please enter your SSN.
+                          {validationMap.get("ssn")}
                         </Form.Control.Feedback>
                       </Form.Group>
 
@@ -242,10 +250,10 @@ function AccountSettings() {
                           type="text"
                           placeholder="Address Line 1"
                           defaultValue={employee.address.addressLine1}
-                          isInvalid={validationMap.has('addressLine1')}
+                          isInvalid={validationMap.has("addressLine1")}
                         />
                         <Form.Control.Feedback type="invalid">
-                          Please enter your address.
+                          {validationMap.get("addressLine1")}
                         </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group as={Col} md="6">
@@ -268,10 +276,10 @@ function AccountSettings() {
                           type="text"
                           placeholder="City"
                           defaultValue={employee.address.city}
-                          isInvalid={validationMap.has('city')}
+                          isInvalid={validationMap.has("city")}
                         />
                         <Form.Control.Feedback type="invalid">
-                          Please enter your city.
+                          {validationMap.get("city")}
                         </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group as={Col} md="3">
@@ -282,10 +290,10 @@ function AccountSettings() {
                           type="text"
                           placeholder="State"
                           defaultValue={employee.address.state}
-                          isInvalid={validationMap.has('state')}
+                          isInvalid={validationMap.has("state")}
                         />
                         <Form.Control.Feedback type="invalid">
-                          Please enter your state.
+                          {validationMap.get("state")}
                         </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group as={Col} md="3">
@@ -296,10 +304,10 @@ function AccountSettings() {
                           type="text"
                           placeholder="Zipcode"
                           defaultValue={employee.address.zipCode}
-                          isInvalid={validationMap.has('zipCode')}
+                          isInvalid={validationMap.has("zipCode")}
                         />
                         <Form.Control.Feedback type="invalid">
-                          Please enter your zipcode.
+                          {validationMap.get("zipcode")}
                         </Form.Control.Feedback>
                       </Form.Group>
                     </Row>
