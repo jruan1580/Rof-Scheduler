@@ -1,6 +1,130 @@
-import { Tab, Nav, Row, Col, Form, Button, Container } from "react-bootstrap";
+import {
+  Tab,
+  Nav,
+  Row,
+  Col,
+  Form,
+  Button,
+  Container,
+  Spinner,
+  Alert,
+} from "react-bootstrap";
+
+import {
+  getEmployeeById,
+  updateEmployeeInformation,
+} from "../SharedServices/employeeManagementService";
+
+import { ensureUpdateInformationProvided } from "../SharedServices/inputValidationService";
+
+import { useEffect, useState } from "react";
 
 function AccountSettings() {
+  const ee = {
+    id: 0,
+    firstName: "",
+    lastName: "",
+    ssn: "",
+    role: "",
+    username: "",
+    address: {
+      addressLine1: "",
+      addressLine2: "",
+      city: "",
+      state: "",
+      zipCode: "",
+    },
+  };
+
+  const [employee, setEmployee] = useState(ee);
+  const [loading, setLoading] = useState(false);
+  const [updateErrMsg, setUpdateErrMsg] = useState("");
+  const [validationMap, setValidationMap] = useState(new Map());
+
+  useEffect(() => {
+    (async function () {
+      try {
+        const emp = await getEmployeeById();
+        setEmployee(emp);
+      } catch (e) {
+        alert("Failed to fetch employee info... Try Again");
+        console.log(e.message);
+      }
+    })();
+  }, []);
+
+  const handleSubmit = (submitEvent) => {
+    submitEvent.preventDefault();
+
+    const id = parseInt(localStorage.getItem("id"));
+    const firstName = submitEvent.target.firstName.value;
+    const lastName = submitEvent.target.lastName.value;
+    const ssn = submitEvent.target.ssn.value;
+    const role = submitEvent.target.role.value;
+    const username = submitEvent.target.username.value;
+    const addressLine1 = submitEvent.target.address1.value;
+    const addressLine2 = submitEvent.target.address2.value;
+    const city = submitEvent.target.city.value;
+    const state = submitEvent.target.state.value;
+    const zipCode = submitEvent.target.zip.value;
+
+    const validationRes = ensureUpdateInformationProvided(
+      firstName,
+      lastName,
+      ssn,
+      role,
+      username,
+      addressLine1,
+      city,
+      state,
+      zipCode
+    );
+    console.log(validationRes);
+    if (validationRes.size > 0) {
+      setValidationMap(validationRes);
+    } else {
+      setValidationMap(new Map());
+      setLoading(true);
+
+      (async function () {
+        try {
+          await updateEmployeeInformation(
+            id,
+            firstName,
+            lastName,
+            ssn,
+            role,
+            username,
+            addressLine1,
+            addressLine2,
+            city,
+            state,
+            zipCode
+          );
+
+          setEmployee({
+            ...employee,
+            firstName: submitEvent.target.firstName.value,
+            lastName: submitEvent.target.lastName.value,
+            ssn: submitEvent.target.ssn.value,
+            role: submitEvent.target.role.value,
+            username: submitEvent.target.username.value,
+            addressLine1: submitEvent.target.address1,
+            addressLine2: submitEvent.target.address2.value,
+            city: submitEvent.target.city.value,
+            state: submitEvent.target.state.value,
+            zipCode: submitEvent.target.zip.value,
+          });
+          setUpdateErrMsg("");
+        } catch (e) {
+          setUpdateErrMsg(e.message);
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
+  };
+
   return (
     <>
       <Container className="settingsContainer">
@@ -24,26 +148,40 @@ function AccountSettings() {
             <Col sm={9}>
               <Tab.Content>
                 <Tab.Pane eventKey="accountSettings">
-                  <Form>
+                  <Form noValidate onSubmit={handleSubmit}>
+                    {updateErrMsg !== "" && (
+                      <Alert variant="danger">{updateErrMsg}</Alert>
+                    )}
+
                     <Row className="mb-3">
                       <Form.Group as={Col} md="4">
                         <Form.Label>First name</Form.Label>
                         <Form.Control
                           required
+                          name="firstName"
                           type="text"
                           placeholder="First name"
-                          defaultValue="Jason"
+                          defaultValue={employee.firstName}
+                          isInvalid={validationMap.has("firstName")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {validationMap.get("firstName")}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group as={Col} md="4">
                         <Form.Label>Last name</Form.Label>
                         <Form.Control
                           required
+                          name="lastName"
                           type="text"
                           placeholder="Last name"
-                          defaultValue="Ruan"
+                          defaultValue={employee.lastName}
+                          isInvalid={validationMap.has("lastName")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter your last name.
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group as={Col} md="4">
@@ -52,17 +190,27 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Username"
-                          defaultValue="jruan1580"
+                          name="username"
+                          defaultValue={employee.username}
+                          isInvalid={validationMap.has("username")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          Please enter a username.
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Row>
 
                     <Row className="mb-3">
                       <Form.Group as={Col} md="4">
                         <Form.Label>Role</Form.Label>
-                        <Form.Select required type="select" placeholder="Role">
-                          <option value="admin">Admin</option>
-                          <option value="employee">Employee</option>
+                        <Form.Select
+                          required
+                          type="select"
+                          placeholder="Role"
+                          name="role"
+                        >
+                          <option value="Administrator">Administrator</option>
+                          <option value="Employee">Employee</option>
                         </Form.Select>
                       </Form.Group>
 
@@ -70,10 +218,15 @@ function AccountSettings() {
                         <Form.Label>SSN</Form.Label>
                         <Form.Control
                           required
+                          name="ssn"
                           type="text"
                           placeholder="SSN"
-                          defaultValue="***-**-1234"
+                          defaultValue={employee.ssn}
+                          isInvalid={validationMap.has("ssn")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {validationMap.get("ssn")}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group as={Col} md="4">
@@ -82,6 +235,7 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Country"
+                          disabled
                           defaultValue="USA"
                         />
                       </Form.Group>
@@ -92,16 +246,23 @@ function AccountSettings() {
                         <Form.Label>Address Line 1</Form.Label>
                         <Form.Control
                           required
+                          name="address1"
                           type="text"
                           placeholder="Address Line 1"
-                          defaultValue="123 Main St"
+                          defaultValue={employee.address.addressLine1}
+                          isInvalid={validationMap.has("addressLine1")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {validationMap.get("addressLine1")}
+                        </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group as={Col} md="6">
                         <Form.Label>Address Line 2</Form.Label>
                         <Form.Control
                           type="text"
+                          name="address2"
                           placeholder="Address Line 2"
+                          defaultValue={employee.address.addressLine2}
                         />
                       </Form.Group>
                     </Row>
@@ -111,38 +272,67 @@ function AccountSettings() {
                         <Form.Label>City</Form.Label>
                         <Form.Control
                           required
+                          name="city"
                           type="text"
                           placeholder="City"
-                          defaultValue="San Diego"
+                          defaultValue={employee.address.city}
+                          isInvalid={validationMap.has("city")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {validationMap.get("city")}
+                        </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group as={Col} md="3">
                         <Form.Label>State</Form.Label>
                         <Form.Control
                           required
+                          name="state"
                           type="text"
                           placeholder="State"
-                          defaultValue="CA"
+                          defaultValue={employee.address.state}
+                          isInvalid={validationMap.has("state")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {validationMap.get("state")}
+                        </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group as={Col} md="3">
                         <Form.Label>Zipcode</Form.Label>
                         <Form.Control
                           required
+                          name="zip"
                           type="text"
                           placeholder="Zipcode"
-                          defaultValue="12345"
+                          defaultValue={employee.address.zipCode}
+                          isInvalid={validationMap.has("zipCode")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {validationMap.get("zipcode")}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Row>
 
-                    <Button
-                      variant="outline-primary"
-                      type="submit"
-                      style={{ marginTop: "0.5rem" }}
-                    >
-                      Save
-                    </Button>
+                    {loading && (
+                      <Button variant="primary" disabled>
+                        <Spinner
+                          as="span"
+                          animation="grow"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                        Loading...
+                      </Button>
+                    )}
+                    {!loading && (
+                      <Button
+                        variant="outline-primary"
+                        type="submit"
+                        style={{ marginTop: "0.5rem" }}
+                      >
+                        Save
+                      </Button>
+                    )}
                   </Form>
                 </Tab.Pane>
 
