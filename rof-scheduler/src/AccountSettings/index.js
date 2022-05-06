@@ -9,10 +9,16 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
+
 import {
   getEmployeeById,
-  updateEmployeeInformation,
+  updateEmployeeInformation
 } from "../SharedServices/employeeManagementService";
+
+import {
+  ensureUpdateInformationProvided
+} from "../SharedServices/inputValidationService";
+
 import { useEffect, useState } from "react";
 
 function AccountSettings() {
@@ -35,14 +41,7 @@ function AccountSettings() {
   const [employee, setEmployee] = useState(ee);
   const [loading, setLoading] = useState(false);
   const [updateErrMsg, setUpdateErrMsg] = useState("");
-  const [firstNameError, setFirstNameError] = useState(false);
-  const [lastNameError, setlastNameError] = useState(false);
-  const [usernameError, setUsernameError] = useState(false);
-  const [ssnError, setSsnError] = useState(false);
-  const [address1Error, setAddress1Error] = useState(false);
-  const [cityError, setCityError] = useState(false);
-  const [stateError, setStateError] = useState(false);
-  const [zipError, setZipError] = useState(false);
+  const [validationMap, setValidationMap] = useState(new Map());
 
   useEffect(() => {
     (async function () {
@@ -71,98 +70,51 @@ function AccountSettings() {
     const state = submitEvent.target.state.value;
     const zipCode = submitEvent.target.zip.value;
 
-    if (firstName === undefined || firstName === "") {
-      setFirstNameError(true);
-      submitEvent.stopPropagation();
-    } else {
-      setFirstNameError(false);
-    }
+    const validationRes = ensureUpdateInformationProvided(firstName, lastName, ssn, role, username, addressLine1, city, state, zipCode);
+    console.log(validationRes);
+    if (validationRes.size > 0){
+      setValidationMap(validationRes);
+    }else{
+      setValidationMap(new Map());
+      setLoading(true);
 
-    if (lastName === undefined || lastName === "") {
-      setlastNameError(true);
-      submitEvent.stopPropagation();
-    } else {
-      setlastNameError(false);
-    }
+      (async function () {
+        try {
+          await updateEmployeeInformation(
+            id,
+            firstName,
+            lastName,
+            ssn,
+            role,
+            username,
+            addressLine1,
+            addressLine2,
+            city,
+            state,
+            zipCode
+          );
 
-    if (ssn === undefined || ssn === "") {
-      setSsnError(true);
-      submitEvent.stopPropagation();
-    } else {
-      setSsnError(false);
-    }
-
-    if (username === undefined || username === "") {
-      setUsernameError(true);
-      submitEvent.stopPropagation();
-    } else {
-      setUsernameError(false);
-    }
-    if (addressLine1 === undefined || addressLine1 === "") {
-      setAddress1Error(true);
-      submitEvent.stopPropagation();
-    } else {
-      setAddress1Error(false);
-    }
-
-    if (city === undefined || city === "") {
-      setCityError(true);
-      submitEvent.stopPropagation();
-    } else {
-      setCityError(false);
-    }
-
-    if (state === undefined || state === "") {
-      setStateError(true);
-      submitEvent.stopPropagation();
-    } else {
-      setStateError(false);
-    }
-
-    if (zipCode === undefined || zipCode === "") {
-      setZipError(true);
-      submitEvent.stopPropagation();
-    } else {
-      setZipError(false);
-    }
-
-    setLoading(true);
-    (async function () {
-      try {
-        await updateEmployeeInformation(
-          id,
-          firstName,
-          lastName,
-          ssn,
-          role,
-          username,
-          addressLine1,
-          addressLine2,
-          city,
-          state,
-          zipCode
-        );
-
-        setEmployee({
-          ...employee,
-          firstName: submitEvent.target.firstName.value,
-          lastName: submitEvent.target.lastName.value,
-          ssn: submitEvent.target.ssn.value,
-          role: submitEvent.target.role.value,
-          username: submitEvent.target.username.value,
-          addressLine1: submitEvent.target.address1,
-          addressLine2: submitEvent.target.address2.value,
-          city: submitEvent.target.city.value,
-          state: submitEvent.target.state.value,
-          zipCode: submitEvent.target.zip.value,
-        });
-        setUpdateErrMsg("");
-      } catch (e) {
-        setUpdateErrMsg(e.message);
-      } finally {
-        setLoading(false);
-      }
-    })();
+          setEmployee({
+            ...employee,
+            firstName: submitEvent.target.firstName.value,
+            lastName: submitEvent.target.lastName.value,
+            ssn: submitEvent.target.ssn.value,
+            role: submitEvent.target.role.value,
+            username: submitEvent.target.username.value,
+            addressLine1: submitEvent.target.address1,
+            addressLine2: submitEvent.target.address2.value,
+            city: submitEvent.target.city.value,
+            state: submitEvent.target.state.value,
+            zipCode: submitEvent.target.zip.value,
+          });
+          setUpdateErrMsg("");
+        } catch (e) {
+          setUpdateErrMsg(e.message);
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }    
   };
 
   return (
@@ -202,10 +154,10 @@ function AccountSettings() {
                           type="text"
                           placeholder="First name"
                           defaultValue={employee.firstName}
-                          isInvalid={firstNameError}
+                          isInvalid={validationMap.has('firstName')}
                         />
                         <Form.Control.Feedback type="invalid">
-                          Please enter your first name.
+                          {validationMap.get('firstName')}
                         </Form.Control.Feedback>
                       </Form.Group>
 
@@ -217,7 +169,7 @@ function AccountSettings() {
                           type="text"
                           placeholder="Last name"
                           defaultValue={employee.lastName}
-                          isInvalid={lastNameError}
+                          isInvalid={validationMap.has('lastName')}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please enter your last name.
@@ -232,7 +184,7 @@ function AccountSettings() {
                           placeholder="Username"
                           name="username"
                           defaultValue={employee.username}
-                          isInvalid={usernameError}
+                          isInvalid={validationMap.has('username')}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please enter a username.
@@ -247,8 +199,7 @@ function AccountSettings() {
                           required
                           type="select"
                           placeholder="Role"
-                          name="role"
-                          defaultValue={employee.role}
+                          name="role"                          
                         >
                           <option value="Administrator">Administrator</option>
                           <option value="Employee">Employee</option>
@@ -263,7 +214,7 @@ function AccountSettings() {
                           type="text"
                           placeholder="SSN"
                           defaultValue={employee.ssn}
-                          isInvalid={ssnError}
+                          isInvalid={validationMap.has('ssn')}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please enter your SSN.
@@ -291,7 +242,7 @@ function AccountSettings() {
                           type="text"
                           placeholder="Address Line 1"
                           defaultValue={employee.address.addressLine1}
-                          isInvalid={address1Error}
+                          isInvalid={validationMap.has('addressLine1')}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please enter your address.
@@ -317,7 +268,7 @@ function AccountSettings() {
                           type="text"
                           placeholder="City"
                           defaultValue={employee.address.city}
-                          isInvalid={cityError}
+                          isInvalid={validationMap.has('city')}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please enter your city.
@@ -331,7 +282,7 @@ function AccountSettings() {
                           type="text"
                           placeholder="State"
                           defaultValue={employee.address.state}
-                          isInvalid={stateError}
+                          isInvalid={validationMap.has('state')}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please enter your state.
@@ -345,7 +296,7 @@ function AccountSettings() {
                           type="text"
                           placeholder="Zipcode"
                           defaultValue={employee.address.zipCode}
-                          isInvalid={zipError}
+                          isInvalid={validationMap.has('zipCode')}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please enter your zipcode.
