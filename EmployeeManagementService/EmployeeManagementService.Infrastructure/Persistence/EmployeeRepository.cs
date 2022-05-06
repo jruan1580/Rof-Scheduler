@@ -43,8 +43,10 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 return await context.Employees
                     .Select(e => new Employee()
                     {
+                        Id = e.Id,
                         FirstName = e.FirstName,
                         LastName = e.LastName,
+                        Password = e.Password,
                         Ssn = e.Ssn,
                         Role = e.Role,
                         Username = e.Username,
@@ -74,6 +76,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                         FirstName = e.FirstName,
                         LastName = e.LastName,
                         Ssn = e.Ssn,
+                        Password = e.Password,
                         Role = e.Role,
                         Username = e.Username,
                         Password = e.Password,
