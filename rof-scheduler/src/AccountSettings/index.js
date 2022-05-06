@@ -1,34 +1,6 @@
 import { Tab, Nav, Row, Col, Form, Button, Container } from "react-bootstrap";
-import { getEmployeeById } from "../SharedServices/employeeManagementService";
-import { useState } from "react";
 
 function AccountSettings() {
-  const [employee, setEmployee] = useState({
-    id: parseInt(localStorage.getItem("id")),
-    firstName: "",
-    lastName: "",
-    ssn: "",
-    role: localStorage.getItem("role"),
-    userName: "",
-    address1: "",
-    address2: "",
-    city: "",
-    state: "",
-    zip: "",
-  });
-
-  const getInfo = () => {
-    (async function () {
-      try {
-        const emp = await getEmployeeById();
-        setEmployee(emp);
-      } catch (e) {
-        alert("Failed to fetch employee info... Try Again");
-        console.log(e.message);
-      }
-    })();
-  };
-
   return (
     <>
       <Container className="settingsContainer">
@@ -41,9 +13,7 @@ function AccountSettings() {
             <Col sm={3}>
               <Nav variant="pills" className="flex-column">
                 <Nav.Item>
-                  <Nav.Link eventKey="accountSettings" onClick={getInfo}>
-                    Account
-                  </Nav.Link>
+                  <Nav.Link eventKey="accountSettings">Account</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link eventKey="passwordSettings">Password</Nav.Link>
@@ -82,7 +52,6 @@ function AccountSettings() {
                           required
                           type="text"
                           placeholder="Username"
-                          disabled
                           defaultValue="jruan1580"
                         />
                       </Form.Group>
