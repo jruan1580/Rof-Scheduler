@@ -11,13 +11,13 @@ export const login = async function (username, password) {
     credentials: "include",
   });
 
-  if (response.status !== 200) {
-    var errMsg = await response.text();
-    throw new Error(errMsg);
+  if (response.status !== 200){
+      var errMsg = await response.text();
+      throw new Error(errMsg);
   }
 
-  return await response;
-};
+  return await response.json();
+}
 
 export const logoff = async function () {
   const baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
