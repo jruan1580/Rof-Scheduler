@@ -16,7 +16,7 @@ export const login = async function (username, password) {
     throw new Error(errMsg);
   }
 
-  return await response;
+  return await response.json();
 };
 
 export const logoff = async function () {
