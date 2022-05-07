@@ -42,7 +42,6 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.AddressLine2)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -66,13 +65,14 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Password).IsRequired();
+
                 entity.Property(e => e.PrimaryPhoneNum)
                     .IsRequired()
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
                 entity.Property(e => e.SecondaryPhoneNum)
-                    .IsRequired()
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
