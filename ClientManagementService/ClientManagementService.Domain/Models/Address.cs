@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ClientManagementService.Domain.Models
+﻿namespace ClientManagementService.Domain.Models
 {
     public class Address
     {

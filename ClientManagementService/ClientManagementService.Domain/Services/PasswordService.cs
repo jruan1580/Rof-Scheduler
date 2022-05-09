@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,7 +19,9 @@ namespace ClientManagementService.Domain.Services
 
         public PasswordService(IConfiguration config)
         {
+            _saltString = config.GetSection("PasswordSalt").Value;
 
+            _salt = Encoding.UTF8.GetBytes(_saltString);
         }
 
         public byte[] EncryptPassword(string password)

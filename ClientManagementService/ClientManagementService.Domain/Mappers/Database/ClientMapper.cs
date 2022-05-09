@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CoreClient = ClientManagementService.Domain.Models.Client;
+﻿using CoreClient = ClientManagementService.Domain.Models.Client;
 using DbClient = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 
 namespace ClientManagementService.Domain.Mappers.Database

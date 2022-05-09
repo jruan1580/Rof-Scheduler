@@ -2,8 +2,6 @@
 using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Domain.Services
