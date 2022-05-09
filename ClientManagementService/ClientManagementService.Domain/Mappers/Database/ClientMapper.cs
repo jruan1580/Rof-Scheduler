@@ -32,7 +32,7 @@ namespace ClientManagementService.Domain.Mappers.Database
             return coreClient;
         }
 
-        public static DbClient ToDbClient(CoreClient coreClient)
+        public static DbClient FromCoreClient(CoreClient coreClient)
         {
             var entity = new DbClient();
 
