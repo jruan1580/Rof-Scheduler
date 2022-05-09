@@ -12,6 +12,7 @@ namespace ClientManagementService.Infrastructure.Persistence
     {
         Task CreateClient(Client newClient);
         Task<Client> GetClientById(long id);
+        Task<Client> GetClientByEmail(string email);
         Task UpdateClientInfo(Client clientToUpdate);
     }
 
@@ -44,7 +45,14 @@ namespace ClientManagementService.Infrastructure.Persistence
             {
                 return await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
             }
+        }
 
+        public async Task<Client> GetClientByEmail(string email)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Clients.FirstOrDefaultAsync(c => c.EmailAddress == email);
+            }
         }
     }
 }

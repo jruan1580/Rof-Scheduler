@@ -79,25 +79,77 @@ namespace ClientManagementService.Domain.Models
 
             if (string.IsNullOrEmpty(Address.AddressLine1))
             {
-                invalidErr.Add("Need a primary phone number.");
+                invalidErr.Add("Need an Address Line 1.");
             }
 
             if (string.IsNullOrEmpty(Address.City))
             {
-                invalidErr.Add("Need a primary phone number.");
+                invalidErr.Add("Need a City.");
             }
 
             if (string.IsNullOrEmpty(Address.State))
             {
-                invalidErr.Add("Need a primary phone number.");
+                invalidErr.Add("Need a State.");
             }
 
             if (string.IsNullOrEmpty(Address.ZipCode))
             {
-                invalidErr.Add("Need a primary phone number.");
+                invalidErr.Add("Need a Zipcode.");
             }
 
             return invalidErr;
+        }
+
+        public List<string> IsValidClientToUpdate()
+        {
+            var invalidErrs = new List<string>();
+
+            if (Id <= 0)
+            {
+                invalidErrs.Add($"Invalid Id: {Id}.");
+            }
+
+            if (string.IsNullOrEmpty(FirstName))
+            {
+                invalidErrs.Add("First name cannot be empty.");
+            }
+
+            if (string.IsNullOrEmpty(LastName))
+            {
+                invalidErrs.Add("Last name cannot be empty.");
+            }
+
+            if (string.IsNullOrEmpty(EmailAddress))
+            {
+                invalidErrs.Add("Email Address cannot be empty.");
+            }
+
+            if (string.IsNullOrEmpty(PrimaryPhoneNum))
+            {
+                invalidErrs.Add("Primary Phone Number cannot be empty.");
+            }
+
+            if (string.IsNullOrEmpty(Address.AddressLine1))
+            {
+                invalidErrs.Add("Address Line 1 cannot be empty.");
+            }
+
+            if (string.IsNullOrEmpty(Address.City))
+            {
+                invalidErrs.Add("City cannot be empty.");
+            }
+
+            if (string.IsNullOrEmpty(Address.State))
+            {
+                invalidErrs.Add("State cannot be empty.");
+            }
+
+            if (string.IsNullOrEmpty(Address.ZipCode))
+            {
+                invalidErrs.Add("Zipcode cannot be empty.");
+            }
+
+            return invalidErrs;
         }
     }
 }
