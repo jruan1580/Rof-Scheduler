@@ -7,6 +7,8 @@ namespace AuthenticationService.Domain.Services
     public interface IAuthService
     {
         Task<BasicUserInfo> Login(string username, string password);
+
+        Task Logout(long id, string role, string token);
     }
 
     public class AuthService : IAuthService

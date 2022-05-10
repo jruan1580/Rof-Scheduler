@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AuthenticationService.Domain\AuthenticationService.Domain.csproj" />
     <ProjectReference Include="..\AuthenticationService.Infrastructure\AuthenticationService.Infrastructure.csproj" />
   </ItemGroup>
 
