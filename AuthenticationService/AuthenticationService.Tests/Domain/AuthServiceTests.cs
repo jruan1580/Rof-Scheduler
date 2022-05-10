@@ -1,12 +1,8 @@
 ﻿using AuthenticationService.Domain.Services;
 using AuthenticationService.Infrastructure.EmployeeManagement;
 using AuthenticationService.Infrastructure.EmployeeManagement.Models;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AuthenticationService.Tests.Domain

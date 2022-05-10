@@ -73,6 +73,12 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
 
                 var contentAsStr = await response.Content.ReadAsStringAsync();
 
+                //bad request - when username or password is not provided.
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    throw new ArgumentException(contentAsStr);
+                }
+
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new Exception($"Failed to login with error message: {contentAsStr}");
