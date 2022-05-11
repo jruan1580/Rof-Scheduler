@@ -36,7 +36,7 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var clientCheck = await GetClientByEmail(newClient.EmailAddress);
+            var clientCheck = await _clientRepository.GetClientByEmail(newClient.EmailAddress);
 
             if (clientCheck != null && clientCheck.FirstName == newClient.FirstName && clientCheck.LastName == newClient.LastName)
             {

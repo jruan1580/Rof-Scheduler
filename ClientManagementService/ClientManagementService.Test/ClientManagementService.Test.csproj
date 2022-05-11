@@ -13,4 +13,10 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ClientManagementService.API\ClientManagementService.API.csproj" />
+    <ProjectReference Include="..\ClientManagementService.Domain\ClientManagementService.Domain.csproj" />
+    <ProjectReference Include="..\ClientManagementService.Infrastructure\ClientManagementService.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
