@@ -1,9 +1,5 @@
 ﻿using ClientManagementService.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Infrastructure.Persistence
@@ -12,6 +8,7 @@ namespace ClientManagementService.Infrastructure.Persistence
     {
         Task CreateClient(Client newClient);
         Task<Client> GetClientById(long id);
+        Task<Client> GetClientByEmail(string email);
         Task UpdateClientInfo(Client clientToUpdate);
     }
 
@@ -44,7 +41,14 @@ namespace ClientManagementService.Infrastructure.Persistence
             {
                 return await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
             }
+        }
 
+        public async Task<Client> GetClientByEmail(string email)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Clients.FirstOrDefaultAsync(c => c.EmailAddress == email);
+            }
         }
     }
 }
