@@ -1,4 +1,5 @@
-﻿using AuthenticationService.Domain.Model;
+﻿using AuthenticationService.Domain.Exceptions;
+using AuthenticationService.Domain.Model;
 using AuthenticationService.Infrastructure.EmployeeManagement;
 using System.Threading.Tasks;
 
@@ -44,11 +45,17 @@ namespace AuthenticationService.Domain.Services
 
             var employeeResponse = await _employeeManagementAccessor.Login(username, password);
 
+            //employee was not found.
+            if (employeeResponse == null)
+            {
+                throw new NotFoundException();
+            }
+
             return new BasicUserInfo().MapFromEmployeeLoginResponse(employeeResponse);
         }
 
         public async Task Logout(long id, string role, string token)
-        {
+        {            
             if (role.Equals("Client"))
             {
 
@@ -56,7 +63,12 @@ namespace AuthenticationService.Domain.Services
 
             var relativeUrl = (role.ToLower().Equals("employee")) ? $"/api/Employee/logout/{id}" : $"/api/Admin/logout/{id}";
 
-            await _employeeManagementAccessor.Logout(id, relativeUrl, token);
+            var resp = await _employeeManagementAccessor.Logout(id, relativeUrl, token);
+
+            if (resp == null)
+            {
+                throw new NotFoundException();
+            }
         }
     }
 }

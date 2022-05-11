@@ -193,7 +193,7 @@ namespace AuthenticationService.Tests.Infrastructure
 
             var res = await _accessor.Logout(1, "/api/Employee/logout", "testToken");
 
-            Assert.IsTrue(res);
+            Assert.IsNotNull(res);
         }
 
         [Test]

@@ -50,7 +50,7 @@ namespace AuthenticationService.Tests.Domain
         public async Task TestEmployeeLogoutSuccess()
         {
             _employeeManagementAccessor.Setup(e => e.Logout(It.IsAny<long>(), It.Is<string>(s => s.Equals("/api/Employee/logout/1")), It.IsAny<string>()))
-                .ReturnsAsync(true);
+                .ReturnsAsync(new LogoutResponse(1, true));
 
             await _authService.Logout(1, "Employee", "testToken");
 

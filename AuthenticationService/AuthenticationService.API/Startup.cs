@@ -49,7 +49,7 @@ namespace AuthenticationService.API
                       OnMessageReceived = context =>
                       {
                           //no auth header, get it out of cookie, otw, it is in auth header
-                          if (!context.Response.Headers.ContainsKey("Authorization"))
+                          if (!context.Request.Headers.ContainsKey("Authorization"))
                           {
                               if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
                               {

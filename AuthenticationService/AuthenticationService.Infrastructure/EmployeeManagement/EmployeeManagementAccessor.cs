@@ -14,7 +14,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
     {
         Task<bool> CheckIfEmployee(string username, string token);
         Task<EmployeeLoginResponse> Login(string username, string password);
-        Task<bool> Logout(long userId, string relativeUrl, string token);
+        Task<LogoutResponse> Logout(long userId, string relativeUrl, string token);
     }
 
     public class EmployeeManagementAccessor : IEmployeeManagementAccessor
@@ -73,10 +73,10 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
 
                 var contentAsStr = await response.Content.ReadAsStringAsync();
 
-                //bad request - when username or password is not provided.
-                if (response.StatusCode == HttpStatusCode.BadRequest)
+                //return null when username is not found
+                if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    throw new ArgumentException(contentAsStr);
+                    return null;
                 }
 
                 if (!response.IsSuccessStatusCode)
@@ -96,7 +96,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         /// <param name="token"></param>
         /// <returns>returns true if successful</returns>
         /// <exception cref="Exception"></exception>
-        public async Task<bool> Logout(long userId, string relativeUrl, string token)
+        public async Task<LogoutResponse> Logout(long userId, string relativeUrl, string token)
         {
             using (var httpClient = _httpClientFactory.CreateClient())
             {
@@ -106,6 +106,12 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
 
                 var response = await httpClient.PatchAsync(url, null);
 
+                //if not found, return no response
+                if(response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
                 if (!response.IsSuccessStatusCode)
                 {
                     var errMsg = await response.Content.ReadAsStringAsync();
@@ -113,7 +119,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
                     throw new Exception($"Failed to login with error message: {errMsg}");
                 }
 
-                return true;
+                return new LogoutResponse(userId, true);
             }
         }
     }

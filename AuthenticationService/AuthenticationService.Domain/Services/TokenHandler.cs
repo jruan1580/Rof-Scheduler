@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace AuthenticationService.Domain.Services
     public interface ITokenHandler
     {
         string GenerateTokenForRole(string role, int minTokenIsValid = 30);
+
+        string ExtractTokenFromRequest(HttpRequest request, string role);
     }
 
     public class TokenHandler : ITokenHandler
@@ -45,6 +48,28 @@ namespace AuthenticationService.Domain.Services
             );
 
             return tokenHandler.WriteToken(token);
+        }
+
+        public string ExtractTokenFromRequest(HttpRequest request, string role)
+        {
+            if (request.Headers.ContainsKey("Authorization"))
+            {
+                return request.Headers["Authorizastion"];
+            }
+
+            switch (role)
+            {
+                case "Administrator":
+                    return request.Cookies["X-Access-Token-Admin"];
+                case "Employee":
+                    return request.Cookies["X-Access-Token-Employee"];
+                case "Client":
+                    return request.Cookies["X-Access-Token-Client"];
+                default:
+                    break;
+            }
+
+            throw new Exception($"Role was not found: {role}");
         }
     }
 }
