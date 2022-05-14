@@ -8,6 +8,7 @@ namespace ClientManagementService.Infrastructure.Persistence
     public interface IClientRepository
     {
         Task CreateClient(Client newClient);
+        Task DeleteClientById(long id);
         Task<Client> GetClientByEmail(string email);
         Task<Client> GetClientById(long id);
         Task<int> IncrementClientFailedLoginAttempts(long id);
@@ -15,6 +16,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task UpdateClientInfo(Client clientToUpdate);
         Task UpdateClientIsLocked(long id, bool isLocked);
         Task UpdateClientLoginStatus(long id, bool isLoggedIn);
+        Task UpdatePassword(long id, string password);
     }
 
     public class ClientRepository : IClientRepository
@@ -29,22 +31,15 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task UpdateClientInfo(Client clientToUpdate)
+        public async Task DeleteClientById(long id)
         {
             using (var context = new RofSchedulerContext())
             {
-                context.Clients.Update(clientToUpdate);
+                var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
+
+                context.Remove(client);
 
                 await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<Client> GetClientById(long id)
-        {
-            //pet table not created cannot join for now...
-            using (var context = new RofSchedulerContext())
-            {
-                return await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
             }
         }
 
@@ -56,20 +51,12 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task UpdateClientLoginStatus(long id, bool isLoggedIn)
+        public async Task<Client> GetClientById(long id)
         {
+            //pet table not created cannot join for now...
             using (var context = new RofSchedulerContext())
             {
-                var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
-
-                if (client == null)
-                {
-                    throw new ArgumentException("Client not found.");
-                }
-
-                client.IsLoggedIn = isLoggedIn;
-
-                await context.SaveChangesAsync();
+                return await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
             }
         }
 
@@ -109,6 +96,16 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
+        public async Task UpdateClientInfo(Client clientToUpdate)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                context.Clients.Update(clientToUpdate);
+
+                await context.SaveChangesAsync();
+            }
+        }
+
         public async Task UpdateClientIsLocked(long id, bool isLocked)
         {
             using (var context = new RofSchedulerContext())
@@ -124,6 +121,28 @@ namespace ClientManagementService.Infrastructure.Persistence
 
                 await context.SaveChangesAsync();
             }
+        }
+
+        public async Task UpdateClientLoginStatus(long id, bool isLoggedIn)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
+
+                if (client == null)
+                {
+                    throw new ArgumentException("Client not found.");
+                }
+
+                client.IsLoggedIn = isLoggedIn;
+
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdatePassword(long id, string password)
+        {
+
         }
     }
 }
