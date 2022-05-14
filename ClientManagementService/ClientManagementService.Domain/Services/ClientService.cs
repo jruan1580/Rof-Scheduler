@@ -115,5 +115,49 @@ namespace ClientManagementService.Domain.Services
 
             return ClientMapper.ToCoreClient(client);
         }
+
+        public async Task ClientLogin(string email, string password)
+        {
+            var client = await GetClientByEmail(email);
+
+            if(client == null)
+            {
+                throw new ArgumentException($"Client with email: {email} not found.");
+            }
+
+            if(!_passwordService.VerifyPasswordHash(password, client.Password))
+            {
+                //increment failed attempt
+                throw new ArgumentException("Incorrect password.");
+            }
+
+            if(client.IsLoggedIn == true)
+            {
+                throw new ArgumentException("Client already logged in.");
+            }
+
+            if(client.IsLocked == true)
+            {
+                throw new ArgumentException("Client account is locked. Unable to log in.");
+            }
+
+            await _clientRepository.UpdateClientLoginStatus(client.Id, true);
+            
+            client.IsLoggedIn = true;
+        }
+
+        public async Task ClientLogout(long id)
+        {
+            var client = await GetClientById(id);
+
+            if(client.IsLoggedIn == false)
+            {
+                throw new ArgumentException("Client already logged out.");
+            }
+
+            await _clientRepository.UpdateClientLoginStatus(client.Id, false);
+            
+            client.IsLoggedIn = false;
+        }
     }
 }
