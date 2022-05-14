@@ -116,7 +116,7 @@ namespace ClientManagementService.Domain.Services
             return ClientMapper.ToCoreClient(client);
         }
 
-        public async Task ClientLogin(string email, string password)
+        public async Task<Client> ClientLogin(string email, string password)
         {
             var client = await GetClientByEmail(email);
 
@@ -127,16 +127,17 @@ namespace ClientManagementService.Domain.Services
 
             if(!_passwordService.VerifyPasswordHash(password, client.Password))
             {
-                //increment failed attempt
+                await IncrementClientFailedLoginAttempts(client.Id);
+
                 throw new ArgumentException("Incorrect password.");
             }
 
-            if(client.IsLoggedIn == true)
+            if(client.IsLoggedIn)
             {
-                throw new ArgumentException("Client already logged in.");
+                return client;
             }
 
-            if(client.IsLocked == true)
+            if(client.IsLocked)
             {
                 throw new ArgumentException("Client account is locked. Unable to log in.");
             }
@@ -144,13 +145,15 @@ namespace ClientManagementService.Domain.Services
             await _clientRepository.UpdateClientLoginStatus(client.Id, true);
             
             client.IsLoggedIn = true;
+
+            return client;
         }
 
         public async Task ClientLogout(long id)
         {
             var client = await GetClientById(id);
 
-            if(client.IsLoggedIn == false)
+            if(!client.IsLoggedIn)
             {
                 throw new ArgumentException("Client already logged out.");
             }
@@ -158,6 +161,32 @@ namespace ClientManagementService.Domain.Services
             await _clientRepository.UpdateClientLoginStatus(client.Id, false);
             
             client.IsLoggedIn = false;
+        }
+
+        public async Task IncrementClientFailedLoginAttempts(long id)
+        {
+            var client = await GetClientById(id);
+
+            if (client.IsLocked)
+            {
+                return;
+            }
+
+            var attempts = await _clientRepository.IncrementClientFailedLoginAttempts(client.Id);
+
+            if(attempts != 3)
+            {
+                return;
+            }
+
+            await _clientRepository.UpdateClientIsLocked(client.Id, true);
+        }
+
+        public async Task ResetClientFailedLoginAttempts(long id)
+        {
+            await _clientRepository.ResetClientFailedLoginAttempts(id);
+
+            await _clientRepository.UpdateClientIsLocked(id, false);
         }
     }
 }
