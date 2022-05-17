@@ -345,5 +345,139 @@ namespace ClientManagementService.Test.Service
             Assert.AreEqual("CA", client.Address.State);
             Assert.AreEqual("12345", client.Address.ZipCode);
         }
+
+        [Test]
+        public void ClientLogIn_AlreadyLoggedIn()
+        {
+            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
+
+            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+                .ReturnsAsync(new Client()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmailAddress = "jdoe@gmail.com",
+                    Password = encryptedPass,
+                    PrimaryPhoneNum = "123-456-7890",
+                    IsLoggedIn = true,
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false
+                });
+
+            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+
+            Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe@gmail.com", "TestPassword123!"));
+        }
+
+        [Test]
+        public void ClientLogIn_PasswordDoesNotMatch()
+        {
+            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
+
+            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+                .ReturnsAsync(new Client()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmailAddress = "jdoe@gmail.com",
+                    Password = encryptedPass,
+                    PrimaryPhoneNum = "123-456-7890",
+                    IsLoggedIn = false,
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false
+                });
+
+            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+
+            Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe@gmail.com", "Test123!"));
+        }
+
+        [Test]
+        public async Task ClientLogIn_Success()
+        {
+            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
+
+            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+                .ReturnsAsync(new Client()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmailAddress = "jdoe@gmail.com",
+                    Password = encryptedPass,
+                    PrimaryPhoneNum = "123-456-7890",
+                    IsLoggedIn = false,
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false
+                });
+
+            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+
+            await clientService.ClientLogin("jdoe@gmail.com", "TestPassword123!");
+
+            _clientRepository.Verify(c => c.UpdateClientLoginStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Once);
+        }
+
+        [Test]
+        public void ClientLogOut_AlreadyLoggedOut()
+        {
+            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
+
+            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+                .ReturnsAsync(new Client()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmailAddress = "jdoe@gmail.com",
+                    Password = encryptedPass,
+                    PrimaryPhoneNum = "123-456-7890",
+                    IsLoggedIn = false,
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false
+                });
+
+            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+
+            Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogout(1));
+        }
+
+        [Test]
+        public async Task ClientLogOut_Success()
+        {
+            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
+
+            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+                .ReturnsAsync(new Client()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmailAddress = "jdoe@gmail.com",
+                    Password = encryptedPass,
+                    PrimaryPhoneNum = "123-456-7890",
+                    IsLoggedIn = true,
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false
+                });
+
+            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+
+            await clientService.ClientLogout(1);
+
+            _clientRepository.Verify(c => c.UpdateClientLoginStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Once);
+        }
     }
 }

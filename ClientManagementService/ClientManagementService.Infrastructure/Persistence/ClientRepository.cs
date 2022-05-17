@@ -1,6 +1,7 @@
 ﻿using ClientManagementService.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Infrastructure.Persistence
@@ -16,7 +17,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task UpdateClientInfo(Client clientToUpdate);
         Task UpdateClientIsLocked(long id, bool isLocked);
         Task UpdateClientLoginStatus(long id, bool isLoggedIn);
-        Task UpdatePassword(long id, string password);
+        Task UpdatePassword(long id, byte[] newPassword);
     }
 
     public class ClientRepository : IClientRepository
@@ -40,6 +41,14 @@ namespace ClientManagementService.Infrastructure.Persistence
                 context.Remove(client);
 
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Client>> GetAllClient()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Clients.ToListAsync();
             }
         }
 
@@ -140,9 +149,21 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task UpdatePassword(long id, string password)
+        public async Task UpdatePassword(long id, byte[] newPassword)
         {
+            using (var context = new RofSchedulerContext())
+            {
+                var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
 
+                if (client == null)
+                {
+                    throw new ArgumentException("No client found.");
+                }
+
+                client.Password = newPassword;
+
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

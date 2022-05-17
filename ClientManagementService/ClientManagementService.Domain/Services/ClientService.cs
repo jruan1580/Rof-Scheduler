@@ -8,10 +8,16 @@ namespace ClientManagementService.Domain.Services
 {
     public interface IClientService
     {
+        Task ClientLogin(string email, string password);
+        Task ClientLogout(long id);
         Task CreateClient(Client newClient, string password);
+        Task DeleteClientById(long id);
         Task<Client> GetClientByEmail(string email);
         Task<Client> GetClientById(long id);
+        Task IncrementClientFailedLoginAttempts(long id);
+        Task ResetClientFailedLoginAttempts(long id);
         Task UpdateClientInfo(Client client);
+        Task UpdatePassword(long id, string newPassword);
     }
 
     public class ClientService : IClientService
@@ -116,50 +122,48 @@ namespace ClientManagementService.Domain.Services
             return ClientMapper.ToCoreClient(client);
         }
 
-        public async Task<Client> ClientLogin(string email, string password)
+        public async Task ClientLogin(string email, string password)
         {
             var client = await GetClientByEmail(email);
 
-            if(client == null)
+            if (client == null)
             {
                 throw new ArgumentException($"Client with email: {email} not found.");
             }
 
-            if(!_passwordService.VerifyPasswordHash(password, client.Password))
+            if (!_passwordService.VerifyPasswordHash(password, client.Password))
             {
                 await IncrementClientFailedLoginAttempts(client.Id);
 
                 throw new ArgumentException("Incorrect password.");
             }
 
-            if(client.IsLoggedIn)
+            if (client.IsLoggedIn)
             {
-                return client;
+                throw new ArgumentException("Client is already logged in.");
             }
 
-            if(client.IsLocked)
+            if (client.IsLocked)
             {
                 throw new ArgumentException("Client account is locked. Unable to log in.");
             }
 
             await _clientRepository.UpdateClientLoginStatus(client.Id, true);
-            
-            client.IsLoggedIn = true;
 
-            return client;
+            client.IsLoggedIn = true;
         }
 
         public async Task ClientLogout(long id)
         {
             var client = await GetClientById(id);
 
-            if(!client.IsLoggedIn)
+            if (!client.IsLoggedIn)
             {
                 throw new ArgumentException("Client already logged out.");
             }
 
             await _clientRepository.UpdateClientLoginStatus(client.Id, false);
-            
+
             client.IsLoggedIn = false;
         }
 
@@ -174,7 +178,7 @@ namespace ClientManagementService.Domain.Services
 
             var attempts = await _clientRepository.IncrementClientFailedLoginAttempts(client.Id);
 
-            if(attempts != 3)
+            if (attempts != 3)
             {
                 return;
             }
@@ -187,6 +191,30 @@ namespace ClientManagementService.Domain.Services
             await _clientRepository.ResetClientFailedLoginAttempts(id);
 
             await _clientRepository.UpdateClientIsLocked(id, false);
+        }
+
+        public async Task UpdatePassword(long id, string newPassword)
+        {
+            var client = await GetClientById(id);
+
+            if (!_passwordService.VerifyPasswordRequirements(newPassword))
+            {
+                throw new ArgumentException("New password does not meet all requirements.");
+            }
+
+            if (_passwordService.VerifyPasswordHash(newPassword, client.Password))
+            {
+                throw new ArgumentException("New password cannot be the same as current password.");
+            }
+
+            var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
+
+            await _clientRepository.UpdatePassword(client.Id, newEncryptedPass);
+        }
+
+        public async Task DeleteClientById(long id)
+        {
+            await _clientRepository.DeleteClientById(id);
         }
     }
 }

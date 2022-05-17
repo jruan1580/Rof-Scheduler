@@ -1,10 +1,223 @@
-﻿using System;
+﻿using ClientManagementService.API.Controllers;
+using ClientManagementService.Domain.Services;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ClientManagementService.Test.Controller
 {
-    class ClientControllerTest
+    [TestFixture]
+    public class ClientControllerTest
     {
+        private Mock<IClientService> _clientService;
+
+        [SetUp]
+        public void Setup()
+        {
+            _clientService = new Mock<IClientService>();
+        }
+
+        [Test]
+        public async Task CreateClient_Success()
+        {
+            var address = new API.DTO.AddressDTO()
+            {
+                AddressLine1 = "123 Test St",
+                City = "San Diego",
+                State = "CA",
+                ZipCode = "12345"
+            };
+
+            var newClient = new API.DTO.ClientDTO()
+            {
+                CountryId = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                EmailAddress = "jdoe@gmail.com",
+                Password = "TestPassword123!",
+                PrimaryPhoneNum = "123-456-7890",
+                IsLoggedIn = false,
+                IsLocked = false,
+                FailedLoginAttempts = 0,
+                TempPasswordChanged = false,
+                Address = address
+            };
+
+            _clientService.Setup(c => c.CreateClient(It.IsAny<Domain.Models.Client>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.CreateClient(newClient);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(StatusCodeResult));
+
+            var statusCode = (StatusCodeResult)response;
+
+            Assert.AreEqual(statusCode.StatusCode, 201);
+        }
+
+        [Test]
+        public async Task CreateClient_InternalServerError()
+        {
+            var newClient = new API.DTO.ClientDTO()
+            {
+                CountryId = 0,
+                FirstName = "",
+                LastName = "",
+                EmailAddress = "",
+                Password = "",
+                PrimaryPhoneNum = "",
+                Address = null
+            };
+
+            _clientService.Setup(c => c.CreateClient(It.IsAny<Domain.Models.Client>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.CreateClient(newClient);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
+
+        [Test]
+        public async Task GetClientById_Success()
+        {
+            _clientService.Setup(c => c.GetClientById(It.IsAny<long>()))
+                .ReturnsAsync(new Domain.Models.Client()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmailAddress = "jdoe@gmail.com",
+                    Password = new byte[100],
+                    PrimaryPhoneNum = "123-456-7890",
+                    IsLoggedIn = false,
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false
+                });
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.GetClientById(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+
+            var okObj = (OkObjectResult)response;
+
+            Assert.AreEqual(okObj.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task GetClientById_InternalServerError()
+        {
+            _clientService.Setup(c => c.GetClientById(It.IsAny<long>()))
+                .ReturnsAsync((Domain.Models.Client)null);
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.GetClientById(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
+
+        [Test]
+        public async Task ClientLogin_Success()
+        {
+            _clientService.Setup(e => e.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.ClientLogin(new API.DTO.ClientDTO()
+            {
+                EmailAddress = "jdoe@gmail.com",
+                Password = "TestPassword123!"
+            });
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkResult));
+
+            var ok = (OkResult)response;
+
+            Assert.AreEqual(ok.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task EmployeeLogin_InternalServerError()
+        {
+            _clientService.Setup(c => c.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.ClientLogin(new API.DTO.ClientDTO()
+            {
+                EmailAddress = "jdoe@gmail.com",
+                Password = "TestPassword1!"
+            });
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
+
+        [Test]
+        public async Task ClientLogout_Success()
+        {
+            _clientService.Setup(c => c.ClientLogout(It.IsAny<long>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.ClientLogout(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkResult));
+
+            var ok = (OkResult)response;
+
+            Assert.AreEqual(ok.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task ClientLogout_InternalServerError()
+        {
+            _clientService.Setup(c => c.ClientLogout(It.IsAny<long>()))
+                .ThrowsAsync(new Exception());
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.ClientLogout(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
     }
 }
