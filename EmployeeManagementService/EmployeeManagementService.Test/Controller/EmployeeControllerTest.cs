@@ -195,16 +195,7 @@ namespace EmployeeManagementService.Test.Controller
                     Role = "Employee"
                 });
 
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers["User-Agent"] = "Chrome";
-
-            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object)
-            {
-                ControllerContext = new ControllerContext()
-                {
-                    HttpContext = httpContext
-                }
-            };
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
             {
@@ -246,21 +237,12 @@ namespace EmployeeManagementService.Test.Controller
         public async Task EmployeeLogout_Success()
         {
             _employeeService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
-                .ReturnsAsync(new Domain.Models.Employee()
-                {
-                    Role = "Employee"
-                });
+                .Returns(Task.CompletedTask);
 
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers["User-Agent"] = "Chrome";
 
-            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object)
-            {
-                ControllerContext = new ControllerContext()
-                {
-                    HttpContext = httpContext
-                }
-            };
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.EmployeeLogout(1);
 

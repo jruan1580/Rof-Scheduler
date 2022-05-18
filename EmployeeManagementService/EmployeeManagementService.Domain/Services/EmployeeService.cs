@@ -1,4 +1,5 @@
-﻿using EmployeeManagementService.Domain.Mappers.Database;
+﻿using EmployeeManagementService.Domain.Exceptions;
+using EmployeeManagementService.Domain.Mappers.Database;
 using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
@@ -13,11 +14,11 @@ namespace EmployeeManagementService.Domain.Services
     {
         Task CreateEmployee(Employee newEmployee, string password);
         Task<Employee> EmployeeLogIn(string username, string password);
-        Task<Employee> EmployeeLogout(long id);
+        Task EmployeeLogout(long id);
         Task<List<Employee>> GetAllEmployees(int page, int offset);
         Task<Employee> GetEmployeeById(long id);
         Task<Employee> GetEmployeeByUsername(string username);
-        Task IncrementEmployeeFailedLoginAttempt(long id);
+        Task IncrementEmployeeFailedLoginAttempt(Employee employee);
         Task ResetEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployeeActiveStatus(long id, bool active);
         Task UpdateEmployeeInformation(Employee employee);
@@ -56,7 +57,7 @@ namespace EmployeeManagementService.Domain.Services
 
             if (employee == null)
             {
-                throw new ArgumentException("Employee does not exist.");
+                throw new EmployeeNotFoundException();
             }
 
             return EmployeeMapper.ToCoreEmployee(employee);
@@ -74,23 +75,21 @@ namespace EmployeeManagementService.Domain.Services
             return EmployeeMapper.ToCoreEmployee(employee);
         }
 
-        public async Task IncrementEmployeeFailedLoginAttempt(long id)
+        public async Task IncrementEmployeeFailedLoginAttempt(Employee employee)
         {
-            var employee = await GetEmployeeById(id);
-
             if (employee.IsLocked)
             {
                 return;
             }
 
-            var attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(id);
+            var attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(employee.Id);
 
             if (attempts != 3)
             {
                 return;
             }
 
-            await _employeeRepository.UpdateEmployeeIsLockedStatus(id, true);
+            await _employeeRepository.UpdateEmployeeIsLockedStatus(employee.Id, true);
         }
 
         public async Task ResetEmployeeFailedLoginAttempt(long id)
@@ -188,12 +187,13 @@ namespace EmployeeManagementService.Domain.Services
 
             if (employee == null)
             {
-                throw new ArgumentException($"Username not found: {username}");
+                throw new EmployeeNotFoundException();
             }
 
             if (!_passwordService.VerifyPasswordHash(password, employee.Password))
             {
-                await IncrementEmployeeFailedLoginAttempt(employee.Id);
+                await IncrementEmployeeFailedLoginAttempt(employee);
+
                 throw new ArgumentException("Incorrect password");
             }
 
@@ -208,19 +208,16 @@ namespace EmployeeManagementService.Domain.Services
             return employee;
         }
 
-        public async Task<Employee> EmployeeLogout(long id)
+        public async Task EmployeeLogout(long id)
         {
             var employee = await GetEmployeeById(id);
 
             if (employee.Status == false)
             {
-                return employee;
+                return;
             }
 
-            await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, false);
-            employee.Status = false;
-
-            return employee;
+            await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, false);                        
         }
 
         public async Task UpdatePassword(long id, string newPassword)
