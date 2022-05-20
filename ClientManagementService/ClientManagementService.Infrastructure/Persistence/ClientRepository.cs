@@ -38,6 +38,11 @@ namespace ClientManagementService.Infrastructure.Persistence
             {
                 var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
 
+                if(client == null)
+                {
+                    throw new ArgumentException($"No client with Id: {id} found.");
+                }
+
                 context.Remove(client);
 
                 await context.SaveChangesAsync();

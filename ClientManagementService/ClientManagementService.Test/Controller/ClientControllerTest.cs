@@ -24,14 +24,6 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task CreateClient_Success()
         {
-            var address = new API.DTO.AddressDTO()
-            {
-                AddressLine1 = "123 Test St",
-                City = "San Diego",
-                State = "CA",
-                ZipCode = "12345"
-            };
-
             var newClient = new API.DTO.ClientDTO()
             {
                 CountryId = 1,
@@ -44,7 +36,13 @@ namespace ClientManagementService.Test.Controller
                 IsLocked = false,
                 FailedLoginAttempts = 0,
                 TempPasswordChanged = false,
-                Address = address
+                Address = new API.DTO.AddressDTO()
+                {
+                    AddressLine1 = "123 Test St",
+                    City = "San Diego",
+                    State = "CA",
+                    ZipCode = "12345"
+                }
             };
 
             _clientService.Setup(c => c.CreateClient(It.IsAny<Domain.Models.Client>(), It.IsAny<string>()))
@@ -141,6 +139,55 @@ namespace ClientManagementService.Test.Controller
         }
 
         [Test]
+        public async Task GetClientByEmail_Success()
+        {
+            _clientService.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+                .ReturnsAsync(new Domain.Models.Client()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmailAddress = "jdoe@gmail.com",
+                    Password = new byte[100],
+                    PrimaryPhoneNum = "123-456-7890",
+                    IsLoggedIn = false,
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false
+                });
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.GetClientByEmail("jdoe@gmail.com");
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+
+            var okObj = (OkObjectResult)response;
+
+            Assert.AreEqual(okObj.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task GetClientByEmail_InternalServerError()
+        {
+            _clientService.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+                .ReturnsAsync((Domain.Models.Client)null);
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.GetClientByEmail("jdoe@gmail.com");
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
+
+        [Test]
         public async Task ClientLogin_Success()
         {
             _clientService.Setup(e => e.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
@@ -163,7 +210,7 @@ namespace ClientManagementService.Test.Controller
         }
 
         [Test]
-        public async Task EmployeeLogin_InternalServerError()
+        public async Task ClientLogin_InternalServerError()
         {
             _clientService.Setup(c => c.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
@@ -211,6 +258,194 @@ namespace ClientManagementService.Test.Controller
             var controller = new ClientController(_clientService.Object);
 
             var response = await controller.ClientLogout(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
+
+        [Test]
+        public async Task ResetClientLockedStatus_Success()
+        {
+            _clientService.Setup(c => c.ResetClientFailedLoginAttempts(1))
+                .Returns(Task.CompletedTask);
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.ResetClientLockedStatus(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkResult));
+
+            var ok = (OkResult)response;
+
+            Assert.AreEqual(ok.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task ResetClientLockedStatus_InternalServerError()
+        {
+            _clientService.Setup(c => c.ResetClientFailedLoginAttempts(1))
+                .ThrowsAsync(new ArgumentException());
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.ResetClientLockedStatus(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
+
+        [Test]
+        public async Task UpdateClientInfo_Success()
+        {
+            var client = new API.DTO.ClientDTO()
+            {
+                Id = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                EmailAddress = "jdoe@gmail.com",
+                PrimaryPhoneNum = "123-456-7890",
+                Address = new API.DTO.AddressDTO()
+                {
+                    AddressLine1 = "123 Test St",
+                    City = "San Diego",
+                    State = "CA",
+                    ZipCode = "12345"
+                }
+            };
+
+            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Domain.Models.Client>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.UpdateClientInfo(client);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkResult));
+
+            var ok = (OkResult)response;
+
+            Assert.AreEqual(ok.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task UpdateClientInfo_InternalServerError()
+        {
+            var client = new API.DTO.ClientDTO()
+            {
+                Id = 0,
+                FirstName = "John",
+                LastName = "Doe",
+                EmailAddress = "jdoe@gmail.com",
+                PrimaryPhoneNum = "123-456-7890",
+                Address = new API.DTO.AddressDTO()
+                {
+                    AddressLine1 = "123 Test St",
+                    City = "San Diego",
+                    State = "CA",
+                    ZipCode = "12345"
+                }
+            };
+
+            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Domain.Models.Client>()))
+                .ThrowsAsync(new ArgumentException());
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.UpdateClientInfo(client);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
+
+        [Test]
+        public async Task UpdatePassword_Success()
+        {
+            var password = new API.DTO.PasswordDTO()
+            {
+                Id = 1,
+                NewPassword = "NewTestPassword123!"
+            };
+
+            _clientService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.UpdatePassword(password);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkResult));
+
+            var ok = (OkResult)response;
+
+            Assert.AreEqual(ok.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task UpdatePassword_InternalServerError()
+        {
+            var password = new API.DTO.PasswordDTO()
+            {
+                Id = 1,
+                NewPassword = "NewTestPassword123!"
+            };
+
+            _clientService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.UpdatePassword(password);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
+        }
+
+        [Test]
+        public async Task DeleteClientById_Success()
+        {
+            _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.DeleteClientById(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkResult));
+
+            var ok = (OkResult)response;
+
+            Assert.AreEqual(ok.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task DeleteClientById_InternalServerError()
+        {
+            _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
+                .ThrowsAsync(new ArgumentException());
+
+            var controller = new ClientController(_clientService.Object);
+
+            var response = await controller.DeleteClientById(1);
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(ObjectResult));
