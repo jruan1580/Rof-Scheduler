@@ -1,4 +1,4 @@
-﻿namespace AuthenticationService.Infrastructure.EmployeeManagement.Models
+﻿namespace AuthenticationService.Infrastructure.Shared.Models
 {
     public class LogoutResponse
     {

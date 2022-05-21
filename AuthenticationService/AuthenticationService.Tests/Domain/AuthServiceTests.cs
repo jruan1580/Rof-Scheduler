@@ -1,6 +1,7 @@
 ﻿using AuthenticationService.Domain.Services;
 using AuthenticationService.Infrastructure.EmployeeManagement;
 using AuthenticationService.Infrastructure.EmployeeManagement.Models;
+using AuthenticationService.Infrastructure.Shared.Models;
 using Moq;
 using NUnit.Framework;
 using System.Threading.Tasks;

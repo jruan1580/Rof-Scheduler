@@ -1,4 +1,5 @@
 ﻿using AuthenticationService.Infrastructure.EmployeeManagement.Models;
+using AuthenticationService.Infrastructure.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
