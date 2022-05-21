@@ -191,7 +191,20 @@ namespace ClientManagementService.Test.Controller
         public async Task ClientLogin_Success()
         {
             _clientService.Setup(e => e.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(new Domain.Models.Client()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmailAddress = "jdoe@gmail.com",
+                    Password = new byte[100],
+                    PrimaryPhoneNum = "123-456-7890",
+                    IsLoggedIn = false,
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false
+                });
 
             var controller = new ClientController(_clientService.Object);
 
@@ -202,11 +215,11 @@ namespace ClientManagementService.Test.Controller
             });
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
 
-            var ok = (OkResult)response;
+            var okObj = (OkObjectResult)response;
 
-            Assert.AreEqual(ok.StatusCode, 200);
+            Assert.AreEqual(okObj.StatusCode, 200);
         }
 
         [Test]

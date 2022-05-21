@@ -8,7 +8,7 @@ namespace ClientManagementService.Domain.Services
 {
     public interface IClientService
     {
-        Task ClientLogin(string email, string password);
+        Task<Client> ClientLogin(string email, string password);
         Task ClientLogout(long id);
         Task CreateClient(Client newClient, string password);
         Task DeleteClientById(long id);
@@ -122,13 +122,23 @@ namespace ClientManagementService.Domain.Services
             return ClientMapper.ToCoreClient(client);
         }
 
-        public async Task ClientLogin(string email, string password)
+        public async Task<Client> ClientLogin(string email, string password)
         {
             var client = await GetClientByEmail(email);
 
             if (client == null)
             {
                 throw new ArgumentException($"Client with email: {email} not found.");
+            }
+
+            if (client.IsLoggedIn)
+            {
+                return client;
+            }
+
+            if (client.IsLocked)
+            {
+                throw new ArgumentException("Client account is locked. Unable to log in.");
             }
 
             if (!_passwordService.VerifyPasswordHash(password, client.Password))
@@ -138,19 +148,11 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException("Incorrect password.");
             }
 
-            if (client.IsLoggedIn)
-            {
-                return;
-            }
-
-            if (client.IsLocked)
-            {
-                throw new ArgumentException("Client account is locked. Unable to log in.");
-            }
-
             await _clientRepository.UpdateClientLoginStatus(client.Id, true);
 
             client.IsLoggedIn = true;
+
+            return client;
         }
 
         public async Task ClientLogout(long id)

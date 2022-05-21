@@ -68,9 +68,9 @@ namespace ClientManagementService.API.Controllers
         {
             try
             {
-                await _clientService.ClientLogin(client.EmailAddress, client.Password);
+                var clientLogIn = await _clientService.ClientLogin(client.EmailAddress, client.Password);
 
-                return Ok();
+                return Ok(new { Id = clientLogIn.Id, FirstName = clientLogIn.FirstName, LastName = clientLogIn.LastName});
             }
             catch (Exception ex)
             {

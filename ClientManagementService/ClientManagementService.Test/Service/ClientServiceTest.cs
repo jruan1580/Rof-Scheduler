@@ -355,7 +355,7 @@ namespace ClientManagementService.Test.Service
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            var client = await clientService.GetClientByEmail("jdoe@gmail.com");
+            var client = await clientService.ClientLogin("jdoe@gmail.com", "TestPassword123!");
 
             Assert.IsTrue(client.IsLoggedIn);
         }
