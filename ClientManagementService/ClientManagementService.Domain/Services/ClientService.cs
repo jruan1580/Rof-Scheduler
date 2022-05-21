@@ -140,7 +140,7 @@ namespace ClientManagementService.Domain.Services
 
             if (client.IsLoggedIn)
             {
-                throw new ArgumentException("Client is already logged in.");
+                return;
             }
 
             if (client.IsLocked)
@@ -159,7 +159,7 @@ namespace ClientManagementService.Domain.Services
 
             if (!client.IsLoggedIn)
             {
-                throw new ArgumentException("Client already logged out.");
+                return;
             }
 
             await _clientRepository.UpdateClientLoginStatus(client.Id, false);

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClientManagementService.API.Controllers
 {
-    [Route("api/client")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace ClientManagementService.API.Controllers
             _clientService = clientService;
         }
 
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateClient([FromBody] ClientDTO client)
         {
             try

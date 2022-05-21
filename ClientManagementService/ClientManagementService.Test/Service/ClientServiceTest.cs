@@ -333,7 +333,7 @@ namespace ClientManagementService.Test.Service
         }
 
         [Test]
-        public void ClientLogIn_AlreadyLoggedIn()
+        public async Task ClientLogIn_AlreadyLoggedIn()
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
@@ -355,7 +355,9 @@ namespace ClientManagementService.Test.Service
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe@gmail.com", "TestPassword123!"));
+            var client = await clientService.GetClientByEmail("jdoe@gmail.com");
+
+            Assert.IsTrue(client.IsLoggedIn);
         }
 
         [Test]
@@ -413,7 +415,7 @@ namespace ClientManagementService.Test.Service
         }
 
         [Test]
-        public void ClientLogOut_AlreadyLoggedOut()
+        public async Task ClientLogOut_AlreadyLoggedOut()
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
@@ -435,7 +437,9 @@ namespace ClientManagementService.Test.Service
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogout(1));
+            var client = await clientService.GetClientById(1);
+
+            Assert.IsFalse(client.IsLoggedIn);
         }
 
         [Test]
