@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using ClientManagementService.API.DTO;
 using ClientManagementService.API.DTOMapper;
+using ClientManagementService.Domain.Exceptions;
 using ClientManagementService.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,13 +43,17 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok(ClientDTOMapper.ToDTOClient(client));
             }
+            catch (ClientNotFoundException)
+            {
+                return NotFound($"Client with id {id} not found");
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpGet("email/{email}")]
+        [HttpGet("{email}/email")]
         public async Task<IActionResult> GetClientByEmail(string email)
         {
             try
@@ -72,13 +77,21 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok(new { Id = clientLogIn.Id, FirstName = clientLogIn.FirstName, LastName = clientLogIn.LastName});
             }
+            catch (ClientNotFoundException)
+            {
+                return NotFound($"Client with username: {client} was not found");
+            }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpPatch("logout/{id}")]
+        [HttpPatch("{id}/logout")]
         public async Task<IActionResult> ClientLogout(long id)
         {
             try
@@ -87,13 +100,17 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
+            catch (ClientNotFoundException)
+            {
+                return NotFound($"Client with id {id} not found");
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpPatch("reset/locked/{id}")]
+        [HttpPatch("{id}/locked")]
         public async Task<IActionResult> ResetClientLockedStatus(long id)
         {
             try
@@ -108,7 +125,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
-        [HttpPatch("update/password")]
+        [HttpPatch("password")]
         public async Task<IActionResult> UpdatePassword([FromBody] PasswordDTO newPassword)
         {
             try
@@ -123,7 +140,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
-        [HttpPut("update/info")]
+        [HttpPut("info")]
         public async Task<IActionResult> UpdateClientInfo([FromBody] ClientDTO client)
         {
             try
@@ -138,7 +155,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}/delete")]
         public async Task<IActionResult> DeleteClientById(long id)
         {
             try

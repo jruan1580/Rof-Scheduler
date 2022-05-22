@@ -1,4 +1,5 @@
 ﻿using AuthenticationService.Infrastructure.ClientManagement.Models;
+using AuthenticationService.Infrastructure.Shared;
 using AuthenticationService.Infrastructure.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -13,7 +14,7 @@ namespace AuthenticationService.Infrastructure.ClientManagement
 {
     public interface IClientManagementAccessor
     {
-        Task<ClientLoginResponse> Login(string username, string password);
+        Task<ClientLoginResponse> Login(string username, string password, string token);
         Task<LogoutResponse> Logout(long userId, string token);
     }
 
@@ -24,14 +25,19 @@ namespace AuthenticationService.Infrastructure.ClientManagement
 
         public ClientManagementAccessor(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
-            _httpClientFactory = httpClientFactory;
+            _httpClientFactory = httpClientFactory;            
             _clientManagementBaseUrl = configuration.GetSection("ClientManagement:URL").Value;
         }
 
-        public async Task<ClientLoginResponse> Login(string username, string password)
+        public async Task<ClientLoginResponse> Login(string username, string password, string token)
         {
             using (var httpClient = _httpClientFactory.CreateClient())
             {
+                if (!string.IsNullOrEmpty(token))
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+                
                 var url = $"{_clientManagementBaseUrl}/api/client/login";
 
                 var body = new { Username = username, Password = password };
@@ -39,20 +45,7 @@ namespace AuthenticationService.Infrastructure.ClientManagement
 
                 var response = await httpClient.PatchAsync(url, content);
 
-                var contentAsStr = await response.Content.ReadAsStringAsync();
-
-                //return null when username is not found
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    return null;
-                }
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Failed to login with error message: {contentAsStr}");
-                }
-
-                return JsonConvert.DeserializeObject<ClientLoginResponse>(contentAsStr);
+                return await Utilities.ParseResponse<ClientLoginResponse>(response);                
             }
         }
 
@@ -60,9 +53,12 @@ namespace AuthenticationService.Infrastructure.ClientManagement
         {
             using (var httpClient = _httpClientFactory.CreateClient())
             {
-                var url = $"{_clientManagementBaseUrl}/api/client/{userId}/logout";
+                if (!string.IsNullOrEmpty(token))
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
 
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var url = $"{_clientManagementBaseUrl}/api/client/{userId}/logout";                
 
                 var response = await httpClient.PatchAsync(url, null);
 
@@ -72,12 +68,7 @@ namespace AuthenticationService.Infrastructure.ClientManagement
                     return null;
                 }
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errMsg = await response.Content.ReadAsStringAsync();
-
-                    throw new Exception($"Failed to login with error message: {errMsg}");
-                }
+                await Utilities.ParseResponse(response);                
 
                 return new LogoutResponse(userId, true);
             }

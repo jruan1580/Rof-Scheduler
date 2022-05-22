@@ -31,9 +31,6 @@ namespace AuthenticationService.Tests.Api
             _tokenHandler.Setup(t => t.GenerateTokenForRole(It.IsAny<string>(), It.IsAny<int>()))
                 .Returns("tokentousefortesting");
 
-            _tokenHandler.Setup(t => t.ExtractTokenFromRequest(It.IsAny<HttpRequest>(), It.IsAny<string>()))
-                .Returns("tokentobeusedfortesting");
-
             _ctr = new AuthenticationController(_tokenHandler.Object, _authService.Object);
         }
 
@@ -131,7 +128,7 @@ namespace AuthenticationService.Tests.Api
                 }
             };
 
-            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
+            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
             var res = await _ctr.Logout(1);
@@ -163,7 +160,7 @@ namespace AuthenticationService.Tests.Api
                 }
             };
 
-            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
+            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
                 .Throws(new Exception("forced exception"));
 
             var res = await _ctr.Logout(1);
@@ -198,7 +195,7 @@ namespace AuthenticationService.Tests.Api
                 }
             };
 
-            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
+            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
                 .Throws(new NotFoundException());
 
             var res = await _ctr.Logout(1);

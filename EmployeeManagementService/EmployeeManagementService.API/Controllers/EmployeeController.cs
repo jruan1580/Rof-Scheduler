@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagementService.API.Controllers
 {
-    [Authorize(Roles = "Employee")]
+    [Authorize(Roles = "Employee,Internal")]
     [ApiController]
     public class EmployeeController : AEmployeeController
     {

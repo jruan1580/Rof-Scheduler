@@ -3,7 +3,6 @@ using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -58,7 +57,6 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPatch("login")]
         public async Task<IActionResult> EmployeeLogin([FromBody] EmployeeDTO employee)
         {
@@ -82,7 +80,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpPatch("logout/{id}")]
+        [HttpPatch("{id}/logout")]
         public async Task<IActionResult> EmployeeLogout(long id)
         {
             try
@@ -101,7 +99,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpPatch("password/update")]
+        [HttpPatch("password")]
         public async Task<IActionResult> UpdatePassword([FromBody] PasswordDTO newPassword)
         {
             try
@@ -109,6 +107,10 @@ namespace EmployeeManagementService.API.Controllers
                 await _employeeService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
 
                 return Ok();
+            }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {

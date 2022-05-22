@@ -1,4 +1,5 @@
-﻿using ClientManagementService.Domain.Mappers.Database;
+﻿using ClientManagementService.Domain.Exceptions;
+using ClientManagementService.Domain.Mappers.Database;
 using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
 using System;
@@ -13,8 +14,7 @@ namespace ClientManagementService.Domain.Services
         Task CreateClient(Client newClient, string password);
         Task DeleteClientById(long id);
         Task<Client> GetClientByEmail(string email);
-        Task<Client> GetClientById(long id);
-        Task IncrementClientFailedLoginAttempts(long id);
+        Task<Client> GetClientById(long id);        
         Task ResetClientFailedLoginAttempts(long id);
         Task UpdateClientInfo(Client client);
         Task UpdatePassword(long id, string newPassword);
@@ -104,7 +104,7 @@ namespace ClientManagementService.Domain.Services
 
             if (client == null)
             {
-                throw new ArgumentException("Client does not exist.");
+                throw new ClientNotFoundException();
             }
 
             return ClientMapper.ToCoreClient(client);
@@ -128,7 +128,7 @@ namespace ClientManagementService.Domain.Services
 
             if (client == null)
             {
-                throw new ArgumentException($"Client with email: {email} not found.");
+                throw new ClientNotFoundException();
             }
 
             if (client.IsLoggedIn)
@@ -143,7 +143,7 @@ namespace ClientManagementService.Domain.Services
 
             if (!_passwordService.VerifyPasswordHash(password, client.Password))
             {
-                await IncrementClientFailedLoginAttempts(client.Id);
+                await IncrementClientFailedLoginAttempts(client);
 
                 throw new ArgumentException("Incorrect password.");
             }
@@ -167,26 +167,7 @@ namespace ClientManagementService.Domain.Services
             await _clientRepository.UpdateClientLoginStatus(client.Id, false);
 
             client.IsLoggedIn = false;
-        }
-
-        public async Task IncrementClientFailedLoginAttempts(long id)
-        {
-            var client = await GetClientById(id);
-
-            if (client.IsLocked)
-            {
-                return;
-            }
-
-            var attempts = await _clientRepository.IncrementClientFailedLoginAttempts(client.Id);
-
-            if (attempts != 3)
-            {
-                return;
-            }
-
-            await _clientRepository.UpdateClientIsLocked(client.Id, true);
-        }
+        }   
 
         public async Task ResetClientFailedLoginAttempts(long id)
         {
@@ -217,6 +198,23 @@ namespace ClientManagementService.Domain.Services
         public async Task DeleteClientById(long id)
         {
             await _clientRepository.DeleteClientById(id);
+        }
+
+        private async Task IncrementClientFailedLoginAttempts(Client client)
+        {
+            if (client.IsLocked)
+            {
+                return;
+            }
+
+            var attempts = await _clientRepository.IncrementClientFailedLoginAttempts(client.Id);
+
+            if (attempts != 3)
+            {
+                return;
+            }
+
+            await _clientRepository.UpdateClientIsLocked(client.Id, true);
         }
     }
 }

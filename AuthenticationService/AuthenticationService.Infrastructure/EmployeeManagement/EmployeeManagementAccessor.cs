@@ -1,4 +1,5 @@
 ﻿using AuthenticationService.Infrastructure.EmployeeManagement.Models;
+using AuthenticationService.Infrastructure.Shared;
 using AuthenticationService.Infrastructure.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -14,7 +15,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
     public interface IEmployeeManagementAccessor
     {
         Task<bool> CheckIfEmployee(string username, string token);
-        Task<EmployeeLoginResponse> Login(string username, string password);
+        Task<EmployeeLoginResponse> Login(string username, string password, string token);
         Task<LogoutResponse> Logout(long userId, string relativeUrl, string token);
     }
 
@@ -33,7 +34,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         {
             using(var httpClient = _httpClientFactory.CreateClient())
             {
-                var url = $"{_employeeManagementBaseUrl}/api/employee/exists?username={username}";
+                var url = $"{_employeeManagementBaseUrl}/api/employee/{username}/username";
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -44,12 +45,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
                     return false;
                 }
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errMsg = await response.Content.ReadAsStringAsync();
-
-                    throw new Exception($"Failed to check if employee exists with error message: {errMsg}");
-                }
+                await Utilities.ParseResponse(response);
 
                 return true;
             }
@@ -61,31 +57,23 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns>returns response if successful</returns>
-        public async Task<EmployeeLoginResponse> Login(string username, string password)
+        public async Task<EmployeeLoginResponse> Login(string username, string password, string token)
         {
             using (var httpClient = _httpClientFactory.CreateClient())
             {
-                var url = $"{_employeeManagementBaseUrl}/api/employee/login";
+                if (!string.IsNullOrEmpty(token))
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+
+                var url = $"{_employeeManagementBaseUrl}/api/employee/login";                
 
                 var body = new { Username = username, Password = password };
                 var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
 
                 var response = await httpClient.PatchAsync(url, content);
 
-                var contentAsStr = await response.Content.ReadAsStringAsync();
-
-                //return null when username is not found
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    return null;
-                }
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception($"Failed to login with error message: {contentAsStr}");
-                }
-
-                return JsonConvert.DeserializeObject<EmployeeLoginResponse>(contentAsStr);
+                return await Utilities.ParseResponse<EmployeeLoginResponse>(response);               
             }
         }
 
@@ -101,9 +89,12 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         {
             using (var httpClient = _httpClientFactory.CreateClient())
             {
-                var url = $"{_employeeManagementBaseUrl}{relativeUrl}";
+                if (!string.IsNullOrEmpty(token))
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
 
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var url = $"{_employeeManagementBaseUrl}{relativeUrl}";
 
                 var response = await httpClient.PatchAsync(url, null);
 
@@ -113,12 +104,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
                     return null;
                 }
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errMsg = await response.Content.ReadAsStringAsync();
-
-                    throw new Exception($"Failed to login with error message: {errMsg}");
-                }
+                await Utilities.ParseResponse(response);
 
                 return new LogoutResponse(userId, true);
             }

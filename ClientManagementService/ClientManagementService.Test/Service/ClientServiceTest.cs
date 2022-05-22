@@ -1,4 +1,5 @@
-﻿using ClientManagementService.Domain.Services;
+﻿using ClientManagementService.Domain.Exceptions;
+using ClientManagementService.Domain.Services;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Entities;
 using Microsoft.Extensions.Configuration;
@@ -220,7 +221,7 @@ namespace ClientManagementService.Test.Service
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            Assert.ThrowsAsync<ArgumentException>(() => clientService.GetClientById(1));
+            Assert.ThrowsAsync<ClientNotFoundException>(() => clientService.GetClientById(1));
         }
 
         [Test]
@@ -381,6 +382,9 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
+            _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()))
+                .ReturnsAsync(2);
+
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe@gmail.com", "Test123!"));
@@ -470,113 +474,113 @@ namespace ClientManagementService.Test.Service
             _clientRepository.Verify(c => c.UpdateClientLoginStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Once);
         }
 
-        [Test]
-        public void IncrementClientFailedLoginAttempt_ClientDoesNotExist()
-        {
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
-                .ReturnsAsync((Client)null);
+        //[Test]
+        //public void IncrementClientFailedLoginAttempt_ClientDoesNotExist()
+        //{
+        //    _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+        //        .ReturnsAsync((Client)null);
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+        //    var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            Assert.ThrowsAsync<ArgumentException>(() => clientService.IncrementClientFailedLoginAttempts(0));
-        }
+        //    Assert.ThrowsAsync<ArgumentException>(() => clientService.IncrementClientFailedLoginAttempts(0));
+        //}
 
-        [Test]
-        public async Task IncrementClientFailedLoginAttempt_AccountAlreadyLocked()
-        {
-            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
+        //[Test]
+        //public async Task IncrementClientFailedLoginAttempt_AccountAlreadyLocked()
+        //{
+        //    var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
-                .ReturnsAsync(new Client()
-                {
-                    Id = 1,
-                    CountryId = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    EmailAddress = "jdoe@gmail.com",
-                    Password = encryptedPass,
-                    PrimaryPhoneNum = "123-456-7890",
-                    IsLoggedIn = false,
-                    IsLocked = true,
-                    FailedLoginAttempts = 3,
-                    TempPasswordChanged = false
-                });
+        //    _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+        //        .ReturnsAsync(new Client()
+        //        {
+        //            Id = 1,
+        //            CountryId = 1,
+        //            FirstName = "John",
+        //            LastName = "Doe",
+        //            EmailAddress = "jdoe@gmail.com",
+        //            Password = encryptedPass,
+        //            PrimaryPhoneNum = "123-456-7890",
+        //            IsLoggedIn = false,
+        //            IsLocked = true,
+        //            FailedLoginAttempts = 3,
+        //            TempPasswordChanged = false
+        //        });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+        //    var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            var client = await clientService.GetClientById(1);
-            await clientService.IncrementClientFailedLoginAttempts(client.Id);
+        //    var client = await clientService.GetClientById(1);
+        //    await clientService.IncrementClientFailedLoginAttempts(client.Id);
 
-            Assert.IsTrue(client.IsLocked);
-        }
+        //    Assert.IsTrue(client.IsLocked);
+        //}
 
-        [Test]
-        public async Task IncrementClientFailedLoginAttempt_AttemptsNot3()
-        {
-            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
+        //[Test]
+        //public async Task IncrementClientFailedLoginAttempt_AttemptsNot3()
+        //{
+        //    var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
-                .ReturnsAsync(new Client()
-                {
-                    Id = 1,
-                    CountryId = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    EmailAddress = "jdoe@gmail.com",
-                    Password = encryptedPass,
-                    PrimaryPhoneNum = "123-456-7890",
-                    IsLoggedIn = false,
-                    IsLocked = false,
-                    FailedLoginAttempts = 2,
-                    TempPasswordChanged = false
-                });
+        //    _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+        //        .ReturnsAsync(new Client()
+        //        {
+        //            Id = 1,
+        //            CountryId = 1,
+        //            FirstName = "John",
+        //            LastName = "Doe",
+        //            EmailAddress = "jdoe@gmail.com",
+        //            Password = encryptedPass,
+        //            PrimaryPhoneNum = "123-456-7890",
+        //            IsLoggedIn = false,
+        //            IsLocked = false,
+        //            FailedLoginAttempts = 2,
+        //            TempPasswordChanged = false
+        //        });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+        //    var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            var client = await clientService.GetClientById(1);
+        //    var client = await clientService.GetClientById(1);
 
-            _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.Is<long>(i => i.Equals(client.Id))))
-                .ReturnsAsync(client.FailedLoginAttempts + 1);
+        //    _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.Is<long>(i => i.Equals(client.Id))))
+        //        .ReturnsAsync(client.FailedLoginAttempts + 1);
 
-            await clientService.IncrementClientFailedLoginAttempts(client.Id);
+        //    await clientService.IncrementClientFailedLoginAttempts(client.Id);
 
-            Assert.AreNotEqual(3, client.FailedLoginAttempts);
-        }
+        //    Assert.AreNotEqual(3, client.FailedLoginAttempts);
+        //}
 
-        [Test]
-        public async Task IncrementClientFailedLoginAttempt_Success()
-        {
-            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
+        //[Test]
+        //public async Task IncrementClientFailedLoginAttempt_Success()
+        //{
+        //    var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
-                .ReturnsAsync(new Client()
-                {
-                    Id = 1,
-                    CountryId = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    EmailAddress = "jdoe@gmail.com",
-                    Password = encryptedPass,
-                    PrimaryPhoneNum = "123-456-7890",
-                    IsLoggedIn = false,
-                    IsLocked = false,
-                    FailedLoginAttempts = 1,
-                    TempPasswordChanged = false
-                });
+        //    _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+        //        .ReturnsAsync(new Client()
+        //        {
+        //            Id = 1,
+        //            CountryId = 1,
+        //            FirstName = "John",
+        //            LastName = "Doe",
+        //            EmailAddress = "jdoe@gmail.com",
+        //            Password = encryptedPass,
+        //            PrimaryPhoneNum = "123-456-7890",
+        //            IsLoggedIn = false,
+        //            IsLocked = false,
+        //            FailedLoginAttempts = 1,
+        //            TempPasswordChanged = false
+        //        });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+        //    var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            var client = await clientService.GetClientById(1);
+        //    var client = await clientService.GetClientById(1);
 
-            _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.Is<long>(i => i.Equals(client.Id))))
-                .ReturnsAsync(client.FailedLoginAttempts + 1);
+        //    _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.Is<long>(i => i.Equals(client.Id))))
+        //        .ReturnsAsync(client.FailedLoginAttempts + 1);
 
-            await clientService.IncrementClientFailedLoginAttempts(client.Id);
+        //    await clientService.IncrementClientFailedLoginAttempts(client.Id);
 
-            Assert.AreEqual(1, client.FailedLoginAttempts);
+        //    Assert.AreEqual(1, client.FailedLoginAttempts);
 
-            _clientRepository.Verify(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()), Times.Once);
-        }
+        //    _clientRepository.Verify(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()), Times.Once);
+        //}
 
         [Test]
         public void ResetClientFailedLoginAttempt_ClientDoesNotExist()

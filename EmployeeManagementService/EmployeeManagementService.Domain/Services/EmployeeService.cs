@@ -18,7 +18,6 @@ namespace EmployeeManagementService.Domain.Services
         Task<List<Employee>> GetAllEmployees(int page, int offset);
         Task<Employee> GetEmployeeById(long id);
         Task<Employee> GetEmployeeByUsername(string username);
-        Task IncrementEmployeeFailedLoginAttempt(Employee employee);
         Task ResetEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployeeActiveStatus(long id, bool active);
         Task UpdateEmployeeInformation(Employee employee);
@@ -73,24 +72,7 @@ namespace EmployeeManagementService.Domain.Services
             }
 
             return EmployeeMapper.ToCoreEmployee(employee);
-        }
-
-        public async Task IncrementEmployeeFailedLoginAttempt(Employee employee)
-        {
-            if (employee.IsLocked)
-            {
-                return;
-            }
-
-            var attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(employee.Id);
-
-            if (attempts != 3)
-            {
-                return;
-            }
-
-            await _employeeRepository.UpdateEmployeeIsLockedStatus(employee.Id, true);
-        }
+        }      
 
         public async Task ResetEmployeeFailedLoginAttempt(long id)
         {
@@ -190,18 +172,18 @@ namespace EmployeeManagementService.Domain.Services
                 throw new EmployeeNotFoundException();
             }
 
+            if (employee.Status == true)
+            {
+                return employee;
+            }
+
             if (!_passwordService.VerifyPasswordHash(password, employee.Password))
             {
                 await IncrementEmployeeFailedLoginAttempt(employee);
 
                 throw new ArgumentException("Incorrect password");
             }
-
-            if (employee.Status == true)
-            {
-                return employee;
-            }
-
+         
             await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, true);
             employee.Status = true;
 
@@ -242,6 +224,23 @@ namespace EmployeeManagementService.Domain.Services
         public async Task DeleteEmployeeById(long id)
         {
             await _employeeRepository.DeleteEmployeeById(id);
+        }
+
+        private async Task IncrementEmployeeFailedLoginAttempt(Employee employee)
+        {
+            if (employee.IsLocked)
+            {
+                return;
+            }
+
+            var attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(employee.Id);
+
+            if (attempts != 3)
+            {
+                return;
+            }
+
+            await _employeeRepository.UpdateEmployeeIsLockedStatus(employee.Id, true);
         }
     }
 }

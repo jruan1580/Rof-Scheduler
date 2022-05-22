@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EmployeeManagementService.API.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrator,Internal")]
     [ApiController]
     public class AdminController : AEmployeeController
     {
@@ -45,7 +45,7 @@ namespace EmployeeManagementService.API.Controllers
         }
  
 
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateEmployee([FromBody] EmployeeDTO employee)
         {
             try
@@ -75,7 +75,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpPatch("reset/{id}/locked")]
+        [HttpPatch("{id}/locked")]
         public async Task<IActionResult> ResetLockedStatus(long id)
         {
             try
@@ -90,7 +90,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}/delete")]
         public async Task<IActionResult> DeleteEmployeeById(long id)
         {
             try

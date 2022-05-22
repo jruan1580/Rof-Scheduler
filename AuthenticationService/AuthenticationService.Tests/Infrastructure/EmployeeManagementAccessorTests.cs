@@ -139,12 +139,61 @@ namespace AuthenticationService.Tests.Infrastructure
             _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
              .Returns(httpClient);
 
-            var res = await _accessor.Login("testUsername", "testPassword");
+            var res = await _accessor.Login("testUsername", "testPassword", "internalToken");
 
             Assert.IsNotNull(res);
             Assert.AreEqual(1, res.Id);
             Assert.AreEqual("testUser", res.FirstName);
             Assert.AreEqual("Employee", res.Role);
+        }
+
+        [Test]
+        public async Task LoginNotFoundStatusCode()
+        {
+            _httpMessageHandlerMock
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>()
+               )
+               .ReturnsAsync(new HttpResponseMessage()
+               {
+                   StatusCode = HttpStatusCode.NotFound
+               });
+
+            var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
+
+            _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
+             .Returns(httpClient);
+
+            var loginResp = await _accessor.Login("testUsername", "testPassword", "internalToken");
+
+            Assert.IsNull(loginResp);
+        }
+
+        [Test]
+        public void LoginBadRequestStatusCode()
+        {
+            _httpMessageHandlerMock
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>()
+               )
+               .ReturnsAsync(new HttpResponseMessage()
+               {
+                   StatusCode = HttpStatusCode.BadRequest,
+                   Content = new StringContent("username not found", Encoding.UTF8)
+               });
+
+            var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
+
+            _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
+             .Returns(httpClient);
+
+            Assert.ThrowsAsync<ArgumentException>(() => _accessor.Login("testUsername", "testPassword", "internalToken"));
         }
 
         [Test]
@@ -168,7 +217,7 @@ namespace AuthenticationService.Tests.Infrastructure
             _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
              .Returns(httpClient);
 
-            Assert.ThrowsAsync<Exception>(() => _accessor.Login("testUsername", "testPassword"));
+            Assert.ThrowsAsync<Exception>(() => _accessor.Login("testUsername", "testPassword", "internalToken"));
         }
 
         [Test]
@@ -194,6 +243,55 @@ namespace AuthenticationService.Tests.Infrastructure
             var res = await _accessor.Logout(1, "/api/Employee/logout", "testToken");
 
             Assert.IsNotNull(res);
+        }
+
+        [Test]
+        public async Task LogoutNotFoundStatusCode()
+        {
+            _httpMessageHandlerMock
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>()
+               )
+               .ReturnsAsync(new HttpResponseMessage()
+               {
+                   StatusCode = HttpStatusCode.NotFound
+               });
+
+            var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
+
+            _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
+             .Returns(httpClient);
+
+            var logoutResp = await _accessor.Logout(1, "/api/Employee/logout", "testToken");
+
+            Assert.IsNull(logoutResp);
+        }
+
+        [Test]
+        public void LogoutBadRequestStatusCode()
+        {
+            _httpMessageHandlerMock
+               .Protected()
+               .Setup<Task<HttpResponseMessage>>(
+                   "SendAsync",
+                   ItExpr.IsAny<HttpRequestMessage>(),
+                   ItExpr.IsAny<CancellationToken>()
+               )
+               .ReturnsAsync(new HttpResponseMessage()
+               {
+                   StatusCode = HttpStatusCode.BadRequest,
+                   Content = new StringContent("username not found", Encoding.UTF8)
+               });
+
+            var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
+
+            _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
+             .Returns(httpClient);
+
+            Assert.ThrowsAsync<ArgumentException>(() => _accessor.Logout(1, "/api/Employee/logout", "testToken"));
         }
 
         [Test]

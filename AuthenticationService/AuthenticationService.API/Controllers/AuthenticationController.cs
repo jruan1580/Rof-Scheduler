@@ -68,9 +68,7 @@ namespace AuthenticationService.API.Controllers
             {
                 var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
-                var token = _tokenHandler.ExtractTokenFromRequest(Request, role.Value);
-
-                await _authService.Logout(id, role.Value, token);
+                await _authService.Logout(id, role.Value);
 
                 switch (role.Value)
                 {

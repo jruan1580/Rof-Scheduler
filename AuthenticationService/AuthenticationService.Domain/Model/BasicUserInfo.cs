@@ -1,4 +1,5 @@
-﻿using AuthenticationService.Infrastructure.EmployeeManagement.Models;
+﻿using AuthenticationService.Infrastructure.ClientManagement.Models;
+using AuthenticationService.Infrastructure.EmployeeManagement.Models;
 
 namespace AuthenticationService.Domain.Model
 {        
@@ -13,6 +14,15 @@ namespace AuthenticationService.Domain.Model
             Id = resp.Id;
             FirstName = resp.FirstName;
             Role = resp.Role;
+
+            return this;
+        }
+
+        public BasicUserInfo MapFromClientLoginResponse(ClientLoginResponse resp)
+        {
+            Id = resp.Id;
+            FirstName = resp.FirstName;
+            Role = "Client";
 
             return this;
         }
