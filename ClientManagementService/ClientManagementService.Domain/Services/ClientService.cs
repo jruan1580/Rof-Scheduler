@@ -14,6 +14,7 @@ namespace ClientManagementService.Domain.Services
         Task DeleteClientById(long id);
         Task<Client> GetClientByEmail(string email);
         Task<Client> GetClientById(long id);
+        Task<Client> GetClientByUsername(string username);
         Task IncrementClientFailedLoginAttempts(long id);
         Task ResetClientFailedLoginAttempts(long id);
         Task UpdateClientInfo(Client client);
@@ -46,7 +47,12 @@ namespace ClientManagementService.Domain.Services
 
             if (clientCheck != null && clientCheck.FirstName == newClient.FirstName && clientCheck.LastName == newClient.LastName)
             {
-                throw new ArgumentException("Client with this name and email address already exists.");
+                throw new ArgumentException("Client with this name, and email address already exists.");
+            }
+
+            if(await GetClientByUsername(newClient.Username) != null)
+            {
+                throw new ArgumentException($"Username {newClient.Username} is already taken.");
             }
 
             if (!_passwordService.VerifyPasswordRequirements(password))
@@ -74,9 +80,14 @@ namespace ClientManagementService.Domain.Services
             }
 
             var clientCheck = await GetClientByEmail(client.EmailAddress);
-            if (clientCheck != null && clientCheck.Id != client.Id && clientCheck.FirstName == client.FirstName && clientCheck.LastName == client.LastName)
+            if (clientCheck != null && clientCheck.Id != client.Id)
             {
-                throw new ArgumentException("Email address and name already in use.");
+                throw new ArgumentException($"A client with email: {client.EmailAddress} already exists.");
+            }
+
+            if (await GetClientByUsername(client.Username) != null)
+            {
+                throw new ArgumentException($"Username {client.Username} is already taken.");
             }
 
             var origClient = await _clientRepository.GetClientById(client.Id);
@@ -122,13 +133,25 @@ namespace ClientManagementService.Domain.Services
             return ClientMapper.ToCoreClient(client);
         }
 
-        public async Task<Client> ClientLogin(string email, string password)
+        public async Task<Client> GetClientByUsername(string username)
         {
-            var client = await GetClientByEmail(email);
+            var client = await _clientRepository.GetClientByUsername(username);
+
+            if(client == null)
+            {
+                return null;
+            }
+
+            return ClientMapper.ToCoreClient(client);
+        }
+
+        public async Task<Client> ClientLogin(string username, string password)
+        {
+            var client = await GetClientByUsername(username);
 
             if (client == null)
             {
-                throw new ArgumentException($"Client with email: {email} not found.");
+                throw new ArgumentException($"Client with username: {username} not found.");
             }
 
             if (client.IsLoggedIn)

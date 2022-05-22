@@ -14,6 +14,7 @@ namespace ClientManagementService.Domain.Mappers.Database
             coreClient.FirstName = dbClient.FirstName;
             coreClient.LastName = dbClient.LastName;
             coreClient.EmailAddress = dbClient.EmailAddress;
+            coreClient.Username = dbClient.Username;
             coreClient.Password = dbClient.Password;
             coreClient.PrimaryPhoneNum = dbClient.PrimaryPhoneNum;
             coreClient.SecondaryPhoneNum = dbClient.SecondaryPhoneNum;
@@ -38,6 +39,7 @@ namespace ClientManagementService.Domain.Mappers.Database
             entity.FirstName = coreClient.FirstName;
             entity.LastName = coreClient.LastName;
             entity.EmailAddress = coreClient.EmailAddress;
+            entity.Username = coreClient.Username;
             entity.Password = coreClient.Password;
             entity.PrimaryPhoneNum = coreClient.PrimaryPhoneNum;
             entity.SecondaryPhoneNum = coreClient.SecondaryPhoneNum;
