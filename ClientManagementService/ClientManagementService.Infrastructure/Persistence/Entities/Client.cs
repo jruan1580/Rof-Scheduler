@@ -12,6 +12,7 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string EmailAddress { get; set; }
+        public string Username { get; set; }
         public byte[] Password { get; set; }
         public string PrimaryPhoneNum { get; set; }
         public string SecondaryPhoneNum { get; set; }

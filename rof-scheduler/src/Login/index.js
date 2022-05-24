@@ -1,6 +1,6 @@
 import { Form, Button, Row, Col, Spinner, Card, Container, Alert } from 'react-bootstrap';
 import { useState } from 'react';
-import { validateLoginPassword } from './inputValidationService';
+import { validateLoginPassword } from '../SharedServices/inputValidationService';
 import { login } from '../SharedServices/employeeManagementService';
 
 function Login({handleLoginState}){
@@ -97,6 +97,9 @@ function Login({handleLoginState}){
                                     }                                              
                                 </Form>
                             </Card.Body>
+                            <Card.Footer>
+                                For new clients, <a href="#">click here</a> to sign up!
+                            </Card.Footer>
                         </Card>
                         
                     </Col>

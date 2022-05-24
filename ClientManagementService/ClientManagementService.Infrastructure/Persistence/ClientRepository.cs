@@ -12,6 +12,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task DeleteClientById(long id);
         Task<Client> GetClientByEmail(string email);
         Task<Client> GetClientById(long id);
+        Task<Client> GetClientByUsername(string username);
         Task<int> IncrementClientFailedLoginAttempts(long id);
         Task ResetClientFailedLoginAttempts(long id);
         Task UpdateClientInfo(Client clientToUpdate);
@@ -67,10 +68,17 @@ namespace ClientManagementService.Infrastructure.Persistence
 
         public async Task<Client> GetClientById(long id)
         {
-            //pet table not created cannot join for now...
             using (var context = new RofSchedulerContext())
             {
                 return await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
+            }
+        }
+
+        public async Task<Client> GetClientByUsername(string username)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Clients.FirstOrDefaultAsync(c => c.Username == username);
             }
         }
 

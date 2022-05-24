@@ -210,7 +210,7 @@ namespace ClientManagementService.Test.Controller
 
             var response = await controller.ClientLogin(new API.DTO.ClientDTO()
             {
-                EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
                 Password = "TestPassword123!"
             });
 
@@ -232,8 +232,8 @@ namespace ClientManagementService.Test.Controller
 
             var response = await controller.ClientLogin(new API.DTO.ClientDTO()
             {
-                EmailAddress = "jdoe@gmail.com",
-                Password = "TestPassword1!"
+                Username = "jdoe",
+                Password = "TestPassword123!"
             });
 
             Assert.NotNull(response);
