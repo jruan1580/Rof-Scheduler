@@ -81,6 +81,11 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .HasMaxLength(2)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasMaxLength(32)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ZipCode)
                     .IsRequired()
                     .HasMaxLength(10)

@@ -36,6 +36,7 @@ namespace ClientManagementService.Test.Service
                 FirstName = "",
                 LastName = "",
                 EmailAddress = "",
+                Username = "",
                 PrimaryPhoneNum = "",
                 Password = null,
                 Address = new Domain.Models.Address()
@@ -60,6 +61,7 @@ namespace ClientManagementService.Test.Service
                 FirstName = "John",
                 LastName = "Doe",
                 EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
                 PrimaryPhoneNum = "123-456-7890",
                 Password = new byte[100],
                 Address = new Domain.Models.Address()
@@ -80,6 +82,34 @@ namespace ClientManagementService.Test.Service
         }
 
         [Test]
+        public void CreateClient_UsernameNotUnique()
+        {
+            var newClient = new Domain.Models.Client()
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
+                PrimaryPhoneNum = "123-456-7890",
+                Password = new byte[100],
+                Address = new Domain.Models.Address()
+                {
+                    AddressLine1 = "123 Test St",
+                    City = "San Diego",
+                    State = "CA",
+                    ZipCode = "12345"
+                }
+            };
+
+            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
+                .ReturnsAsync(new Client() { Username = "jdoe" });
+
+            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+
+            Assert.ThrowsAsync<ArgumentException>(() => clientService.CreateClient(newClient, "TestPassword123!"));
+        }
+
+        [Test]
         public void CreateClient_PasswordReqNotMet()
         {
             var newClient = new Domain.Models.Client()
@@ -87,6 +117,7 @@ namespace ClientManagementService.Test.Service
                 FirstName = "John",
                 LastName = "Doe",
                 EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
                 PrimaryPhoneNum = "123-456-7890",
                 Password = null,
                 Address = new Domain.Models.Address()
@@ -111,6 +142,7 @@ namespace ClientManagementService.Test.Service
                 FirstName = "John",
                 LastName = "Doe",
                 EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
                 PrimaryPhoneNum = "123-456-7890",
                 Password = new byte[100],
                 Address = new Domain.Models.Address()
@@ -138,6 +170,7 @@ namespace ClientManagementService.Test.Service
                 FirstName = "",
                 LastName = "",
                 EmailAddress = "",
+                Username = "",
                 PrimaryPhoneNum = "",
                 Password = null,
                 Address = new Domain.Models.Address()
@@ -163,6 +196,7 @@ namespace ClientManagementService.Test.Service
                 FirstName = "John",
                 LastName = "Doe",
                 EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
                 PrimaryPhoneNum = "123-456-7890",
                 Password = new byte[100],
                 Address = new Domain.Models.Address()
@@ -175,7 +209,39 @@ namespace ClientManagementService.Test.Service
             };
 
             _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
-                .ReturnsAsync(new Client() { FirstName = "John", LastName = "Doe", EmailAddress = "jdoe@gmail.com" });
+                .ReturnsAsync(new Client() {Id = 2, EmailAddress = "jdoe@gmail.com" });
+
+            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+
+            Assert.ThrowsAsync<ArgumentException>(() => clientService.UpdateClientInfo(client));
+        }
+
+        [Test]
+        public void UpdateClientInfo_UsernameNotUnique()
+        {
+            var client = new Domain.Models.Client()
+            {
+                Id = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
+                PrimaryPhoneNum = "123-456-7890",
+                Password = new byte[100],
+                Address = new Domain.Models.Address()
+                {
+                    AddressLine1 = "123 Test St",
+                    City = "San Diego",
+                    State = "CA",
+                    ZipCode = "12345"
+                }
+            };
+
+            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+                .ReturnsAsync(new Client() { Id = 1, EmailAddress = "jdoe@gmail.com" });
+
+            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
+                .ReturnsAsync(new Client() { Username = "jdoe" });
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
@@ -191,6 +257,7 @@ namespace ClientManagementService.Test.Service
                 FirstName = "John",
                 LastName = "Doe",
                 EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
                 PrimaryPhoneNum = "123-456-7890",
                 Password = new byte[100],
                 Address = new Domain.Models.Address()
@@ -237,6 +304,7 @@ namespace ClientManagementService.Test.Service
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
                     PrimaryPhoneNum = "123-456-7890",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     AddressLine1 = "123 Test St",
                     City = "San Diego",
@@ -258,6 +326,7 @@ namespace ClientManagementService.Test.Service
             Assert.AreEqual("John", client.FirstName);
             Assert.AreEqual("Doe", client.LastName);
             Assert.AreEqual("jdoe@gmail.com", client.EmailAddress);
+            Assert.AreEqual("jdoe", client.Username);
             Assert.AreEqual("123-456-7890", client.PrimaryPhoneNum);
             Assert.AreEqual(encryptedPass, client.Password);
             Assert.IsFalse(client.IsLocked);
@@ -296,6 +365,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     PrimaryPhoneNum = "123-456-7890",
                     Password = encryptedPass,
                     AddressLine1 = "123 Test St",
@@ -317,6 +387,7 @@ namespace ClientManagementService.Test.Service
             Assert.AreEqual(1, client.CountryId);
             Assert.AreEqual("John", client.FirstName);
             Assert.AreEqual("Doe", client.LastName);
+            Assert.AreEqual("jdoe", client.Username);
             Assert.AreEqual("jdoe@gmail.com", client.EmailAddress);
             Assert.AreEqual("123-456-7890", client.PrimaryPhoneNum);
             Assert.AreEqual(encryptedPass, client.Password);
@@ -337,7 +408,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -345,6 +416,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = true,
@@ -355,7 +427,7 @@ namespace ClientManagementService.Test.Service
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            var client = await clientService.ClientLogin("jdoe@gmail.com", "TestPassword123!");
+            var client = await clientService.ClientLogin("jdoe", "TestPassword123!");
 
             Assert.IsTrue(client.IsLoggedIn);
         }
@@ -365,7 +437,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -373,6 +445,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,
@@ -383,7 +456,7 @@ namespace ClientManagementService.Test.Service
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe@gmail.com", "Test123!"));
+            Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe", "Test123!"));
         }
 
         [Test]
@@ -391,7 +464,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -399,6 +472,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,
@@ -409,7 +483,7 @@ namespace ClientManagementService.Test.Service
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            await clientService.ClientLogin("jdoe@gmail.com", "TestPassword123!");
+            await clientService.ClientLogin("jdoe", "TestPassword123!");
 
             _clientRepository.Verify(c => c.UpdateClientLoginStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Once);
         }
@@ -427,6 +501,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,
@@ -455,6 +530,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = true,
@@ -494,6 +570,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,
@@ -523,6 +600,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,
@@ -556,6 +634,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,
@@ -602,6 +681,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,
@@ -630,6 +710,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,
@@ -656,6 +737,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,
@@ -682,6 +764,7 @@ namespace ClientManagementService.Test.Service
                     FirstName = "John",
                     LastName = "Doe",
                     EmailAddress = "jdoe@gmail.com",
+                    Username = "jdoe",
                     Password = encryptedPass,
                     PrimaryPhoneNum = "123-456-7890",
                     IsLoggedIn = false,

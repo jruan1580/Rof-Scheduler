@@ -14,6 +14,7 @@ namespace ClientManagementService.API.DTOMapper
             dtoClient.FirstName = coreClient.FirstName;
             dtoClient.LastName = coreClient.LastName;
             dtoClient.EmailAddress = coreClient.EmailAddress;
+            dtoClient.Username = coreClient.Username;
             dtoClient.PrimaryPhoneNum = coreClient.PrimaryPhoneNum;
             dtoClient.SecondaryPhoneNum = coreClient.SecondaryPhoneNum;
             dtoClient.IsLocked = coreClient.IsLocked;
@@ -45,6 +46,7 @@ namespace ClientManagementService.API.DTOMapper
             coreClient.SetFullName();
 
             coreClient.EmailAddress = dtoClient.EmailAddress;
+            coreClient.Username = dtoClient.Username;
             coreClient.PrimaryPhoneNum = dtoClient.PrimaryPhoneNum;
             coreClient.SecondaryPhoneNum = dtoClient.SecondaryPhoneNum;
             coreClient.IsLocked = dtoClient.IsLocked;

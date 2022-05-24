@@ -18,6 +18,7 @@ namespace ClientManagementService.Test.Mapper
             coreClient.FirstName = "John";
             coreClient.LastName = "Doe";
             coreClient.EmailAddress = "jdoe@gmail.com";
+            coreClient.Username = "jdoe";
             coreClient.PrimaryPhoneNum = "123-456-7890";
             coreClient.IsLocked = false;
             coreClient.FailedLoginAttempts = 0;
@@ -41,6 +42,7 @@ namespace ClientManagementService.Test.Mapper
             Assert.AreEqual("Doe", dtoClient.LastName);
             Assert.AreEqual("123-456-7890", dtoClient.PrimaryPhoneNum);
             Assert.AreEqual("jdoe@gmail.com", dtoClient.EmailAddress);
+            Assert.AreEqual("jdoe", dtoClient.Username);
             Assert.IsFalse(dtoClient.IsLocked);
             Assert.AreEqual(0, dtoClient.FailedLoginAttempts);
             Assert.IsTrue(dtoClient.TempPasswordChanged);
@@ -63,6 +65,7 @@ namespace ClientManagementService.Test.Mapper
             dtoClient.LastName = "Doe";
             dtoClient.PrimaryPhoneNum = "123-456-7890";
             dtoClient.EmailAddress = "jdoe@gmail.com";
+            dtoClient.Username = "jdoe";
             dtoClient.IsLocked = false;
             dtoClient.FailedLoginAttempts = 0;
             dtoClient.TempPasswordChanged = true;
@@ -84,6 +87,7 @@ namespace ClientManagementService.Test.Mapper
             Assert.AreEqual("Doe", coreClient.LastName);
             Assert.AreEqual("123-456-7890", coreClient.PrimaryPhoneNum);
             Assert.AreEqual("jdoe@gmail.com", coreClient.EmailAddress);
+            Assert.AreEqual("jdoe", coreClient.Username);
             Assert.IsFalse(coreClient.IsLocked);
             Assert.AreEqual(0, coreClient.FailedLoginAttempts);
             Assert.IsTrue(coreClient.TempPasswordChanged);

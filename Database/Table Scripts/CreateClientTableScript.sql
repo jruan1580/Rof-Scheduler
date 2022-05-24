@@ -4,6 +4,7 @@ CREATE TABLE dbo.Client(
 	FirstName VARCHAR(50) NOT NULL,
 	LastName VARCHAR(50) NOT NULL,
 	EmailAddress VARCHAR(50) NOT NULL,
+	Username VARCHAR(32) NOT NULL,
 	Password VARBINARY(max) NOT NULL,
 	PrimaryPhoneNum VARCHAR(25) NOT NULL,
 	SecondaryPhoneNum VARCHAR(25),

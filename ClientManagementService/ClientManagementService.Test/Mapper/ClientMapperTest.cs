@@ -18,6 +18,7 @@ namespace ClientManagementService.Test.Mapper
             entity.FirstName = "John";
             entity.LastName = "Doe";
             entity.EmailAddress = "jdoe@gmail.com";
+            entity.Username = "jdoe";
             entity.PrimaryPhoneNum = "123-456-7890";
             entity.Password = new byte[32];
             entity.IsLocked = false;
@@ -37,6 +38,7 @@ namespace ClientManagementService.Test.Mapper
             Assert.AreEqual("John", core.FirstName);
             Assert.AreEqual("Doe", core.LastName);
             Assert.AreEqual("jdoe@gmail.com", core.EmailAddress);
+            Assert.AreEqual("jdoe", core.Username);
             Assert.AreEqual("123-456-7890", core.PrimaryPhoneNum);
             Assert.AreEqual(new byte[32], core.Password);
             Assert.IsFalse(core.IsLocked);
@@ -61,6 +63,7 @@ namespace ClientManagementService.Test.Mapper
             core.FirstName = "John";
             core.LastName = "Doe";
             core.EmailAddress = "jdoe@gmail.com";
+            core.Username = "jdoe";
             core.PrimaryPhoneNum = "123-456-7890";
             core.Password = new byte[32];
             core.IsLocked = false;
@@ -78,6 +81,7 @@ namespace ClientManagementService.Test.Mapper
             Assert.AreEqual("John", entity.FirstName);
             Assert.AreEqual("Doe", entity.LastName);
             Assert.AreEqual("jdoe@gmail.com", entity.EmailAddress);
+            Assert.AreEqual("jdoe", entity.Username);
             Assert.AreEqual("123-456-7890", entity.PrimaryPhoneNum);
             Assert.AreEqual(new byte[32], entity.Password);
             Assert.IsFalse(entity.IsLocked);
