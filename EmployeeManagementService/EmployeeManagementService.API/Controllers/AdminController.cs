@@ -1,6 +1,7 @@
 using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
+using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,6 +55,10 @@ namespace EmployeeManagementService.API.Controllers
 
                 return StatusCode(201);
             }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
@@ -68,6 +73,14 @@ namespace EmployeeManagementService.API.Controllers
                 await _employeeService.UpdateEmployeeInformation(EmployeeDTOMapper.FromDTOEmployee(employee));
 
                 return Ok();
+            }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound();
+            }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {
@@ -84,13 +97,17 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpDelete("{id}/delete")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployeeById(long id)
         {
             try
@@ -98,6 +115,10 @@ namespace EmployeeManagementService.API.Controllers
                 await _employeeService.DeleteEmployeeById(id);
 
                 return Ok();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {

@@ -54,6 +54,10 @@ namespace AuthenticationService.API.Controllers
             {
                 return NotFound("Username not found");
             }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
@@ -91,7 +95,11 @@ namespace AuthenticationService.API.Controllers
             catch (NotFoundException)
             {
                 return NotFound("User not found");
-            }           
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);

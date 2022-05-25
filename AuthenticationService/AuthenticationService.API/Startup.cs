@@ -1,4 +1,5 @@
 using AuthenticationService.Domain.Services;
+using AuthenticationService.Infrastructure.ClientManagement;
 using AuthenticationService.Infrastructure.EmployeeManagement;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -24,8 +25,11 @@ namespace AuthenticationService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpClient();
+
             services.AddTransient<ITokenHandler, Domain.Services.TokenHandler>();
             services.AddTransient<IEmployeeManagementAccessor, EmployeeManagementAccessor>();
+            services.AddTransient<IClientManagementAccessor, ClientManagementAccessor>();
             services.AddTransient<IAuthService, AuthService>();
 
             services.AddMvc();

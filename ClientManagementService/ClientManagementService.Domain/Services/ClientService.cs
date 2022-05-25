@@ -15,7 +15,6 @@ namespace ClientManagementService.Domain.Services
         Task DeleteClientById(long id);
         Task<Client> GetClientByEmail(string email);
         Task<Client> GetClientById(long id);        
-        Task<Client> GetClientByUsername(string username);
         Task ResetClientFailedLoginAttempts(long id);
         Task UpdateClientInfo(Client client);
         Task UpdatePassword(long id, string newPassword);
@@ -131,19 +130,7 @@ namespace ClientManagementService.Domain.Services
             }
 
             return ClientMapper.ToCoreClient(client);
-        }
-
-        public async Task<Client> GetClientByUsername(string username)
-        {
-            var client = await _clientRepository.GetClientByUsername(username);
-
-            if(client == null)
-            {
-                return null;
-            }
-
-            return ClientMapper.ToCoreClient(client);
-        }
+        }       
 
         public async Task<Client> ClientLogin(string username, string password)
         {
@@ -238,6 +225,18 @@ namespace ClientManagementService.Domain.Services
             }
 
             await _clientRepository.UpdateClientIsLocked(client.Id, true);
+        }
+
+        private async Task<Client> GetClientByUsername(string username)
+        {
+            var client = await _clientRepository.GetClientByUsername(username);
+
+            if (client == null)
+            {
+                return null;
+            }
+
+            return ClientMapper.ToCoreClient(client);
         }
     }
 }

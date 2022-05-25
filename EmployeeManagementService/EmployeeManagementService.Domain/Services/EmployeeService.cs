@@ -107,7 +107,7 @@ namespace EmployeeManagementService.Domain.Services
             var originalEmployee = await _employeeRepository.GetEmployeeById(employee.Id);
             if (originalEmployee == null)
             {
-                throw new ArgumentException($"Employee with id: {employee.Id} does not exist");
+                throw new EmployeeNotFoundException();
             }
 
             originalEmployee.Username = employee.Username;

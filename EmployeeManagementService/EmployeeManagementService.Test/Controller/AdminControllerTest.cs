@@ -111,7 +111,7 @@ namespace EmployeeManagementService.Test.Controller
         }
 
         [Test]
-        public async Task CreateEmployee_InternalServerError()
+        public async Task CreateEmployee_BadRequestError()
         {
             var newEmployee = new API.DTO.EmployeeDTO()
             {
@@ -124,19 +124,16 @@ namespace EmployeeManagementService.Test.Controller
                 Active = null
             };
 
-            _employeeService.Setup(e => e.CreateEmployee(It.IsAny<Domain.Models.Employee>(), It.IsAny<string>()))
-                .ThrowsAsync(new Exception());
-
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.CreateEmployee(newEmployee);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
 
-            var obj = (ObjectResult)response;
+            var obj = (BadRequestObjectResult)response;
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(obj.StatusCode, 400);
         }
 
         [Test]
@@ -205,7 +202,7 @@ namespace EmployeeManagementService.Test.Controller
         }
 
         [Test]
-        public async Task UpdateEmployeeInformation_InternalServerError()
+        public async Task UpdateEmployeeInformation_BadRequestError()
         {
             var updateEmployee = new API.DTO.EmployeeDTO()
             {
@@ -216,21 +213,18 @@ namespace EmployeeManagementService.Test.Controller
                 Username = "",
                 Role = "",
                 Address = new API.DTO.AddressDTO { AddressLine1 = "", AddressLine2 = "", City = "", State = "", ZipCode = "" }
-            };
-
-            _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Domain.Models.Employee>()))
-                .ThrowsAsync(new Exception());
+            };          
 
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
 
-            var obj = (ObjectResult)response;
+            var obj = (BadRequestObjectResult)response;
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(obj.StatusCode, 400);
         }
 
         [Test]

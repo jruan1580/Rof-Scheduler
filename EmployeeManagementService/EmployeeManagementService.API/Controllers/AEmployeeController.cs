@@ -31,6 +31,10 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
             }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound($"Employee with id: {id} not found");
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
@@ -107,6 +111,10 @@ namespace EmployeeManagementService.API.Controllers
                 await _employeeService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
 
                 return Ok();
+            }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound($"Employee with id: {newPassword.Id} not found");
             }
             catch(ArgumentException argEx)
             {
