@@ -28,6 +28,10 @@ namespace ClientManagementService.API.Controllers
 
                 return StatusCode(201);
             }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
@@ -59,6 +63,11 @@ namespace ClientManagementService.API.Controllers
             try
             {
                 var client = await _clientService.GetClientByEmail(email);
+
+                if (client == null)
+                {
+                    return NotFound($"Client with email, {email}, was not found");
+                }
 
                 return Ok(ClientDTOMapper.ToDTOClient(client));
             }
@@ -119,6 +128,10 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
@@ -133,6 +146,14 @@ namespace ClientManagementService.API.Controllers
                 await _clientService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
 
                 return Ok();
+            }
+            catch (ClientNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {
@@ -149,13 +170,21 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
+            catch (ClientNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpDelete("{id}/delete")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClientById(long id)
         {
             try
@@ -163,6 +192,10 @@ namespace ClientManagementService.API.Controllers
                 await _clientService.DeleteClientById(id);
 
                 return Ok();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {

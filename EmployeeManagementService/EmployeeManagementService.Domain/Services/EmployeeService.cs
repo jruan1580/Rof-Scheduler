@@ -2,11 +2,13 @@
 using EmployeeManagementService.Domain.Mappers.Database;
 using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Infrastructure.Persistence;
+using EmployeeManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EmployeeDB = EmployeeManagementService.Infrastructure.Persistence.Entities.Employee;
 
 namespace EmployeeManagementService.Domain.Services
 {
@@ -52,7 +54,7 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task<Employee> GetEmployeeById(long id)
         {
-            var employee = await _employeeRepository.GetEmployeeById(id);
+            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
 
             if (employee == null)
             {
@@ -64,7 +66,7 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task<Employee> GetEmployeeByUsername(string username)
         {
-            var employee = await _employeeRepository.GetEmployeeByUsername(username);
+            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<string>(GetEmployeeFilterEnum.Usermame, username));
 
             if (employee == null)
             {
@@ -76,14 +78,30 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task ResetEmployeeFailedLoginAttempt(long id)
         {
-            await _employeeRepository.ResetEmployeeFailedLoginAttempt(id);
+            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
 
-            await _employeeRepository.UpdateEmployeeIsLockedStatus(id, false);
+            if (employee == null)
+            {
+                throw new EmployeeNotFoundException();
+            }
+
+            employee.FailedLoginAttempts = 0;
+            employee.IsLocked = false;
+
+            await _employeeRepository.UpdateEmployee(employee);
         }
 
         public async Task UpdateEmployeeActiveStatus(long id, bool active)
         {
-            await _employeeRepository.UpdateEmployeeActiveStatus(id, active);
+            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
+
+            if (employee == null)
+            {
+                throw new EmployeeNotFoundException();
+            }
+
+            employee.Active = active;
+            await _employeeRepository.UpdateEmployee(employee);
         }
 
         public async Task UpdateEmployeeInformation(Employee employee)
@@ -104,7 +122,12 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException("Invalid role assigned");
             }
 
-            var originalEmployee = await _employeeRepository.GetEmployeeById(employee.Id);
+            if (await _employeeRepository.DoesEmployeeExistsBySsnOrUsername(employee.Ssn, employee.Username, employee.Id))
+            {
+                throw new ArgumentException("Employee with ssn or username exists");
+            }
+
+            var originalEmployee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, employee.Id));
             if (originalEmployee == null)
             {
                 throw new EmployeeNotFoundException();
@@ -122,7 +145,7 @@ namespace EmployeeManagementService.Domain.Services
             originalEmployee.ZipCode = employee.Address?.ZipCode;
             //originalEmployee.CountryId = employee.CountryId;
 
-            await _employeeRepository.UpdateEmployeeInformation(originalEmployee);
+            await _employeeRepository.UpdateEmployee(originalEmployee);
         }
 
         public async Task CreateEmployee(Employee newEmployee, string password)
@@ -136,11 +159,9 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException(errorMessage);
             }
 
-            var employeeCheck = await GetEmployeeByUsername(newEmployee.Username);
-
-            if (employeeCheck != null && newEmployee.Username == employeeCheck.Username)
+            if (await _employeeRepository.DoesEmployeeExistsBySsnOrUsername(newEmployee.Ssn, newEmployee.Username, newEmployee.Id))
             {
-                throw new ArgumentException("Username already exists");
+                throw new ArgumentException("Employee with ssn or username exists");
             }
 
             if (!_passwordService.VerifyPasswordRequirements(password))
@@ -165,7 +186,7 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task<Employee> EmployeeLogIn(string username, string password)
         {
-            var employee = await GetEmployeeByUsername(username);
+            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<string>(GetEmployeeFilterEnum.Usermame, username));
 
             if (employee == null)
             {
@@ -174,7 +195,7 @@ namespace EmployeeManagementService.Domain.Services
 
             if (employee.Status == true)
             {
-                return employee;
+                return EmployeeMapper.ToCoreEmployee(employee);
             }
 
             if (!_passwordService.VerifyPasswordHash(password, employee.Password))
@@ -183,28 +204,30 @@ namespace EmployeeManagementService.Domain.Services
 
                 throw new ArgumentException("Incorrect password");
             }
-         
-            await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, true);
-            employee.Status = true;
 
-            return employee;
+            employee.Status = true;
+            await _employeeRepository.UpdateEmployee(employee);            
+
+            return EmployeeMapper.ToCoreEmployee(employee); 
         }
 
         public async Task EmployeeLogout(long id)
         {
-            var employee = await GetEmployeeById(id);
+            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
 
             if (employee.Status == false)
             {
                 return;
             }
 
-            await _employeeRepository.UpdateEmployeeLoginStatus(employee.Id, false);                        
+            employee.Status = false;
+
+            await _employeeRepository.UpdateEmployee(employee);
         }
 
         public async Task UpdatePassword(long id, string newPassword)
         {
-            var employee = await GetEmployeeById(id);
+            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
 
             if (!_passwordService.VerifyPasswordRequirements(newPassword))
             {
@@ -218,15 +241,24 @@ namespace EmployeeManagementService.Domain.Services
 
             var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
 
-            await _employeeRepository.UpdatePassword(employee.Id, newEncryptedPass);
+            employee.Password = newEncryptedPass;
+
+            await _employeeRepository.UpdateEmployee(employee);
         }
 
         public async Task DeleteEmployeeById(long id)
         {
+            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
+            
+            if (employee == null)
+            {
+                return;
+            }
+
             await _employeeRepository.DeleteEmployeeById(id);
         }
 
-        private async Task IncrementEmployeeFailedLoginAttempt(Employee employee)
+        private async Task IncrementEmployeeFailedLoginAttempt(EmployeeDB employee)
         {
             if (employee.IsLocked)
             {
@@ -240,7 +272,9 @@ namespace EmployeeManagementService.Domain.Services
                 return;
             }
 
-            await _employeeRepository.UpdateEmployeeIsLockedStatus(employee.Id, true);
+            employee.IsLocked = true;
+
+            await _employeeRepository.UpdateEmployee(employee);
         }
     }
 }

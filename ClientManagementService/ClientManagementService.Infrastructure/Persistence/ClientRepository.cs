@@ -19,6 +19,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task UpdateClientIsLocked(long id, bool isLocked);
         Task UpdateClientLoginStatus(long id, bool isLoggedIn);
         Task UpdatePassword(long id, byte[] newPassword);
+        Task<bool> ClientAlreadyExists(long id, string email, string firstName, string lastName, string username);
     }
 
     public class ClientRepository : IClientRepository
@@ -176,6 +177,21 @@ namespace ClientManagementService.Infrastructure.Persistence
                 client.Password = newPassword;
 
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> ClientAlreadyExists(long id, string email, string firstName, string lastName, string username)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                email = email.ToLower();
+                firstName = firstName.ToLower();
+                lastName = lastName.ToLower();
+                username = username.ToLower();
+
+                return await context.Clients.AnyAsync(c => c.Id != id &&
+                    ((c.EmailAddress.ToLower().Equals(email) && c.FirstName.ToLower().Equals(firstName) && c.LastName.ToLower().Equals(lastName)) 
+                        || c.Username.ToLower().Equals(username)));                
             }
         }
     }

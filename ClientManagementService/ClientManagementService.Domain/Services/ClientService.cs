@@ -42,17 +42,11 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var clientCheck = await _clientRepository.GetClientByEmail(newClient.EmailAddress);
-
-            if (clientCheck != null && clientCheck.FirstName == newClient.FirstName && clientCheck.LastName == newClient.LastName)
+            var clientExists = await _clientRepository.ClientAlreadyExists(newClient.Id, newClient.EmailAddress, newClient.FirstName, newClient.LastName, newClient.Username);
+            if (clientExists)
             {
-                throw new ArgumentException("Client with this name, and email address already exists.");
-            }
-
-            if(await GetClientByUsername(newClient.Username) != null)
-            {
-                throw new ArgumentException($"Username {newClient.Username} is already taken.");
-            }
+                throw new ArgumentException("Either username already exists or email address and name combination already exists");
+            }           
 
             if (!_passwordService.VerifyPasswordRequirements(password))
             {
@@ -78,21 +72,16 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var clientCheck = await GetClientByEmail(client.EmailAddress);
-            if (clientCheck != null && clientCheck.Id != client.Id)
+            var clientExists = await _clientRepository.ClientAlreadyExists(client.Id, client.EmailAddress, client.FirstName, client.LastName, client.Username);
+            if (clientExists)
             {
-                throw new ArgumentException($"A client with email: {client.EmailAddress} already exists.");
-            }
-
-            if (await GetClientByUsername(client.Username) != null)
-            {
-                throw new ArgumentException($"Username {client.Username} is already taken.");
+                throw new ArgumentException("Either username already exists or email address and name combination already exists");
             }
 
             var origClient = await _clientRepository.GetClientById(client.Id);
             if (origClient == null)
             {
-                throw new ArgumentException($"Client with id: {client.Id} does not exist.");
+                throw new ClientNotFoundException();
             }
 
             origClient.FirstName = client.FirstName;

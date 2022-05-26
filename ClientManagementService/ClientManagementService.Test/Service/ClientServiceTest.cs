@@ -74,8 +74,8 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
-                .ReturnsAsync(new Client() { FirstName = "John", LastName = "Doe", EmailAddress = "jdoe@gmail.com"});
+            _clientRepository.Setup(c => c.ClientAlreadyExists(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
@@ -102,8 +102,8 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
-                .ReturnsAsync(new Client() { Username = "jdoe" });
+            _clientRepository.Setup(c => c.ClientAlreadyExists(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+               .ReturnsAsync(true);
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
@@ -209,8 +209,8 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
-                .ReturnsAsync(new Client() {Id = 2, EmailAddress = "jdoe@gmail.com" });
+            _clientRepository.Setup(c => c.ClientAlreadyExists(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+               .ReturnsAsync(true);
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
@@ -238,11 +238,8 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
-                .ReturnsAsync(new Client() { Id = 1, EmailAddress = "jdoe@gmail.com" });
-
-            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
-                .ReturnsAsync(new Client() { Username = "jdoe" });
+            _clientRepository.Setup(c => c.ClientAlreadyExists(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+               .ReturnsAsync(true);
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 

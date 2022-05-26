@@ -45,7 +45,6 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
  
-
         [HttpPost]
         public async Task<IActionResult> CreateEmployee([FromBody] EmployeeDTO employee)
         {
@@ -97,9 +96,9 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
-            catch(ArgumentException argEx)
+            catch (EmployeeNotFoundException)
             {
-                return BadRequest(argEx.Message);
+                return NotFound();
             }
             catch (Exception ex)
             {
@@ -116,9 +115,9 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (ArgumentException argEx)
+            catch (EmployeeNotFoundException)
             {
-                return BadRequest(argEx.Message);
+                return NotFound();
             }
             catch (Exception ex)
             {
