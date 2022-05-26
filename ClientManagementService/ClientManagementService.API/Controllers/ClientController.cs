@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using ClientManagementService.API.DTO;
 using ClientManagementService.API.DTOMapper;
+using ClientManagementService.Domain.Exceptions;
 using ClientManagementService.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,6 +28,10 @@ namespace ClientManagementService.API.Controllers
 
                 return StatusCode(201);
             }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
@@ -42,18 +47,27 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok(ClientDTOMapper.ToDTOClient(client));
             }
+            catch (ClientNotFoundException)
+            {
+                return NotFound($"Client with id {id} not found");
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpGet("email/{email}")]
+        [HttpGet("{email}/email")]
         public async Task<IActionResult> GetClientByEmail(string email)
         {
             try
             {
                 var client = await _clientService.GetClientByEmail(email);
+
+                if (client == null)
+                {
+                    return NotFound($"Client with email, {email}, was not found");
+                }
 
                 return Ok(ClientDTOMapper.ToDTOClient(client));
             }
@@ -72,13 +86,21 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok(new { Id = clientLogIn.Id, FirstName = clientLogIn.FirstName, LastName = clientLogIn.LastName});
             }
+            catch (ClientNotFoundException)
+            {
+                return NotFound($"Client with username: {client} was not found");
+            }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpPatch("logout/{id}")]
+        [HttpPatch("{id}/logout")]
         public async Task<IActionResult> ClientLogout(long id)
         {
             try
@@ -87,13 +109,17 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
+            catch (ClientNotFoundException)
+            {
+                return NotFound($"Client with id {id} not found");
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpPatch("reset/locked/{id}")]
+        [HttpPatch("{id}/locked")]
         public async Task<IActionResult> ResetClientLockedStatus(long id)
         {
             try
@@ -102,13 +128,17 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpPatch("update/password")]
+        [HttpPatch("password")]
         public async Task<IActionResult> UpdatePassword([FromBody] PasswordDTO newPassword)
         {
             try
@@ -117,13 +147,21 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
+            catch (ClientNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpPut("update/info")]
+        [HttpPut("info")]
         public async Task<IActionResult> UpdateClientInfo([FromBody] ClientDTO client)
         {
             try
@@ -132,13 +170,21 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
+            catch (ClientNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClientById(long id)
         {
             try
@@ -146,6 +192,10 @@ namespace ClientManagementService.API.Controllers
                 await _clientService.DeleteClientById(id);
 
                 return Ok();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {

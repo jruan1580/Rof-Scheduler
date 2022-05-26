@@ -1,6 +1,7 @@
 using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
+using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace EmployeeManagementService.API.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrator,Internal")]
     [ApiController]
     public class AdminController : AEmployeeController
     {
@@ -44,8 +45,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
  
-
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateEmployee([FromBody] EmployeeDTO employee)
         {
             try
@@ -53,6 +53,10 @@ namespace EmployeeManagementService.API.Controllers
                 await _employeeService.CreateEmployee(EmployeeDTOMapper.FromDTOEmployee(employee), employee.Password);
 
                 return StatusCode(201);
+            }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {
@@ -69,13 +73,21 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound();
+            }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpPatch("reset/{id}/locked")]
+        [HttpPatch("{id}/locked")]
         public async Task<IActionResult> ResetLockedStatus(long id)
         {
             try
@@ -84,13 +96,17 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound();
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployeeById(long id)
         {
             try
@@ -98,6 +114,10 @@ namespace EmployeeManagementService.API.Controllers
                 await _employeeService.DeleteEmployeeById(id);
 
                 return Ok();
+            }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound();
             }
             catch (Exception ex)
             {

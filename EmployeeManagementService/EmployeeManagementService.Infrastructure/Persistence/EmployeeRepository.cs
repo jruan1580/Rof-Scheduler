@@ -1,4 +1,5 @@
 ﻿using EmployeeManagementService.Infrastructure.Persistence.Entities;
+using EmployeeManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,16 +12,11 @@ namespace EmployeeManagementService.Infrastructure.Persistence
     {
         Task CreateEmployee(Employee newEmployee);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
-        Task<Employee> GetEmployeeById(long id);
-        Task<Employee> GetEmployeeByUsername(string username);
+        Task<Employee> GetEmployeeByFilter<T>(GetEmployeeFilterModel<T> filter);
         Task<int> IncrementEmployeeFailedLoginAttempt(long id);
-        Task ResetEmployeeFailedLoginAttempt(long id);
-        Task UpdateEmployeeActiveStatus(long id, bool active);
-        Task UpdateEmployeeInformation(Employee employeeToUpdate);
-        Task UpdateEmployeeIsLockedStatus(long id, bool isLocked);
-        Task UpdateEmployeeLoginStatus(long id, bool status);
-        Task UpdatePassword(long id, byte[] newPassword);
+        Task UpdateEmployee(Employee employeeToUpdate);
         Task DeleteEmployeeById(long id);
+        Task<bool> DoesEmployeeExistsBySsnOrUsername(string ssn, string username, long id);
     }
 
     public class EmployeeRepository : IEmployeeRepository
@@ -64,43 +60,24 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<Employee> GetEmployeeById(long id)
+        public async Task<Employee> GetEmployeeByFilter<T>(GetEmployeeFilterModel<T> filter)
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Employees
-                    .Where(e => e.Id == id)
-                    .Select(e => new Employee()
-                    {
-                        Id = e.Id,
-                        FirstName = e.FirstName,
-                        LastName = e.LastName,
-                        Ssn = e.Ssn,
-                        Password = e.Password,
-                        Role = e.Role,
-                        Username = e.Username,
-                        Active = e.Active,
-                        IsLocked = e.IsLocked,
-                        FailedLoginAttempts = e.FailedLoginAttempts,
-                        AddressLine1 = e.AddressLine1,
-                        AddressLine2 = e.AddressLine2,
-                        City = e.City,
-                        State = e.State,
-                        ZipCode = e.ZipCode,
-                        CountryId = e.CountryId,
-                        Status = e.Status
-                    })
-                    .FirstOrDefaultAsync();
+                if (filter.FilterType == GetEmployeeFilterEnum.Id)
+                {
+                    return await context.Employees.FirstOrDefaultAsync(e => e.Id == Convert.ToInt64(filter.Value));
+                }
+                else if (filter.FilterType == GetEmployeeFilterEnum.Usermame)
+                {
+                    return await context.Employees.FirstOrDefaultAsync(e => e.Username.ToLower().Equals(Convert.ToString(filter.Value).ToLower()));
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid Filter Type");
+                }
             }
-        }
-
-        public async Task<Employee> GetEmployeeByUsername(string username)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                return await context.Employees.Include(c => c.Country).FirstOrDefaultAsync(e => e.Username == username);
-            }
-        }
+        }       
 
         public async Task CreateEmployee(Employee newEmployee)
         {
@@ -112,45 +89,11 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task UpdateEmployeeInformation(Employee employeeToUpdate)
+        public async Task UpdateEmployee(Employee employeeToUpdate)
         {
             using (var context = new RofSchedulerContext())
             {
                 context.Employees.Update(employeeToUpdate);
-
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdateEmployeeLoginStatus(long id, bool status)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
-
-                if (employee == null)
-                {
-                    throw new ArgumentException("No employee found.");
-                }
-
-                employee.Status = status;
-
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdateEmployeeActiveStatus(long id, bool active)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
-
-                if (employee == null)
-                {
-                    throw new ArgumentException("No employee found.");
-                }
-
-                employee.Active = active;
 
                 await context.SaveChangesAsync();
             }
@@ -173,58 +116,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 return employee.FailedLoginAttempts;
             }
-        }
-
-        public async Task ResetEmployeeFailedLoginAttempt(long id)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
-
-                if (employee == null)
-                {
-                    throw new ArgumentException("No employee found.");
-                }
-
-                employee.FailedLoginAttempts = 0;
-
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdateEmployeeIsLockedStatus(long id, bool isLocked)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
-
-                if (employee == null)
-                {
-                    throw new ArgumentException("No employee found.");
-                }
-
-                employee.IsLocked = isLocked;
-
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdatePassword(long id, byte[] newPassword)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id);
-
-                if (employee == null)
-                {
-                    throw new ArgumentException("No employee found.");
-                }
-
-                employee.Password = newPassword;
-
-                await context.SaveChangesAsync();
-            }
-        }
+        }      
 
         public async Task DeleteEmployeeById(long id)
         {
@@ -240,6 +132,15 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 context.Remove(employee);
 
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> DoesEmployeeExistsBySsnOrUsername(string ssn, string username, long id)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Employees.AnyAsync(e => e.Id != id && (e.Ssn.Equals(ssn) 
+                    || e.Username.ToLower().Equals(username.ToLower())));             
             }
         }
     }

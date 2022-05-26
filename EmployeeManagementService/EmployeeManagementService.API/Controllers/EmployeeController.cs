@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
+using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagementService.API.Controllers
 {
-    [Authorize(Roles = "Employee")]
+    [Authorize(Roles = "Employee,Internal")]
     [ApiController]
     public class EmployeeController : AEmployeeController
     {
@@ -31,6 +32,14 @@ namespace EmployeeManagementService.API.Controllers
                 await _employeeService.UpdateEmployeeInformation(EmployeeDTOMapper.FromDTOEmployee(employee));
 
                 return Ok();
+            }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {

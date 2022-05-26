@@ -1,6 +1,6 @@
-using EmployeeManagementService.API.Authentication;
-using EmployeeManagementService.Domain.Services;
-using EmployeeManagementService.Infrastructure.Persistence;
+using AuthenticationService.Domain.Services;
+using AuthenticationService.Infrastructure.ClientManagement;
+using AuthenticationService.Infrastructure.EmployeeManagement;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EmployeeManagementService.API
+namespace AuthenticationService.API
 {
     public class Startup
     {
@@ -25,21 +25,14 @@ namespace EmployeeManagementService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
-            services.AddTransient<IEmployeeService, EmployeeService>();
-            services.AddTransient<IPasswordService, PasswordService>();
-            services.AddTransient<ITokenHandler, Authentication.TokenHandler>();
+            services.AddHttpClient();
 
-            services.AddMvc();           
+            services.AddTransient<ITokenHandler, Domain.Services.TokenHandler>();
+            services.AddTransient<IEmployeeManagementAccessor, EmployeeManagementAccessor>();
+            services.AddTransient<IClientManagementAccessor, ClientManagementAccessor>();
+            services.AddTransient<IAuthService, AuthService>();
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("http://localhost:3000")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
-                //.AllowCredentials());
-            });
+            services.AddMvc();
 
             services.AddControllers();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -66,7 +59,7 @@ namespace EmployeeManagementService.API
                               {
                                   context.Token = context.Request.Cookies["X-Access-Token-Admin"];
                               }
-                          }
+                          }                        
 
                           return Task.CompletedTask;
                       }
@@ -86,12 +79,12 @@ namespace EmployeeManagementService.API
 
             app.UseRouting();
 
+
             app.UseCors(x => x
-                .WithOrigins("http://localhost:3000", "https://localhost:3000")
+                .WithOrigins("http://localhost:3000")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()); // allow credentials
-
 
             app.UseAuthentication();
 
