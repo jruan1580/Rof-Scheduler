@@ -58,7 +58,7 @@ namespace EmployeeManagementService.Test.Controller
         }
 
         [Test]
-        public async Task UpdateEmployeeInformation_InternalServerError()
+        public async Task UpdateEmployeeInformation_BadRequestError()
         {
             var updateEmployee = new API.DTO.EmployeeDTO()
             {
@@ -70,20 +70,17 @@ namespace EmployeeManagementService.Test.Controller
                 Role = "",
                 Address = new API.DTO.AddressDTO { AddressLine1 = "", AddressLine2 = "", City = "", State = "", ZipCode = "" }
             };
-
-            _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Domain.Models.Employee>()))
-                .ThrowsAsync(new Exception());
-
+          
             var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
 
-            var obj = (ObjectResult)response;
+            var obj = (BadRequestObjectResult)response;
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(obj.StatusCode, 400);
         }
 
         [Test]
@@ -195,16 +192,7 @@ namespace EmployeeManagementService.Test.Controller
                     Role = "Employee"
                 });
 
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers["User-Agent"] = "Chrome";
-
-            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object)
-            {
-                ControllerContext = new ControllerContext()
-                {
-                    HttpContext = httpContext
-                }
-            };
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
             {
@@ -246,21 +234,12 @@ namespace EmployeeManagementService.Test.Controller
         public async Task EmployeeLogout_Success()
         {
             _employeeService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
-                .ReturnsAsync(new Domain.Models.Employee()
-                {
-                    Role = "Employee"
-                });
+                .Returns(Task.CompletedTask);
 
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers["User-Agent"] = "Chrome";
 
-            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object)
-            {
-                ControllerContext = new ControllerContext()
-                {
-                    HttpContext = httpContext
-                }
-            };
+            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.EmployeeLogout(1);
 

@@ -1,10 +1,8 @@
-﻿using EmployeeManagementService.API.Authentication;
+using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
+using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -33,6 +31,10 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
             }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound($"Employee with id: {id} not found");
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
@@ -59,7 +61,6 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPatch("login")]
         public async Task<IActionResult> EmployeeLogin([FromBody] EmployeeDTO employee)
         {
@@ -67,21 +68,15 @@ namespace EmployeeManagementService.API.Controllers
             {
                 var loginEmployee = await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
 
-                var token = _tokenHandler.GenerateTokenForUserAndRole(loginEmployee.Role);
-
-                if (Request.Headers.TryGetValue("User-Agent", out var agent) && !agent.ToString().Contains("Postman"))
-                {
-                    if (loginEmployee.Role == "Administrator")
-                    {
-                        Response.Cookies.Append("X-Access-Token-Admin", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });                        
-                    }
-                    else
-                    {
-                        Response.Cookies.Append("X-Access-Token-Employee", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });
-                    }
-                }                      
-
-                return Ok(new { accessToken = token, Id = loginEmployee.Id, FirstName = loginEmployee.FirstName, Role = loginEmployee.Role });
+                return Ok(new { Id = loginEmployee.Id, FirstName = loginEmployee.FirstName, Role = loginEmployee.Role });
+            }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound("Employee not found");
+            }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {
@@ -89,26 +84,18 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpPatch("logout/{id}")]
+        [HttpPatch("{id}/logout")]
         public async Task<IActionResult> EmployeeLogout(long id)
         {
             try
             {
-                var employee = await _employeeService.EmployeeLogout(id);
-
-                if (Request.Headers.TryGetValue("User-Agent", out var agent) && !agent.ToString().Contains("Postman"))
-                {
-                    if (employee.Role == "Administrator")
-                    {
-                        Response.Cookies.Append("X-Access-Token-Admin", string.Empty, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(-30) });
-                    }
-                    else
-                    {
-                        Response.Cookies.Append("X-Access-Token-Employee", string.Empty, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(-30) });
-                    }
-                }
+                await _employeeService.EmployeeLogout(id);               
 
                 return Ok();
+            }
+            catch(EmployeeNotFoundException)
+            {
+                return NotFound("Employee not found");
             }
             catch (Exception ex)
             {
@@ -116,7 +103,7 @@ namespace EmployeeManagementService.API.Controllers
             }
         }
 
-        [HttpPatch("password/update")]
+        [HttpPatch("password")]
         public async Task<IActionResult> UpdatePassword([FromBody] PasswordDTO newPassword)
         {
             try
@@ -124,6 +111,14 @@ namespace EmployeeManagementService.API.Controllers
                 await _employeeService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
 
                 return Ok();
+            }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound($"Employee with id: {newPassword.Id} not found");
+            }
+            catch(ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
             }
             catch (Exception ex)
             {

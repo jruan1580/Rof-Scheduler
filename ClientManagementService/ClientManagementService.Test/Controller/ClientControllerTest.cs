@@ -170,7 +170,7 @@ namespace ClientManagementService.Test.Controller
         }
 
         [Test]
-        public async Task GetClientByEmail_InternalServerError()
+        public async Task GetClientByEmail_NotFoundError()
         {
             _clientService.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
                 .ReturnsAsync((Domain.Models.Client)null);
@@ -180,11 +180,11 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.GetClientByEmail("jdoe@gmail.com");
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(response.GetType(), typeof(NotFoundObjectResult));
 
-            var obj = (ObjectResult)response;
+            var obj = (NotFoundObjectResult)response;
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(obj.StatusCode, 404);
         }
 
         [Test]
@@ -299,7 +299,7 @@ namespace ClientManagementService.Test.Controller
         }
 
         [Test]
-        public async Task ResetClientLockedStatus_InternalServerError()
+        public async Task ResetClientLockedStatus_BadRequestError()
         {
             _clientService.Setup(c => c.ResetClientFailedLoginAttempts(1))
                 .ThrowsAsync(new ArgumentException());
@@ -309,11 +309,11 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.ResetClientLockedStatus(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
 
-            var obj = (ObjectResult)response;
+            var obj = (BadRequestObjectResult)response;
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(obj.StatusCode, 400);
         }
 
         [Test]
@@ -351,7 +351,7 @@ namespace ClientManagementService.Test.Controller
         }
 
         [Test]
-        public async Task UpdateClientInfo_InternalServerError()
+        public async Task UpdateClientInfo_BadRequestError()
         {
             var client = new API.DTO.ClientDTO()
             {
@@ -377,11 +377,11 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.UpdateClientInfo(client);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
 
-            var obj = (ObjectResult)response;
+            var obj = (BadRequestObjectResult)response;
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(obj.StatusCode, 400);
         }
 
         [Test]
@@ -451,7 +451,7 @@ namespace ClientManagementService.Test.Controller
         }
 
         [Test]
-        public async Task DeleteClientById_InternalServerError()
+        public async Task DeleteClientById_BadRequestError()
         {
             _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
                 .ThrowsAsync(new ArgumentException());
@@ -461,11 +461,11 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.DeleteClientById(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
 
-            var obj = (ObjectResult)response;
+            var obj = (BadRequestObjectResult)response;
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(obj.StatusCode, 400);
         }
     }
 }

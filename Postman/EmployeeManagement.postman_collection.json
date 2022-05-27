@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "2eab8054-2b32-4fac-b234-842da0c081e9",
+		"_postman_id": "375f2dde-4ae8-4a9e-9874-1ba8ffb33607",
 		"name": "EmployeeManagement",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -39,15 +39,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/create",
+									"raw": "{{host}}:{{port}}/api/admin",
 									"host": [
 										"{{host}}"
 									],
 									"port": "{{port}}",
 									"path": [
 										"api",
-										"admin",
-										"create"
+										"admin"
 									]
 								}
 							},
@@ -179,7 +178,7 @@
 								"method": "PATCH",
 								"header": [],
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/reset/999/locked",
+									"raw": "{{host}}:{{port}}/api/admin/999/locked",
 									"host": [
 										"{{host}}"
 									],
@@ -187,7 +186,6 @@
 									"path": [
 										"api",
 										"admin",
-										"reset",
 										"999",
 										"locked"
 									]
@@ -214,7 +212,7 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/delete/999",
+									"raw": "{{host}}:{{port}}/api/admin/999",
 									"host": [
 										"{{host}}"
 									],
@@ -222,7 +220,6 @@
 									"path": [
 										"api",
 										"admin",
-										"delete",
 										"999"
 									]
 								}
@@ -357,8 +354,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 500\", () => {\r",
-									"  pm.response.to.have.status(500);\r",
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -378,14 +375,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/login",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/login",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"admin",
+								"authentication",
 								"login"
 							]
 						}
@@ -431,14 +428,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/login",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/login",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"admin",
+								"authentication",
 								"login"
 							]
 						}
@@ -473,14 +470,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/login",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/login",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"admin",
+								"authentication",
 								"login"
 							]
 						}
@@ -526,15 +523,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/create",
+							"raw": "{{host}}:{{port}}/api/admin",
 							"host": [
 								"{{host}}"
 							],
 							"port": "{{port}}",
 							"path": [
 								"api",
-								"admin",
-								"create"
+								"admin"
 							]
 						}
 					},
@@ -547,8 +543,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 500\", () => {\r",
-									"  pm.response.to.have.status(500);\r",
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -574,15 +570,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/create",
+							"raw": "{{host}}:{{port}}/api/admin",
 							"host": [
 								"{{host}}"
 							],
 							"port": "{{port}}",
 							"path": [
 								"api",
-								"admin",
-								"create"
+								"admin"
 							]
 						}
 					},
@@ -632,14 +627,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/employee/login",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/login",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"employee",
+								"authentication",
 								"login"
 							]
 						}
@@ -674,14 +669,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/employee/login",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/login",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"employee",
+								"authentication",
 								"login"
 							]
 						}
@@ -730,15 +725,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/create",
+									"raw": "{{host}}:{{port}}/api/admin",
 									"host": [
 										"{{host}}"
 									],
 									"port": "{{port}}",
 									"path": [
 										"api",
-										"admin",
-										"create"
+										"admin"
 									]
 								}
 							},
@@ -855,7 +849,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/reset/{{employeeUserId}}/locked",
+									"raw": "{{host}}:{{port}}/api/admin/{{employeeUserId}}/locked",
 									"host": [
 										"{{host}}"
 									],
@@ -863,7 +857,6 @@
 									"path": [
 										"api",
 										"admin",
-										"reset",
 										"{{employeeUserId}}",
 										"locked"
 									]
@@ -896,7 +889,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/delete/{{employeeUserId}}",
+									"raw": "{{host}}:{{port}}/api/admin/{{employeeUserId}}",
 									"host": [
 										"{{host}}"
 									],
@@ -904,7 +897,6 @@
 									"path": [
 										"api",
 										"admin",
-										"delete",
 										"{{employeeUserId}}"
 									]
 								}
@@ -972,8 +964,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 404\", () => {\r",
+											"  pm.response.to.have.status(404);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1090,8 +1082,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1191,8 +1183,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 404\", () => {\r",
+											"  pm.response.to.have.status(404);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1309,8 +1301,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1415,8 +1407,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1442,7 +1434,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/password/update",
+									"raw": "{{host}}:{{port}}/api/admin/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1450,8 +1442,7 @@
 									"path": [
 										"api",
 										"admin",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1464,8 +1455,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1491,7 +1482,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/password/update",
+									"raw": "{{host}}:{{port}}/api/admin/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1499,8 +1490,7 @@
 									"path": [
 										"api",
 										"admin",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1513,8 +1503,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1540,7 +1530,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/password/update",
+									"raw": "{{host}}:{{port}}/api/admin/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1548,8 +1538,7 @@
 									"path": [
 										"api",
 										"admin",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1562,8 +1551,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1589,7 +1578,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/password/update",
+									"raw": "{{host}}:{{port}}/api/admin/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1597,8 +1586,7 @@
 									"path": [
 										"api",
 										"admin",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1611,8 +1599,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1638,7 +1626,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/password/update",
+									"raw": "{{host}}:{{port}}/api/admin/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1646,8 +1634,7 @@
 									"path": [
 										"api",
 										"admin",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1660,8 +1647,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1687,7 +1674,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/password/update",
+									"raw": "{{host}}:{{port}}/api/admin/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1695,8 +1682,7 @@
 									"path": [
 										"api",
 										"admin",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1736,7 +1722,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/admin/password/update",
+									"raw": "{{host}}:{{port}}/api/admin/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1744,8 +1730,7 @@
 									"path": [
 										"api",
 										"admin",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1763,8 +1748,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1790,7 +1775,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/employee/password/update",
+									"raw": "{{host}}:{{port}}/api/employee/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1798,8 +1783,7 @@
 									"path": [
 										"api",
 										"employee",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1812,8 +1796,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1839,7 +1823,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/employee/password/update",
+									"raw": "{{host}}:{{port}}/api/employee/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1847,8 +1831,7 @@
 									"path": [
 										"api",
 										"employee",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1861,8 +1844,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1888,7 +1871,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/employee/password/update",
+									"raw": "{{host}}:{{port}}/api/employee/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1896,8 +1879,7 @@
 									"path": [
 										"api",
 										"employee",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1910,8 +1892,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1937,7 +1919,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/employee/password/update",
+									"raw": "{{host}}:{{port}}/api/employee/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1945,8 +1927,7 @@
 									"path": [
 										"api",
 										"employee",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -1959,8 +1940,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1986,7 +1967,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/employee/password/update",
+									"raw": "{{host}}:{{port}}/api/employee/password",
 									"host": [
 										"{{host}}"
 									],
@@ -1994,8 +1975,7 @@
 									"path": [
 										"api",
 										"employee",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -2008,8 +1988,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 500\", () => {\r",
-											"  pm.response.to.have.status(500);\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"  pm.response.to.have.status(400);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2035,7 +2015,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/employee/password/update",
+									"raw": "{{host}}:{{port}}/api/employee/password",
 									"host": [
 										"{{host}}"
 									],
@@ -2043,8 +2023,7 @@
 									"path": [
 										"api",
 										"employee",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -2084,7 +2063,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{host}}:{{port}}/api/employee/password/update",
+									"raw": "{{host}}:{{port}}/api/employee/password",
 									"host": [
 										"{{host}}"
 									],
@@ -2092,8 +2071,7 @@
 									"path": [
 										"api",
 										"employee",
-										"password",
-										"update"
+										"password"
 									]
 								}
 							},
@@ -2131,16 +2109,16 @@
 							}
 						],
 						"url": {
-							"raw": "{{host}}:{{port}}/api/employee/logout/{{employeeUserId}}",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/{{employeeUserId}}/logout",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"employee",
-								"logout",
-								"{{employeeUserId}}"
+								"authentication",
+								"{{employeeUserId}}",
+								"logout"
 							]
 						}
 					},
@@ -2171,16 +2149,16 @@
 							}
 						],
 						"url": {
-							"raw": "{{host}}:{{port}}/api/employee/logout/{{employeeUserId}}",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/{{employeeUserId}}/logout",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"employee",
-								"logout",
-								"{{employeeUserId}}"
+								"authentication",
+								"{{employeeUserId}}",
+								"logout"
 							]
 						}
 					},
@@ -2198,8 +2176,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 500\", () => {\r",
-									"  pm.response.to.have.status(500);\r",
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2219,14 +2197,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/employee/login",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/login",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"employee",
+								"authentication",
 								"login"
 							]
 						}
@@ -2240,8 +2218,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 500\", () => {\r",
-									"  pm.response.to.have.status(500);\r",
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2261,14 +2239,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/employee/login",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/login",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"employee",
+								"authentication",
 								"login"
 							]
 						}
@@ -2282,8 +2260,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 500\", () => {\r",
-									"  pm.response.to.have.status(500);\r",
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2303,14 +2281,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/employee/login",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/login",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"employee",
+								"authentication",
 								"login"
 							]
 						}
@@ -2342,7 +2320,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/reset/{{employeeUserId}}/locked",
+							"raw": "{{host}}:{{port}}/api/admin/{{employeeUserId}}/locked",
 							"host": [
 								"{{host}}"
 							],
@@ -2350,7 +2328,6 @@
 							"path": [
 								"api",
 								"admin",
-								"reset",
 								"{{employeeUserId}}",
 								"locked"
 							]
@@ -2388,16 +2365,16 @@
 							}
 						],
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/logout/{{adminUserId}}",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/{{adminUserId}}/logout",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"admin",
-								"logout",
-								"{{adminUserId}}"
+								"authentication",
+								"{{adminUserId}}",
+								"logout"
 							]
 						}
 					},
@@ -2428,16 +2405,16 @@
 							}
 						],
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/logout/{{adminUserId}}",
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/{{adminUserId}}/logout",
 							"host": [
 								"{{host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{authServicePort}}",
 							"path": [
 								"api",
-								"admin",
-								"logout",
-								"{{adminUserId}}"
+								"authentication",
+								"{{adminUserId}}",
+								"logout"
 							]
 						}
 					},
@@ -2473,7 +2450,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/delete/{{employeeUserId}}",
+							"raw": "{{host}}:{{port}}/api/admin/{{employeeUserId}}",
 							"host": [
 								"{{host}}"
 							],
@@ -2481,7 +2458,6 @@
 							"path": [
 								"api",
 								"admin",
-								"delete",
 								"{{employeeUserId}}"
 							]
 						}
@@ -2522,7 +2498,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}:{{port}}/api/admin/password/update",
+							"raw": "{{host}}:{{port}}/api/admin/password",
 							"host": [
 								"{{host}}"
 							],
@@ -2530,8 +2506,7 @@
 							"path": [
 								"api",
 								"admin",
-								"password",
-								"update"
+								"password"
 							]
 						}
 					},

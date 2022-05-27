@@ -1,4 +1,5 @@
-﻿using ClientManagementService.Domain.Mappers.Database;
+﻿using ClientManagementService.Domain.Exceptions;
+using ClientManagementService.Domain.Mappers.Database;
 using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
 using System;
@@ -13,9 +14,7 @@ namespace ClientManagementService.Domain.Services
         Task CreateClient(Client newClient, string password);
         Task DeleteClientById(long id);
         Task<Client> GetClientByEmail(string email);
-        Task<Client> GetClientById(long id);
-        Task<Client> GetClientByUsername(string username);
-        Task IncrementClientFailedLoginAttempts(long id);
+        Task<Client> GetClientById(long id);        
         Task ResetClientFailedLoginAttempts(long id);
         Task UpdateClientInfo(Client client);
         Task UpdatePassword(long id, string newPassword);
@@ -43,17 +42,11 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var clientCheck = await _clientRepository.GetClientByEmail(newClient.EmailAddress);
-
-            if (clientCheck != null && clientCheck.FirstName == newClient.FirstName && clientCheck.LastName == newClient.LastName)
+            var clientExists = await _clientRepository.ClientAlreadyExists(newClient.Id, newClient.EmailAddress, newClient.FirstName, newClient.LastName, newClient.Username);
+            if (clientExists)
             {
-                throw new ArgumentException("Client with this name, and email address already exists.");
-            }
-
-            if(await GetClientByUsername(newClient.Username) != null)
-            {
-                throw new ArgumentException($"Username {newClient.Username} is already taken.");
-            }
+                throw new ArgumentException("Either username already exists or email address and name combination already exists");
+            }           
 
             if (!_passwordService.VerifyPasswordRequirements(password))
             {
@@ -79,21 +72,16 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var clientCheck = await GetClientByEmail(client.EmailAddress);
-            if (clientCheck != null && clientCheck.Id != client.Id)
+            var clientExists = await _clientRepository.ClientAlreadyExists(client.Id, client.EmailAddress, client.FirstName, client.LastName, client.Username);
+            if (clientExists)
             {
-                throw new ArgumentException($"A client with email: {client.EmailAddress} already exists.");
-            }
-
-            if (await GetClientByUsername(client.Username) != null)
-            {
-                throw new ArgumentException($"Username {client.Username} is already taken.");
+                throw new ArgumentException("Either username already exists or email address and name combination already exists");
             }
 
             var origClient = await _clientRepository.GetClientById(client.Id);
             if (origClient == null)
             {
-                throw new ArgumentException($"Client with id: {client.Id} does not exist.");
+                throw new ClientNotFoundException();
             }
 
             origClient.FirstName = client.FirstName;
@@ -115,7 +103,7 @@ namespace ClientManagementService.Domain.Services
 
             if (client == null)
             {
-                throw new ArgumentException("Client does not exist.");
+                throw new ClientNotFoundException();
             }
 
             return ClientMapper.ToCoreClient(client);
@@ -131,19 +119,7 @@ namespace ClientManagementService.Domain.Services
             }
 
             return ClientMapper.ToCoreClient(client);
-        }
-
-        public async Task<Client> GetClientByUsername(string username)
-        {
-            var client = await _clientRepository.GetClientByUsername(username);
-
-            if(client == null)
-            {
-                return null;
-            }
-
-            return ClientMapper.ToCoreClient(client);
-        }
+        }       
 
         public async Task<Client> ClientLogin(string username, string password)
         {
@@ -151,7 +127,7 @@ namespace ClientManagementService.Domain.Services
 
             if (client == null)
             {
-                throw new ArgumentException($"Client with username: {username} not found.");
+                throw new ClientNotFoundException();
             }
 
             if (client.IsLoggedIn)
@@ -166,7 +142,7 @@ namespace ClientManagementService.Domain.Services
 
             if (!_passwordService.VerifyPasswordHash(password, client.Password))
             {
-                await IncrementClientFailedLoginAttempts(client.Id);
+                await IncrementClientFailedLoginAttempts(client);
 
                 throw new ArgumentException("Incorrect password.");
             }
@@ -190,26 +166,7 @@ namespace ClientManagementService.Domain.Services
             await _clientRepository.UpdateClientLoginStatus(client.Id, false);
 
             client.IsLoggedIn = false;
-        }
-
-        public async Task IncrementClientFailedLoginAttempts(long id)
-        {
-            var client = await GetClientById(id);
-
-            if (client.IsLocked)
-            {
-                return;
-            }
-
-            var attempts = await _clientRepository.IncrementClientFailedLoginAttempts(client.Id);
-
-            if (attempts != 3)
-            {
-                return;
-            }
-
-            await _clientRepository.UpdateClientIsLocked(client.Id, true);
-        }
+        }   
 
         public async Task ResetClientFailedLoginAttempts(long id)
         {
@@ -240,6 +197,35 @@ namespace ClientManagementService.Domain.Services
         public async Task DeleteClientById(long id)
         {
             await _clientRepository.DeleteClientById(id);
+        }
+
+        private async Task IncrementClientFailedLoginAttempts(Client client)
+        {
+            if (client.IsLocked)
+            {
+                return;
+            }
+
+            var attempts = await _clientRepository.IncrementClientFailedLoginAttempts(client.Id);
+
+            if (attempts != 3)
+            {
+                return;
+            }
+
+            await _clientRepository.UpdateClientIsLocked(client.Id, true);
+        }
+
+        private async Task<Client> GetClientByUsername(string username)
+        {
+            var client = await _clientRepository.GetClientByUsername(username);
+
+            if (client == null)
+            {
+                return null;
+            }
+
+            return ClientMapper.ToCoreClient(client);
         }
     }
 }
