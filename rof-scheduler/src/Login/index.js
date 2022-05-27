@@ -1,7 +1,7 @@
 import { Form, Button, Row, Col, Spinner, Card, Container, Alert } from 'react-bootstrap';
 import { useState } from 'react';
 import { validateLoginPassword } from '../SharedServices/inputValidationService';
-import { login } from '../SharedServices/employeeManagementService';
+import { login } from '../SharedServices/authenticationService';
 
 function Login({handleLoginState}){
     const [loading, setLoading] = useState(false);
