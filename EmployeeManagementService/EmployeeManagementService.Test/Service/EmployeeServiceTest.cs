@@ -488,12 +488,41 @@ namespace EmployeeManagementService.Test.Service
                     Active = true
                 });
 
+            short failedAttempts = 2;
             _employeeRepository.Setup(e => e.IncrementEmployeeFailedLoginAttempt(It.IsAny<long>()))
-                .ReturnsAsync(2);
+                .ReturnsAsync(failedAttempts);
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.EmployeeLogIn("jdoe", "tE$t1234"));
+        }
+
+        [Test]
+        public void EmployeeLogin_Locked()
+        {
+            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
+
+            _employeeRepository.Setup(e => e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
+                .ReturnsAsync(new Employee()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Ssn = "123-45-6789",
+                    Username = "jdoe",
+                    Password = encryptedPass,
+                    Role = "Employee",
+                    IsLocked = true,
+                    FailedLoginAttempts = 3,
+                    TempPasswordChanged = false,
+                    Status = false,
+                    Active = true
+                });
+
+            var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
+
+            Assert.ThrowsAsync<EmployeeIsLockedException>(() => employeeService.EmployeeLogIn("jdoe", "tE$t1234"));
         }
 
         [Test]
