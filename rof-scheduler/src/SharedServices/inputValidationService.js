@@ -64,3 +64,60 @@ export const ensureUpdateInformationProvided = function (
 
   return validationErrors;
 };
+
+export const ensureCreateClientInformationProvided = function (
+  firstName,
+  lastName,
+  email,
+  username,
+  password,
+  primaryPhone,
+  addressLine1,
+  city,
+  state,
+  zipCode
+) {
+  var validationErrors = new Map();
+
+  if (firstName === undefined || firstName === "") {
+    validationErrors.set("firstName", "Please enter your first name.");
+  }
+
+  if (lastName === undefined || lastName === "") {
+    validationErrors.set("lastName", "Please enter your last name.");
+  }
+
+  if (email === undefined || email === "") {
+    validationErrors.set("email", "Please enter your email.");
+  }
+
+  if (username === undefined || username === "") {
+    validationErrors.set("username", "Please enter your username.");
+  }
+
+  if (password === undefined || password === "") {
+    validationErrors.set("password", "Please enter your password.");
+  }
+
+  if (primaryPhone === undefined || primaryPhone === "") {
+    validationErrors.set("primaryPhone", "Please enter a primary phone.");
+  }
+
+  if (addressLine1 === undefined || addressLine1 === "") {
+    validationErrors.set("addressLine1", "Please enter your address line 1.");
+  }
+
+  if (city === undefined || city === "") {
+    validationErrors.set("city", "Please enter your city.");
+  }
+
+  if (state === undefined || state === "") {
+    validationErrors.set("state", "Please enter your state.");
+  }
+
+  if (zipCode === undefined || zipCode === "") {
+    validationErrors.set("zipCode", "Please enter your zipcode.");
+  }
+
+  return validationErrors;
+};
