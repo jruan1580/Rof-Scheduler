@@ -137,7 +137,7 @@ namespace ClientManagementService.Domain.Services
 
             if (client.IsLocked)
             {
-                throw new ArgumentException("Client account is locked. Unable to log in.");
+                throw new ArgumentException("Client account is locked. Contact admin to get unlocked.");
             }
 
             if (!_passwordService.VerifyPasswordHash(password, client.Password))

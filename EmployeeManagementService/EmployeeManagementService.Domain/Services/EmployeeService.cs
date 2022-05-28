@@ -193,6 +193,11 @@ namespace EmployeeManagementService.Domain.Services
                 throw new EmployeeNotFoundException();
             }
 
+            if (employee.IsLocked)
+            {
+                throw new EmployeeIsLockedException();
+            }
+
             if (employee.Status == true)
             {
                 return EmployeeMapper.ToCoreEmployee(employee);
