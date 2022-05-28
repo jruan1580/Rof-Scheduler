@@ -488,8 +488,9 @@ namespace EmployeeManagementService.Test.Service
                     Active = true
                 });
 
+            short failedAttempts = 2;
             _employeeRepository.Setup(e => e.IncrementEmployeeFailedLoginAttempt(It.IsAny<long>()))
-                .ReturnsAsync(2);
+                .ReturnsAsync(failedAttempts);
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 

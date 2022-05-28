@@ -13,7 +13,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         Task CreateEmployee(Employee newEmployee);
         Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
         Task<Employee> GetEmployeeByFilter<T>(GetEmployeeFilterModel<T> filter);
-        Task<int> IncrementEmployeeFailedLoginAttempt(long id);
+        Task<short> IncrementEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployee(Employee employeeToUpdate);
         Task DeleteEmployeeById(long id);
         Task<bool> DoesEmployeeExistsBySsnOrUsername(string ssn, string username, long id);
@@ -99,7 +99,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<int> IncrementEmployeeFailedLoginAttempt(long id)
+        public async Task<short> IncrementEmployeeFailedLoginAttempt(long id)
         {
             using (var context = new RofSchedulerContext())
             {
