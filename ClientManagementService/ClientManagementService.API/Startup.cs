@@ -45,6 +45,12 @@ namespace ClientManagementService.API
 
             app.UseRouting();
 
+            app.UseCors(x => x
+                .WithOrigins("http://localhost:3000", "https://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

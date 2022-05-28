@@ -72,6 +72,11 @@ namespace ClientManagementService.Domain.Models
                 invalidErr.Add("Need email address.");
             }
 
+            if (string.IsNullOrEmpty(Username))
+            {
+                invalidErr.Add("Need username.");
+            }
+
             if (string.IsNullOrEmpty(PrimaryPhoneNum))
             {
                 invalidErr.Add("Need a primary phone number.");
