@@ -1,7 +1,7 @@
 ﻿using ClientManagementService.Infrastructure.Persistence.Entities;
+using ClientManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Infrastructure.Persistence
@@ -10,15 +10,9 @@ namespace ClientManagementService.Infrastructure.Persistence
     {
         Task CreateClient(Client newClient);
         Task DeleteClientById(long id);
-        Task<Client> GetClientByEmail(string email);
-        Task<Client> GetClientById(long id);
-        Task<Client> GetClientByUsername(string username);
+        Task<Client> GetClientByFilter<T>(GetClientFilterModel<T> filter);
         Task<int> IncrementClientFailedLoginAttempts(long id);
-        Task ResetClientFailedLoginAttempts(long id);
-        Task UpdateClientInfo(Client clientToUpdate);
-        Task UpdateClientIsLocked(long id, bool isLocked);
-        Task UpdateClientLoginStatus(long id, bool isLoggedIn);
-        Task UpdatePassword(long id, byte[] newPassword);
+        Task UpdateClient(Client clientToUpdate);
         Task<bool> ClientAlreadyExists(long id, string email, string firstName, string lastName, string username);
     }
 
@@ -51,35 +45,26 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<List<Client>> GetAllClient()
+        public async Task<Client> GetClientByFilter<T>(GetClientFilterModel<T> filter)
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Clients.ToListAsync();
-            }
-        }
-
-        public async Task<Client> GetClientByEmail(string email)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                return await context.Clients.FirstOrDefaultAsync(c => c.EmailAddress == email);
-            }
-        }
-
-        public async Task<Client> GetClientById(long id)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                return await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
-            }
-        }
-
-        public async Task<Client> GetClientByUsername(string username)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                return await context.Clients.FirstOrDefaultAsync(c => c.Username == username);
+                if(filter.Filter == GetClientFilterEnum.Id)
+                {
+                    return await context.Clients.FirstOrDefaultAsync(c => c.Id == Convert.ToInt64(filter.Value));
+                }
+                else if(filter.Filter == GetClientFilterEnum.Username)
+                {
+                    return await context.Clients.FirstOrDefaultAsync(c => c.Username.ToLower().Equals(Convert.ToString(filter.Value).ToLower()));
+                }
+                else if(filter.Filter == GetClientFilterEnum.Email)
+                {
+                    return await context.Clients.FirstOrDefaultAsync(c => c.EmailAddress.ToLower().Equals(Convert.ToString(filter.Value).ToLower()));
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid Filter Type.");
+                }
             }
         }
 
@@ -102,79 +87,11 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task ResetClientFailedLoginAttempts(long id)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
-
-                if (client == null)
-                {
-                    throw new ArgumentException("Client not found.");
-                }
-
-                client.FailedLoginAttempts = 0;
-
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdateClientInfo(Client clientToUpdate)
+        public async Task UpdateClient(Client clientToUpdate)
         {
             using (var context = new RofSchedulerContext())
             {
                 context.Clients.Update(clientToUpdate);
-
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdateClientIsLocked(long id, bool isLocked)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
-
-                if (client == null)
-                {
-                    throw new ArgumentException("Client not found.");
-                }
-
-                client.IsLocked = isLocked;
-
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdateClientLoginStatus(long id, bool isLoggedIn)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
-
-                if (client == null)
-                {
-                    throw new ArgumentException("Client not found.");
-                }
-
-                client.IsLoggedIn = isLoggedIn;
-
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdatePassword(long id, byte[] newPassword)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
-
-                if (client == null)
-                {
-                    throw new ArgumentException("No client found.");
-                }
-
-                client.Password = newPassword;
 
                 await context.SaveChangesAsync();
             }
