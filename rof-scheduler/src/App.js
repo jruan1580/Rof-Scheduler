@@ -48,7 +48,7 @@ function App() {
           <Routes>
             <Route
               exact
-              path="/createclient"
+              path="/signup"
               element={<CreateClient />}
             ></Route>
           </Routes>

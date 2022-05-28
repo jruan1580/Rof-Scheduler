@@ -35,6 +35,7 @@ function CreateClient() {
   const [errMsg, setErrMsg] = useState("");
   const [validationMap, setValidationMap] = useState(new Map());
   const [showPassword, setShowPassword] = useState(false);
+  const [displaySuccess, setDisplaySuccess] = useState(false);
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
@@ -69,6 +70,8 @@ function CreateClient() {
       state,
       zipCode
     );
+
+    setDisplaySuccess(false);
 
     if (validationRes.size > 0) {
       setValidationMap(validationRes);
@@ -111,6 +114,7 @@ function CreateClient() {
           });
 
           setErrMsg("");
+          setDisplaySuccess(true);
         } catch (e) {
           setErrMsg(e.message);
         } finally {
@@ -132,6 +136,7 @@ function CreateClient() {
       >
         <Form noValidate onSubmit={handleSubmit}>
           {errMsg !== "" && <Alert variant="danger">{errMsg}</Alert>}
+          {displaySuccess && <Alert variant="success">You have successfully signed up. <a href="/">click here</a> to login</Alert>}
 
           <h4>General Information</h4>
           <Row className="mb-3">

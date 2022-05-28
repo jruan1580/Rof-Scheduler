@@ -105,7 +105,7 @@ function Login({ handleLoginState }) {
                 </Form>
               </Card.Body>
               <Card.Footer>
-                For new clients, <a href="/createclient">click here</a> to sign
+                For new clients, <a href="/signup">click here</a> to sign
                 up!
               </Card.Footer>
             </Card>
