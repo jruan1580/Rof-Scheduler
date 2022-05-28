@@ -79,7 +79,7 @@ function AccountSettings() {
       state,
       zipCode
     );
-    console.log(validationRes);
+
     if (validationRes.size > 0) {
       setValidationMap(validationRes);
     } else {
@@ -109,7 +109,7 @@ function AccountSettings() {
             ssn: submitEvent.target.ssn.value,
             role: submitEvent.target.role.value,
             username: submitEvent.target.username.value,
-            addressLine1: submitEvent.target.address1,
+            addressLine1: submitEvent.target.address1.value,
             addressLine2: submitEvent.target.address2.value,
             city: submitEvent.target.city.value,
             state: submitEvent.target.state.value,
