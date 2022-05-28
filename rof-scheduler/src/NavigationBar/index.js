@@ -1,5 +1,5 @@
 import { Navbar, Nav, Container, NavDropdown} from "react-bootstrap";
-import { logoff } from '../SharedServices/employeeManagementService';
+import { logoff } from '../SharedServices/authenticationService';
 
 function NavigationBar({loginState, handleLoginState}){
 

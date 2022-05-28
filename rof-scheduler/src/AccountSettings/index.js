@@ -40,6 +40,7 @@ function AccountSettings() {
   const [loading, setLoading] = useState(false);
   const [updateErrMsg, setUpdateErrMsg] = useState("");
   const [validationMap, setValidationMap] = useState(new Map());
+  const [displaySuccess, setDisplaySuccess] = useState(false);
 
   useEffect(() => {
     (async function () {
@@ -79,6 +80,8 @@ function AccountSettings() {
       state,
       zipCode
     );
+    
+    setDisplaySuccess(false);
 
     if (validationRes.size > 0) {
       setValidationMap(validationRes);
@@ -116,6 +119,7 @@ function AccountSettings() {
             zipCode: submitEvent.target.zip.value,
           });
           setUpdateErrMsg("");
+          setDisplaySuccess(true);
         } catch (e) {
           setUpdateErrMsg(e.message);
         } finally {
@@ -137,10 +141,10 @@ function AccountSettings() {
             <Col sm={3}>
               <Nav variant="pills" className="flex-column">
                 <Nav.Item>
-                  <Nav.Link eventKey="accountSettings">Account</Nav.Link>
+                  <Nav.Link eventKey="accountSettings" style={{"cursor":"pointer"}}>Account</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  <Nav.Link eventKey="passwordSettings">Password</Nav.Link>
+                  <Nav.Link eventKey="passwordSettings" style={{"cursor":"pointer"}}>Password</Nav.Link>
                 </Nav.Item>
               </Nav>
             </Col>
@@ -149,9 +153,8 @@ function AccountSettings() {
               <Tab.Content>
                 <Tab.Pane eventKey="accountSettings">
                   <Form noValidate onSubmit={handleSubmit}>
-                    {updateErrMsg !== "" && (
-                      <Alert variant="danger">{updateErrMsg}</Alert>
-                    )}
+                    {updateErrMsg !== "" && <Alert variant="danger">{updateErrMsg}</Alert>}
+                    {displaySuccess && <Alert variant="success">Successfully Updated!</Alert>}
 
                     <Row className="mb-3">
                       <Form.Group as={Col} md="4">
@@ -326,7 +329,7 @@ function AccountSettings() {
                     )}
                     {!loading && (
                       <Button
-                        variant="outline-primary"
+                        variant="primary"
                         type="submit"
                         style={{ marginTop: "0.5rem" }}
                       >
@@ -354,7 +357,7 @@ function AccountSettings() {
                     </Form.Group>
 
                     <Button
-                      variant="outline-primary"
+                      variant="primary"
                       type="submit"
                       style={{ marginTop: "0.5rem" }}
                     >
