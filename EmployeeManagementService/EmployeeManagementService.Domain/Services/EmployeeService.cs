@@ -278,6 +278,7 @@ namespace EmployeeManagementService.Domain.Services
             }
 
             employee.IsLocked = true;
+            employee.FailedLoginAttempts = (short)attempts;
 
             await _employeeRepository.UpdateEmployee(employee);
         }
