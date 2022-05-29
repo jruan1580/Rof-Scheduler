@@ -2,6 +2,7 @@
 using ClientManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Infrastructure.Persistence
@@ -10,8 +11,9 @@ namespace ClientManagementService.Infrastructure.Persistence
     {
         Task CreateClient(Client newClient);
         Task DeleteClientById(long id);
+        Task<List<Client>> GetAllClients();
         Task<Client> GetClientByFilter<T>(GetClientFilterModel<T> filter);
-        Task<int> IncrementClientFailedLoginAttempts(long id);
+        Task<short> IncrementClientFailedLoginAttempts(long id);
         Task UpdateClient(Client clientToUpdate);
         Task<bool> ClientAlreadyExists(long id, string email, string firstName, string lastName, string username);
     }
@@ -45,6 +47,14 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
+        public async Task<List<Client>> GetAllClients()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Clients.ToListAsync();
+            }
+        }
+
         public async Task<Client> GetClientByFilter<T>(GetClientFilterModel<T> filter)
         {
             using (var context = new RofSchedulerContext())
@@ -68,7 +78,7 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<int> IncrementClientFailedLoginAttempts(long id)
+        public async Task<short> IncrementClientFailedLoginAttempts(long id)
         {
             using (var context = new RofSchedulerContext())
             {
