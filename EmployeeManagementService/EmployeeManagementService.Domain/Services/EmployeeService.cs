@@ -133,6 +133,8 @@ namespace EmployeeManagementService.Domain.Services
                 throw new EmployeeNotFoundException();
             }
 
+            originalEmployee.EmailAddress = employee.Email;
+            originalEmployee.PhoneNumber = employee.PhoneNumber;
             originalEmployee.Username = employee.Username;
             originalEmployee.FirstName = employee.FirstName;
             originalEmployee.LastName = employee.LastName;

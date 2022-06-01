@@ -31,6 +31,8 @@ export const updateEmployeeInformation = async function (
   ssn,
   role,
   username,
+  email,
+  phoneNumber,
   addressLine1,
   addressLine2,
   city,
@@ -45,6 +47,8 @@ export const updateEmployeeInformation = async function (
     ssn,
     role,
     username,
+    email,
+    phoneNumber,
     address: {
       addressLine1,
       addressLine2,
