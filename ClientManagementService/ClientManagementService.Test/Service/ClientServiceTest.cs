@@ -2,6 +2,7 @@
 using ClientManagementService.Domain.Services;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Entities;
+using ClientManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
@@ -267,20 +268,20 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client() { Id = 1 });
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
             await clientService.UpdateClientInfo(client);
 
-            _clientRepository.Verify(c => c.UpdateClientInfo(It.IsAny<Client>()), Times.Once);
+            _clientRepository.Verify(c => c.UpdateClient(It.IsAny<Client>()), Times.Once);
         }
 
         [Test]
         public void GetClientById_DoesNotExist()
         {
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync((Client)null);
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
@@ -293,7 +294,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -342,7 +343,7 @@ namespace ClientManagementService.Test.Service
         [Test]
         public void GetClientByEmail_DoesNotExist()
         {
-            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ThrowsAsync(new ArgumentException());
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
@@ -355,7 +356,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByEmail(It.IsAny<string>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -406,7 +407,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -435,7 +436,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -452,8 +453,9 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
+            short failedAttempts = 1;
             _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()))
-                .ReturnsAsync(2);
+                .ReturnsAsync(failedAttempts);
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
@@ -465,7 +467,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByUsername(It.IsAny<string>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -486,7 +488,7 @@ namespace ClientManagementService.Test.Service
 
             await clientService.ClientLogin("jdoe", "TestPassword123!");
 
-            _clientRepository.Verify(c => c.UpdateClientLoginStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Once);
+            _clientRepository.Verify(c => c.UpdateClient(It.IsAny<Client>()), Times.Once);
         }
 
         [Test]
@@ -494,7 +496,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -523,7 +525,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -544,7 +546,7 @@ namespace ClientManagementService.Test.Service
 
             await clientService.ClientLogout(1);
 
-            _clientRepository.Verify(c => c.UpdateClientLoginStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Once);
+            _clientRepository.Verify(c => c.UpdateClient(It.IsAny<Client>()), Times.Once);
         }
 
         //[Test]
@@ -658,12 +660,12 @@ namespace ClientManagementService.Test.Service
         [Test]
         public void ResetClientFailedLoginAttempt_ClientDoesNotExist()
         {
-            _clientRepository.Setup(c => c.ResetClientFailedLoginAttempts(It.IsAny<long>()))
-                .ThrowsAsync(new ArgumentException());
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
+                .ReturnsAsync((Client)null);
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            Assert.ThrowsAsync<ArgumentException>(() => clientService.ResetClientFailedLoginAttempts(0));
+            Assert.ThrowsAsync<ClientNotFoundException>(() => clientService.ResetClientFailedLoginAttempts(0));
         }
 
         [Test]
@@ -671,7 +673,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -692,7 +694,7 @@ namespace ClientManagementService.Test.Service
 
             await clientService.ResetClientFailedLoginAttempts(1);
 
-            _clientRepository.Verify(c => c.ResetClientFailedLoginAttempts(It.IsAny<long>()), Times.Once);
+            _clientRepository.Verify(c => c.UpdateClient(It.IsAny<Client>()), Times.Once);
         }
 
         [Test]
@@ -700,7 +702,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -727,7 +729,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -754,7 +756,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -775,7 +777,7 @@ namespace ClientManagementService.Test.Service
 
             await clientService.UpdatePassword(1, "TestPassword1234!");
 
-            _clientRepository.Verify(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<byte[]>()), Times.Once);
+            _clientRepository.Verify(c => c.UpdateClient(It.IsAny<Client>()), Times.Once);
         }
 
         [Test]
