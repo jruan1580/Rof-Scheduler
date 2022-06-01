@@ -6,6 +6,7 @@ import Calendar from "./Calendar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AccountSettings from "./AccountSettings";
 import CreateClient from "./CreateClient";
+import Employee from "./Employee";
 
 function App() {
   const [isLogin, setLogin] = useState(false);
@@ -33,24 +34,11 @@ function App() {
                 element={<Login handleLoginState={setLogin} />}
               />
             )}
-            {/* {isLogin &&  <Route exact path="/" element={<Calendar/>}/>}            */}
-          </Routes>
-          <Routes>
+            {/* {isLogin &&  <Route exact path="/" element={<Calendar/>}/>}            */}                        
+            <Route exact path="/signup" element={<CreateClient />} />
+            <Route exact path="/accountsettings" element={<AccountSettings />} />
             <Route exact path="/calendar" element={<Calendar />} />
-          </Routes>
-          <Routes>
-            <Route
-              exact
-              path="/accountsettings"
-              element={<AccountSettings />}
-            />
-          </Routes>
-          <Routes>
-            <Route
-              exact
-              path="/signup"
-              element={<CreateClient />}
-            ></Route>
+            <Route exact path="/employee" element={<Employee />} />
           </Routes>
         </Container>
       </BrowserRouter>

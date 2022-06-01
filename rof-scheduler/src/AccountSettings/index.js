@@ -48,8 +48,7 @@ function AccountSettings() {
         const emp = await getEmployeeById();
         setEmployee(emp);
       } catch (e) {
-        alert("Failed to fetch employee info... Try Again");
-        console.log(e.message);
+        setUpdateErrMsg(e.message);                
       }
     })();
   }, []);
