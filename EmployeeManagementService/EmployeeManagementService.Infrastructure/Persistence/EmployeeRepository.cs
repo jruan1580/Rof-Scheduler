@@ -46,6 +46,8 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                         Ssn = e.Ssn,
                         Role = e.Role,
                         Username = e.Username,
+                        EmailAddress = e.EmailAddress,
+                        PhoneNumber = e.PhoneNumber,
                         Active = e.Active,
                         AddressLine1 = e.AddressLine1,
                         AddressLine2 = e.AddressLine2,

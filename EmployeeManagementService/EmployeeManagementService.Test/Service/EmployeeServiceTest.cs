@@ -331,6 +331,8 @@ namespace EmployeeManagementService.Test.Service
                 LastName = "Doe",
                 Ssn = "123-45-6789",
                 Username = "jdoe",
+                Email = "test@email.com",
+                PhoneNumber = "9998887776",
                 Role = "Employee",
                 Address = new Domain.Models.Address {AddressLine1 = "123 Abc St", AddressLine2 = "", City = "Oakland", State = "CA", ZipCode = "12345"}
             };
@@ -422,8 +424,9 @@ namespace EmployeeManagementService.Test.Service
                 FirstName = "John",
                 LastName = "Doe",
                 Username = "jdoe",
+                Email = "test@email.com",
+                PhoneNumber = "9998887776",
                 Ssn = "123-45-6789",
-                Password = new byte[32],
                 Role = "Employee",
                 Active = true
             };
