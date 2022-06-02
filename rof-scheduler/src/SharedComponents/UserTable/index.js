@@ -22,12 +22,12 @@ function GenericUserTable({ users }){
                             return (
                                 <tr key={user.id}>
                                     <td>{user.id}</td>
-                                    <td>{user.name}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.primaryPhone}</td>
+                                    <td>{user.fullName}</td>
+                                    <td>{user.emailAddress}</td>
+                                    <td>{user.phoneNumber}</td>
                                     <td>{user.role}</td>
-                                    <td>{user.locked}</td>
-                                    <td>{user.active}</td>
+                                    <td>{user.isLocked ? 'Yes' : 'No'}</td>
+                                    <td>{user.active ? 'Yes' : 'No'}</td>
                                 </tr>
                             );
                         })

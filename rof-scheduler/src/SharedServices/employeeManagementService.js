@@ -1,3 +1,23 @@
+export const getAllEmployees = async function(page, recPerPage){
+  const baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
+  const url = baseUrl + "/admin?page=" + page + "&offset=" + recPerPage;
+
+  var response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (response.status !== 200) {
+    var errMsg = await response.text();
+    throw new Error(errMsg);
+  }
+
+  return await response.json();
+}
+
 export const getEmployeeById = async function () {
   const baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
 

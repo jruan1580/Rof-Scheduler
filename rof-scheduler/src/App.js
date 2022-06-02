@@ -38,7 +38,7 @@ function App() {
             <Route exact path="/signup" element={<CreateClient />} />
             <Route exact path="/accountsettings" element={<AccountSettings />} />
             <Route exact path="/calendar" element={<Calendar />} />
-            <Route exact path="/employee" element={<Employee />} />
+            <Route exact path="/employeemanagement" element={<Employee />} />
           </Routes>
         </Container>
       </BrowserRouter>
