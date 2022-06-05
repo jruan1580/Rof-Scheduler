@@ -1,4 +1,4 @@
-﻿namespace ClientManagementService.Infrastructure.Persistence.Filters
+﻿namespace ClientManagementService.Infrastructure.Persistence.Filters.Client
 {
     public class GetClientFilterModel<T>
     {
