@@ -18,6 +18,7 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
         }
 
         public virtual DbSet<Client> Clients { get; set; }
+        public virtual DbSet<Pet> Pets { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -90,6 +91,47 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .IsRequired()
                     .HasMaxLength(10)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<Pet>(entity =>
+            {
+                entity.ToTable("Pet");
+
+                entity.Property(e => e.Breed)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Dhppvax).HasColumnName("DHPPVax");
+
+                entity.Property(e => e.Dob)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("DOB");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OtherInfo)
+                    .IsRequired()
+                    .HasMaxLength(2000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Weight).HasColumnType("decimal(18, 0)");
+
+                entity.HasOne(d => d.Owner)
+                    .WithMany(p => p.Pets)
+                    .HasForeignKey(d => d.OwnerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Pet__OwnerId__28ED12D1");
             });
 
             OnModelCreatingPartial(modelBuilder);
