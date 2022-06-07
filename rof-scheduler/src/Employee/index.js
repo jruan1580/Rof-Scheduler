@@ -7,28 +7,38 @@ function Employee(){
     const [employees, setEmployees] = useState([]);
     const [currPage, setCurrPage] = useState(1);
     const [errorMessage, setErrorMessage] = useState(undefined);
+    const [keyword, setKeyword] = useState("");
+    const [totalPages, setTotalPages] = useState(0);
 
-    useEffect(() =>{
+    useEffect(() =>{        
         (async function(){
             try{
-                const employeeByPage = await getAllEmployees(currPage, 10);
+                const employeeByPage = await getAllEmployees(currPage, 10, keyword);
                 
-                setEmployees(employeeByPage);
+                setEmployees(employeeByPage.employees);
+                setTotalPages(employeeByPage.totalPages);
             }catch(e){
                 setErrorMessage(e.message);                
             }
         })();
 
-    }, [currPage]);
+    }, [currPage, keyword]);
+
+    const search = (searchEvent) => {
+        searchEvent.preventDefault();
+        const searchTerm = (searchEvent.target.searchEmployee.value === undefined) ? "" : searchEvent.target.searchEmployee.value;
+        setKeyword(searchTerm);
+        setCurrPage(1); //reset to current page               
+    }
 
     return(
             <>
                 <h1>Employee Management</h1><br/>
                 <Row>
-                    <Form>
+                    <Form  onSubmit={search}>
                         <Row className="align-items-center">
                             <Col lg={4}>            
-                                <Form.Control id="searchEmployee" placeholder="Search employee by name, email..etc." />
+                                <Form.Control name="searchEmployee" id="searchEmployee" placeholder="Search employee by name, email..etc." />
                             </Col>
                             <Col lg={6}>
                                 <Button type="submit">Search</Button>
@@ -44,8 +54,8 @@ function Employee(){
                     <GenericUserTable users={employees}/>   
                 </Row>
                 <Pagination>
-                    {currPage != 1 && <Pagination.Prev /> }
-                    {employees.length == 10 && <Pagination.Next /> }
+                    {currPage != 1 && <Pagination.Prev onClick={() => setCurrPage(currPage - 1)}/> }
+                    {currPage != totalPages && <Pagination.Next onClick={() => setCurrPage(currPage + 1)}/> }
                 </Pagination>
                           
             </>

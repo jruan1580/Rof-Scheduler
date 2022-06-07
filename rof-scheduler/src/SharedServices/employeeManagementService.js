@@ -1,6 +1,6 @@
-export const getAllEmployees = async function(page, recPerPage){
-  const baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
-  const url = baseUrl + "/admin?page=" + page + "&offset=" + recPerPage;
+export const getAllEmployees = async function(page, recPerPage, keyword){
+  var baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
+  var url = baseUrl + "/admin?page=" + page + "&offset=" + recPerPage + "&keyword=" + keyword;
 
   var response = await fetch(url, {
     method: "GET",
@@ -19,11 +19,11 @@ export const getAllEmployees = async function(page, recPerPage){
 }
 
 export const getEmployeeById = async function () {
-  const baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
+  var baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
 
-  const id = parseInt(localStorage.getItem("id"));
-  const role = localStorage.getItem("role");
-  const url =
+  var id = parseInt(localStorage.getItem("id"));
+  var role = localStorage.getItem("role");
+  var url =
     role.toLowerCase() === "administrator"
       ? baseUrl + "/admin/" + id
       : baseUrl + "/employee/" + id;
@@ -59,8 +59,8 @@ export const updateEmployeeInformation = async function (
   state,
   zipCode
 ) {
-  const baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
-  const data = {
+  var baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
+  var data = {
     id,
     firstName,
     lastName,
@@ -79,7 +79,7 @@ export const updateEmployeeInformation = async function (
   };
 
   role = localStorage.getItem("role");
-  const url =
+  var url =
     role.toLowerCase() === "administrator"
       ? baseUrl + "/admin/info"
       : baseUrl + "/employee/info";

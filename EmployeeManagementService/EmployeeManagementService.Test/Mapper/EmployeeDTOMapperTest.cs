@@ -47,7 +47,7 @@ namespace EmployeeManagementService.Test.Mapper
             Assert.AreEqual("Doe", dtoEmp.LastName);
             Assert.AreEqual("123-45-6789", dtoEmp.Ssn);
             Assert.AreEqual("jdoe", dtoEmp.Username);
-            Assert.AreEqual("test@email.com", dtoEmp.Email);
+            Assert.AreEqual("test@email.com", dtoEmp.EmailAddress);
             Assert.AreEqual("9998887776", dtoEmp.PhoneNumber);
             Assert.AreEqual("Admin", dtoEmp.Role);
             Assert.AreEqual(false, dtoEmp.IsLocked);
@@ -73,7 +73,7 @@ namespace EmployeeManagementService.Test.Mapper
             dtoEmp.LastName = "Doe";
             dtoEmp.Ssn = "123-45-6789";
             dtoEmp.Username = "jdoe";
-            dtoEmp.Email = "test@email.com";
+            dtoEmp.EmailAddress = "test@email.com";
             dtoEmp.PhoneNumber = "9998887776";
             dtoEmp.Role = "Admin";
             dtoEmp.IsLocked = false;

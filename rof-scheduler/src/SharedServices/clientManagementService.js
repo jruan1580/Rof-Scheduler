@@ -13,8 +13,8 @@ export const createClient = async function (
   state,
   zipCode
 ) {
-  const baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
-  const data = {
+  var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
+  var data = {
     countryId,
     firstName,
     lastName,

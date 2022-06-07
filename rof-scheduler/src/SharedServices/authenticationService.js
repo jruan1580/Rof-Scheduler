@@ -1,6 +1,6 @@
 export const login = async function (username, password) {
-    const baseUrl = process.env.REACT_APP_AUTH_SERVICE_BASE_URL;
-    const data = { username, password };
+    var baseUrl = process.env.REACT_APP_AUTH_SERVICE_BASE_URL;
+    var data = { username, password };
   
     var response = await fetch(baseUrl + "/authentication/login", {
       method: "PATCH",
@@ -20,10 +20,10 @@ export const login = async function (username, password) {
   }
   
   export const logoff = async function () {
-    const baseUrl = process.env.REACT_APP_AUTH_SERVICE_BASE_URL;
+    var baseUrl = process.env.REACT_APP_AUTH_SERVICE_BASE_URL;
   
-    const id = parseInt(localStorage.getItem("id"));    
-    const url = baseUrl + "/authentication/" + id + "/logout";
+    var id = parseInt(localStorage.getItem("id"));    
+    var url = baseUrl + "/authentication/" + id + "/logout";
 
     var response = await fetch(url, {
       method: "PATCH",

@@ -35,7 +35,7 @@ function GenericUserTable({ users }){
                     {
                         users.length == 0 &&
                         <tr>
-                            <td colSpan={7} style={{textAlign:"center"}}>No employee available. Please add an employee.</td>
+                            <td colSpan={7} style={{textAlign:"center"}}>No user data available. Please add an user.</td>
                         </tr>
                     }
                 </tbody>
