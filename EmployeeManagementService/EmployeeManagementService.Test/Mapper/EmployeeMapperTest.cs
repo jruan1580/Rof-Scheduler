@@ -19,6 +19,8 @@ namespace EmployeeManagementService.Test.Mapper
             dbEmployee.LastName = "Doe";
             dbEmployee.Ssn = "123-45-6789";
             dbEmployee.Username = "jdoe";
+            dbEmployee.EmailAddress = "test@email.com";
+            dbEmployee.PhoneNumber = "9998887776";
             dbEmployee.Password = new byte[32];
             dbEmployee.Role = "Admin";
             dbEmployee.IsLocked = false;
@@ -38,6 +40,8 @@ namespace EmployeeManagementService.Test.Mapper
             Assert.AreEqual(1, core.CountryId);
             Assert.AreEqual("John", core.FirstName);
             Assert.AreEqual("Doe", core.LastName);
+            Assert.AreEqual("test@email.com", core.Email);
+            Assert.AreEqual("9998887776", core.PhoneNumber);
             Assert.AreEqual("123-45-6789", core.GetNotSanitizedSSN());
             Assert.AreEqual("***-**-6789", core.Ssn);
             Assert.AreEqual("jdoe", core.Username);
@@ -66,6 +70,8 @@ namespace EmployeeManagementService.Test.Mapper
             coreEmployee.LastName = "Doe";
             coreEmployee.SetSSN("123-45-6789");
             coreEmployee.Username = "jdoe";
+            coreEmployee.Email = "test@email.com";
+            coreEmployee.PhoneNumber = "9998887776";
             coreEmployee.Password = new byte[32];
             coreEmployee.Role = "Admin";
             coreEmployee.IsLocked = false;
@@ -83,6 +89,8 @@ namespace EmployeeManagementService.Test.Mapper
             Assert.AreEqual("Doe", entity.LastName);
             Assert.AreEqual("123-45-6789", entity.Ssn);
             Assert.AreEqual("jdoe", entity.Username);
+            Assert.AreEqual("test@email.com", entity.EmailAddress);
+            Assert.AreEqual("9998887776", entity.PhoneNumber);
             Assert.AreEqual(new byte[32], entity.Password);
             Assert.AreEqual("Admin", entity.Role);
             Assert.AreEqual(false, entity.IsLocked);

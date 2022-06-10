@@ -48,8 +48,7 @@ function AccountSettings() {
         const emp = await getEmployeeById();
         setEmployee(emp);
       } catch (e) {
-        alert("Failed to fetch employee info... Try Again");
-        console.log(e.message);
+        setUpdateErrMsg(e.message);                
       }
     })();
   }, []);
@@ -63,6 +62,8 @@ function AccountSettings() {
     const ssn = submitEvent.target.ssn.value;
     const role = submitEvent.target.role.value;
     const username = submitEvent.target.username.value;
+    const email = submitEvent.target.email.value;
+    const phoneNumber = submitEvent.target.phone.value;
     const addressLine1 = submitEvent.target.address1.value;
     const addressLine2 = submitEvent.target.address2.value;
     const city = submitEvent.target.city.value;
@@ -75,6 +76,8 @@ function AccountSettings() {
       ssn,
       role,
       username,
+      email,
+      phoneNumber,
       addressLine1,
       city,
       state,
@@ -98,6 +101,8 @@ function AccountSettings() {
             ssn,
             role,
             username,
+            email,
+            phoneNumber,
             addressLine1,
             addressLine2,
             city,
@@ -107,16 +112,18 @@ function AccountSettings() {
 
           setEmployee({
             ...employee,
-            firstName: submitEvent.target.firstName.value,
-            lastName: submitEvent.target.lastName.value,
-            ssn: submitEvent.target.ssn.value,
-            role: submitEvent.target.role.value,
-            username: submitEvent.target.username.value,
-            addressLine1: submitEvent.target.address1.value,
-            addressLine2: submitEvent.target.address2.value,
-            city: submitEvent.target.city.value,
-            state: submitEvent.target.state.value,
-            zipCode: submitEvent.target.zip.value,
+            firstName,
+            lastName,
+            ssn,
+            role,
+            username,
+            email,
+            phoneNumber,
+            addressLine1,
+            addressLine2,
+            city,
+            state,
+            zipCode,
           });
           setUpdateErrMsg("");
           setDisplaySuccess(true);
@@ -205,19 +212,6 @@ function AccountSettings() {
 
                     <Row className="mb-3">
                       <Form.Group as={Col} md="4">
-                        <Form.Label>Role</Form.Label>
-                        <Form.Select
-                          required
-                          type="select"
-                          placeholder="Role"
-                          name="role"
-                        >
-                          <option value="Administrator">Administrator</option>
-                          <option value="Employee">Employee</option>
-                        </Form.Select>
-                      </Form.Group>
-
-                      <Form.Group as={Col} md="4">
                         <Form.Label>SSN</Form.Label>
                         <Form.Control
                           required
@@ -233,14 +227,48 @@ function AccountSettings() {
                       </Form.Group>
 
                       <Form.Group as={Col} md="4">
-                        <Form.Label>Country</Form.Label>
+                        <Form.Label>Phone Number</Form.Label>
                         <Form.Control
                           required
+                          name="phone"
                           type="text"
-                          placeholder="Country"
-                          disabled
-                          defaultValue="USA"
+                          placeholder="Phone Number"
+                          defaultValue={employee.phoneNumber}
+                          isInvalid={validationMap.has("phone")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {validationMap.get("phone")}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+
+                      <Form.Group as={Col} md="4">
+                        <Form.Label>Email</Form.Label>
+                        <Form.Control
+                          required
+                          name="email"
+                          type="email"
+                          placeholder="Email Address"
+                          defaultValue={employee.email}
+                          isInvalid={validationMap.has("email")}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {validationMap.get("email")}
+                        </Form.Control.Feedback>
+                      </Form.Group>                                      
+                    </Row>
+
+                    <Row className="mb-3">
+                      <Form.Group as={Col} md="4">
+                        <Form.Label>Role</Form.Label>
+                        <Form.Select
+                          required
+                          type="select"
+                          placeholder="Role"
+                          name="role"
+                        >
+                          <option value="Administrator">Administrator</option>
+                          <option value="Employee">Employee</option>
+                        </Form.Select>
                       </Form.Group>
                     </Row>
 
@@ -271,7 +299,7 @@ function AccountSettings() {
                     </Row>
 
                     <Row className="mb-3">
-                      <Form.Group as={Col} md="6">
+                      <Form.Group as={Col} md="3">
                         <Form.Label>City</Form.Label>
                         <Form.Control
                           required
@@ -312,6 +340,17 @@ function AccountSettings() {
                         <Form.Control.Feedback type="invalid">
                           {validationMap.get("zipcode")}
                         </Form.Control.Feedback>
+                      </Form.Group>
+                      
+                      <Form.Group as={Col} md="3">
+                        <Form.Label>Country</Form.Label>
+                        <Form.Control
+                          required
+                          type="text"
+                          placeholder="Country"
+                          disabled
+                          defaultValue="USA"
+                        />
                       </Form.Group>
                     </Row>
 

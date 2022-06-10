@@ -17,7 +17,7 @@ namespace EmployeeManagementService.Domain.Services
         Task CreateEmployee(Employee newEmployee, string password);
         Task<Employee> EmployeeLogIn(string username, string password);
         Task EmployeeLogout(long id);
-        Task<List<Employee>> GetAllEmployees(int page, int offset);
+        Task<EmployeesWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword);
         Task<Employee> GetEmployeeById(long id);
         Task<Employee> GetEmployeeByUsername(string username);
         Task ResetEmployeeFailedLoginAttempt(long id);
@@ -40,16 +40,18 @@ namespace EmployeeManagementService.Domain.Services
             _roles = config.GetSection("Roles").Value;
         }
 
-        public async Task<List<Employee>> GetAllEmployees(int page, int offset)
+        public async Task<EmployeesWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword)
         {
-            var employees = await _employeeRepository.GetAllEmployees(page, offset);
+            var result = await _employeeRepository.GetAllEmployeesByKeyword(page, offset, keyword);
+            var employees = result.Item1;
+            var totalPages = result.Item2;
 
             if (employees == null || employees.Count == 0)
             {
-                return new List<Employee>();
+                return new EmployeesWithTotalPage(new List<Employee>(), 0);
             }
 
-            return employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();
+            return new EmployeesWithTotalPage(employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList(), totalPages);
         }
 
         public async Task<Employee> GetEmployeeById(long id)
@@ -133,6 +135,8 @@ namespace EmployeeManagementService.Domain.Services
                 throw new EmployeeNotFoundException();
             }
 
+            originalEmployee.EmailAddress = employee.Email;
+            originalEmployee.PhoneNumber = employee.PhoneNumber;
             originalEmployee.Username = employee.Username;
             originalEmployee.FirstName = employee.FirstName;
             originalEmployee.LastName = employee.LastName;

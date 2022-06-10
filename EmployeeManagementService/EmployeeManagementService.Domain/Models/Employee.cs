@@ -19,6 +19,10 @@ namespace EmployeeManagementService.Domain.Models
         public string Ssn { get; set; }
         
         public string Username { get; set; }
+
+        public string Email { get; set; }
+
+        public string PhoneNumber { get; set; }
         
         public byte[] Password { get; set; }
         
@@ -114,6 +118,16 @@ namespace EmployeeManagementService.Domain.Models
                 invalidErrors.Add("SSN cannot be empty");
             }
 
+            if (string.IsNullOrEmpty(PhoneNumber))
+            {
+                invalidErrors.Add("Phone number cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(Email))
+            {
+                invalidErrors.Add("Email cannot be empty");
+            }
+
             return invalidErrors;
         }
 
@@ -144,6 +158,16 @@ namespace EmployeeManagementService.Domain.Models
             if (string.IsNullOrEmpty(Ssn))
             {
                 invalidErrors.Add("SSN cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(PhoneNumber))
+            {
+                invalidErrors.Add("Phone number cannot be empty");
+            }
+
+            if (string.IsNullOrEmpty(Email))
+            {
+                invalidErrors.Add("Email cannot be empty");
             }
 
             return invalidErrors;
