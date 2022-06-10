@@ -68,6 +68,11 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.EmailAddress)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasMaxLength(25)
@@ -79,6 +84,11 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.Password).IsRequired();
+
+                entity.Property(e => e.PhoneNumber)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Role)
                     .IsRequired()
@@ -110,7 +120,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.CountryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Employee__Countr__2A164134");
+                    .HasConstraintName("FK__Employee__Countr__46E78A0C");
             });
 
             OnModelCreatingPartial(modelBuilder);

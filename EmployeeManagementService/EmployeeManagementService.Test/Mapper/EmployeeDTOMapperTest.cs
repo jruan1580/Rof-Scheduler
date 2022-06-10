@@ -21,6 +21,8 @@ namespace EmployeeManagementService.Test.Mapper
             coreEmp.LastName = "Doe";
             coreEmp.Ssn = "123-45-6789";
             coreEmp.Username = "jdoe";
+            coreEmp.Email = "test@email.com";
+            coreEmp.PhoneNumber = "9998887776";
             coreEmp.Role = "Admin";
             coreEmp.IsLocked = false;
             coreEmp.FailedLoginAttempts = 0;
@@ -45,6 +47,8 @@ namespace EmployeeManagementService.Test.Mapper
             Assert.AreEqual("Doe", dtoEmp.LastName);
             Assert.AreEqual("123-45-6789", dtoEmp.Ssn);
             Assert.AreEqual("jdoe", dtoEmp.Username);
+            Assert.AreEqual("test@email.com", dtoEmp.EmailAddress);
+            Assert.AreEqual("9998887776", dtoEmp.PhoneNumber);
             Assert.AreEqual("Admin", dtoEmp.Role);
             Assert.AreEqual(false, dtoEmp.IsLocked);
             Assert.AreEqual(0, dtoEmp.FailedLoginAttempts);
@@ -69,6 +73,8 @@ namespace EmployeeManagementService.Test.Mapper
             dtoEmp.LastName = "Doe";
             dtoEmp.Ssn = "123-45-6789";
             dtoEmp.Username = "jdoe";
+            dtoEmp.EmailAddress = "test@email.com";
+            dtoEmp.PhoneNumber = "9998887776";
             dtoEmp.Role = "Admin";
             dtoEmp.IsLocked = false;
             dtoEmp.FailedLoginAttempts = 0;
@@ -93,6 +99,8 @@ namespace EmployeeManagementService.Test.Mapper
             Assert.AreEqual("123-45-6789", coreEmp.GetNotSanitizedSSN());
             Assert.AreEqual("***-**-6789", coreEmp.Ssn);
             Assert.AreEqual("jdoe", coreEmp.Username);
+            Assert.AreEqual("test@email.com", coreEmp.Email);
+            Assert.AreEqual("9998887776", coreEmp.PhoneNumber);
             Assert.AreEqual("Admin", coreEmp.Role);
             Assert.AreEqual(false, coreEmp.IsLocked);
             Assert.AreEqual(0, coreEmp.FailedLoginAttempts);

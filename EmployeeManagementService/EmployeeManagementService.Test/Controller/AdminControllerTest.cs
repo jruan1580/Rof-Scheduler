@@ -32,29 +32,31 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task GetAllEmployees_Success()
         {
-            _employeeService.Setup(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(new List<Domain.Models.Employee>()
+            var employees = new List<Domain.Models.Employee>()
+            {
+                new Domain.Models.Employee()
                 {
-                    new Domain.Models.Employee()
-                    {
-                        Id = 1,
-                        FirstName = "John",
-                        LastName = "Doe",
-                        Ssn = "123-45-6789",
-                        Username = "jdoe",
-                        Password = new byte[32],
-                        Role = "Employee",
-                        IsLocked = false,
-                        FailedLoginAttempts = 0,
-                        TempPasswordChanged = false,
-                        Status = false,
-                        Active = true
-                    }
-                });
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Ssn = "123-45-6789",
+                    Username = "jdoe",
+                    Password = new byte[32],
+                    Role = "Employee",
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false,
+                    Status = false,
+                    Active = true
+                }
+            };
+
+            _employeeService.Setup(e => e.GetAllEmployeesByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(new Domain.Models.EmployeesWithTotalPage(employees, 1));
 
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
-            var response = await controller.GetAllEmployees(1, 10);
+            var response = await controller.GetAllEmployees(1, 10, "");
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
@@ -67,12 +69,12 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task GetAllEmployees_InternalServerError()
         {
-            _employeeService.Setup(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()))
+            _employeeService.Setup(e => e.GetAllEmployeesByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
-            var response = await controller.GetAllEmployees(1, 10);
+            var response = await controller.GetAllEmployees(1, 10, "");
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(ObjectResult));

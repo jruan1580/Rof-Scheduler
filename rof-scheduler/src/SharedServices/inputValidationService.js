@@ -19,6 +19,8 @@ export const ensureUpdateInformationProvided = function (
   ssn,
   role,
   username,
+  email,
+  phoneNumber,
   addressLine1,
   city,
   state,
@@ -60,6 +62,14 @@ export const ensureUpdateInformationProvided = function (
 
   if (zipCode === undefined || zipCode === "") {
     validationErrors.set("zipCode", "Please enter your zipcode.");
+  }
+
+  if (email === undefined || email === ""){
+    validationErrors.set("email", "Please enter an email address.");
+  }
+
+  if (phoneNumber === undefined || phoneNumber === ""){
+    validationErrors.set("phone", "Please enter a phone number.");
   }
 
   return validationErrors;

@@ -11,7 +11,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
     public interface IEmployeeRepository
     {
         Task CreateEmployee(Employee newEmployee);
-        Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
+        Task<(List<Employee>, int)> GetAllEmployeesByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Employee> GetEmployeeByFilter<T>(GetEmployeeFilterModel<T> filter);
         Task<short> IncrementEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployee(Employee employeeToUpdate);
@@ -21,22 +21,34 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
     public class EmployeeRepository : IEmployeeRepository
     {
-        public async Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10)
+        public async Task<(List<Employee>, int)> GetAllEmployeesByKeyword(int page = 1, int offset = 10, string keyword = "")
         {
             using (var context = new RofSchedulerContext())
-            {
-                var count = await context.Employees.CountAsync();
+            {              
+                var skip = (page - 1) * offset;
+                IQueryable<Employee> employees = context.Employees;
 
-                var totalPages = Math.Ceiling(count / (double)offset);
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    keyword = keyword.ToLower();
+
+                    employees = context.Employees
+                        .Where(e => (e.FirstName.ToLower().Contains(keyword))
+                            || (e.LastName.ToLower().Contains(keyword))
+                            || (e.EmailAddress.ToLower().Contains(keyword)));
+                }
+                     
+                var countByCriteria = await employees.CountAsync();
+                var fullPages = countByCriteria / offset; //full pages with example 23 count and offset is 10. we will get 2 full pages (10 each page)
+                var remaining = countByCriteria % offset; //remaining will be 3 which will be an extra page
+                var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; //therefore total pages is sum of full pages plus one more page is any remains.
 
                 if (page > totalPages)
                 {
                     throw new ArgumentException("No more employees.");
                 }
 
-                var skip = (page - 1) * offset;
-
-                return await context.Employees
+                var resut = await employees
                     .Select(e => new Employee()
                     {
                         Id = e.Id,
@@ -46,6 +58,8 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                         Ssn = e.Ssn,
                         Role = e.Role,
                         Username = e.Username,
+                        EmailAddress = e.EmailAddress,
+                        PhoneNumber = e.PhoneNumber,
                         Active = e.Active,
                         AddressLine1 = e.AddressLine1,
                         AddressLine2 = e.AddressLine2,
@@ -57,6 +71,8 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                     .Skip(skip)
                     .Take(offset)
                     .ToListAsync();
+
+                return (resut, totalPages);
             }
         }
 

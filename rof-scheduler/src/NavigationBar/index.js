@@ -26,17 +26,24 @@ function NavigationBar({loginState, handleLoginState}){
                         width="185px"
                         className="align-top"
                     />
-                </Navbar.Brand>                
-                {
-                    loginState &&
-                    <Nav className="ms-auto">
-                        <Nav.Item><Nav.Link href="/">Home</Nav.Link></Nav.Item>
+                </Navbar.Brand> 
+                <Nav className="ms-auto">
+                    {loginState && <Nav.Item><Nav.Link href="/">Home</Nav.Link></Nav.Item>}
+                    {
+                        loginState && localStorage.getItem('role') === 'Administrator' &&
+                        <NavDropdown title='User Management'>                        
+                            <NavDropdown.Item href="/employeemanagement">Employee</NavDropdown.Item>
+                        </NavDropdown>  
+                    }
+                    {
+                        loginState &&
                         <NavDropdown title={localStorage.getItem('firstName')}>                        
                             <NavDropdown.Item href="/accountsettings">Account Settings</NavDropdown.Item>
                             <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
                         </NavDropdown>  
-                    </Nav>                
-                }                                                 
+                    }
+                </Nav> 
+                                                                     
             </Container>
         </Navbar>
     );
