@@ -74,6 +74,10 @@ namespace EmployeeManagementService.API.Controllers
             {
                 return NotFound("Employee not found");
             }
+            catch (EmployeeIsLockedException)
+            {
+                return BadRequest("Employee is locked. Contact Admin to get unlocked.");
+            }
             catch(ArgumentException argEx)
             {
                 return BadRequest(argEx.Message);

@@ -2,8 +2,10 @@
 using ClientManagementService.Domain.Mappers.Database;
 using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
+using ClientManagementService.Infrastructure.Persistence.Filters;
 using System;
 using System.Threading.Tasks;
+using ClientDB = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 
 namespace ClientManagementService.Domain.Services
 {
@@ -78,7 +80,7 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException("Either username already exists or email address and name combination already exists");
             }
 
-            var origClient = await _clientRepository.GetClientById(client.Id);
+            var origClient = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, client.Id));
             if (origClient == null)
             {
                 throw new ClientNotFoundException();
@@ -94,12 +96,12 @@ namespace ClientManagementService.Domain.Services
             origClient.State = client.Address?.State;
             origClient.ZipCode = client.Address?.ZipCode;
 
-            await _clientRepository.UpdateClientInfo(origClient);
+            await _clientRepository.UpdateClient(origClient);
         }
 
         public async Task<Client> GetClientById(long id)
         {
-            var client = await _clientRepository.GetClientById(id);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, id));
 
             if (client == null)
             {
@@ -111,7 +113,7 @@ namespace ClientManagementService.Domain.Services
 
         public async Task<Client> GetClientByEmail(string email)
         {
-            var client = await _clientRepository.GetClientByEmail(email);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<string>(GetClientFilterEnum.Email, email));
 
             if (client == null)
             {
@@ -123,21 +125,21 @@ namespace ClientManagementService.Domain.Services
 
         public async Task<Client> ClientLogin(string username, string password)
         {
-            var client = await GetClientByUsername(username);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<string>(GetClientFilterEnum.Username, username));
 
             if (client == null)
             {
                 throw new ClientNotFoundException();
             }
 
-            if (client.IsLoggedIn)
-            {
-                return client;
-            }
-
             if (client.IsLocked)
             {
-                throw new ArgumentException("Client account is locked. Unable to log in.");
+                throw new ArgumentException("Client account is locked. Contact admin to get unlocked.");
+            }
+
+            if (client.IsLoggedIn)
+            {
+                return ClientMapper.ToCoreClient(client);
             }
 
             if (!_passwordService.VerifyPasswordHash(password, client.Password))
@@ -147,37 +149,45 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException("Incorrect password.");
             }
 
-            await _clientRepository.UpdateClientLoginStatus(client.Id, true);
-
             client.IsLoggedIn = true;
+            
+            await _clientRepository.UpdateClient(client);
 
-            return client;
+            return ClientMapper.ToCoreClient(client);
         }
 
         public async Task ClientLogout(long id)
         {
-            var client = await GetClientById(id);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, id));
 
             if (!client.IsLoggedIn)
             {
                 return;
             }
 
-            await _clientRepository.UpdateClientLoginStatus(client.Id, false);
-
             client.IsLoggedIn = false;
+
+            await _clientRepository.UpdateClient(client);
         }   
 
         public async Task ResetClientFailedLoginAttempts(long id)
         {
-            await _clientRepository.ResetClientFailedLoginAttempts(id);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, id));
 
-            await _clientRepository.UpdateClientIsLocked(id, false);
+            if(client == null)
+            {
+                throw new ClientNotFoundException();
+            }
+
+            client.FailedLoginAttempts = 0;
+            client.IsLocked = false;
+
+            await _clientRepository.UpdateClient(client);
         }
 
         public async Task UpdatePassword(long id, string newPassword)
         {
-            var client = await GetClientById(id);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, id));
 
             if (!_passwordService.VerifyPasswordRequirements(newPassword))
             {
@@ -191,7 +201,9 @@ namespace ClientManagementService.Domain.Services
 
             var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
 
-            await _clientRepository.UpdatePassword(client.Id, newEncryptedPass);
+            client.Password = newEncryptedPass;
+
+            await _clientRepository.UpdateClient(client);
         }
 
         public async Task DeleteClientById(long id)
@@ -199,7 +211,7 @@ namespace ClientManagementService.Domain.Services
             await _clientRepository.DeleteClientById(id);
         }
 
-        private async Task IncrementClientFailedLoginAttempts(Client client)
+        private async Task IncrementClientFailedLoginAttempts(ClientDB client)
         {
             if (client.IsLocked)
             {
@@ -213,19 +225,10 @@ namespace ClientManagementService.Domain.Services
                 return;
             }
 
-            await _clientRepository.UpdateClientIsLocked(client.Id, true);
-        }
+            client.IsLocked = true;
+            client.FailedLoginAttempts = attempts;
 
-        private async Task<Client> GetClientByUsername(string username)
-        {
-            var client = await _clientRepository.GetClientByUsername(username);
-
-            if (client == null)
-            {
-                return null;
-            }
-
-            return ClientMapper.ToCoreClient(client);
+            await _clientRepository.UpdateClient(client);
         }
     }
 }

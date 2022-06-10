@@ -197,6 +197,11 @@ namespace EmployeeManagementService.Domain.Services
                 throw new EmployeeNotFoundException();
             }
 
+            if (employee.IsLocked)
+            {
+                throw new EmployeeIsLockedException();
+            }
+
             if (employee.Status == true)
             {
                 return EmployeeMapper.ToCoreEmployee(employee);
@@ -277,6 +282,7 @@ namespace EmployeeManagementService.Domain.Services
             }
 
             employee.IsLocked = true;
+            employee.FailedLoginAttempts = attempts;
 
             await _employeeRepository.UpdateEmployee(employee);
         }

@@ -1,5 +1,6 @@
 ﻿using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.Controllers;
+using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -375,6 +376,28 @@ namespace EmployeeManagementService.Test.Controller
             var obj = (ObjectResult)response;
 
             Assert.AreEqual(obj.StatusCode, 500);
+        }
+
+        [Test]
+        public async Task AdminLogin_Locked()
+        {
+            _employeeService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
+               .ThrowsAsync(new EmployeeIsLockedException());
+
+            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+
+            var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
+            {
+                Username = "jdoe",
+                Password = "abcdef123345!"
+            });
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
+
+            var obj = (BadRequestObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 400);
         }
 
         [Test]
