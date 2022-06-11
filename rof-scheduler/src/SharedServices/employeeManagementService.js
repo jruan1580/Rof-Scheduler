@@ -44,6 +44,25 @@ export const getEmployeeById = async function () {
   return await response.json();
 };
 
+export const createEmployee = async function(
+  firstName,
+  lastName,
+  ssn,
+  role,
+  username,
+  email,
+  phoneNumber,
+  addressLine1,
+  addressLine2,
+  city,
+  state,
+  zipCode
+){
+  var baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
+
+  
+}
+
 export const updateEmployeeInformation = async function (
   id,
   firstName,
@@ -67,7 +86,7 @@ export const updateEmployeeInformation = async function (
     ssn,
     role,
     username,
-    email,
+    emailAddress: email,
     phoneNumber,
     address: {
       addressLine1,

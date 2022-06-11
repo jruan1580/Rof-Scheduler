@@ -248,7 +248,7 @@ function AccountSettings() {
                           name="email"
                           type="email"
                           placeholder="Email Address"
-                          defaultValue={employee.email}
+                          defaultValue={employee.emailAddress}
                           isInvalid={validationMap.has("email")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -257,7 +257,7 @@ function AccountSettings() {
                       </Form.Group>                                      
                     </Row>
 
-                    <Row className="mb-3">
+                    {/* <Row className="mb-3">
                       <Form.Group as={Col} md="4">
                         <Form.Label>Role</Form.Label>
                         <Form.Select
@@ -270,7 +270,7 @@ function AccountSettings() {
                           <option value="Employee">Employee</option>
                         </Form.Select>
                       </Form.Group>
-                    </Row>
+                    </Row> */}
 
                     <Row className="mb-3">
                       <Form.Group as={Col} md="6">
