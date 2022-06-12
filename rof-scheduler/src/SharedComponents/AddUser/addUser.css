@@ -2,3 +2,7 @@
     width: 80%;    /* Occupy the 90% of the screen width */
     max-width: 80%!important;
 } 
+
+.modal-header-color{
+    background-color: rgba(0,0,0,.03);
+}

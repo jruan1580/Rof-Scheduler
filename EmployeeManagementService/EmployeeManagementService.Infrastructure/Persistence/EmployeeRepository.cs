@@ -68,6 +68,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                         ZipCode = e.ZipCode,
                         CountryId = e.CountryId
                     })
+                    .OrderByDescending(e => e.Id)
                     .Skip(skip)
                     .Take(offset)
                     .ToListAsync();

@@ -6,7 +6,7 @@ import { createEmployee } from '../../SharedServices/employeeManagementService';
 import { useState } from "react";
 import "./addUser.css";
 
-function AddUserModal({userType, show, handleHide}){
+function AddUserModal({userType, show, handleHide, handleUserAddSuccess}){
     const [loading, setLoading] = useState(false);
     const [validationMap, setValidationMap] = useState(new Map());
     const [errMsg, setErrMsg] = useState(undefined);
@@ -86,6 +86,8 @@ function AddUserModal({userType, show, handleHide}){
 
                     }
                     setErrMsg(undefined);
+                    e.target.reset();
+                    handleUserAddSuccess();
                 }catch(e){
                     setErrMsg(e.message);
                 }finally{
@@ -104,7 +106,7 @@ function AddUserModal({userType, show, handleHide}){
                 dialogClassName="add-modal80"
                 centered
             >
-                <Modal.Header closeButton>
+                <Modal.Header className='modal-header-color' closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
                         Add {userType}
                     </Modal.Title>
@@ -233,11 +235,17 @@ function AddUserModal({userType, show, handleHide}){
                                 </Form.Control.Feedback>
                             </Form.Group>
                         </Row><br/>
-
                         
                         <hr></hr>
                        
-                        <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2" disabled={loading}>Cancel</Button>
+                        {
+                            loading &&
+                            <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2" disabled>Cancel</Button>
+                        }
+                        {
+                            !loading &&
+                            <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
+                        }                        
                         {
                             loading && (
                             <Button variant="primary" className="float-end" disabled>

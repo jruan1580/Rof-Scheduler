@@ -4,7 +4,7 @@ import AddUserModal from '../SharedComponents/AddUser';
 import GenericUserTable from '../SharedComponents/UserTable';
 import { getAllEmployees } from '../SharedServices/employeeManagementService';
 
-function Employee(){
+function EmployeeManagement(){
     const [employees, setEmployees] = useState([]);
     const [currPage, setCurrPage] = useState(1);
     const [errorMessage, setErrorMessage] = useState(undefined);
@@ -36,7 +36,7 @@ function Employee(){
     return(
             <>
                 <h1>Employee Management</h1><br/>
-                <AddUserModal userType='Employee' show={showAddModal} handleHide={() => setShowAddModal(false)}/>
+                <AddUserModal userType='Employee' show={showAddModal} handleHide={() => setShowAddModal(false)} handleUserAddSuccess={() => window.location.reload()}/>
                 <Row>
                     <Form  onSubmit={search}>
                         <Row className="align-items-center">
@@ -65,4 +65,4 @@ function Employee(){
     );
 }
 
-export default Employee;
+export default EmployeeManagement;
