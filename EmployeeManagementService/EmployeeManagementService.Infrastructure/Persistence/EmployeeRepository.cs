@@ -98,7 +98,15 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         public async Task CreateEmployee(Employee newEmployee)
         {
             using (var context = new RofSchedulerContext())
-            {                
+            {
+                //default employee's country to USA for now
+                var usa = context.Countries.FirstOrDefault(c => c.Name.Equals("United States of America"));
+                if (usa == null)
+                {
+                    throw new Exception("Unable to find country United States of America");
+                }
+
+                newEmployee.CountryId = usa.Id;
                 context.Employees.Add(newEmployee);
 
                 await context.SaveChangesAsync();

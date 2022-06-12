@@ -257,21 +257,6 @@ function AccountSettings() {
                       </Form.Group>                                      
                     </Row>
 
-                    {/* <Row className="mb-3">
-                      <Form.Group as={Col} md="4">
-                        <Form.Label>Role</Form.Label>
-                        <Form.Select
-                          required
-                          type="select"
-                          placeholder="Role"
-                          name="role"
-                        >
-                          <option value="Administrator">Administrator</option>
-                          <option value="Employee">Employee</option>
-                        </Form.Select>
-                      </Form.Group>
-                    </Row> */}
-
                     <Row className="mb-3">
                       <Form.Group as={Col} md="6">
                         <Form.Label>Address Line 1</Form.Label>

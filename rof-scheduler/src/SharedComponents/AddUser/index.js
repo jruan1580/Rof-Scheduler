@@ -1,15 +1,26 @@
-import { Modal, Button, Row, Form, Col } from 'react-bootstrap';
+import { Modal, Button, Row, Form, Col, Alert, Spinner } from 'react-bootstrap';
 
 import { ensureCreateEmployeeInformationProvided } from "../../SharedServices/inputValidationService";
+import { createEmployee } from '../../SharedServices/employeeManagementService';
 
 import { useState } from "react";
+import "./addUser.css";
 
 function AddUserModal({userType, show, handleHide}){
+    const [loading, setLoading] = useState(false);
     const [validationMap, setValidationMap] = useState(new Map());
+    const [errMsg, setErrMsg] = useState(undefined);
+    
+    const closeModal = function(){
+        setValidationMap(new Map());
+        setErrMsg(undefined);
+        handleHide();
+    }
 
     const handleCreateUser = function(e){
         e.preventDefault();
 
+        setErrMsg(undefined);
         var firstName = e.target.firstName.value;
         var lastName = e.target.lastName.value;
         var ssn = e.target.ssn.value;
@@ -47,11 +58,40 @@ function AddUserModal({userType, show, handleHide}){
             //validate client
         }
 
-        console.log(inputValidations);
         if (inputValidations.size > 0) {
             setValidationMap(inputValidations);
         }else{
             setValidationMap(new Map());
+            setLoading(true);
+
+            (async function(){
+                try{
+                    if (userType === "Employee"){
+                        await createEmployee(
+                            firstName,
+                            lastName,
+                            ssn,
+                            role,
+                            username,
+                            email,
+                            phoneNumber,
+                            addressLine1,
+                            addressLine2,
+                            city,
+                            state,
+                            zipCode,
+                            password
+                        );
+                    }else{
+
+                    }
+                    setErrMsg(undefined);
+                }catch(e){
+                    setErrMsg(e.message);
+                }finally{
+                    setLoading(false);
+                }
+            })();      
         }
     }
 
@@ -59,9 +99,9 @@ function AddUserModal({userType, show, handleHide}){
         <>
             <Modal
                 show={show}
-                onHide={handleHide}
-                size="lg"
+                onHide={closeModal}
                 aria-labelledby="contained-modal-title-vcenter"
+                dialogClassName="add-modal80"
                 centered
             >
                 <Modal.Header closeButton>
@@ -71,7 +111,8 @@ function AddUserModal({userType, show, handleHide}){
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={handleCreateUser}>
-                        <h3>General User Information</h3>
+                        {errMsg !== undefined && <Alert variant="danger">{errMsg}</Alert>}
+                        <h4>General User Information</h4>
                         <br/>
                         <Row>                                                       
                             <Form.Group as={Col} md="4">
@@ -156,26 +197,27 @@ function AddUserModal({userType, show, handleHide}){
                             </Form.Group>
                         </Row><br/>
 
-                        <h2>Account Information</h2><br/>
+                        <h4>Account Information</h4><br/>
                         <Row>
-                            <Form.Group as={Col} md="5">
+                            <Form.Group as={Col} md="3">
                                 <Form.Label>Username</Form.Label>
                                 <Form.Control placeholder="Username" name="username" isInvalid={validationMap.has("username")}/>
                                 <Form.Control.Feedback type="invalid">
                                     {validationMap.get("username")}
                                 </Form.Control.Feedback>
                             </Form.Group>
-                            <Form.Group as={Col} md="5">
+                            <Form.Group as={Col} md="3">
                                 <Form.Label>Role</Form.Label>
-                                <Form.Control placeholder="Role" name="role" isInvalid={validationMap.has("role")}/>
+                                    <Form.Select type="select" placeholder="Role" name="role" isInvalid={validationMap.has("role")}>
+                                        <option value="Administrator">Administrator</option>
+                                        <option value="Employee">Employee</option>
+                                    </Form.Select>
                                 <Form.Control.Feedback type="invalid">
                                     {validationMap.get("role")}
                                 </Form.Control.Feedback>
                             </Form.Group>
-                        </Row><br/>
 
-                        <Row>
-                            <Form.Group as={Col} md="5">
+                            <Form.Group as={Col} md="3">
                                 <Form.Label>Temp Password</Form.Label>
                                 <Form.Control type="password" placeholder="Password" name="password" isInvalid={validationMap.has("password")}/>
                                 <Form.Control.Feedback type="invalid">
@@ -183,7 +225,7 @@ function AddUserModal({userType, show, handleHide}){
                                 </Form.Control.Feedback>
                             </Form.Group>
 
-                            <Form.Group as={Col} md="5">
+                            <Form.Group as={Col} md="3">
                                 <Form.Label>Retype Temp Password</Form.Label>
                                 <Form.Control type="password" placeholder="Retype Temp Password" name="retypedPassword" isInvalid={validationMap.has("retypedPassword")}/>
                                 <Form.Control.Feedback type="invalid">
@@ -191,11 +233,29 @@ function AddUserModal({userType, show, handleHide}){
                                 </Form.Control.Feedback>
                             </Form.Group>
                         </Row><br/>
+
+                        
                         <hr></hr>
-                        
-                        <Button type="button" variant='danger' onClick={() => handleHide()} className="float-end ms-2" >Cancel</Button>
-                        <Button type="submit" className="float-end">Create</Button>
-                        
+                       
+                        <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2" disabled={loading}>Cancel</Button>
+                        {
+                            loading && (
+                            <Button variant="primary" className="float-end" disabled>
+                            <Spinner
+                                as="span"
+                                animation="grow"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                            Loading...
+                            </Button>
+                        )}
+                        {
+                            !loading &&
+                            <Button type="submit" className="float-end">Create</Button>
+                        }
+                       
                     </Form>
                 </Modal.Body>
               

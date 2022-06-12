@@ -56,11 +56,44 @@ export const createEmployee = async function(
   addressLine2,
   city,
   state,
-  zipCode
+  zipCode,
+  password
 ){
   var baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
+  var data = {
+    firstName,
+    lastName,
+    password,
+    ssn,
+    role,
+    username,
+    emailAddress: email,
+    phoneNumber,
+    address: {
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      zipCode
+    }
+  };
 
+  var url = baseUrl + "/admin";
   
+  var response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+    credentials: "include",
+  });
+
+  console.log(response);
+  if (response.status !== 201) {
+    var errMsg = await response.text();
+    throw new Error(errMsg);
+  }
 }
 
 export const updateEmployeeInformation = async function (
@@ -93,8 +126,8 @@ export const updateEmployeeInformation = async function (
       addressLine2,
       city,
       state,
-      zipCode,
-    },
+      zipCode
+    }
   };
 
   role = localStorage.getItem("role");
