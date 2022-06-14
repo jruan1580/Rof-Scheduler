@@ -115,24 +115,28 @@ namespace EmployeeManagementService.Domain.Services
                 var errorMessage = string.Join("\n", invalidErrors);
 
                 throw new ArgumentException(errorMessage);
-            }
+            }          
 
-            var roles = _roles.Split(",");
-
-            if (!roles.Contains(employee.Role))
+            if (await _employeeRepository.DoesEmployeeExistsBySsnOrUsernameOrEmail(employee.Ssn, employee.Username, employee.Email, employee.Id))
             {
-                throw new ArgumentException("Invalid role assigned");
-            }
-
-            if (await _employeeRepository.DoesEmployeeExistsBySsnOrUsername(employee.Ssn, employee.Username, employee.Id))
-            {
-                throw new ArgumentException("Employee with ssn or username exists");
+                throw new ArgumentException("Employee with ssn, username, or email exists");
             }
 
             var originalEmployee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, employee.Id));
             if (originalEmployee == null)
             {
                 throw new EmployeeNotFoundException();
+            }
+
+            //role is not empty, we need to validate role passed in
+            if (!string.IsNullOrEmpty(employee.Role))
+            {
+                var roles = _roles.Split(",");
+
+                if (!roles.Contains(employee.Role))
+                {
+                    throw new ArgumentException("Invalid role assigned");
+                }
             }
 
             originalEmployee.EmailAddress = employee.Email;
@@ -163,9 +167,9 @@ namespace EmployeeManagementService.Domain.Services
                 throw new ArgumentException(errorMessage);
             }
 
-            if (await _employeeRepository.DoesEmployeeExistsBySsnOrUsername(newEmployee.Ssn, newEmployee.Username, newEmployee.Id))
+            if (await _employeeRepository.DoesEmployeeExistsBySsnOrUsernameOrEmail(newEmployee.Ssn, newEmployee.Username, newEmployee.Email, newEmployee.Id))
             {
-                throw new ArgumentException("Employee with ssn or username exists");
+                throw new ArgumentException("Employee with ssn, username, or email exists");
             }
 
             if (!_passwordService.VerifyPasswordRequirements(password))

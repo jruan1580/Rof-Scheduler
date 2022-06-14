@@ -108,11 +108,6 @@ namespace EmployeeManagementService.Domain.Models
                 invalidErrors.Add("Last name cannot be empty");
             }
 
-            if (string.IsNullOrEmpty(Role))
-            {
-                invalidErrors.Add("Role cannot be empty");
-            }
-
             if (string.IsNullOrEmpty(Ssn))
             {
                 invalidErrors.Add("SSN cannot be empty");

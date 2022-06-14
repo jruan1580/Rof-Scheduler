@@ -10,6 +10,8 @@ function AddUserModal({userType, show, handleHide, handleUserAddSuccess}){
     const [loading, setLoading] = useState(false);
     const [validationMap, setValidationMap] = useState(new Map());
     const [errMsg, setErrMsg] = useState(undefined);
+    const [successMsg, setSuccessMsg] = useState(false);
+    const [disableBtns, setDisableBtns] = useState(false);
     
     const closeModal = function(){
         setValidationMap(new Map());
@@ -86,8 +88,10 @@ function AddUserModal({userType, show, handleHide, handleUserAddSuccess}){
 
                     }
                     setErrMsg(undefined);
-                    e.target.reset();
-                    handleUserAddSuccess();
+                    setDisableBtns(true);
+                    setSuccessMsg(true);
+
+                    handleUserAddSuccess();                    
                 }catch(e){
                     setErrMsg(e.message);
                 }finally{
@@ -106,7 +110,7 @@ function AddUserModal({userType, show, handleHide, handleUserAddSuccess}){
                 dialogClassName="add-modal80"
                 centered
             >
-                <Modal.Header className='modal-header-color' closeButton>
+                <Modal.Header className='modal-header-color'>
                     <Modal.Title id="contained-modal-title-vcenter">
                         Add {userType}
                     </Modal.Title>
@@ -114,6 +118,8 @@ function AddUserModal({userType, show, handleHide, handleUserAddSuccess}){
                 <Modal.Body>
                     <Form onSubmit={handleCreateUser}>
                         {errMsg !== undefined && <Alert variant="danger">{errMsg}</Alert>}
+                        {successMsg && <Alert variant="success">{userType} successfully added! Page will reload in 3 seconds and new {userType} will be available....</Alert>}
+
                         <h4>General User Information</h4>
                         <br/>
                         <Row>                                                       
@@ -239,15 +245,15 @@ function AddUserModal({userType, show, handleHide, handleUserAddSuccess}){
                         <hr></hr>
                        
                         {
-                            loading &&
+                            (loading || disableBtns) &&
                             <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2" disabled>Cancel</Button>
                         }
                         {
-                            !loading &&
+                            (!loading && ! disableBtns) &&
                             <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
                         }                        
                         {
-                            loading && (
+                            (loading || disableBtns) && (
                             <Button variant="primary" className="float-end" disabled>
                             <Spinner
                                 as="span"
@@ -260,7 +266,7 @@ function AddUserModal({userType, show, handleHide, handleUserAddSuccess}){
                             </Button>
                         )}
                         {
-                            !loading &&
+                            (!loading && !disableBtns) &&
                             <Button type="submit" className="float-end">Create</Button>
                         }
                        

@@ -16,7 +16,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         Task<short> IncrementEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployee(Employee employeeToUpdate);
         Task DeleteEmployeeById(long id);
-        Task<bool> DoesEmployeeExistsBySsnOrUsername(string ssn, string username, long id);
+        Task<bool> DoesEmployeeExistsBySsnOrUsernameOrEmail(string ssn, string username, string email, long id);
     }
 
     public class EmployeeRepository : IEmployeeRepository
@@ -160,12 +160,12 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<bool> DoesEmployeeExistsBySsnOrUsername(string ssn, string username, long id)
+        public async Task<bool> DoesEmployeeExistsBySsnOrUsernameOrEmail(string ssn, string username, string email, long id)
         {
             using (var context = new RofSchedulerContext())
             {
                 return await context.Employees.AnyAsync(e => e.Id != id && (e.Ssn.Equals(ssn) 
-                    || e.Username.ToLower().Equals(username.ToLower())));             
+                    || e.Username.ToLower().Equals(username.ToLower()) || e.EmailAddress.ToLower().Equals(email.ToLower())));             
             }
         }
     }

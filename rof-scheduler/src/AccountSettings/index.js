@@ -60,7 +60,6 @@ function AccountSettings() {
     const firstName = submitEvent.target.firstName.value;
     const lastName = submitEvent.target.lastName.value;
     const ssn = submitEvent.target.ssn.value;
-    const role = submitEvent.target.role.value;
     const username = submitEvent.target.username.value;
     const email = submitEvent.target.email.value;
     const phoneNumber = submitEvent.target.phone.value;
@@ -74,7 +73,7 @@ function AccountSettings() {
       firstName,
       lastName,
       ssn,
-      role,
+      'noRole', //pass in some fake value to pass validation. we are not updating roles in account setting.
       username,
       email,
       phoneNumber,
@@ -99,7 +98,7 @@ function AccountSettings() {
             firstName,
             lastName,
             ssn,
-            role,
+            '', //pass in empty role for account settings, we are not updating roles in account setting.
             username,
             email,
             phoneNumber,
@@ -114,8 +113,7 @@ function AccountSettings() {
             ...employee,
             firstName,
             lastName,
-            ssn,
-            role,
+            ssn,            
             username,
             email,
             phoneNumber,

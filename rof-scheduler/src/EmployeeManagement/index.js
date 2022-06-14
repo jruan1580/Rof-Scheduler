@@ -33,10 +33,14 @@ function EmployeeManagement(){
         setCurrPage(1); //reset to current page               
     }
 
+    const reloadAfterThreeSeconds = () => {
+        setTimeout(() => window.location.reload(), 3000);
+    }
+
     return(
             <>
                 <h1>Employee Management</h1><br/>
-                <AddUserModal userType='Employee' show={showAddModal} handleHide={() => setShowAddModal(false)} handleUserAddSuccess={() => window.location.reload()}/>
+                <AddUserModal userType='Employee' show={showAddModal} handleHide={() => setShowAddModal(false)} handleUserAddSuccess={reloadAfterThreeSeconds}/>
                 <Row>
                     <Form  onSubmit={search}>
                         <Row className="align-items-center">
