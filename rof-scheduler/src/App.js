@@ -6,7 +6,7 @@ import Calendar from "./Calendar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AccountSettings from "./AccountSettings";
 import CreateClient from "./CreateClient";
-import Employee from "./Employee";
+import EmployeeManagement from "./EmployeeManagement";
 
 function App() {
   const [isLogin, setLogin] = useState(false);
@@ -38,7 +38,7 @@ function App() {
             <Route exact path="/signup" element={<CreateClient />} />
             <Route exact path="/accountsettings" element={<AccountSettings />} />
             <Route exact path="/calendar" element={<Calendar />} />
-            <Route exact path="/employeemanagement" element={<Employee />} />
+            <Route exact path="/employeemanagement" element={<EmployeeManagement />} />
           </Routes>
         </Container>
       </BrowserRouter>

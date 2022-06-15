@@ -24,7 +24,7 @@ namespace AuthenticationService.API.Controllers
             _authService = authService;
         }
 
-        [AllowAnonymous]
+        [AllowAnonymous] 
         [HttpPatch("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO employee)
         {

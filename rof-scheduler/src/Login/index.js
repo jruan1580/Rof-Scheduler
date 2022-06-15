@@ -1,6 +1,5 @@
 import { Form, Button, Row, Col, Spinner, Card, Container, Alert } from 'react-bootstrap';
 import { useState } from 'react';
-import { validateLoginPassword } from '../SharedServices/inputValidationService';
 import { login } from '../SharedServices/authenticationService';
 
 function Login({ handleLoginState }) {
@@ -15,7 +14,7 @@ function Login({ handleLoginState }) {
 
     const username = submitEvent.target.username.value;
     const password = submitEvent.target.password.value;
-    const passwordValidation = validateLoginPassword(password);
+    const passwordValidation = (password === undefined || password === "") ? "Please enter a password" : "";    
 
     if (passwordValidation !== "" || username === undefined) {
       setPasswordErrMsg(passwordValidation);

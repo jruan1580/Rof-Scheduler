@@ -16,7 +16,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         Task<short> IncrementEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployee(Employee employeeToUpdate);
         Task DeleteEmployeeById(long id);
-        Task<bool> DoesEmployeeExistsBySsnOrUsername(string ssn, string username, long id);
+        Task<bool> DoesEmployeeExistsBySsnOrUsernameOrEmail(string ssn, string username, string email, long id);
     }
 
     public class EmployeeRepository : IEmployeeRepository
@@ -68,6 +68,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                         ZipCode = e.ZipCode,
                         CountryId = e.CountryId
                     })
+                    .OrderByDescending(e => e.Id)
                     .Skip(skip)
                     .Take(offset)
                     .ToListAsync();
@@ -98,7 +99,15 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         public async Task CreateEmployee(Employee newEmployee)
         {
             using (var context = new RofSchedulerContext())
-            {                
+            {
+                //default employee's country to USA for now
+                var usa = context.Countries.FirstOrDefault(c => c.Name.Equals("United States of America"));
+                if (usa == null)
+                {
+                    throw new Exception("Unable to find country United States of America");
+                }
+
+                newEmployee.CountryId = usa.Id;
                 context.Employees.Add(newEmployee);
 
                 await context.SaveChangesAsync();
@@ -151,12 +160,12 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<bool> DoesEmployeeExistsBySsnOrUsername(string ssn, string username, long id)
+        public async Task<bool> DoesEmployeeExistsBySsnOrUsernameOrEmail(string ssn, string username, string email, long id)
         {
             using (var context = new RofSchedulerContext())
             {
                 return await context.Employees.AnyAsync(e => e.Id != id && (e.Ssn.Equals(ssn) 
-                    || e.Username.ToLower().Equals(username.ToLower())));             
+                    || e.Username.ToLower().Equals(username.ToLower()) || e.EmailAddress.ToLower().Equals(email.ToLower())));             
             }
         }
     }
