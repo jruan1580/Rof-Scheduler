@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Form, Button, Row, Col, Alert, Pagination } from 'react-bootstrap';
+import AddUserModal from '../SharedComponents/AddUser';
 import GenericUserTable from '../SharedComponents/UserTable';
 import { getAllEmployees } from '../SharedServices/employeeManagementService';
 
-function Employee(){
+function EmployeeManagement(){
     const [employees, setEmployees] = useState([]);
     const [currPage, setCurrPage] = useState(1);
     const [errorMessage, setErrorMessage] = useState(undefined);
     const [keyword, setKeyword] = useState("");
     const [totalPages, setTotalPages] = useState(0);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     useEffect(() =>{        
         (async function(){
@@ -31,9 +33,14 @@ function Employee(){
         setCurrPage(1); //reset to current page               
     }
 
+    const reloadAfterThreeSeconds = () => {
+        setTimeout(() => window.location.reload(), 3000);
+    }
+
     return(
             <>
                 <h1>Employee Management</h1><br/>
+                <AddUserModal userType='Employee' show={showAddModal} handleHide={() => setShowAddModal(false)} handleUserAddSuccess={reloadAfterThreeSeconds}/>
                 <Row>
                     <Form  onSubmit={search}>
                         <Row className="align-items-center">
@@ -44,7 +51,7 @@ function Employee(){
                                 <Button type="submit">Search</Button>
                             </Col>
                             <Col lg={2}>
-                                <Button>Add Employee</Button>
+                                <Button onClick={() => setShowAddModal(true)}>Add Employee</Button>
                             </Col>
                         </Row>
                     </Form>
@@ -62,4 +69,4 @@ function Employee(){
     );
 }
 
-export default Employee;
+export default EmployeeManagement;

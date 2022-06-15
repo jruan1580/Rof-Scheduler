@@ -388,7 +388,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
                 .ReturnsAsync(new Employee() { Username = "jdoe" });
 
-            _employeeRepository.Setup(e => e.DoesEmployeeExistsBySsnOrUsername(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<long>()))
+            _employeeRepository.Setup(e => e.DoesEmployeeExistsBySsnOrUsernameOrEmail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<long>()))
                 .ReturnsAsync(true);
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
