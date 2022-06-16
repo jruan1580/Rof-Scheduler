@@ -75,7 +75,7 @@ namespace EmployeeManagementService.API.Controllers
             }
             catch (EmployeeNotFoundException)
             {
-                return NotFound();
+                return NotFound($"Employee not found");
             }
             catch(ArgumentException argEx)
             {
@@ -98,7 +98,29 @@ namespace EmployeeManagementService.API.Controllers
             }
             catch (EmployeeNotFoundException)
             {
-                return NotFound();
+                return NotFound($"Employee with id: {id} not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPatch("{id}/activate")]
+        [HttpPatch("{id}/deactivate")]
+        public async Task<IActionResult> UpdateEmployeeStatus(long id)
+        {
+            try
+            {
+                var active = (Request.Path.Value.Contains("activate")) ? true : false;
+
+                await _employeeService.UpdateEmployeeActiveStatus(id, active);
+
+                return Ok();
+            }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound($"Employee with id: {id} not found");
             }
             catch (Exception ex)
             {
@@ -117,7 +139,7 @@ namespace EmployeeManagementService.API.Controllers
             }
             catch (EmployeeNotFoundException)
             {
-                return NotFound();
+                return NotFound($"Employee with id: {id} not found");
             }
             catch (Exception ex)
             {

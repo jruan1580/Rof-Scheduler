@@ -89,7 +89,6 @@ export const createEmployee = async function(
     credentials: "include",
   });
 
-  console.log(response);
   if (response.status !== 201) {
     var errMsg = await response.text();
     throw new Error(errMsg);
@@ -150,3 +149,31 @@ export const updateEmployeeInformation = async function (
     throw new Error(errMsg);
   }
 };
+
+export const resetEmployeeLockStatus = async function(id){
+  var url = baseUrl + "/admin/" + id + "/locked";
+  
+  var response = await fetch(url, {
+    method: "PATCH",  
+    credentials: "include",
+  });
+
+  if (response.status !== 200) {
+    var errMsg = await response.text();
+    throw new Error(errMsg);
+  }
+}
+
+export const updateEmployeeStatus = async function(id, status){
+  var url = baseUrl + "/admin/" + id + "/status/" + status;
+  
+  var response = await fetch(url, {
+    method: "PATCH",  
+    credentials: "include",
+  });
+
+  if (response.status !== 200) {
+    var errMsg = await response.text();
+    throw new Error(errMsg);
+  }
+}
