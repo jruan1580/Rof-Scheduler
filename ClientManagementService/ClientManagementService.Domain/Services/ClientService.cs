@@ -4,6 +4,7 @@ using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Filters;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClientDB = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 
@@ -97,6 +98,13 @@ namespace ClientManagementService.Domain.Services
             origClient.ZipCode = client.Address?.ZipCode;
 
             await _clientRepository.UpdateClient(origClient);
+        }
+
+        public async Task<List<Client>> GetAllClients()
+        {
+            var clientList = new List<Client>();
+
+            return clientList;
         }
 
         public async Task<Client> GetClientById(long id)
