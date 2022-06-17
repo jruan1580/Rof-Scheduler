@@ -17,7 +17,7 @@ namespace ClientManagementService.Domain.Services
         Task ClientLogout(long id);
         Task CreateClient(Client newClient, string password);
         Task DeleteClientById(long id);
-        Task<ClientsWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword);
+        Task<ClientsWithTotalPage> GetAllClientsByKeyword(int page, int offset, string keyword);
         Task<Client> GetClientByEmail(string email);
         Task<Client> GetClientById(long id);        
         Task ResetClientFailedLoginAttempts(long id);
@@ -102,7 +102,7 @@ namespace ClientManagementService.Domain.Services
             await _clientRepository.UpdateClient(origClient);
         }
 
-        public async Task<ClientsWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword)
+        public async Task<ClientsWithTotalPage> GetAllClientsByKeyword(int page, int offset, string keyword)
         {
             var result = await _clientRepository.GetAllClientsByKeyword(page, offset, keyword);
             var clients = result.Item1;

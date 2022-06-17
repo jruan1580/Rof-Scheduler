@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClientManagementService.API.DTO;
 using ClientManagementService.API.DTOMapper;
@@ -35,6 +36,28 @@ namespace ClientManagementService.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllClients([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
+        {
+            try
+            {
+                var clientList = new List<ClientDTO>();
+
+                var result = await _clientService.GetAllClientsByKeyword(page, offset, keyword);
+
+                foreach (var client in result.Clients)
+                {
+                    clientList.Add(ClientDTOMapper.ToDTOClient(client));
+                }
+
+                return Ok(new { clients = clientList, totalPages = result.TotalPages });
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex);
             }
         }
 
