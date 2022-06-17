@@ -5,6 +5,7 @@ using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Filters;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ClientDB = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 
@@ -16,6 +17,7 @@ namespace ClientManagementService.Domain.Services
         Task ClientLogout(long id);
         Task CreateClient(Client newClient, string password);
         Task DeleteClientById(long id);
+        Task<ClientsWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword);
         Task<Client> GetClientByEmail(string email);
         Task<Client> GetClientById(long id);        
         Task ResetClientFailedLoginAttempts(long id);
@@ -100,11 +102,18 @@ namespace ClientManagementService.Domain.Services
             await _clientRepository.UpdateClient(origClient);
         }
 
-        public async Task<List<Client>> GetAllClients()
+        public async Task<ClientsWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword)
         {
-            var clientList = new List<Client>();
+            var result = await _clientRepository.GetAllClientsByKeyword(page, offset, keyword);
+            var clients = result.Item1;
+            var totalPages = result.Item2;
 
-            return clientList;
+            if (clients == null || clients.Count == 0)
+            {
+                return new ClientsWithTotalPage(new List<Client>(), 0);
+            }
+
+            return new ClientsWithTotalPage(clients.Select(c => ClientMapper.ToCoreClient(c)).ToList(), totalPages);
         }
 
         public async Task<Client> GetClientById(long id)
