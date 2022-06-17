@@ -12,6 +12,7 @@ namespace ClientManagementService.Infrastructure.Persistence
     {
         Task AddPet(Pet newPet);
         Task DeletePetById(long petId);
+        Task<List<Pet>> GetAllPets();
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
         Task<List<Pet>> GetPetsByClientId(long clientId);
         Task UpdatePet(Pet updatePet);
@@ -43,6 +44,14 @@ namespace ClientManagementService.Infrastructure.Persistence
                 }
 
                 return petList;
+            }
+        }
+
+        public async Task<List<Pet>> GetAllPets()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Pets.ToListAsync();
             }
         }
 
