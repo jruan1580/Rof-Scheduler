@@ -61,6 +61,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                         EmailAddress = e.EmailAddress,
                         PhoneNumber = e.PhoneNumber,
                         Active = e.Active,
+                        IsLocked = e.IsLocked,
                         AddressLine1 = e.AddressLine1,
                         AddressLine2 = e.AddressLine2,
                         City = e.City,

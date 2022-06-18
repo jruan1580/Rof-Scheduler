@@ -151,6 +151,7 @@ export const updateEmployeeInformation = async function (
 };
 
 export const resetEmployeeLockStatus = async function(id){
+  var baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
   var url = baseUrl + "/admin/" + id + "/locked";
   
   var response = await fetch(url, {
@@ -165,7 +166,9 @@ export const resetEmployeeLockStatus = async function(id){
 }
 
 export const updateEmployeeStatus = async function(id, status){
-  var url = baseUrl + "/admin/" + id + "/status/" + status;
+  var baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
+  var url = baseUrl + "/admin/" + id;
+  url += (status) ? "/activate" : "/deactivate" ;
   
   var response = await fetch(url, {
     method: "PATCH",  
