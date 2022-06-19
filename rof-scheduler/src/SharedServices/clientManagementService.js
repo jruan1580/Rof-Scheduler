@@ -46,3 +46,23 @@ export const createClient = async function (
     throw new Error(errMsg);
   }
 };
+
+export const getAllClients = async function(page, recPerPage, keyword){
+  var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
+  var url = baseUrl + "/?page=" + page + "&offset=" + recPerPage + "&keyword=" + keyword;
+
+  var response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (response.status !== 200) {
+    var errMsg = await response.text();
+    throw new Error(errMsg);
+  }
+
+  return await response.json();
+}
