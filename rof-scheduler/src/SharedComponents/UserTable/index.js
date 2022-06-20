@@ -27,7 +27,7 @@ function GenericUserTable({ users, resetEmployeeLockStatus, updateEmployeeActive
                                     <td>{user.id}</td>
                                     <td>{user.fullName}</td>
                                     <td>{user.emailAddress}</td>
-                                    <td>{user.phoneNumber}</td>
+                                    <td>{user.phoneNumber}{user.primaryPhoneNum}</td>
                                     <td>{user.role}</td>
                                     <td>{user.isLocked ? 'Yes' : 'No'}</td>
                                     <td>{user.active ? 'Yes' : 'No'}</td>

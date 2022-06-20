@@ -49,7 +49,7 @@ export const createClient = async function (
 
 export const getAllClients = async function(page, recPerPage, keyword){
   var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
-  var url = baseUrl + "/?page=" + page + "&offset=" + recPerPage + "&keyword=" + keyword;
+  var url = baseUrl + "/client?page=" + page + "&offset=" + recPerPage + "&keyword=" + keyword;
 
   var response = await fetch(url, {
     method: "GET",
