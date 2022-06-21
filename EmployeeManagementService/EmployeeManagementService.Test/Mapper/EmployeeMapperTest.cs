@@ -42,8 +42,7 @@ namespace EmployeeManagementService.Test.Mapper
             Assert.AreEqual("Doe", core.LastName);
             Assert.AreEqual("test@email.com", core.Email);
             Assert.AreEqual("9998887776", core.PhoneNumber);
-            Assert.AreEqual("123-45-6789", core.GetNotSanitizedSSN());
-            Assert.AreEqual("***-**-6789", core.Ssn);
+            Assert.AreEqual("123-45-6789", core.Ssn);
             Assert.AreEqual("jdoe", core.Username);
             Assert.AreEqual(new byte[32], core.Password);
             Assert.AreEqual("Admin", core.Role);
@@ -68,7 +67,7 @@ namespace EmployeeManagementService.Test.Mapper
             coreEmployee.CountryId = 1;
             coreEmployee.FirstName = "John";
             coreEmployee.LastName = "Doe";
-            coreEmployee.SetSSN("123-45-6789");
+            coreEmployee.Ssn = "123-45-6789";
             coreEmployee.Username = "jdoe";
             coreEmployee.Email = "test@email.com";
             coreEmployee.PhoneNumber = "9998887776";
@@ -114,7 +113,7 @@ namespace EmployeeManagementService.Test.Mapper
             coreEmployee.CountryId = 1;
             coreEmployee.FirstName = "John";
             coreEmployee.LastName = "Doe";
-            coreEmployee.SetSSN("123-45-6789");
+            coreEmployee.Ssn = "123-45-6789";
             coreEmployee.Username = "jdoe";
             coreEmployee.Password = new byte[32];
             coreEmployee.Role = "Admin";

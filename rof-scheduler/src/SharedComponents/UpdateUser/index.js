@@ -1,17 +1,105 @@
-import { Modal, Row, Form, Col, Button, Spinner } from "react-bootstrap";
+import { Modal, Row, Form, Col, Button, Spinner, Alert } from "react-bootstrap";
 import "./updateUser.css";
 import { useState } from "react";
 
+import { ensureUpdateInformationProvided } from "../../SharedServices/inputValidationService";
+import { updateEmployeeInformation } from '../../SharedServices/employeeManagementService';
+
 function UpdateUserModal({userType, user, show, hideModal}){
     const [validationMap, setValidationMap] = useState(new Map());
-    const [disableBtns, setDisableBtns] = useState(false);
     const [updating, setUpdating] = useState(false);
+    const [errMsg, setErrMsg] = useState(undefined);
+    const [successMsg, setSuccessMsg] = useState(false);
+
+    const closeModal = function(){
+        setValidationMap(new Map());
+        setErrMsg(undefined);
+        setSuccessMsg(false);
+        hideModal();
+    }
+
+    const handleUpdate = (e) =>{
+        e.preventDefault();
+
+        setErrMsg(undefined);
+        setSuccessMsg(false);
+
+        var firstName = e.target.firstName.value;
+        var lastName = e.target.lastName.value;
+        var ssn = e.target.ssn.value;
+        var role = e.target.role.value;
+        var username = e.target.username.value;
+        var email = e.target.email.value;
+        var phoneNumber = e.target.phoneNumber.value;
+        var addressLine1 = e.target.addressLine1.value;
+        var addressLine2 = e.target.addressLine2.value;
+        var city = e.target.city.value;
+        var state = e.target.state.value;
+        var zipCode = e.target.zipCode.value;
+       
+        var inputValidations = new Map();
+
+        if (userType === "Employee"){
+            inputValidations = ensureUpdateInformationProvided(
+                firstName,
+                lastName,
+                ssn,
+                role,
+                username,
+                email,
+                phoneNumber,
+                addressLine1,
+                city,
+                state,
+                zipCode
+            );
+        }else{
+            //client
+        }
+
+        if (inputValidations.size > 0){
+            setValidationMap(inputValidations);
+        }else{
+            setValidationMap(new Map());
+            setUpdating(true);
+
+            (async function(){
+                try{
+                    if (userType === "Employee"){
+                        await updateEmployeeInformation(
+                            user.id,
+                            firstName,
+                            lastName,
+                            ssn,
+                            role,
+                            username,
+                            email, 
+                            phoneNumber,
+                            addressLine1,
+                            addressLine2,
+                            city,
+                            state,
+                            zipCode
+                        );
+                    }else{
+
+                    }
+
+                    setSuccessMsg(true);
+                }catch(e){
+                    setErrMsg(e.message);
+                }finally{
+                    setUpdating(false);
+                }
+            })();
+        }
+    }
 
     return(
         <>
              <Modal
                 show={show}
-                onHide={hideModal}
+                onHide={closeModal}
                 dialogClassName="update-modal70"
                 centered
             >
@@ -22,7 +110,9 @@ function UpdateUserModal({userType, user, show, hideModal}){
                 </Modal.Header>
 
                 <Modal.Body>
-                    <Form>
+                    <Form onSubmit={handleUpdate}>
+                        {errMsg !== undefined && <Alert variant="danger">{errMsg}</Alert>}
+                        {successMsg && <Alert variant="success">{userType} successfully updated.</Alert>}
                         <h4>General User Information</h4>
                         <br/>
                         <Row>                                                       
@@ -154,15 +244,15 @@ function UpdateUserModal({userType, user, show, hideModal}){
                         </Row>
                         <hr></hr>                       
                         {
-                           (updating || disableBtns) &&
-                           <Button type="button" variant='danger' onClick={() => hideModal()} className="float-end ms-2" disabled>Cancel</Button>
+                           (updating) &&
+                           <Button type="button" variant='danger' className="float-end ms-2" disabled>Cancel</Button>
                         }
                         {
-                            (!updating && ! disableBtns) &&
-                            <Button type="button" variant='danger' onClick={() => hideModal()} className="float-end ms-2">Cancel</Button>
+                            (!updating) &&
+                            <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
                         }                        
                         {
-                            (updating || disableBtns) && (
+                            (updating) && (
                             <Button variant="primary" className="float-end" disabled>
                             <Spinner
                                 as="span"
@@ -175,7 +265,7 @@ function UpdateUserModal({userType, user, show, hideModal}){
                             </Button>
                         )}
                         {
-                            (!updating && !disableBtns) &&
+                            (!updating) &&
                             <Button type="submit" className="float-end">Update</Button>
                         }
                     </Form>

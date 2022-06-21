@@ -246,7 +246,7 @@ function AddUserModal({userType, show, handleHide, handleUserAddSuccess}){
                        
                         {
                             (loading || disableBtns) &&
-                            <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2" disabled>Cancel</Button>
+                            <Button type="button" variant='danger' className="float-end ms-2" disabled>Cancel</Button>
                         }
                         {
                             (!loading && ! disableBtns) &&

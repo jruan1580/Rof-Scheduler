@@ -26,7 +26,7 @@ namespace EmployeeManagementService.Domain.Mappers.Database
 
             coreEmp.SetAddress(dbEmployee.AddressLine1, dbEmployee.AddressLine2, dbEmployee.City, dbEmployee.State, dbEmployee.ZipCode);
 
-            coreEmp.SetSSN(dbEmployee.Ssn);
+            coreEmp.Ssn = dbEmployee.Ssn;
 
             coreEmp.SetFullName();
 
@@ -58,7 +58,7 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             entity.State = coreEmployee.Address?.State;
             entity.ZipCode = coreEmployee.Address?.ZipCode;
 
-            entity.Ssn = coreEmployee.GetNotSanitizedSSN();
+            entity.Ssn = coreEmployee.Ssn;
 
             return entity;
         }

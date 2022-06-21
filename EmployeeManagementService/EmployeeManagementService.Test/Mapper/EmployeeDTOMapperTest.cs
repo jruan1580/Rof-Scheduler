@@ -96,8 +96,7 @@ namespace EmployeeManagementService.Test.Mapper
             Assert.AreEqual(1, coreEmp.Id);
             Assert.AreEqual("John", coreEmp.FirstName);
             Assert.AreEqual("Doe", coreEmp.LastName);
-            Assert.AreEqual("123-45-6789", coreEmp.GetNotSanitizedSSN());
-            Assert.AreEqual("***-**-6789", coreEmp.Ssn);
+            Assert.AreEqual("123-45-6789", coreEmp.Ssn);
             Assert.AreEqual("jdoe", coreEmp.Username);
             Assert.AreEqual("test@email.com", coreEmp.Email);
             Assert.AreEqual("9998887776", coreEmp.PhoneNumber);
