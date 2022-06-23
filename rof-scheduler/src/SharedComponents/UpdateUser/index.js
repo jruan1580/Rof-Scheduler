@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ensureUpdateInformationProvided } from "../../SharedServices/inputValidationService";
 import { updateEmployeeInformation } from '../../SharedServices/employeeManagementService';
 
-function UpdateUserModal({userType, user, show, hideModal}){
+function UpdateUserModal({userType, user, show, hideModal, postUpdateAction}){
     const [validationMap, setValidationMap] = useState(new Map());
     const [updating, setUpdating] = useState(false);
     const [errMsg, setErrMsg] = useState(undefined);
@@ -65,6 +65,9 @@ function UpdateUserModal({userType, user, show, hideModal}){
 
             (async function(){
                 try{
+                    var updatedFields = new Map();
+                    updatedFields.set('id', user.id);
+                    
                     if (userType === "Employee"){
                         await updateEmployeeInformation(
                             user.id,
@@ -81,10 +84,20 @@ function UpdateUserModal({userType, user, show, hideModal}){
                             state,
                             zipCode
                         );
+
+                        updatedFields.set('firstName', firstName);
+                        updatedFields.set('lastName', lastName);
+                        updatedFields.set('ssn', ssn);
+                        updatedFields.set('role', role);
+                        updatedFields.set('username', username);
+                        updatedFields.set('email', email);
+                        updatedFields.set('phoneNumber', phoneNumber);
+                        updatedFields.set('address', { addressLine1, addressLine2, city, state, zipCode});
                     }else{
 
                     }
 
+                    postUpdateAction(updatedFields);
                     setSuccessMsg(true);
                 }catch(e){
                     setErrMsg(e.message);
