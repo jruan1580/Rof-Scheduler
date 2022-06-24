@@ -1,6 +1,7 @@
 ﻿using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.Controllers;
 using EmployeeManagementService.Domain.Exceptions;
+using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -71,7 +72,10 @@ namespace EmployeeManagementService.Test.Controller
                 Role = "",
                 Address = new API.DTO.AddressDTO { AddressLine1 = "", AddressLine2 = "", City = "", State = "", ZipCode = "" }
             };
-          
+
+            _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
+                .ThrowsAsync(new ArgumentException("bad arguments"));
+
             var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);

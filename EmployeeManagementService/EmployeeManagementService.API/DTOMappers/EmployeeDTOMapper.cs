@@ -48,8 +48,9 @@ namespace EmployeeManagementService.API.DTOMappers
             coreEmp.PhoneNumber = dtoEmp.PhoneNumber;
 
             coreEmp.SetFullName();
-            
-            coreEmp.SetSSN(dtoEmp.Ssn);
+
+            //coreEmp.SetSSN(dtoEmp.Ssn);
+            coreEmp.Ssn = dtoEmp.Ssn;
             
             coreEmp.Username = dtoEmp.Username;
             coreEmp.Role = dtoEmp.Role;

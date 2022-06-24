@@ -112,7 +112,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                var active = (Request.Path.Value.Equals("activate")) ? true : false;
+                var active = (Request.Path.Value.Contains("deactivate")) ? false : true;
 
                 await _employeeService.UpdateEmployeeActiveStatus(id, active);
 

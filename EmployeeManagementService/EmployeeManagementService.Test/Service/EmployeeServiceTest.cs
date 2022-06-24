@@ -80,8 +80,7 @@ namespace EmployeeManagementService.Test.Service
             Assert.IsNotEmpty(result.Employees);
             Assert.AreEqual("John", result.Employees[0].FirstName);
             Assert.AreEqual("Doe", result.Employees[0].LastName);
-            Assert.AreEqual("123-45-6789", result.Employees[0].GetNotSanitizedSSN());
-            Assert.AreEqual("***-**-6789", result.Employees[0].Ssn);
+            Assert.AreEqual("123-45-6789", result.Employees[0].Ssn);
             Assert.AreEqual("Employee", result.Employees[0].Role);
             Assert.AreEqual("jdoe", result.Employees[0].Username);
             Assert.IsTrue(result.Employees[0].Active);
@@ -128,8 +127,7 @@ namespace EmployeeManagementService.Test.Service
             Assert.IsNotNull(employee);
             Assert.AreEqual("John", employee.FirstName);
             Assert.AreEqual("Doe", employee.LastName);
-            Assert.AreEqual("123-45-6789", employee.GetNotSanitizedSSN());
-            Assert.AreEqual("***-**-6789", employee.Ssn);
+            Assert.AreEqual("123-45-6789", employee.Ssn);            
             Assert.AreEqual("Employee", employee.Role);
             Assert.AreEqual("jdoe", employee.Username);
             Assert.IsTrue(employee.Active);
@@ -180,8 +178,7 @@ namespace EmployeeManagementService.Test.Service
             Assert.IsNotNull(employee);
             Assert.AreEqual("John", employee.FirstName);
             Assert.AreEqual("Doe", employee.LastName);
-            Assert.AreEqual("123-45-6789", employee.GetNotSanitizedSSN());
-            Assert.AreEqual("***-**-6789", employee.Ssn);
+            Assert.AreEqual("123-45-6789", employee.Ssn);            
             Assert.AreEqual("Employee", employee.Role);
             Assert.AreEqual("jdoe", employee.Username);
             Assert.AreEqual(encryptedPass, employee.Password);
