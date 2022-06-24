@@ -4,7 +4,7 @@ namespace EmployeeManagementService.Domain.Models
 {
     public class Employee
     {
-        private string _notSantizedSSN;
+        //private string _notSantizedSSN;
 
         public long Id { get; set; }
 
@@ -40,26 +40,26 @@ namespace EmployeeManagementService.Domain.Models
 
         public Address Address { get; set; }
 
-        public string GetNotSanitizedSSN()
-        {
-            return _notSantizedSSN;
-        }
+        //public string GetNotSanitizedSSN()
+        //{
+        //    return _notSantizedSSN;
+        //}
 
-        /// <summary>
-        /// Want to set ssn to ***-**-NNNN
-        /// </summary>
-        /// <param name="ssn"></param>
-        public void SetSSN(string ssn)
-        {
-            _notSantizedSSN = ssn;
+        ///// <summary>
+        ///// Want to set ssn to ***-**-NNNN
+        ///// </summary>
+        ///// <param name="ssn"></param>
+        //public void SetSSN(string ssn)
+        //{
+        //    _notSantizedSSN = ssn;
 
-            if (ssn != null)
-            {
-                var lastFourDigit = ssn.Substring(7);
+        //    if (ssn != null)
+        //    {
+        //        var lastFourDigit = ssn.Substring(7);
 
-                Ssn = $"***-**-{lastFourDigit}";
-            }           
-        }
+        //        Ssn = $"***-**-{lastFourDigit}";
+        //    }           
+        //}
 
         public void SetFullName()
         {

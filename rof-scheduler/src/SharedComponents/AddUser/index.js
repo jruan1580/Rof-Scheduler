@@ -344,66 +344,49 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md="3">
-                <Form.Label>Retype Temp Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Retype Temp Password"
-                  name="retypedPassword"
-                  isInvalid={validationMap.has("retypedPassword")}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {validationMap.get("retypedPassword")}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Row>
-            <br />
-
-            <hr></hr>
-
-            {(loading || disableBtns) && (
-              <Button
-                type="button"
-                variant="danger"
-                onClick={() => closeModal()}
-                className="float-end ms-2"
-                disabled
-              >
-                Cancel
-              </Button>
-            )}
-            {!loading && !disableBtns && (
-              <Button
-                type="button"
-                variant="danger"
-                onClick={() => closeModal()}
-                className="float-end ms-2"
-              >
-                Cancel
-              </Button>
-            )}
-            {(loading || disableBtns) && (
-              <Button variant="primary" className="float-end" disabled>
-                <Spinner
-                  as="span"
-                  animation="grow"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-                Loading...
-              </Button>
-            )}
-            {!loading && !disableBtns && (
-              <Button type="submit" className="float-end">
-                Create
-              </Button>
-            )}
-          </Form>
-        </Modal.Body>
-      </Modal>
-    </>
-  );
+                            <Form.Group as={Col} md="3">
+                                <Form.Label>Retype Temp Password</Form.Label>
+                                <Form.Control type="password" placeholder="Retype Temp Password" name="retypedPassword" isInvalid={validationMap.has("retypedPassword")}/>
+                                <Form.Control.Feedback type="invalid">
+                                    {validationMap.get("retypedPassword")}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Row><br/>
+                        
+                        <hr></hr>
+                       
+                        {
+                            (loading || disableBtns) &&
+                            <Button type="button" variant='danger' className="float-end ms-2" disabled>Cancel</Button>
+                        }
+                        {
+                            (!loading && ! disableBtns) &&
+                            <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
+                        }                        
+                        {
+                            (loading || disableBtns) && (
+                            <Button variant="primary" className="float-end" disabled>
+                            <Spinner
+                                as="span"
+                                animation="grow"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                            Loading...
+                            </Button>
+                        )}
+                        {
+                            (!loading && !disableBtns) &&
+                            <Button type="submit" className="float-end">Create</Button>
+                        }
+                       
+                    </Form>
+                </Modal.Body>
+              
+            </Modal>
+        </>
+    );
 }
 
 export default AddUserModal;

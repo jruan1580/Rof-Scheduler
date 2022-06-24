@@ -1,6 +1,7 @@
 ﻿using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.Controllers;
 using EmployeeManagementService.Domain.Exceptions;
+using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -127,12 +128,15 @@ namespace EmployeeManagementService.Test.Controller
                 Active = null
             };
 
+            _employeeService.Setup(e => e.CreateEmployee(It.IsAny<Employee>(), It.IsAny<string>()))
+                .ThrowsAsync(new ArgumentException("bad arguments"));
+
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.CreateEmployee(newEmployee);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
+            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
 
             var obj = (BadRequestObjectResult)response;
 
@@ -150,7 +154,7 @@ namespace EmployeeManagementService.Test.Controller
             var response = await controller.ResetLockedStatus(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.AreEqual(typeof(OkResult), response.GetType());
 
             var ok = (OkResult)response;
 
@@ -216,7 +220,10 @@ namespace EmployeeManagementService.Test.Controller
                 Username = "",
                 Role = "",
                 Address = new API.DTO.AddressDTO { AddressLine1 = "", AddressLine2 = "", City = "", State = "", ZipCode = "" }
-            };          
+            };
+
+            _employeeService.Setup(_e => _e.UpdateEmployeeInformation(It.IsAny<Employee>()))
+                .ThrowsAsync(new ArgumentException("bad arguments"));
 
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
