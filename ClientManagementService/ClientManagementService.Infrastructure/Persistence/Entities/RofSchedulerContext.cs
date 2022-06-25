@@ -18,6 +18,7 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
         }
 
         public virtual DbSet<Client> Clients { get; set; }
+        public virtual DbSet<Country> Countries { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -89,6 +90,22 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                 entity.Property(e => e.ZipCode)
                     .IsRequired()
                     .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Country)
+                    .WithMany(p => p.Clients)
+                    .HasForeignKey(d => d.CountryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Client__CountryI__22401542");
+            });
+
+            modelBuilder.Entity<Country>(entity =>
+            {
+                entity.ToTable("Country");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 

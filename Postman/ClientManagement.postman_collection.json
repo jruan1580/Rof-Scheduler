@@ -28,7 +28,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Client\",\r\n    \"EmailAddress\": \"test@gmail.com\",\r\n    \"Username\": \"testClient\",\r\n    \"Password\": \"TestPassword123!\",\r\n    \"PrimaryPhoneNum\":\"123-456-7890\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Client2\",\r\n    \"EmailAddress\": \"test2@gmail.com\",\r\n    \"Username\": \"testClient2\",\r\n    \"Password\": \"TestPassword123!\",\r\n    \"PrimaryPhoneNum\":\"123-456-7890\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -69,7 +69,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Client\",\r\n    \"EmailAddress\": \"test@gmail.com\",\r\n    \"Username\": \"testClient\",\r\n    \"Password\": \"TestPassword123!\",\r\n    \"PrimaryPhoneNum\":\"123-456-7890\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Client\",\r\n    \"EmailAddress\": \"test@gmail.com\",\r\n    \"Username\": \"testClient\",\r\n    \"Password\": \"TestPassword123!\",\r\n    \"PrimaryPhoneNum\":\"123-456-7890\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -950,7 +950,7 @@
 						}
 					],
 					"request": {
-						"method": "GET",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Authorization",
@@ -990,7 +990,7 @@
 						}
 					],
 					"request": {
-						"method": "GET",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Authorization",
