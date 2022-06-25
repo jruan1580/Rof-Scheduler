@@ -21,10 +21,12 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             coreEmp.TempPasswordChanged = dbEmployee.TempPasswordChanged;
             coreEmp.Status = dbEmployee.Status;
             coreEmp.Active = dbEmployee.Active;
+            coreEmp.Email = dbEmployee.EmailAddress;
+            coreEmp.PhoneNumber = dbEmployee.PhoneNumber;
 
             coreEmp.SetAddress(dbEmployee.AddressLine1, dbEmployee.AddressLine2, dbEmployee.City, dbEmployee.State, dbEmployee.ZipCode);
 
-            coreEmp.SetSSN(dbEmployee.Ssn);
+            coreEmp.Ssn = dbEmployee.Ssn;
 
             coreEmp.SetFullName();
 
@@ -40,6 +42,8 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             entity.FirstName = coreEmployee.FirstName;
             entity.LastName = coreEmployee.LastName;
             entity.Username = coreEmployee.Username;
+            entity.EmailAddress = coreEmployee.Email;
+            entity.PhoneNumber = coreEmployee.PhoneNumber;
             entity.Password = coreEmployee.Password;
             entity.Role = coreEmployee.Role;
             entity.IsLocked = coreEmployee.IsLocked;
@@ -54,7 +58,7 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             entity.State = coreEmployee.Address?.State;
             entity.ZipCode = coreEmployee.Address?.ZipCode;
 
-            entity.Ssn = coreEmployee.GetNotSanitizedSSN();
+            entity.Ssn = coreEmployee.Ssn;
 
             return entity;
         }

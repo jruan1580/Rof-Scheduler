@@ -24,20 +24,20 @@ namespace EmployeeManagementService.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllEmployees([FromQuery] int page, [FromQuery] int offset)
+        public async Task<IActionResult> GetAllEmployees([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
             try
             {
                 var employeeList = new List<EmployeeDTO>();
 
-                var employees = await _employeeService.GetAllEmployees(page, offset);
+                var result = await _employeeService.GetAllEmployeesByKeyword(page, offset, keyword);
 
-                foreach (var employee in employees)
+                foreach (var employee in result.Employees)
                 {
                     employeeList.Add(EmployeeDTOMapper.ToDTOEmployee(employee));
                 }
 
-                return Ok(employeeList);
+                return Ok(new { employees = employeeList, totalPages = result.TotalPages});
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ namespace EmployeeManagementService.API.Controllers
             }
             catch (EmployeeNotFoundException)
             {
-                return NotFound();
+                return NotFound($"Employee not found");
             }
             catch(ArgumentException argEx)
             {
@@ -98,7 +98,29 @@ namespace EmployeeManagementService.API.Controllers
             }
             catch (EmployeeNotFoundException)
             {
-                return NotFound();
+                return NotFound($"Employee with id: {id} not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPatch("{id}/activate")]
+        [HttpPatch("{id}/deactivate")]
+        public async Task<IActionResult> UpdateEmployeeStatus(long id)
+        {
+            try
+            {
+                var active = (Request.Path.Value.Contains("deactivate")) ? false : true;
+
+                await _employeeService.UpdateEmployeeActiveStatus(id, active);
+
+                return Ok();
+            }
+            catch (EmployeeNotFoundException)
+            {
+                return NotFound($"Employee with id: {id} not found");
             }
             catch (Exception ex)
             {
@@ -117,7 +139,7 @@ namespace EmployeeManagementService.API.Controllers
             }
             catch (EmployeeNotFoundException)
             {
-                return NotFound();
+                return NotFound($"Employee with id: {id} not found");
             }
             catch (Exception ex)
             {

@@ -22,6 +22,8 @@ namespace EmployeeManagementService.API.DTOMappers
             dtoEmp.Status = coreEmp.Status;
             dtoEmp.Active = coreEmp.Active;
             dtoEmp.FullName = coreEmp.FullName;
+            dtoEmp.EmailAddress = coreEmp.Email;
+            dtoEmp.PhoneNumber = coreEmp.PhoneNumber;
 
             dtoEmp.Address = new AddressDTO();
             dtoEmp.Address.AddressLine1 = coreEmp.Address?.AddressLine1;
@@ -42,10 +44,13 @@ namespace EmployeeManagementService.API.DTOMappers
             coreEmp.CountryId = dtoEmp.CountryId;
             coreEmp.FirstName = dtoEmp.FirstName;
             coreEmp.LastName = dtoEmp.LastName;
+            coreEmp.Email = dtoEmp.EmailAddress;
+            coreEmp.PhoneNumber = dtoEmp.PhoneNumber;
 
             coreEmp.SetFullName();
-            
-            coreEmp.SetSSN(dtoEmp.Ssn);
+
+            //coreEmp.SetSSN(dtoEmp.Ssn);
+            coreEmp.Ssn = dtoEmp.Ssn;
             
             coreEmp.Username = dtoEmp.Username;
             coreEmp.Role = dtoEmp.Role;

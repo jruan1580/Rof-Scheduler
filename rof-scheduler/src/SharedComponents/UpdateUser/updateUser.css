@@ -1,0 +1,8 @@
+.update-modal70{
+    width: 70%;    /* Occupy the 80% of the screen width */
+    max-width: 70%!important;
+}
+
+.update-modal-header-color{
+    background-color: rgba(0,0,0,.03);
+}

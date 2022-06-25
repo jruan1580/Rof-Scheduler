@@ -515,7 +515,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"Password\": \"TestPassword123!\",\r\n    \"Role\":\"Employee\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"EmailAddress\": \"employee@test.com\",\r\n    \"PhoneNumber\": \"9998887776\",\r\n    \"Password\": \"TestPassword123!\",\r\n    \"Role\":\"Employee\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -562,7 +562,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"Password\": \"TestPassword123!\",\r\n    \"Role\":\"Employee\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"EmailAddress\": \"employee@test.com\",\r\n    \"PhoneNumber\": \"9998887776\",\r\n    \"Password\": \"TestPassword123!\",\r\n    \"Role\":\"Employee\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1101,7 +1101,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Id\": 0,\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"Update\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"Role\":\"Employee\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
+									"raw": "{\r\n    \"Id\": 0,\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"Update\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"EmailAddress\": \"employee@test.com\",\r\n    \"PhoneNumber\": \"9998887776\",\r\n    \"Role\":\"Employee\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1149,7 +1149,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Id\": {{employeeUserId}},\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"Role\":\"Employee\",    \r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
+									"raw": "{\r\n    \"Id\": {{employeeUserId}},\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"Test\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"EmailAddress\": \"employee@test.com\",\r\n    \"PhoneNumber\": \"9998887776\",\r\n    \"Role\":\"Employee\",\r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1320,7 +1320,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Id\": 0,\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"UpdateUser\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"Role\": \"Employee\",\r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
+									"raw": "{\r\n    \"Id\": 0,\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"UpdateUser\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"EmailAddress\": \"employee@test.com\",\r\n    \"PhoneNumber\": \"9998887776\",\r\n    \"Role\": \"Employee\",\r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1368,7 +1368,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"Id\": {{employeeUserId}},\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"UpdateUser\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"Role\": \"Employee\",\r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
+									"raw": "{\r\n    \"Id\": {{employeeUserId}},\r\n    \"CountryId\": 1,\r\n    \"FirstName\": \"UpdateUser\",\r\n    \"LastName\": \"Employee\",\r\n    \"Ssn\": \"111-11-1112\",\r\n    \"Username\": \"testEmp\",\r\n    \"EmailAddress\": \"employee@test.com\",\r\n    \"PhoneNumber\": \"9998887776\",\r\n    \"Role\": \"Employee\",\r\n    \"Address\":{\r\n        \"AddressLine1\": \"123 Main St.\",\r\n        \"City\": \"San Diego\",\r\n        \"State\": \"CA\",\r\n        \"ZipCode\": \"92123\"\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2378,91 +2378,6 @@
 			]
 		},
 		{
-			"name": "Admin Logout",
-			"item": [
-				{
-					"name": "Admin Logout Success",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", () => {\r",
-									"  pm.response.to.have.status(200);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}",
-								"type": "default"
-							}
-						],
-						"url": {
-							"raw": "{{host}}:{{authServicePort}}/api/authentication/{{adminUserId}}/logout",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{authServicePort}}",
-							"path": [
-								"api",
-								"authentication",
-								"{{adminUserId}}",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Admin Logout - Already Logged Out",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", () => {\r",
-									"  pm.response.to.have.status(200);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{host}}:{{authServicePort}}/api/authentication/{{adminUserId}}/logout",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{authServicePort}}",
-							"path": [
-								"api",
-								"authentication",
-								"{{adminUserId}}",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
 			"name": "Clean Up",
 			"item": [
 				{
@@ -2547,6 +2462,91 @@
 								"api",
 								"admin",
 								"password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin Logout",
+			"item": [
+				{
+					"name": "Admin Logout Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/{{adminUserId}}/logout",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{authServicePort}}",
+							"path": [
+								"api",
+								"authentication",
+								"{{adminUserId}}",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Logout - Already Logged Out",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/{{adminUserId}}/logout",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{authServicePort}}",
+							"path": [
+								"api",
+								"authentication",
+								"{{adminUserId}}",
+								"logout"
 							]
 						}
 					},

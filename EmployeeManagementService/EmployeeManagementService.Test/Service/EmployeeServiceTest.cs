@@ -35,54 +35,55 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public async Task GetAllEmployees_NoEmployees()
         {
-            _employeeRepository.Setup(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(new List<Employee>());
+            _employeeRepository.Setup(e => e.GetAllEmployeesByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync((new List<Employee>(), 0));
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            var employees = await employeeService.GetAllEmployees(1, 10);
+            var result = await employeeService.GetAllEmployeesByKeyword(1, 10, "");
 
-            Assert.IsEmpty(employees);
+            Assert.IsEmpty(result.Employees);
+            Assert.AreEqual(0, result.TotalPages);
         }
 
         [Test]
         public async Task GetAllEmployees_Success()
         {
             var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
-
-            _employeeRepository.Setup(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(new List<Employee>()
+            var employees = new List<Employee>()
+            {
+                new Employee()
                 {
-                    new Employee()
-                    {
-                        Id = 1,
-                        CountryId = 1,
-                        FirstName = "John",
-                        LastName = "Doe",
-                        Ssn = "123-45-6789",
-                        Username = "jdoe",
-                        Password = encryptedPass,
-                        Role = "Employee",
-                        IsLocked = false,
-                        FailedLoginAttempts = 0,
-                        TempPasswordChanged = false,
-                        Status = false,
-                        Active = true
-                    }
-                });
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Ssn = "123-45-6789",
+                    Username = "jdoe",
+                    Password = encryptedPass,
+                    Role = "Employee",
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false,
+                    Status = false,
+                    Active = true
+                }
+            };
+
+            _employeeRepository.Setup(e => e.GetAllEmployeesByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync((employees, 1));
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            var employees = await employeeService.GetAllEmployees(1, 10);
+            var result = await employeeService.GetAllEmployeesByKeyword(1, 10, "");
 
-            Assert.IsNotEmpty(employees);
-            Assert.AreEqual("John", employees[0].FirstName);
-            Assert.AreEqual("Doe", employees[0].LastName);
-            Assert.AreEqual("123-45-6789", employees[0].GetNotSanitizedSSN());
-            Assert.AreEqual("***-**-6789", employees[0].Ssn);
-            Assert.AreEqual("Employee", employees[0].Role);
-            Assert.AreEqual("jdoe", employees[0].Username);
-            Assert.IsTrue(employees[0].Active);
+            Assert.IsNotEmpty(result.Employees);
+            Assert.AreEqual("John", result.Employees[0].FirstName);
+            Assert.AreEqual("Doe", result.Employees[0].LastName);
+            Assert.AreEqual("123-45-6789", result.Employees[0].Ssn);
+            Assert.AreEqual("Employee", result.Employees[0].Role);
+            Assert.AreEqual("jdoe", result.Employees[0].Username);
+            Assert.IsTrue(result.Employees[0].Active);
         }
 
         [Test]
@@ -126,8 +127,7 @@ namespace EmployeeManagementService.Test.Service
             Assert.IsNotNull(employee);
             Assert.AreEqual("John", employee.FirstName);
             Assert.AreEqual("Doe", employee.LastName);
-            Assert.AreEqual("123-45-6789", employee.GetNotSanitizedSSN());
-            Assert.AreEqual("***-**-6789", employee.Ssn);
+            Assert.AreEqual("123-45-6789", employee.Ssn);            
             Assert.AreEqual("Employee", employee.Role);
             Assert.AreEqual("jdoe", employee.Username);
             Assert.IsTrue(employee.Active);
@@ -178,8 +178,7 @@ namespace EmployeeManagementService.Test.Service
             Assert.IsNotNull(employee);
             Assert.AreEqual("John", employee.FirstName);
             Assert.AreEqual("Doe", employee.LastName);
-            Assert.AreEqual("123-45-6789", employee.GetNotSanitizedSSN());
-            Assert.AreEqual("***-**-6789", employee.Ssn);
+            Assert.AreEqual("123-45-6789", employee.Ssn);            
             Assert.AreEqual("Employee", employee.Role);
             Assert.AreEqual("jdoe", employee.Username);
             Assert.AreEqual(encryptedPass, employee.Password);
@@ -331,6 +330,8 @@ namespace EmployeeManagementService.Test.Service
                 LastName = "Doe",
                 Ssn = "123-45-6789",
                 Username = "jdoe",
+                Email = "test@email.com",
+                PhoneNumber = "9998887776",
                 Role = "Employee",
                 Address = new Domain.Models.Address {AddressLine1 = "123 Abc St", AddressLine2 = "", City = "Oakland", State = "CA", ZipCode = "12345"}
             };
@@ -384,7 +385,7 @@ namespace EmployeeManagementService.Test.Service
             _employeeRepository.Setup(e => e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
                 .ReturnsAsync(new Employee() { Username = "jdoe" });
 
-            _employeeRepository.Setup(e => e.DoesEmployeeExistsBySsnOrUsername(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<long>()))
+            _employeeRepository.Setup(e => e.DoesEmployeeExistsBySsnOrUsernameOrEmail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<long>()))
                 .ReturnsAsync(true);
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
@@ -422,8 +423,9 @@ namespace EmployeeManagementService.Test.Service
                 FirstName = "John",
                 LastName = "Doe",
                 Username = "jdoe",
+                Email = "test@email.com",
+                PhoneNumber = "9998887776",
                 Ssn = "123-45-6789",
-                Password = new byte[32],
                 Role = "Employee",
                 Active = true
             };

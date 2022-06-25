@@ -11,32 +11,44 @@ namespace EmployeeManagementService.Infrastructure.Persistence
     public interface IEmployeeRepository
     {
         Task CreateEmployee(Employee newEmployee);
-        Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10);
+        Task<(List<Employee>, int)> GetAllEmployeesByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Employee> GetEmployeeByFilter<T>(GetEmployeeFilterModel<T> filter);
         Task<short> IncrementEmployeeFailedLoginAttempt(long id);
         Task UpdateEmployee(Employee employeeToUpdate);
         Task DeleteEmployeeById(long id);
-        Task<bool> DoesEmployeeExistsBySsnOrUsername(string ssn, string username, long id);
+        Task<bool> DoesEmployeeExistsBySsnOrUsernameOrEmail(string ssn, string username, string email, long id);
     }
 
     public class EmployeeRepository : IEmployeeRepository
     {
-        public async Task<List<Employee>> GetAllEmployees(int page = 1, int offset = 10)
+        public async Task<(List<Employee>, int)> GetAllEmployeesByKeyword(int page = 1, int offset = 10, string keyword = "")
         {
             using (var context = new RofSchedulerContext())
-            {
-                var count = await context.Employees.CountAsync();
+            {              
+                var skip = (page - 1) * offset;
+                IQueryable<Employee> employees = context.Employees;
 
-                var totalPages = Math.Ceiling(count / (double)offset);
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    keyword = keyword.ToLower();
+
+                    employees = context.Employees
+                        .Where(e => (e.FirstName.ToLower().Contains(keyword))
+                            || (e.LastName.ToLower().Contains(keyword))
+                            || (e.EmailAddress.ToLower().Contains(keyword)));
+                }
+                     
+                var countByCriteria = await employees.CountAsync();
+                var fullPages = countByCriteria / offset; //full pages with example 23 count and offset is 10. we will get 2 full pages (10 each page)
+                var remaining = countByCriteria % offset; //remaining will be 3 which will be an extra page
+                var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; //therefore total pages is sum of full pages plus one more page is any remains.
 
                 if (page > totalPages)
                 {
                     throw new ArgumentException("No more employees.");
                 }
 
-                var skip = (page - 1) * offset;
-
-                return await context.Employees
+                var resut = await employees
                     .Select(e => new Employee()
                     {
                         Id = e.Id,
@@ -46,7 +58,10 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                         Ssn = e.Ssn,
                         Role = e.Role,
                         Username = e.Username,
+                        EmailAddress = e.EmailAddress,
+                        PhoneNumber = e.PhoneNumber,
                         Active = e.Active,
+                        IsLocked = e.IsLocked,
                         AddressLine1 = e.AddressLine1,
                         AddressLine2 = e.AddressLine2,
                         City = e.City,
@@ -54,9 +69,12 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                         ZipCode = e.ZipCode,
                         CountryId = e.CountryId
                     })
+                    .OrderByDescending(e => e.Id)
                     .Skip(skip)
                     .Take(offset)
                     .ToListAsync();
+
+                return (resut, totalPages);
             }
         }
 
@@ -82,7 +100,15 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         public async Task CreateEmployee(Employee newEmployee)
         {
             using (var context = new RofSchedulerContext())
-            {                
+            {
+                //default employee's country to USA for now
+                var usa = context.Countries.FirstOrDefault(c => c.Name.Equals("United States of America"));
+                if (usa == null)
+                {
+                    throw new Exception("Unable to find country United States of America");
+                }
+
+                newEmployee.CountryId = usa.Id;
                 context.Employees.Add(newEmployee);
 
                 await context.SaveChangesAsync();
@@ -135,12 +161,12 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<bool> DoesEmployeeExistsBySsnOrUsername(string ssn, string username, long id)
+        public async Task<bool> DoesEmployeeExistsBySsnOrUsernameOrEmail(string ssn, string username, string email, long id)
         {
             using (var context = new RofSchedulerContext())
             {
                 return await context.Employees.AnyAsync(e => e.Id != id && (e.Ssn.Equals(ssn) 
-                    || e.Username.ToLower().Equals(username.ToLower())));             
+                    || e.Username.ToLower().Equals(username.ToLower()) || e.EmailAddress.ToLower().Equals(email.ToLower())));             
             }
         }
     }

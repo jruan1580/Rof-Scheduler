@@ -1,6 +1,7 @@
 ﻿using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.Controllers;
 using EmployeeManagementService.Domain.Exceptions;
+using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,29 +33,31 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task GetAllEmployees_Success()
         {
-            _employeeService.Setup(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(new List<Domain.Models.Employee>()
+            var employees = new List<Domain.Models.Employee>()
+            {
+                new Domain.Models.Employee()
                 {
-                    new Domain.Models.Employee()
-                    {
-                        Id = 1,
-                        FirstName = "John",
-                        LastName = "Doe",
-                        Ssn = "123-45-6789",
-                        Username = "jdoe",
-                        Password = new byte[32],
-                        Role = "Employee",
-                        IsLocked = false,
-                        FailedLoginAttempts = 0,
-                        TempPasswordChanged = false,
-                        Status = false,
-                        Active = true
-                    }
-                });
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Ssn = "123-45-6789",
+                    Username = "jdoe",
+                    Password = new byte[32],
+                    Role = "Employee",
+                    IsLocked = false,
+                    FailedLoginAttempts = 0,
+                    TempPasswordChanged = false,
+                    Status = false,
+                    Active = true
+                }
+            };
+
+            _employeeService.Setup(e => e.GetAllEmployeesByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(new Domain.Models.EmployeesWithTotalPage(employees, 1));
 
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
-            var response = await controller.GetAllEmployees(1, 10);
+            var response = await controller.GetAllEmployees(1, 10, "");
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
@@ -67,12 +70,12 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task GetAllEmployees_InternalServerError()
         {
-            _employeeService.Setup(e => e.GetAllEmployees(It.IsAny<int>(), It.IsAny<int>()))
+            _employeeService.Setup(e => e.GetAllEmployeesByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
-            var response = await controller.GetAllEmployees(1, 10);
+            var response = await controller.GetAllEmployees(1, 10, "");
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(ObjectResult));
@@ -125,12 +128,15 @@ namespace EmployeeManagementService.Test.Controller
                 Active = null
             };
 
+            _employeeService.Setup(e => e.CreateEmployee(It.IsAny<Employee>(), It.IsAny<string>()))
+                .ThrowsAsync(new ArgumentException("bad arguments"));
+
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
             var response = await controller.CreateEmployee(newEmployee);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
+            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
 
             var obj = (BadRequestObjectResult)response;
 
@@ -148,7 +154,7 @@ namespace EmployeeManagementService.Test.Controller
             var response = await controller.ResetLockedStatus(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.AreEqual(typeof(OkResult), response.GetType());
 
             var ok = (OkResult)response;
 
@@ -214,7 +220,10 @@ namespace EmployeeManagementService.Test.Controller
                 Username = "",
                 Role = "",
                 Address = new API.DTO.AddressDTO { AddressLine1 = "", AddressLine2 = "", City = "", State = "", ZipCode = "" }
-            };          
+            };
+
+            _employeeService.Setup(_e => _e.UpdateEmployeeInformation(It.IsAny<Employee>()))
+                .ThrowsAsync(new ArgumentException("bad arguments"));
 
             var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
 
