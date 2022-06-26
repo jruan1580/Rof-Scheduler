@@ -17,7 +17,9 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
         {
         }
 
+        public virtual DbSet<Breed> Breeds { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
+        public virtual DbSet<Country> Countries { get; set; }
         public virtual DbSet<Pet> Pets { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -32,6 +34,21 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<Breed>(entity =>
+            {
+                entity.ToTable("Breed");
+
+                entity.Property(e => e.BreedName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
 
             modelBuilder.Entity<Client>(entity =>
             {
@@ -91,16 +108,27 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .IsRequired()
                     .HasMaxLength(10)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Country)
+                    .WithMany(p => p.Clients)
+                    .HasForeignKey(d => d.CountryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Client__CountryI__22401542");
+            });
+
+            modelBuilder.Entity<Country>(entity =>
+            {
+                entity.ToTable("Country");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Pet>(entity =>
             {
                 entity.ToTable("Pet");
-
-                entity.Property(e => e.Breed)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.Dhppvax).HasColumnName("DHPPVax");
 
@@ -116,22 +144,22 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.OtherInfo)
-                    .IsRequired()
                     .HasMaxLength(2000)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Type)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.Weight).HasColumnType("decimal(18, 0)");
+
+                entity.HasOne(d => d.Breed)
+                    .WithMany(p => p.Pets)
+                    .HasForeignKey(d => d.BreedId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Pet__BreedId__40C49C62");
 
                 entity.HasOne(d => d.Owner)
                     .WithMany(p => p.Pets)
                     .HasForeignKey(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Pet__OwnerId__28ED12D1");
+                    .HasConstraintName("FK__Pet__OwnerId__3FD07829");
             });
 
             OnModelCreatingPartial(modelBuilder);

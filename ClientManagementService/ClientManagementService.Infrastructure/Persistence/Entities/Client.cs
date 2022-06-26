@@ -31,6 +31,7 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
         public string State { get; set; }
         public string ZipCode { get; set; }
 
+        public virtual Country Country { get; set; }
         public virtual ICollection<Pet> Pets { get; set; }
     }
 }
