@@ -12,7 +12,7 @@ namespace ClientManagementService.Infrastructure.Persistence
     {
         Task AddPet(Pet newPet);
         Task DeletePetById(long petId);
-        Task<List<Pet>> GetAllPets();
+        Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
         Task<List<Pet>> GetPetsByClientId(long clientId);
         Task UpdatePet(Pet updatePet);
@@ -47,11 +47,33 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<List<Pet>> GetAllPets()
+        public async Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "")
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Pets.ToListAsync();
+                var skip = (page - 1) * offset;
+                IQueryable<Pet> pet = context.Pets;
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    keyword = keyword.ToLower();
+
+                    pet = context.Pets.Where(e => (e.Name.ToLower().Contains(keyword)));
+                }
+
+                var countByCriteria = await pet.CountAsync();
+                var fullPages = countByCriteria / offset;
+                var remaining = countByCriteria % offset;
+                var totalPages = (remaining > 0) ? fullPages + 1 : fullPages;
+
+                if (page > totalPages)
+                {
+                    throw new ArgumentException("No more pets.");
+                }
+
+                var result = await pet.OrderByDescending(e => e.Id).Skip(skip).Take(offset).ToListAsync();
+
+                return (result, totalPages);
             }
         }
 
