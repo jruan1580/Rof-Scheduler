@@ -58,7 +58,7 @@ namespace ClientManagementService.Infrastructure.Persistence
                 {
                     keyword = keyword.ToLower();
 
-                    pet = context.Pets.Where(e => (e.Name.ToLower().Contains(keyword)));
+                    pet = context.Pets.Where(p => (p.Name.ToLower().Contains(keyword)));
                 }
 
                 var countByCriteria = await pet.CountAsync();
@@ -71,7 +71,7 @@ namespace ClientManagementService.Infrastructure.Persistence
                     throw new ArgumentException("No more pets.");
                 }
 
-                var result = await pet.OrderByDescending(e => e.Id).Skip(skip).Take(offset).ToListAsync();
+                var result = await pet.OrderByDescending(p => p.Id).Skip(skip).Take(offset).ToListAsync();
 
                 return (result, totalPages);
             }
