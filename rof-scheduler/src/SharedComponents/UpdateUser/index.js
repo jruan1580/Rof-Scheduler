@@ -71,7 +71,7 @@ function UpdateUserModal({
         lastName,
         email,
         username,
-        phoneNumber,
+        primaryPhoneNum,
         addressLine1,
         city,
         state,
@@ -128,7 +128,7 @@ function UpdateUserModal({
               lastName,
               username,
               email,
-              phoneNumber,
+              primaryPhoneNum,
               secPhoneNum,
               addressLine1,
               addressLine2,
@@ -141,7 +141,7 @@ function UpdateUserModal({
             updatedFields.set("lastName", lastName);
             updatedFields.set("username", username);
             updatedFields.set("email", email);
-            updatedFields.set("phoneNumber", phoneNumber);
+            updatedFields.set("phoneNumber", primaryPhoneNum);
             updatedFields.set("secPhoneNum", secPhoneNum);
             updatedFields.set("address", {
               addressLine1,

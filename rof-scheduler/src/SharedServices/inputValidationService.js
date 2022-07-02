@@ -231,7 +231,7 @@ export const ensureClientUpdateInformationProvided = function (
   lastName,
   username,
   email,
-  phoneNumber,
+  primaryPhoneNum,
   addressLine1,
   city,
   state,
@@ -271,7 +271,7 @@ export const ensureClientUpdateInformationProvided = function (
     validationErrors.set("email", "Please enter an email address.");
   }
 
-  if (phoneNumber === undefined || phoneNumber === "") {
+  if (primaryPhoneNum === undefined || primaryPhoneNum === "") {
     validationErrors.set("phone", "Please enter a phone number.");
   }
 
