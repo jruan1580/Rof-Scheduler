@@ -83,7 +83,7 @@ function ClientManagement() {
       clients[i].lastName = updatedFieldsMap.get("lastName");
       clients[i].emailAddress = updatedFieldsMap.get("email");
       clients[i].username = updatedFieldsMap.get("username");
-      clients[i].phoneNumber = updatedFieldsMap.get("phoneNumber");
+      clients[i].primaryPhoneNum = updatedFieldsMap.get("phoneNumber");
       clients[i].secPhoneNum = updatedFieldsMap.get("secPhoneNum");
       clients[i].address = updatedFieldsMap.get("address");
     }

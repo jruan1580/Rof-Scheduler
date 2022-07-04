@@ -27,12 +27,8 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
     setErrMsg(undefined);
     var firstName = e.target.firstName.value;
     var lastName = e.target.lastName.value;
-    var ssn = e.target.ssn.value;
-    var role = e.target.role.value;
     var username = e.target.username.value;
     var email = e.target.email.value;
-    var phoneNumber = e.target.phoneNumber.value;
-    var secPhoneNum = e.target.secPhoneNum.value;
     var addressLine1 = e.target.addressLine1.value;
     var addressLine2 = e.target.addressLine2.value;
     var city = e.target.city.value;
@@ -40,6 +36,14 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
     var zipCode = e.target.zipCode.value;
     var password = e.target.password.value;
     var retypedPassword = e.target.retypedPassword.value;
+    if (userType === "Employee") {
+      var ssn = e.target.ssn.value;
+      var role = e.target.role.value;
+      var phoneNumber = e.target.phoneNumber.value;
+    } else if (userType === "Client") {
+      var primaryPhoneNum = e.target.phoneNumber.value;
+      var secPhoneNum = e.target.secPhoneNum.value;
+    }
     var inputValidations = new Map();
 
     //validate employee
@@ -67,7 +71,7 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
         email,
         username,
         password,
-        phoneNumber,
+        primaryPhoneNum,
         addressLine1,
         city,
         state,
@@ -107,7 +111,7 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
               email,
               username,
               password,
-              phoneNumber,
+              primaryPhoneNum,
               secPhoneNum,
               addressLine1,
               addressLine2,
@@ -224,7 +228,7 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
                   <Form.Label>Secondary Phone Number</Form.Label>
                   <Form.Control
                     placeholder="Secondary Phone Number"
-                    name="secPhoneNumr"
+                    name="secPhoneNum"
                   />
                 </Form.Group>
               )}
@@ -344,49 +348,65 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
                 </Form.Control.Feedback>
               </Form.Group>
 
-                            <Form.Group as={Col} md="3">
-                                <Form.Label>Retype Temp Password</Form.Label>
-                                <Form.Control type="password" placeholder="Retype Temp Password" name="retypedPassword" isInvalid={validationMap.has("retypedPassword")}/>
-                                <Form.Control.Feedback type="invalid">
-                                    {validationMap.get("retypedPassword")}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                        </Row><br/>
-                        
-                        <hr></hr>
-                       
-                        {
-                            (loading || disableBtns) &&
-                            <Button type="button" variant='danger' className="float-end ms-2" disabled>Cancel</Button>
-                        }
-                        {
-                            (!loading && ! disableBtns) &&
-                            <Button type="button" variant='danger' onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
-                        }                        
-                        {
-                            (loading || disableBtns) && (
-                            <Button variant="primary" className="float-end" disabled>
-                            <Spinner
-                                as="span"
-                                animation="grow"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                            />
-                            Loading...
-                            </Button>
-                        )}
-                        {
-                            (!loading && !disableBtns) &&
-                            <Button type="submit" className="float-end">Create</Button>
-                        }
-                       
-                    </Form>
-                </Modal.Body>
-              
-            </Modal>
-        </>
-    );
+              <Form.Group as={Col} md="3">
+                <Form.Label>Retype Temp Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  placeholder="Retype Temp Password"
+                  name="retypedPassword"
+                  isInvalid={validationMap.has("retypedPassword")}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {validationMap.get("retypedPassword")}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Row>
+            <br />
+
+            <hr></hr>
+
+            {(loading || disableBtns) && (
+              <Button
+                type="button"
+                variant="danger"
+                className="float-end ms-2"
+                disabled
+              >
+                Cancel
+              </Button>
+            )}
+            {!loading && !disableBtns && (
+              <Button
+                type="button"
+                variant="danger"
+                onClick={() => closeModal()}
+                className="float-end ms-2"
+              >
+                Cancel
+              </Button>
+            )}
+            {(loading || disableBtns) && (
+              <Button variant="primary" className="float-end" disabled>
+                <Spinner
+                  as="span"
+                  animation="grow"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                Loading...
+              </Button>
+            )}
+            {!loading && !disableBtns && (
+              <Button type="submit" className="float-end">
+                Create
+              </Button>
+            )}
+          </Form>
+        </Modal.Body>
+      </Modal>
+    </>
+  );
 }
 
 export default AddUserModal;

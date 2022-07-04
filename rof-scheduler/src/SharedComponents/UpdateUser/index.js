@@ -36,18 +36,21 @@ function UpdateUserModal({
 
     var firstName = e.target.firstName.value;
     var lastName = e.target.lastName.value;
-    var ssn = e.target.ssn.value;
-    var role = e.target.role.value;
     var username = e.target.username.value;
     var email = e.target.email.value;
-    var phoneNumber = e.target.phoneNumber.value;
-    var primaryPhoneNum = e.target.phoneNumber;
-    var secPhoneNum = e.target.secPhoneNum.value;
     var addressLine1 = e.target.addressLine1.value;
     var addressLine2 = e.target.addressLine2.value;
     var city = e.target.city.value;
     var state = e.target.state.value;
     var zipCode = e.target.zipCode.value;
+    if (userType === "Employee") {
+      var ssn = e.target.ssn.value;
+      var role = e.target.role.value;
+      var phoneNumber = e.target.phoneNumber.value;
+    } else if (userType === "Client") {
+      var primaryPhoneNum = e.target.phoneNumber.value;
+      var secPhoneNum = e.target.secPhoneNum.value;
+    }
 
     var inputValidations = new Map();
 
@@ -263,7 +266,7 @@ function UpdateUserModal({
                   <Form.Label>Secondary Phone Number</Form.Label>
                   <Form.Control
                     placeholder="Secondary Phone Number"
-                    name="secPhoneNumr"
+                    name="secPhoneNum"
                   />
                 </Form.Group>
               )}
