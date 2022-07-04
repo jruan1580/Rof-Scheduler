@@ -32,7 +32,7 @@ function GenericUserTable({
                   <td>{user.fullName}</td>
                   <td>{user.emailAddress}</td>
                   {userType == "Employee" && <td>{user.phoneNumber}</td>}
-                  {userType == "client" && <td>{user.primaryPhoneNum}</td>}
+                  {userType == "Client" && <td>{user.primaryPhoneNum}</td>}
                   {userType == "Employee" && <td>{user.role}</td>}
                   <td>{user.isLocked ? "Yes" : "No"}</td>
                   {userType == "Employee" && (

@@ -41,6 +41,7 @@ function UpdateUserModal({
     var username = e.target.username.value;
     var email = e.target.email.value;
     var phoneNumber = e.target.phoneNumber.value;
+    var primaryPhoneNum = e.target.phoneNumber;
     var secPhoneNum = e.target.secPhoneNum.value;
     var addressLine1 = e.target.addressLine1.value;
     var addressLine2 = e.target.addressLine2.value;
@@ -246,7 +247,11 @@ function UpdateUserModal({
                 <Form.Control
                   placeholder="Phone Number"
                   name="phoneNumber"
-                  defaultValue={user === undefined ? "" : user.phoneNumber}
+                  defaultValue={
+                    user === undefined
+                      ? ""
+                      : user.phoneNumber || user.primaryPhoneNum
+                  }
                   isInvalid={validationMap.has("phone")}
                 />
                 <Form.Control.Feedback type="invalid">
