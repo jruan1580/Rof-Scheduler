@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Test.Controller
@@ -51,7 +52,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.CreateClient(newClient);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(StatusCodeResult));
+            Assert.AreEqual(typeof(StatusCodeResult), response.GetType());
 
             var statusCode = (StatusCodeResult)response;
 
@@ -80,12 +81,72 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.CreateClient(newClient);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(typeof(ObjectResult), response.GetType());
 
             var obj = (ObjectResult)response;
 
             Assert.AreEqual(obj.StatusCode, 500);
         }
+
+        //[Test]
+        //public async Task GetAllEmployees_Success()
+        //{
+        //    var clients = new List<Domain.Models.Client>()
+        //    {
+        //        new Domain.Models.Client()
+        //        {
+        //            CountryId = 1,
+        //            FirstName = "John",
+        //            LastName = "Doe",
+        //            EmailAddress = "jdoe@gmail.com",
+        //            Password = new byte[100],
+        //            PrimaryPhoneNum = "123-456-7890",
+        //            IsLoggedIn = false,
+        //            IsLocked = false,
+        //            FailedLoginAttempts = 0,
+        //            TempPasswordChanged = false,
+        //            Address = new Domain.Models.Address()
+        //            {
+        //                AddressLine1 = "123 Test St",
+        //                City = "San Diego",
+        //                State = "CA",
+        //                ZipCode = "12345"
+        //            }
+        //        }
+        //    };
+
+        //    _clientService.Setup(c => c.GetAllClientsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+        //        .ReturnsAsync(new Domain.Models.ClientsWithTotalPage(clients, 1));
+
+        //    var controller = new ClientController(_clientService.Object);
+
+        //    var response = await controller.GetAllClients(1, 10, "");
+
+        //    Assert.NotNull(response);
+        //    Assert.AreEqual(typeof(OkObjectResult), response.GetType());
+
+        //    var okObj = (OkObjectResult)response;
+
+        //    Assert.AreEqual(okObj.StatusCode, 200);
+        //}
+
+        //[Test]
+        //public async Task GetAllEmployees_InternalServerError()
+        //{
+        //    _clientService.Setup(c => c.GetAllClientsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+        //        .ThrowsAsync(new Exception());
+
+        //    var controller = new ClientController(_clientService.Object);
+
+        //    var response = await controller.GetAllClients(1, 10, "");
+
+        //    Assert.NotNull(response);
+        //    Assert.AreEqual(typeof(ObjectResult), response.GetType());
+
+        //    var obj = (ObjectResult)response;
+
+        //    Assert.AreEqual(obj.StatusCode, 500);
+        //}
 
         [Test]
         public async Task GetClientById_Success()
@@ -111,7 +172,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.GetClientById(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+            Assert.AreEqual(typeof(OkObjectResult), response.GetType());
 
             var okObj = (OkObjectResult)response;
 
@@ -129,7 +190,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.GetClientById(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(typeof(ObjectResult), response.GetType());
 
             var obj = (ObjectResult)response;
 
@@ -160,7 +221,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.GetClientByEmail("jdoe@gmail.com");
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+            Assert.AreEqual(typeof(OkObjectResult), response.GetType());
 
             var okObj = (OkObjectResult)response;
 
@@ -178,7 +239,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.GetClientByEmail("jdoe@gmail.com");
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(NotFoundObjectResult));
+            Assert.AreEqual(typeof(NotFoundObjectResult), response.GetType());
 
             var obj = (NotFoundObjectResult)response;
 
@@ -213,7 +274,7 @@ namespace ClientManagementService.Test.Controller
             });
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+            Assert.AreEqual(typeof(OkObjectResult), response.GetType());
 
             var okObj = (OkObjectResult)response;
 
@@ -235,7 +296,7 @@ namespace ClientManagementService.Test.Controller
             });
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(typeof(ObjectResult), response.GetType());
 
             var obj = (ObjectResult)response;
 
@@ -253,7 +314,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.ClientLogout(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.AreEqual(typeof(OkResult), response.GetType());
 
             var ok = (OkResult)response;
 
@@ -271,7 +332,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.ClientLogout(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(typeof(ObjectResult), response.GetType());
 
             var obj = (ObjectResult)response;
 
@@ -289,7 +350,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.ResetClientLockedStatus(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.AreEqual(typeof(OkResult), response.GetType());
 
             var ok = (OkResult)response;
 
@@ -307,7 +368,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.ResetClientLockedStatus(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
+            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
 
             var obj = (BadRequestObjectResult)response;
 
@@ -341,7 +402,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.UpdateClientInfo(client);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.AreEqual(typeof(OkResult), response.GetType());
 
             var ok = (OkResult)response;
 
@@ -375,7 +436,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.UpdateClientInfo(client);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
+            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
 
             var obj = (BadRequestObjectResult)response;
 
@@ -399,7 +460,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.UpdatePassword(password);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.AreEqual(typeof(OkResult), response.GetType());
 
             var ok = (OkResult)response;
 
@@ -423,7 +484,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.UpdatePassword(password);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.AreEqual(typeof(ObjectResult), response.GetType());
 
             var obj = (ObjectResult)response;
 
@@ -441,7 +502,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.DeleteClientById(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.AreEqual(typeof(OkResult), response.GetType());
 
             var ok = (OkResult)response;
 
@@ -459,7 +520,7 @@ namespace ClientManagementService.Test.Controller
             var response = await controller.DeleteClientById(1);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
+            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
 
             var obj = (BadRequestObjectResult)response;
 

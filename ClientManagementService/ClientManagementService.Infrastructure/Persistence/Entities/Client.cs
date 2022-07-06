@@ -7,6 +7,11 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
 {
     public partial class Client
     {
+        public Client()
+        {
+            Pets = new HashSet<Pet>();
+        }
+
         public long Id { get; set; }
         public long CountryId { get; set; }
         public string FirstName { get; set; }
@@ -25,5 +30,8 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
         public string City { get; set; }
         public string State { get; set; }
         public string ZipCode { get; set; }
+
+        public virtual Country Country { get; set; }
+        public virtual ICollection<Pet> Pets { get; set; }
     }
 }
