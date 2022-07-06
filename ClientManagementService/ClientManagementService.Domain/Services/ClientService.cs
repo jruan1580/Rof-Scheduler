@@ -2,7 +2,7 @@
 using ClientManagementService.Domain.Mappers.Database;
 using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
-using ClientManagementService.Infrastructure.Persistence.Filters;
+using ClientManagementService.Infrastructure.Persistence.Filters.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;

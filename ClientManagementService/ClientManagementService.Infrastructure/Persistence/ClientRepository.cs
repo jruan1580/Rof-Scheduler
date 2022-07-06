@@ -1,5 +1,5 @@
 ﻿using ClientManagementService.Infrastructure.Persistence.Entities;
-using ClientManagementService.Infrastructure.Persistence.Filters;
+using ClientManagementService.Infrastructure.Persistence.Filters.Client;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

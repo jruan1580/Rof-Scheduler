@@ -2,7 +2,7 @@
 using ClientManagementService.Domain.Services;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Entities;
-using ClientManagementService.Infrastructure.Persistence.Filters;
+using ClientManagementService.Infrastructure.Persistence.Filters.Client;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
