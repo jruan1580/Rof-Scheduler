@@ -25,6 +25,14 @@ namespace ClientManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
+                var usa = context.Countries.FirstOrDefault(c => c.Name.Equals("United States of America"));
+
+                if (usa == null)
+                {
+                    throw new Exception("Unable to find country United States of America");
+                }
+
+                newClient.CountryId = usa.Id;
                 context.Clients.Add(newClient);
 
                 await context.SaveChangesAsync();

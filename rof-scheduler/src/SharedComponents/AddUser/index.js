@@ -36,14 +36,21 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
     var zipCode = e.target.zipCode.value;
     var password = e.target.password.value;
     var retypedPassword = e.target.retypedPassword.value;
+    var ssn = undefined;
+    var role = undefined;
+    var phoneNumber = undefined;
+    var primaryPhoneNum = undefined;
+    var secPhoneNum = undefined;
+
     if (userType === "Employee") {
-      var ssn = e.target.ssn.value;
-      var role = e.target.role.value;
-      var phoneNumber = e.target.phoneNumber.value;
+      ssn = e.target.ssn.value;
+      role = e.target.role.value;
+      phoneNumber = e.target.phoneNumber.value;
     } else if (userType === "Client") {
-      var primaryPhoneNum = e.target.phoneNumber.value;
-      var secPhoneNum = e.target.secPhoneNum.value;
+      primaryPhoneNum = e.target.phoneNumber.value;
+      secPhoneNum = e.target.secPhoneNum.value;
     }
+
     var inputValidations = new Map();
 
     //validate employee

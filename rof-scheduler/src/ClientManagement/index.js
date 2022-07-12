@@ -53,11 +53,10 @@ function ClientManagement() {
         setShowLoadingModal(true);
         await resetClientLockStatus(id);
         for (var i = 0; i < clients.length; i++) {
-          if (clients[i].id !== id) {
-            continue;
+          if (clients[i].id === id) {
+            clients[i].isLocked = false;
+            break;
           }
-
-          clients[i].isLocked = false;
         }
 
         setClients(clients);
@@ -71,21 +70,21 @@ function ClientManagement() {
 
   const postUpdateClientAction = (updatedFieldsMap) => {
     for (var i = 0; i < clients.length; i++) {
-      if (clients[i].id !== updatedFieldsMap.get("id")) {
-        continue;
-      }
+      if (clients[i].id === updatedFieldsMap.get("id")) {
+        clients[i].fullName =
+          updatedFieldsMap.get("firstName") +
+          " " +
+          updatedFieldsMap.get("lastName");
+        clients[i].firstName = updatedFieldsMap.get("firstName");
+        clients[i].lastName = updatedFieldsMap.get("lastName");
+        clients[i].emailAddress = updatedFieldsMap.get("email");
+        clients[i].username = updatedFieldsMap.get("username");
+        clients[i].primaryPhoneNum = updatedFieldsMap.get("phoneNumber");
+        clients[i].secPhoneNum = updatedFieldsMap.get("secPhoneNum");
+        clients[i].address = updatedFieldsMap.get("address");
 
-      clients[i].fullName =
-        updatedFieldsMap.get("firstName") +
-        " " +
-        updatedFieldsMap.get("lastName");
-      clients[i].firstName = updatedFieldsMap.get("firstName");
-      clients[i].lastName = updatedFieldsMap.get("lastName");
-      clients[i].emailAddress = updatedFieldsMap.get("email");
-      clients[i].username = updatedFieldsMap.get("username");
-      clients[i].primaryPhoneNum = updatedFieldsMap.get("phoneNumber");
-      clients[i].secPhoneNum = updatedFieldsMap.get("secPhoneNum");
-      clients[i].address = updatedFieldsMap.get("address");
+        break;
+      }
     }
 
     setClients(clients);
