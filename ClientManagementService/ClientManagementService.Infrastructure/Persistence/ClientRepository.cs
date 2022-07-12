@@ -74,6 +74,12 @@ namespace ClientManagementService.Infrastructure.Persistence
                 }
 
                 var countByCriteria = await client.CountAsync();
+
+                if(countByCriteria == 0)
+                {
+                    return (new List<Client>(), 0);
+                }
+
                 var fullPages = countByCriteria / offset; 
                 var remaining = countByCriteria % offset; 
                 var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; 
