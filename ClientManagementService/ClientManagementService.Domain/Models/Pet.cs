@@ -59,5 +59,42 @@ namespace ClientManagementService.Domain.Models
 
             return invalidErr;
         }
+
+        public List<string> IsValidPetToUpdate()
+        {
+            var invalidErr = new List<string>();
+
+            if (Id <= 0)
+            {
+                invalidErr.Add($"Invalid Id: {Id}.");
+            }
+
+            if (string.IsNullOrEmpty(Name))
+            {
+                invalidErr.Add("Need pet's name.");
+            }
+
+            if (Weight <= 0)
+            {
+                invalidErr.Add("Need pet's weight.");
+            }
+
+            if (string.IsNullOrEmpty(Dob))
+            {
+                invalidErr.Add("Need pet's birthday.");
+            }
+
+            if (OwnerId <= 0)
+            {
+                invalidErr.Add("Need owner info.");
+            }
+
+            if (BreedId <= 0)
+            {
+                invalidErr.Add("Need breed info.");
+            }
+
+            return invalidErr;
+        }
     }
 }
