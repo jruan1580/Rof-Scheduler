@@ -1,4 +1,5 @@
-﻿using ClientManagementService.Domain.Models;
+﻿using ClientManagementService.Domain.Mappers.Database;
+using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
@@ -27,15 +28,16 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var petExists = await _petRepository.PetAlreadyExists(newPet.OwnerId, newPet.BreedId, newPet.Name);
-            if (petExists)
-            {
-                throw new ArgumentException($"This pet already exists under Owner with id: {newPet.OwnerId}.");
-            }
+            var newPetEntity = PetMapper.FromCorePet(newPet);
 
-            //var newClientEntity = ClientMapper.FromCoreClient(newPet);
-
-            //await _clientRepository.CreateClient(newClientEntity);
+            await _petRepository.AddPet(newPetEntity);
         }
+
+
+        //Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
+        //Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
+        //Task<List<Pet>> GetPetsByClientId(long clientId);
+        //Task UpdatePet(Pet updatePet);
+        //Task DeletePetById(long petId);
     }
 }

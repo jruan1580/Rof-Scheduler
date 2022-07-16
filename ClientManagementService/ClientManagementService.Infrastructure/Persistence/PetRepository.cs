@@ -16,7 +16,6 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
         Task<List<Pet>> GetPetsByClientId(long clientId);
         Task UpdatePet(Pet updatePet);
-        Task<bool> PetAlreadyExists(long ownerId, long breedId, string name);
     }
 
     public class PetRepository : IPetRepository
@@ -121,16 +120,6 @@ namespace ClientManagementService.Infrastructure.Persistence
                 context.Remove(pet);
 
                 await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<bool> PetAlreadyExists(long ownerId, long breedId, string name)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                name = name.ToLower();
-
-                return await context.Pets.AnyAsync(p => p.Name.ToLower().Equals(name) && p.OwnerId.Equals(ownerId) && p.BreedId.Equals(breedId));
             }
         }
     }
