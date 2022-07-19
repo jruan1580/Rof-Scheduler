@@ -33,6 +33,7 @@ function NavigationBar({loginState, handleLoginState}){
                         loginState && localStorage.getItem('role') === 'Administrator' &&
                         <NavDropdown title='User Management'>                        
                             <NavDropdown.Item href="/employeemanagement">Employee</NavDropdown.Item>
+                            <NavDropdown.Item href="/clientmanagement">Client</NavDropdown.Item>
                         </NavDropdown>  
                     }
                     {

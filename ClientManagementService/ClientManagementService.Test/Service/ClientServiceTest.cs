@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Test.Service
@@ -338,6 +339,70 @@ namespace ClientManagementService.Test.Service
             Assert.AreEqual("San Diego", client.Address.City);
             Assert.AreEqual("CA", client.Address.State);
             Assert.AreEqual("12345", client.Address.ZipCode);
+        }
+
+        [Test]
+        public async Task GetAllClients_NoClients()
+        {
+            _clientRepository.Setup(c => c.GetAllClientsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync((new List<Client>(), 0));
+
+            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+
+            var result = await clientService.GetAllClientsByKeyword(1, 10, "");
+
+            Assert.IsEmpty(result.Clients);
+            Assert.AreEqual(0, result.TotalPages);
+        }
+
+        [Test]
+        public async Task GetAllClients_Success()
+        {
+            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
+            var clients = new List<Client>()
+            {
+                new Client()
+                {
+                    Id = 1,
+                    CountryId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmailAddress = "jdoe@gmail.com",
+                    PrimaryPhoneNum = "123-456-7890",
+                    Username = "jdoe",
+                    Password = encryptedPass,
+                    AddressLine1 = "123 Test St",
+                    City = "San Diego",
+                    State = "CA",
+                    ZipCode = "12345",
+                    IsLocked = false,
+                    IsLoggedIn = false,
+                    TempPasswordChanged = false,
+                    FailedLoginAttempts = 0
+                }
+            };
+
+            _clientRepository.Setup(c => c.GetAllClientsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync((clients, 1));
+
+            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+
+            var result = await clientService.GetAllClientsByKeyword(1, 10, "");
+
+            Assert.IsNotEmpty(result.Clients);
+            Assert.AreEqual("John", result.Clients[0].FirstName);
+            Assert.AreEqual("Doe", result.Clients[0].LastName);
+            Assert.AreEqual("123-456-7890", result.Clients[0].PrimaryPhoneNum);
+            Assert.AreEqual("jdoe@gmail.com", result.Clients[0].EmailAddress);
+            Assert.AreEqual("jdoe", result.Clients[0].Username);
+            Assert.AreEqual(encryptedPass, result.Clients[0].Password);
+            Assert.AreEqual("123 Test St", result.Clients[0].Address.AddressLine1);
+            Assert.AreEqual("San Diego", result.Clients[0].Address.City);
+            Assert.AreEqual("CA", result.Clients[0].Address.State);
+            Assert.AreEqual("12345", result.Clients[0].Address.ZipCode);
+            Assert.IsFalse(result.Clients[0].IsLocked);
+            Assert.IsFalse(result.Clients[0].TempPasswordChanged);
+            Assert.IsFalse(result.Clients[0].IsLoggedIn);
         }
 
         [Test]

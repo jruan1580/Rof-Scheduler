@@ -7,6 +7,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AccountSettings from "./AccountSettings";
 import CreateClient from "./CreateClient";
 import EmployeeManagement from "./EmployeeManagement";
+import ClientManagement from "./ClientManagement";
 
 function App() {
   const [isLogin, setLogin] = useState(false);
@@ -39,6 +40,7 @@ function App() {
             <Route exact path="/accountsettings" element={<AccountSettings />} />
             <Route exact path="/calendar" element={<Calendar />} />
             <Route exact path="/employeemanagement" element={<EmployeeManagement />} />
+            <Route exact path ="/clientmanagement" element={<ClientManagement />} />
           </Routes>
         </Container>
       </BrowserRouter>
