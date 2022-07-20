@@ -3,6 +3,7 @@ using ClientManagementService.Infrastructure.Persistence.Filters.Client;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Infrastructure.Persistence
@@ -11,7 +12,7 @@ namespace ClientManagementService.Infrastructure.Persistence
     {
         Task CreateClient(Client newClient);
         Task DeleteClientById(long id);
-        Task<List<Client>> GetAllClients();
+        Task<(List<Client>, int)> GetAllClientsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Client> GetClientByFilter<T>(GetClientFilterModel<T> filter);
         Task<short> IncrementClientFailedLoginAttempts(long id);
         Task UpdateClient(Client clientToUpdate);
@@ -24,6 +25,14 @@ namespace ClientManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
+                var usa = context.Countries.FirstOrDefault(c => c.Name.Equals("United States of America"));
+
+                if (usa == null)
+                {
+                    throw new Exception("Unable to find country United States of America");
+                }
+
+                newClient.CountryId = usa.Id;
                 context.Clients.Add(newClient);
 
                 await context.SaveChangesAsync();
@@ -47,11 +56,42 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<List<Client>> GetAllClients()
+        public async Task<(List<Client>, int)> GetAllClientsByKeyword(int page = 1, int offset = 10, string keyword = "")
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Clients.ToListAsync();
+                var skip = (page - 1) * offset;
+                IQueryable<Client> client = context.Clients;
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    keyword = keyword.ToLower();
+
+                    client = context.Clients
+                        .Where(e => (e.FirstName.ToLower().Contains(keyword))
+                            || (e.LastName.ToLower().Contains(keyword))
+                            || (e.EmailAddress.ToLower().Contains(keyword)));
+                }
+
+                var countByCriteria = await client.CountAsync();
+
+                if(countByCriteria == 0)
+                {
+                    return (new List<Client>(), 0);
+                }
+
+                var fullPages = countByCriteria / offset; 
+                var remaining = countByCriteria % offset; 
+                var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; 
+
+                if (page > totalPages)
+                {
+                    throw new ArgumentException("No more employees.");
+                }
+
+                var result = await client.OrderByDescending(e => e.Id).Skip(skip).Take(offset).ToListAsync();
+
+                return (result, totalPages);
             }
         }
 
