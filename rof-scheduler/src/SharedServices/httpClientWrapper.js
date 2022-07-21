@@ -6,16 +6,16 @@ export const get = async function(url) {
         },
         credentials: "include",
     });
-    
-    if (response.status !== 200) {
-        if (response.status == 401){
-            console.log('unauthorized');
-            return null;
-        }
 
+    //clear storage if unauth
+    if (response.status === 401){
+        localStorage.clear();    
+    }
+
+    if (response.status !== 200 && response.status !== 401){
         var errMsg = await response.text();
         throw new Error(errMsg);
     }
-
-    return await response.json();
+        
+    return response;
 }

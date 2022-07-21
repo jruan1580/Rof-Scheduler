@@ -10,7 +10,7 @@ import {
   updateEmployeeStatus,
 } from "../SharedServices/employeeManagementService";
 
-function EmployeeManagement() {
+function EmployeeManagement({setLoginState}) {
   //TODO - refactor to use useReducer instead since way too many states
   const [employees, setEmployees] = useState([]);
   const [currPage, setCurrPage] = useState(1);
@@ -25,8 +25,16 @@ function EmployeeManagement() {
   useEffect(() => {
     (async function () {
       try {
-        const employeeByPage = await getAllEmployees(currPage, 10, keyword);
+        const resp = await getAllEmployees(currPage, 10, keyword);
+        
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
 
+        const employeeByPage = await resp.json();
+
+        //const employeeByPage = await getAllEmployees(currPage, 10, keyword);
         setEmployees(employeeByPage.employees);
         setTotalPages(employeeByPage.totalPages);
       } catch (e) {

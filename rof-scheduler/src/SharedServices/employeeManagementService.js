@@ -1,21 +1,24 @@
+import  { get } from './httpClientWrapper';
+
 export const getAllEmployees = async function(page, recPerPage, keyword){
   var baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
   var url = baseUrl + "/admin?page=" + page + "&offset=" + recPerPage + "&keyword=" + keyword;
 
-  var response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
+  return await get(url);
+  // var response = await fetch(url, {
+  //   method: "GET",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   credentials: "include",
+  // });
 
-  if (response.status !== 200) {
-    var errMsg = await response.text();
-    throw new Error(errMsg);
-  }
+  // if (response.status !== 200) {
+  //   var errMsg = await response.text();
+  //   throw new Error(errMsg);
+  // }
 
-  return await response.json();
+  // return await response.json();
 }
 
 export const getEmployeeById = async function () {
