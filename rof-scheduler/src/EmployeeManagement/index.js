@@ -61,7 +61,13 @@ function EmployeeManagement({setLoginState}) {
     (async function () {
       try {
         setShowLoadingModal(true);
-        await resetEmployeeLockStatus(id);
+        var resp = await resetEmployeeLockStatus(id);
+
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
+
         for (var i = 0; i < employees.length; i++) {
           if (employees[i].id !== id) {
             continue;
@@ -83,7 +89,13 @@ function EmployeeManagement({setLoginState}) {
     (async function () {
       try {
         setShowLoadingModal(true);
-        await updateEmployeeStatus(id, status);
+
+        var resp = await updateEmployeeStatus(id, status);
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
+
         for (var i = 0; i < employees.length; i++) {
           if (employees[i].id !== id) {
             continue;

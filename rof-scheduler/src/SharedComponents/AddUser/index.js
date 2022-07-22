@@ -91,11 +91,13 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
     } else {
       setValidationMap(new Map());
       setLoading(true);
-
+     
       (async function () {
         try {
+          var resp = undefined;
+
           if (userType === "Employee") {
-            await createEmployee(
+            resp = await createEmployee(
               firstName,
               lastName,
               ssn,
@@ -111,7 +113,7 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
               password
             );
           } else {
-            await createClient(
+            resp = await createClient(
               1,
               firstName,
               lastName,
@@ -127,8 +129,14 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
               zipCode
             );
           }
+
+          if (resp !== undefined && resp.status === 401){
+            return;
+          }
+
           setErrMsg(undefined);
           setDisableBtns(true);
+
           setSuccessMsg(true);
 
           handleUserAddSuccess();

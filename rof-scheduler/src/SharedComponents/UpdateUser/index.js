@@ -99,23 +99,24 @@ function UpdateUserModal({
         try {
           var updatedFields = new Map();
           updatedFields.set("id", user.id);
+          var resp = undefined;
 
           if (userType === "Employee") {
-            await updateEmployeeInformation(
-              user.id,
-              firstName,
-              lastName,
-              ssn,
-              role,
-              username,
-              email,
-              phoneNumber,
-              addressLine1,
-              addressLine2,
-              city,
-              state,
-              zipCode
-            );
+            resp = await updateEmployeeInformation(
+                user.id,
+                firstName,
+                lastName,
+                ssn,
+                role,
+                username,
+                email,
+                phoneNumber,
+                addressLine1,
+                addressLine2,
+                city,
+                state,
+                zipCode
+              );
 
             updatedFields.set("firstName", firstName);
             updatedFields.set("lastName", lastName);
@@ -132,20 +133,20 @@ function UpdateUserModal({
               zipCode,
             });
           } else {
-            await updateClientInformation(
-              user.id,
-              firstName,
-              lastName,
-              username,
-              email,
-              primaryPhoneNum,
-              secPhoneNum,
-              addressLine1,
-              addressLine2,
-              city,
-              state,
-              zipCode
-            );
+            resp = await updateClientInformation(
+                user.id,
+                firstName,
+                lastName,
+                username,
+                email,
+                primaryPhoneNum,
+                secPhoneNum,
+                addressLine1,
+                addressLine2,
+                city,
+                state,
+                zipCode
+              );
 
             updatedFields.set("firstName", firstName);
             updatedFields.set("lastName", lastName);
@@ -160,6 +161,10 @@ function UpdateUserModal({
               state,
               zipCode,
             });
+          }
+
+          if (resp !== undefined && resp.status === 401){
+            return;
           }
 
           postUpdateAction(updatedFields);

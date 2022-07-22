@@ -9,7 +9,7 @@ import {
   resetClientLockStatus,
 } from "../SharedServices/clientManagementService";
 
-function ClientManagement() {
+function ClientManagement({setLoginState}) {
   const [clients, setClients] = useState([]);
   const [currPage, setCurrPage] = useState(1);
   const [errorMessage, setErrorMessage] = useState(undefined);
@@ -23,7 +23,14 @@ function ClientManagement() {
   useEffect(() => {
     (async function () {
       try {
-        const clientByPage = await getAllClients(currPage, 10, keyword);
+        var resp = await getAllClients(currPage, 10, keyword);
+
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
+
+        const clientByPage = await resp.json();
 
         setClients(clientByPage.clients);
         setTotalPages(clientByPage.totalPages);
@@ -51,7 +58,12 @@ function ClientManagement() {
     (async function () {
       try {
         setShowLoadingModal(true);
-        await resetClientLockStatus(id);
+        var resp = await resetClientLockStatus(id);
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
+
         for (var i = 0; i < clients.length; i++) {
           if (clients[i].id === id) {
             clients[i].isLocked = false;

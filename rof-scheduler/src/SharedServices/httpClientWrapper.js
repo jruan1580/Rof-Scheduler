@@ -1,18 +1,26 @@
-export const get = async function(url) {
-    var response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-    });
+export const makeHttpRequest = async function(url, method, headers, expectedStatusCode, data){
+    var requestInit = (data === undefined) ? 
+        {
+            method: method,
+            headers: headers,
+            credentials: "include"
+        }:
+        {
+            method: method,
+            headers: headers,
+            body: JSON.stringify(data),
+            credentials: "include"
+        };
 
-    //clear storage if unauth
-    if (response.status === 401){
-        localStorage.clear();    
+    var response = await fetch(url, requestInit);
+
+     //clear storage if unauth
+     if (response.status === 401){
+        localStorage.clear();
+        return response;
     }
 
-    if (response.status !== 200 && response.status !== 401){
+    if (response.status !== expectedStatusCode){
         var errMsg = await response.text();
         throw new Error(errMsg);
     }
