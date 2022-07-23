@@ -1,4 +1,3 @@
-using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.API.Filters;
@@ -19,8 +18,8 @@ namespace EmployeeManagementService.API.Controllers
     {
         private readonly IEmployeeService _employeeService;
 
-        public AdminController(IEmployeeService employeeService, ITokenHandler tokenHandler) 
-            : base(employeeService, tokenHandler)
+        public AdminController(IEmployeeService employeeService) 
+            : base(employeeService)
         {
             _employeeService = employeeService;
         }

@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClientManagementService.API.DTO;
 using ClientManagementService.API.DTOMapper;
+using ClientManagementService.API.Filters;
 using ClientManagementService.Domain.Exceptions;
 using ClientManagementService.Domain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientManagementService.API.Controllers
-{
+{    
+    [CookieActionFilter]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
@@ -20,6 +23,7 @@ namespace ClientManagementService.API.Controllers
             _clientService = clientService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateClient([FromBody] ClientDTO client)
         {
@@ -39,6 +43,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee")]
         [HttpGet]
         public async Task<IActionResult> GetAllClients([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
@@ -61,6 +66,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetClientById(long id)
         {
@@ -80,6 +86,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{email}/email")]
         public async Task<IActionResult> GetClientByEmail(string email)
         {
@@ -100,6 +107,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Internal")]
         [HttpPatch("login")]
         public async Task<IActionResult> ClientLogin([FromBody] ClientDTO client)
         {
@@ -123,6 +131,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Client,Internal")]
         [HttpPatch("{id}/logout")]
         public async Task<IActionResult> ClientLogout(long id)
         {
@@ -142,6 +151,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee")]
         [HttpPatch("{id}/locked")]
         public async Task<IActionResult> ResetClientLockedStatus(long id)
         {
@@ -161,6 +171,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpPatch("password")]
         public async Task<IActionResult> UpdatePassword([FromBody] PasswordDTO newPassword)
         {
@@ -184,6 +195,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpPut("info")]
         public async Task<IActionResult> UpdateClientInfo([FromBody] ClientDTO client)
         {
@@ -207,6 +219,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClientById(long id)
         {
