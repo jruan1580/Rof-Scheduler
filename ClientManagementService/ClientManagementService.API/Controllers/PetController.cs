@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ClientManagementService.API.DTO;
 using ClientManagementService.API.DTOMapper;
 using ClientManagementService.Domain.Exceptions;
 using ClientManagementService.Domain.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientManagementService.API.Controllers
@@ -116,46 +114,46 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
-        //public async Task UpdatePet(Pet updatePet)
-        //{
-        //    var invalidErrs = updatePet.IsValidPetToUpdate().ToArray();
+        [HttpPut("updatePet")]
+        public async Task<IActionResult> UpdatePetInfo([FromBody] PetDTO pet)
+        {
+            try
+            {
+                await _petService.UpdatePet(PetDTOMapper.FromDTOPet(pet));
 
-        //    if (invalidErrs.Length > 0)
-        //    {
-        //        var errMsg = string.Join("\n", invalidErrs);
+                return Ok();
+            }
+            catch (PetNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
-        //        throw new ArgumentException(errMsg);
-        //    }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePetById(long id)
+        {
+            try
+            {
+                await _petService.DeletePetById(id);
 
-        //    var petExists = await _petRepository.PetAlreadyExists(updatePet.OwnerId, updatePet.BreedId, updatePet.Name);
-        //    if (petExists)
-        //    {
-        //        throw new ArgumentException($"Pet with same name and breed already exist under this owner id {updatePet.OwnerId}");
-        //    }
-
-        //    var origPet = await _petRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, updatePet.Id));
-        //    if (origPet == null)
-        //    {
-        //        throw new PetNotFoundException();
-        //    }
-
-        //    origPet.Name = updatePet.Name;
-        //    origPet.Weight = updatePet.Weight;
-        //    origPet.Dob = updatePet.Dob;
-        //    origPet.BordetellaVax = updatePet.BordetellaVax;
-        //    origPet.RabieVax = updatePet.RabieVax;
-        //    origPet.Dhppvax = updatePet.Dhppvax;
-        //    origPet.BreedId = updatePet.BreedId;
-        //    origPet.OwnerId = updatePet.OwnerId;
-        //    origPet.OtherInfo = updatePet.OtherInfo;
-        //    origPet.Picture = updatePet.Picture;
-
-        //    await _petRepository.UpdatePet(origPet);
-        //}
-
-        //public async Task DeletePetById(long petId)
-        //{
-        //    await _petRepository.DeletePetById(petId);
-        //}
+                return Ok();
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
