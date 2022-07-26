@@ -1,6 +1,8 @@
-﻿using ClientManagementService.Domain.Services;
+﻿using ClientManagementService.Domain.Exceptions;
+using ClientManagementService.Domain.Services;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Entities;
+using ClientManagementService.Infrastructure.Persistence.Filters.Pet;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -129,6 +131,206 @@ namespace ClientManagementService.Test.Service
             Assert.IsTrue(result.Pets[0].RabieVax);
             Assert.IsEmpty(result.Pets[0].OtherInfo);
             Assert.IsNull(result.Pets[0].Picture);
+        }
+
+        [Test]
+        public void GetPetById_DoesNotExist()
+        {
+            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
+                .ReturnsAsync((Pet)null);
+
+            var petService = new PetService(_petRepository.Object);
+
+            Assert.ThrowsAsync<PetNotFoundException>(() => petService.GetPetById(1));
+        }
+
+        [Test]
+        public async Task GetPetById_Success()
+        {
+            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
+                .ReturnsAsync(new Pet()
+                {
+                    Id = 1,
+                    Name = "Pet1",
+                    OwnerId = 1,
+                    BreedId = 1,
+                    Dob = "1/1/2022",
+                    Weight = 30,
+                    Dhppvax = true,
+                    BordetellaVax = true,
+                    RabieVax = true,
+                    OtherInfo = "",
+                    Picture = null
+                });
+
+            var petService = new PetService(_petRepository.Object);
+
+            var pet = await petService.GetPetById(1);
+
+            Assert.IsNotNull(pet);
+            Assert.AreEqual(1, pet.Id);
+            Assert.AreEqual(1, pet.OwnerId);
+            Assert.AreEqual(1, pet.BreedId);
+            Assert.AreEqual("Pet1", pet.Name);
+            Assert.AreEqual("1/1/2022", pet.Dob);
+            Assert.AreEqual(30, pet.Weight);
+            Assert.IsTrue(pet.Dhppvax);
+            Assert.IsTrue(pet.BordetellaVax);
+            Assert.IsTrue(pet.RabieVax);
+            Assert.IsEmpty(pet.OtherInfo);
+            Assert.IsNull(pet.Picture);
+        }
+
+        [Test]
+        public void GetPetByName_DoesNotExist()
+        {
+            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<string>>()))
+                .ReturnsAsync((Pet)null);
+
+            var petService = new PetService(_petRepository.Object);
+
+            Assert.ThrowsAsync<PetNotFoundException>(() => petService.GetPetByName("Pet1"));
+        }
+
+        [Test]
+        public async Task GetPetByName_Success()
+        {
+            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<string>>()))
+                .ReturnsAsync(new Pet()
+                {
+                    Id = 1,
+                    Name = "Pet1",
+                    OwnerId = 1,
+                    BreedId = 1,
+                    Dob = "1/1/2022",
+                    Weight = 30,
+                    Dhppvax = true,
+                    BordetellaVax = true,
+                    RabieVax = true,
+                    OtherInfo = "",
+                    Picture = null
+                });
+
+            var petService = new PetService(_petRepository.Object);
+
+            var pet = await petService.GetPetByName("Pet1");
+
+            Assert.IsNotNull(pet);
+            Assert.AreEqual(1, pet.Id);
+            Assert.AreEqual(1, pet.OwnerId);
+            Assert.AreEqual(1, pet.BreedId);
+            Assert.AreEqual("Pet1", pet.Name);
+            Assert.AreEqual("1/1/2022", pet.Dob);
+            Assert.AreEqual(30, pet.Weight);
+            Assert.IsTrue(pet.Dhppvax);
+            Assert.IsTrue(pet.BordetellaVax);
+            Assert.IsTrue(pet.RabieVax);
+            Assert.IsEmpty(pet.OtherInfo);
+            Assert.IsNull(pet.Picture);
+        }
+
+        [Test]
+        public async Task GetPetsByClientId_NoPets()
+        {
+            _petRepository.Setup(p => p.GetPetsByClientId(It.IsAny<long>()))
+                .ReturnsAsync(new List<Pet>());
+
+            var petService = new PetService(_petRepository.Object);
+
+            var result = await petService.GetPetsByClientId(1);
+
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public async Task GetPetsByClientId_Success()
+        {
+            _petRepository.Setup(p => p.GetPetsByClientId(It.IsAny<long>()))
+                .ReturnsAsync(new List<Pet>());
+
+            var petService = new PetService(_petRepository.Object);
+
+            var result = await petService.GetPetsByClientId(1);
+
+            Assert.IsEmpty(result);
+        }
+
+        [Test]
+        public void UpdatePet_PetNotUnique()
+        {
+            var pet = new Domain.Models.Pet()
+            {
+                Id = 1,
+                Name = "Pet1",
+                OwnerId = 1,
+                BreedId = 1,
+                Dob = "1/1/2022",
+                Weight = 30,
+                Dhppvax = true,
+                BordetellaVax = true,
+                RabieVax = true,
+                OtherInfo = "",
+                Picture = null
+            };
+
+            _petRepository.Setup(p => p.PetAlreadyExists(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
+               .ReturnsAsync(true);
+
+            var petService = new PetService(_petRepository.Object);
+
+            Assert.ThrowsAsync<ArgumentException>(() => petService.UpdatePet(pet));
+        }
+
+        [Test]
+        public async Task UpdatePet_Success()
+        {
+            var pet = new Domain.Models.Pet()
+            {
+                Id = 1,
+                Name = "Pet1",
+                OwnerId = 1,
+                BreedId = 1,
+                Dob = "1/1/2022",
+                Weight = 30,
+                Dhppvax = true,
+                BordetellaVax = true,
+                RabieVax = true,
+                OtherInfo = "",
+                Picture = null
+            };
+
+            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
+                .ReturnsAsync(new Pet() { Id = 1 });
+
+            var petService = new PetService(_petRepository.Object);
+
+            await petService.UpdatePet(pet);
+
+            _petRepository.Verify(p => p.UpdatePet(It.IsAny<Pet>()), Times.Once);
+        }
+
+        [Test]
+        public void DeletePettById_NoPet()
+        {
+            _petRepository.Setup(p => p.DeletePetById(It.IsAny<long>()))
+                .ThrowsAsync(new ArgumentException());
+
+            var petService = new PetService(_petRepository.Object);
+
+            Assert.ThrowsAsync<ArgumentException>(() => petService.DeletePetById(1));
+        }
+
+        [Test]
+        public async Task DeletePettById_Success()
+        {
+            _petRepository.Setup(p => p.DeletePetById(It.IsAny<long>()))
+                .Returns(Task.CompletedTask);
+
+            var petService = new PetService(_petRepository.Object);
+
+            await petService.DeletePetById(1);
+
+            _petRepository.Verify(p => p.DeletePetById(It.IsAny<long>()), Times.Once);
         }
     }
 }
