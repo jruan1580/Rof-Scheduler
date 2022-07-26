@@ -204,18 +204,18 @@ namespace EmployeeManagementService.Domain.Services
             if (employee.IsLocked)
             {
                 throw new EmployeeIsLockedException();
-            }
-
-            if (employee.Status == true)
-            {
-                return EmployeeMapper.ToCoreEmployee(employee);
-            }
+            }           
 
             if (!_passwordService.VerifyPasswordHash(password, employee.Password))
             {
                 await IncrementEmployeeFailedLoginAttempt(employee);
 
                 throw new ArgumentException("Incorrect password");
+            }
+
+            if (employee.Status == true)
+            {
+                return EmployeeMapper.ToCoreEmployee(employee);
             }
 
             employee.Status = true;

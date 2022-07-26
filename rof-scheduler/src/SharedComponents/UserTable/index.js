@@ -20,7 +20,7 @@ function GenericUserTable({
             {userType == "Employee" && <th>Role</th>}
             <th>Locked</th>
             {userType == "Employee" && <th>Active</th>}
-            <th colSpan={3}></th>
+            <th colSpan={userType == "Employee" ? 3 : 2}></th>
           </tr>
         </thead>
         <tbody>

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
+using EmployeeManagementService.API.Filters;
 using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -11,14 +10,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagementService.API.Controllers
 {
+    [CookieActionFilter]
     [Authorize(Roles = "Employee,Internal")]
     [ApiController]
     public class EmployeeController : AEmployeeController
     {
         private readonly IEmployeeService _employeeService;
 
-        public EmployeeController(IEmployeeService employeeService, ITokenHandler tokenHandler) 
-            : base(employeeService, tokenHandler)
+        public EmployeeController(IEmployeeService employeeService) 
+            : base(employeeService)
         {
             _employeeService = employeeService;
         }

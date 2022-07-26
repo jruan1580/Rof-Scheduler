@@ -1,5 +1,4 @@
-﻿using EmployeeManagementService.API.Authentication;
-using EmployeeManagementService.API.Controllers;
+﻿using EmployeeManagementService.API.Controllers;
 using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Domain.Services;
@@ -18,16 +17,11 @@ namespace EmployeeManagementService.Test.Controller
     public class AdminControllerTest
     {
         private Mock<IEmployeeService> _employeeService;
-        private Mock<ITokenHandler> _tokenHandler;
 
         [SetUp]
         public void Setup()
         {
             _employeeService = new Mock<IEmployeeService>();
-            _tokenHandler = new Mock<ITokenHandler>();
-
-            _tokenHandler.Setup(t => t.GenerateTokenForUserAndRole(It.IsAny<string>(), It.IsAny<int>()))
-                .Returns("randomgeneratedtokenstring");
         }
 
         [Test]
@@ -55,7 +49,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.GetAllEmployeesByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(new Domain.Models.EmployeesWithTotalPage(employees, 1));
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.GetAllEmployees(1, 10, "");
 
@@ -73,7 +67,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.GetAllEmployeesByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.GetAllEmployees(1, 10, "");
 
@@ -102,7 +96,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.CreateEmployee(It.IsAny<Domain.Models.Employee>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.CreateEmployee(newEmployee);
 
@@ -131,7 +125,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.CreateEmployee(It.IsAny<Employee>(), It.IsAny<string>()))
                 .ThrowsAsync(new ArgumentException("bad arguments"));
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.CreateEmployee(newEmployee);
 
@@ -149,7 +143,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.ResetEmployeeFailedLoginAttempt(1))
                 .Returns(Task.CompletedTask);
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.ResetLockedStatus(1);
 
@@ -167,7 +161,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.ResetEmployeeFailedLoginAttempt(1))
                 .ThrowsAsync(new Exception());
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.ResetLockedStatus(1);
 
@@ -196,7 +190,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Domain.Models.Employee>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);
 
@@ -225,7 +219,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(_e => _e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .ThrowsAsync(new ArgumentException("bad arguments"));
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);
 
@@ -257,7 +251,7 @@ namespace EmployeeManagementService.Test.Controller
                     Active = true
                 });
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.GetEmployeeById(1);
 
@@ -275,7 +269,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
                 .ReturnsAsync((Domain.Models.Employee)null);
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.GetEmployeeById(1);
 
@@ -307,7 +301,7 @@ namespace EmployeeManagementService.Test.Controller
                     Active = true
                 });
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.GetEmployeeByUsername("jdoe");
 
@@ -325,7 +319,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
                 .ReturnsAsync((Domain.Models.Employee)null);
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.GetEmployeeByUsername("jdoe");
 
@@ -347,7 +341,7 @@ namespace EmployeeManagementService.Test.Controller
                 });
      
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
             {
@@ -369,7 +363,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
             {
@@ -391,7 +385,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
                .ThrowsAsync(new EmployeeIsLockedException());
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
             {
@@ -413,7 +407,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.EmployeeLogout(1);
 
@@ -431,7 +425,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new AdminController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new AdminController(_employeeService.Object);
 
             var response = await controller.EmployeeLogout(1);
 
@@ -455,7 +449,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new EmployeeController(_employeeService.Object);
 
             var response = await controller.UpdatePassword(password);
 
@@ -479,7 +473,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new EmployeeController(_employeeService.Object, _tokenHandler.Object);
+            var controller = new EmployeeController(_employeeService.Object);
 
             var response = await controller.UpdatePassword(password);
 

@@ -10,7 +10,7 @@ import {
   updateEmployeeStatus,
 } from "../SharedServices/employeeManagementService";
 
-function EmployeeManagement() {
+function EmployeeManagement({setLoginState}) {
   //TODO - refactor to use useReducer instead since way too many states
   const [employees, setEmployees] = useState([]);
   const [currPage, setCurrPage] = useState(1);
@@ -25,8 +25,16 @@ function EmployeeManagement() {
   useEffect(() => {
     (async function () {
       try {
-        const employeeByPage = await getAllEmployees(currPage, 10, keyword);
+        const resp = await getAllEmployees(currPage, 10, keyword);
+        
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
 
+        const employeeByPage = await resp.json();
+
+        //const employeeByPage = await getAllEmployees(currPage, 10, keyword);
         setEmployees(employeeByPage.employees);
         setTotalPages(employeeByPage.totalPages);
       } catch (e) {
@@ -53,7 +61,13 @@ function EmployeeManagement() {
     (async function () {
       try {
         setShowLoadingModal(true);
-        await resetEmployeeLockStatus(id);
+        var resp = await resetEmployeeLockStatus(id);
+
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
+
         for (var i = 0; i < employees.length; i++) {
           if (employees[i].id !== id) {
             continue;
@@ -75,7 +89,13 @@ function EmployeeManagement() {
     (async function () {
       try {
         setShowLoadingModal(true);
-        await updateEmployeeStatus(id, status);
+
+        var resp = await updateEmployeeStatus(id, status);
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
+
         for (var i = 0; i < employees.length; i++) {
           if (employees[i].id !== id) {
             continue;
@@ -137,6 +157,7 @@ function EmployeeManagement() {
         show={showAddModal}
         handleHide={() => setShowAddModal(false)}
         handleUserAddSuccess={reloadAfterThreeSeconds}
+        setLoginState={setLoginState}
       />
       <UpdateUserModal
         user={currEmployeeToUpdate}
@@ -144,6 +165,7 @@ function EmployeeManagement() {
         show={showUpdateModal}
         hideModal={closeUpdateModal}
         postUpdateAction={postUpdateEmployeeAction}
+        setLoginState={setLoginState}
       />
       <LoadingModal show={showLoadingModal} />
       <Row>

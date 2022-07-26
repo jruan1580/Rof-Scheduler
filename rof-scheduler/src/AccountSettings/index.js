@@ -19,7 +19,7 @@ import { ensureUpdateInformationProvided } from "../SharedServices/inputValidati
 
 import { useEffect, useState } from "react";
 
-function AccountSettings() {
+function AccountSettings({setLoginState}) {
   const ee = {
     id: 0,
     firstName: "",
@@ -45,7 +45,14 @@ function AccountSettings() {
   useEffect(() => {
     (async function () {
       try {
-        const emp = await getEmployeeById();
+        const resp = await getEmployeeById();
+
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
+
+        const emp = await resp.json();
         setEmployee(emp);
       } catch (e) {
         setUpdateErrMsg(e.message);                
@@ -93,21 +100,26 @@ function AccountSettings() {
 
       (async function () {
         try {
-          await updateEmployeeInformation(
-            id,
-            firstName,
-            lastName,
-            ssn,
-            '', //pass in empty role for account settings, we are not updating roles in account setting.
-            username,
-            email,
-            phoneNumber,
-            addressLine1,
-            addressLine2,
-            city,
-            state,
-            zipCode
-          );
+          var resp = await updateEmployeeInformation(
+              id,
+              firstName,
+              lastName,
+              ssn,
+              '', //pass in empty role for account settings, we are not updating roles in account setting.
+              username,
+              email,
+              phoneNumber,
+              addressLine1,
+              addressLine2,
+              city,
+              state,
+              zipCode
+            );
+
+          if (resp.status === 401){
+            setLoginState(false);
+            return;
+          }
 
           setEmployee({
             ...employee,

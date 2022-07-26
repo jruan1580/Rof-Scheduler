@@ -1,4 +1,5 @@
 import { Navbar, Nav, Container, NavDropdown} from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { logoff } from '../SharedServices/authenticationService';
 
 function NavigationBar({loginState, handleLoginState}){
@@ -31,15 +32,15 @@ function NavigationBar({loginState, handleLoginState}){
                     {loginState && <Nav.Item><Nav.Link href="/">Home</Nav.Link></Nav.Item>}
                     {
                         loginState && localStorage.getItem('role') === 'Administrator' &&
-                        <NavDropdown title='User Management'>                        
-                            <NavDropdown.Item href="/employeemanagement">Employee</NavDropdown.Item>
-                            <NavDropdown.Item href="/clientmanagement">Client</NavDropdown.Item>
+                        <NavDropdown title='User Management'>         
+                            <NavDropdown.Item as={Link} to="/employeemanagement">Employee</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/clientmanagement">Client</NavDropdown.Item>
                         </NavDropdown>  
                     }
                     {
                         loginState &&
                         <NavDropdown title={localStorage.getItem('firstName')}>                        
-                            <NavDropdown.Item href="/accountsettings">Account Settings</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/accountsettings">Account Settings</NavDropdown.Item>
                             <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
                         </NavDropdown>  
                     }
