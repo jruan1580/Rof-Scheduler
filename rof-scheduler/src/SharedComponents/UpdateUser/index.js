@@ -15,6 +15,7 @@ function UpdateUserModal({
   show,
   hideModal,
   postUpdateAction,
+  setLoginState
 }) {
   const [validationMap, setValidationMap] = useState(new Map());
   const [updating, setUpdating] = useState(false);
@@ -164,6 +165,7 @@ function UpdateUserModal({
           }
 
           if (resp !== undefined && resp.status === 401){
+            setLoginState(false);
             return;
           }
 

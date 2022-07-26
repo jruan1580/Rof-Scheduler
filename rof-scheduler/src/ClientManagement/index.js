@@ -123,6 +123,7 @@ function ClientManagement({setLoginState}) {
         show={showAddModal}
         handleHide={() => setShowAddModal(false)}
         handleUserAddSuccess={reloadAfterThreeSeconds}
+        setLoginState={setLoginState}
       />
       <UpdateUserModal
         user={currClientToUpdate}
@@ -130,6 +131,7 @@ function ClientManagement({setLoginState}) {
         show={showUpdateModal}
         hideModal={closeUpdateModal}
         postUpdateAction={postUpdateClientAction}
+        setLoginState={setLoginState}
       />
       <LoadingModal show={showLoadingModal} />
       <Row>

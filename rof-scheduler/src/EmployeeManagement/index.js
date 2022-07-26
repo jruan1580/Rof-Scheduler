@@ -157,6 +157,7 @@ function EmployeeManagement({setLoginState}) {
         show={showAddModal}
         handleHide={() => setShowAddModal(false)}
         handleUserAddSuccess={reloadAfterThreeSeconds}
+        setLoginState={setLoginState}
       />
       <UpdateUserModal
         user={currEmployeeToUpdate}
@@ -164,6 +165,7 @@ function EmployeeManagement({setLoginState}) {
         show={showUpdateModal}
         hideModal={closeUpdateModal}
         postUpdateAction={postUpdateEmployeeAction}
+        setLoginState={setLoginState}
       />
       <LoadingModal show={showLoadingModal} />
       <Row>

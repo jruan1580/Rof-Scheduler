@@ -8,7 +8,7 @@ import { createClient } from "../../SharedServices/clientManagementService";
 import { useState } from "react";
 import "./addUser.css";
 
-function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
+function AddUserModal({ userType, show, handleHide, handleUserAddSuccess, setLoginState }) {
   const [loading, setLoading] = useState(false);
   const [validationMap, setValidationMap] = useState(new Map());
   const [errMsg, setErrMsg] = useState(undefined);
@@ -131,6 +131,7 @@ function AddUserModal({ userType, show, handleHide, handleUserAddSuccess }) {
           }
 
           if (resp !== undefined && resp.status === 401){
+            setLoginState(false);
             return;
           }
 
