@@ -1,4 +1,3 @@
-using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Exceptions;
@@ -14,12 +13,10 @@ namespace EmployeeManagementService.API.Controllers
     public abstract class AEmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
-        private readonly ITokenHandler _tokenHandler;        
 
-        public AEmployeeController(IEmployeeService employeeService, ITokenHandler tokenHandler)
+        public AEmployeeController(IEmployeeService employeeService)
         {
             _employeeService = employeeService;
-            _tokenHandler = tokenHandler;
         }
         
         [HttpGet("{id}")]

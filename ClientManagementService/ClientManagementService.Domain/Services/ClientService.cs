@@ -152,18 +152,18 @@ namespace ClientManagementService.Domain.Services
             if (client.IsLocked)
             {
                 throw new ArgumentException("Client account is locked. Contact admin to get unlocked.");
-            }
-
-            if (client.IsLoggedIn)
-            {
-                return ClientMapper.ToCoreClient(client);
-            }
+            }            
 
             if (!_passwordService.VerifyPasswordHash(password, client.Password))
             {
                 await IncrementClientFailedLoginAttempts(client);
 
                 throw new ArgumentException("Incorrect password.");
+            }
+
+            if (client.IsLoggedIn)
+            {
+                return ClientMapper.ToCoreClient(client);
             }
 
             client.IsLoggedIn = true;

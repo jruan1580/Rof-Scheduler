@@ -59,6 +59,16 @@ namespace AuthenticationService.API
                               {
                                   context.Token = context.Request.Cookies["X-Access-Token-Admin"];
                               }
+
+                              if (context.Request.Cookies.ContainsKey("X-Access-Token-Client"))
+                              {
+                                  context.Token = context.Request.Cookies["X-Access-Token-Client"];
+                              }
+
+                              if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
+                              {
+                                  context.Token = context.Request.Cookies["X-Access-Token-Employee"];
+                              }
                           }                        
 
                           return Task.CompletedTask;

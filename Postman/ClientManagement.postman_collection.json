@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f6949bc9-1205-4f8d-9f3b-52558b18a2a5",
+		"_postman_id": "c909760b-9722-4d86-9074-2929bdb269f6",
 		"name": "ClientManagement",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -237,49 +237,6 @@
 		{
 			"name": "After Login Tests",
 			"item": [
-				{
-					"name": "Get All Clients Success",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", () => {\r",
-									"  pm.response.to.have.status(200);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host}}:{{port}}/api/client/?page=1&offset=10",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"client",
-								""
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "offset",
-									"value": "10"
-								}
-							]
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "Get Client By Id Not Found",
 					"event": [
@@ -1012,6 +969,118 @@
 			]
 		},
 		{
+			"name": "Admin Login",
+			"item": [
+				{
+					"name": "Admin Login Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Test token and id was returned\", () => {\r",
+									"  pm.expect(jsonData).to.be.an(\"object\");\r",
+									"  pm.expect(jsonData.accessToken).to.be.a(\"string\");  \r",
+									"  pm.expect(jsonData.id).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"adminToken\", jsonData.accessToken);\r",
+									"pm.environment.set(\"adminUserId\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Username\": \"jruan1580\",\r\n    \"Password\": \"TestPassword123!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/login",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{authServicePort}}",
+							"path": [
+								"api",
+								"authentication",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get All Client",
+			"item": [
+				{
+					"name": "Get All Clients Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/client/?page=1&offset=10",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"client",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "offset",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Reset Lock Test",
 			"item": [
 				{
@@ -1118,7 +1187,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{clientToken}}",
+								"value": "Bearer {{adminToken}}",
 								"type": "text"
 							}
 						],
@@ -1163,7 +1232,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{clientToken}}",
+								"value": "Bearer {{adminToken}}",
 								"type": "text"
 							}
 						],
@@ -1177,6 +1246,51 @@
 								"api",
 								"client",
 								"{{clientId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin Logout",
+			"item": [
+				{
+					"name": "Admin Logout Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{authServicePort}}/api/authentication/{{adminUserId}}/logout",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{authServicePort}}",
+							"path": [
+								"api",
+								"authentication",
+								"{{adminUserId}}",
+								"logout"
 							]
 						}
 					},

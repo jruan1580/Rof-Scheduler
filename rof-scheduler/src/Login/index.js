@@ -1,6 +1,7 @@
 import { Form, Button, Row, Col, Spinner, Card, Container, Alert } from 'react-bootstrap';
 import { useState } from 'react';
 import { login } from '../SharedServices/authenticationService';
+import { useLocation } from 'react-router-dom';
 
 function Login({ handleLoginState }) {
   const [loading, setLoading] = useState(false);
@@ -8,10 +9,17 @@ function Login({ handleLoginState }) {
   const [usernameError, setUsernameError] = useState(false);
   const [loginErrMsg, setLoginErrMsg] = useState("");
 
+  const { search } = useLocation();
+  var queryParams = new URLSearchParams(search);
+
+  const [isUnauthRedirect, setUnauthRedirect] = useState(queryParams.has('unauthorized'));
+  
   const handleSubmit = (submitEvent) => {
     //prevents reload when submit
     submitEvent.preventDefault();
 
+    setUnauthRedirect(false);
+    
     const username = submitEvent.target.username.value;
     const password = submitEvent.target.password.value;
     const passwordValidation = (password === undefined || password === "") ? "Please enter a password" : "";    
@@ -56,6 +64,10 @@ function Login({ handleLoginState }) {
                   {loginErrMsg !== "" && (
                     <Alert variant="danger">{loginErrMsg}</Alert>
                   )}
+                  {
+                    isUnauthRedirect &&
+                    <Alert variant='warning'>User session has expired. Please login.</Alert>
+                  }
 
                   <Form.Group className="mb-3">
                     <Form.Label>Username</Form.Label>

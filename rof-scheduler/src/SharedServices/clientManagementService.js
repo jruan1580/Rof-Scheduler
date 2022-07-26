@@ -1,3 +1,5 @@
+import  { makeHttpRequest } from './httpClientWrapper';
+
 export const createClient = async function (
   countryId,
   firstName,
@@ -32,19 +34,7 @@ export const createClient = async function (
     },
   };
 
-  var response = await fetch(baseUrl + "/client", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-    credentials: "include",
-  });
-
-  if (response.status !== 201) {
-    var errMsg = await response.text();
-    throw new Error(errMsg);
-  }
+  return await makeHttpRequest(baseUrl + "/client", "POST", {"Content-Type": "application/json"}, 201, data);
 };
 
 export const getAllClients = async function (page, recPerPage, keyword) {
@@ -58,35 +48,14 @@ export const getAllClients = async function (page, recPerPage, keyword) {
     "&keyword=" +
     keyword;
 
-  var response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
-
-  if (response.status !== 200) {
-    var errMsg = await response.text();
-    throw new Error(errMsg);
-  }
-
-  return await response.json();
+  return await makeHttpRequest(url, "GET", { "Accept": "application/json"}, 200, undefined);  
 };
 
 export const resetClientLockStatus = async function (id) {
   var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
   var url = baseUrl + "/client/" + id + "/locked";
 
-  var response = await fetch(url, {
-    method: "PATCH",
-    credentials: "include",
-  });
-
-  if (response.status !== 200) {
-    var errMsg = await response.text();
-    throw new Error(errMsg);
-  }
+  return await makeHttpRequest(url, "PATCH", { "Accept": "application/json"}, 200, undefined);
 };
 
 export const updateClientInformation = async function (
@@ -123,17 +92,5 @@ export const updateClientInformation = async function (
 
   var url = baseUrl + "/client/info";
 
-  var response = await fetch(url, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-    credentials: "include",
-  });
-
-  if (response.status !== 200) {
-    var errMsg = await response.text();
-    throw new Error(errMsg);
-  }
+  return await makeHttpRequest(url, "PUT", {"Content-Type": "application/json"}, 200, data);  
 };

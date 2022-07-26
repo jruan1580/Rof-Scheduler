@@ -1,4 +1,3 @@
-using EmployeeManagementService.API.Authentication;
 using EmployeeManagementService.Domain.Services;
 using EmployeeManagementService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,18 +27,8 @@ namespace EmployeeManagementService.API
             services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
             services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IPasswordService, PasswordService>();
-            services.AddTransient<ITokenHandler, Authentication.TokenHandler>();
 
             services.AddMvc();           
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("http://localhost:3000")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
-                //.AllowCredentials());
-            });
 
             services.AddControllers();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -66,6 +55,11 @@ namespace EmployeeManagementService.API
                               {
                                   context.Token = context.Request.Cookies["X-Access-Token-Admin"];
                               }
+
+                              if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
+                              {
+                                  context.Token = context.Request.Cookies["X-Access-Token-Employee"];
+                              }
                           }
 
                           return Task.CompletedTask;
@@ -87,11 +81,10 @@ namespace EmployeeManagementService.API
             app.UseRouting();
 
             app.UseCors(x => x
-                .WithOrigins("http://localhost:3000", "https://localhost:3000")
+                .WithOrigins("http://localhost:3000")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()); // allow credentials
-
 
             app.UseAuthentication();
 

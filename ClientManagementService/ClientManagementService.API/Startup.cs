@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ClientManagementService.Domain.Services;
 using ClientManagementService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ClientManagementService.API
 {
@@ -31,6 +28,47 @@ namespace ClientManagementService.API
             services.AddTransient<IClientService, ClientService>();
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddControllers();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+             .AddJwtBearer(options =>
+             {
+                 options.TokenValidationParameters = new TokenValidationParameters
+                 {
+                     ValidateIssuer = true,
+                     ValidateAudience = true,
+                     ValidateLifetime = true,
+                     ValidateIssuerSigningKey = true,
+                     ValidIssuer = Configuration.GetSection("Jwt:Issuer").Value,
+                     ValidAudience = Configuration.GetSection("Jwt:Audience").Value,
+                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("Jwt:Key").Value))
+                 };
+                 options.Events = new JwtBearerEvents()
+                 {
+                     OnMessageReceived = context =>
+                     {
+                         //no auth header, get it out of cookie, otw, it is in auth header
+                         if (!context.Request.Headers.ContainsKey("Authorization"))
+                         {
+                             if (context.Request.Cookies.ContainsKey("X-Access-Token-Client"))
+                             {
+                                 context.Token = context.Request.Cookies["X-Access-Token-Client"];
+                             }
+
+                             if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
+                             {
+                                 context.Token = context.Request.Cookies["X-Access-Token-Admin"];
+                             }
+
+                             if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
+                             {
+                                 context.Token = context.Request.Cookies["X-Access-Token-Employee"];
+                             }
+                         }
+
+                         return Task.CompletedTask;
+                     }
+                 };
+             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +88,8 @@ namespace ClientManagementService.API
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
