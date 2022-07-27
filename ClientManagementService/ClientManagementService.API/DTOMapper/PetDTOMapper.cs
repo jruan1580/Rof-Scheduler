@@ -1,4 +1,5 @@
 ﻿using ClientManagementService.API.DTO;
+using ClientManagementService.Domain.Models;
 using CorePet = ClientManagementService.Domain.Models.Pet;
 
 
@@ -21,6 +22,9 @@ namespace ClientManagementService.API.DTOMapper
             dtoPet.RabieVax = corePet.RabieVax;
             dtoPet.OtherInfo = corePet.OtherInfo;
             dtoPet.Picture = corePet.Picture;
+            dtoPet.OwnerFirstName = corePet.Owner.FirstName;
+            dtoPet.OwnerLastName = corePet.Owner.LastName;
+            dtoPet.BreedName = corePet.BreedInfo.BreedName;
 
             return dtoPet;
         }
@@ -40,6 +44,8 @@ namespace ClientManagementService.API.DTOMapper
             corePet.RabieVax = dtoPet.RabieVax;
             corePet.OtherInfo = dtoPet.OtherInfo;
             corePet.Picture = dtoPet.Picture;
+            corePet.Owner = new Client() { Id = dtoPet.OwnerId, FirstName = dtoPet.OwnerFirstName, LastName = dtoPet.OwnerLastName };
+            corePet.BreedInfo = new Breed() { Id = dtoPet.BreedId, BreedName = dtoPet.BreedName };
 
             return corePet;
         }

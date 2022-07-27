@@ -28,6 +28,10 @@ namespace ClientManagementService.Domain.Models
         
         public byte[] Picture { get; set; }
 
+        public Client Owner { get; set; }
+
+        public Breed BreedInfo { get; set; }
+
         public List<string> IsValidPetToCreate()
         {
             var invalidErr = new List<string>();

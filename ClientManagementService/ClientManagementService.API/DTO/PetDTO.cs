@@ -28,5 +28,11 @@ namespace ClientManagementService.API.DTO
         public string OtherInfo { get; set; }
 
         public byte[] Picture { get; set; }
+
+        public string OwnerFirstName { get; set; }
+
+        public string OwnerLastName { get; set; }
+
+        public string BreedName { get; set; }
     }
 }

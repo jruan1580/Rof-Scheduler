@@ -1,4 +1,5 @@
-﻿using CorePet = ClientManagementService.Domain.Models.Pet;
+﻿using ClientManagementService.Domain.Models;
+using CorePet = ClientManagementService.Domain.Models.Pet;
 using DbPet = ClientManagementService.Infrastructure.Persistence.Entities.Pet;
 
 namespace ClientManagementService.Domain.Mappers.Database
@@ -21,6 +22,9 @@ namespace ClientManagementService.Domain.Mappers.Database
             corePet.OtherInfo = dbPet.OtherInfo;
             corePet.Picture = dbPet.Picture;
 
+            corePet.Owner = new Client() { Id = dbPet.OwnerId, FirstName = dbPet.Owner.FirstName, LastName = dbPet.Owner.LastName };
+            corePet.BreedInfo = new Breed() { Id = dbPet.BreedId, BreedName = dbPet.Breed.BreedName };
+
             return corePet;
         }
 
@@ -29,8 +33,8 @@ namespace ClientManagementService.Domain.Mappers.Database
             var entity = new DbPet();
 
             entity.Id = corePet.Id;
-            entity.OwnerId = corePet.OwnerId;
-            entity.BreedId = corePet.BreedId;
+            entity.OwnerId = corePet.Owner.Id;
+            entity.BreedId = corePet.BreedInfo.Id;
             entity.Name = corePet.Name;
             entity.Weight = corePet.Weight;
             entity.Dob = corePet.Dob;
