@@ -3,7 +3,7 @@ import "./updateUser.css";
 import { useState } from "react";
 
 import {
-  ensureUpdateInformationProvided,
+  ensureEmployeeUpdateInformationProvided,
   ensureClientUpdateInformationProvided,
 } from "../../SharedServices/inputValidationService";
 import { updateEmployeeInformation } from "../../SharedServices/employeeManagementService";

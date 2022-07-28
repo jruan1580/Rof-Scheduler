@@ -107,7 +107,7 @@ export const ensureCreateEmployeeInformationProvided = function (
   return validationErrors;
 };
 
-export const ensureUpdateInformationProvided = function (
+export const ensureEmployeeUpdateInformationProvided = function (
   firstName,
   lastName,
   ssn,

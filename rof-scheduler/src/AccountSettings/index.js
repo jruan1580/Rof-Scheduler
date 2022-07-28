@@ -15,28 +15,14 @@ import {
   updateEmployeeInformation,
 } from "../SharedServices/employeeManagementService";
 
-import { ensureUpdateInformationProvided } from "../SharedServices/inputValidationService";
+import { getClientById } from "../SharedServices/clientManagementService";
+
+import { ensureEmployeeUpdateInformationProvided } from "../SharedServices/inputValidationService";
 
 import { useEffect, useState } from "react";
 
 function AccountSettings({setLoginState}) {
-  const ee = {
-    id: 0,
-    firstName: "",
-    lastName: "",
-    ssn: "",
-    role: "",
-    username: "",
-    address: {
-      addressLine1: "",
-      addressLine2: "",
-      city: "",
-      state: "",
-      zipCode: "",
-    },
-  };
-
-  const [employee, setEmployee] = useState(ee);
+  const [user, setUser] = useState(undefined);//user can be either employee, admin, or client
   const [loading, setLoading] = useState(false);
   const [updateErrMsg, setUpdateErrMsg] = useState("");
   const [validationMap, setValidationMap] = useState(new Map());
@@ -45,15 +31,19 @@ function AccountSettings({setLoginState}) {
   useEffect(() => {
     (async function () {
       try {
-        const resp = await getEmployeeById();
+        const role = localStorage.getItem("role");
+        
+        const resp = (role.toLowerCase() === "employee" || role.toLowerCase() === "administrator")
+          ? await getEmployeeById()
+          : await getClientById();
 
         if (resp.status === 401){
           setLoginState(false);
           return;
         }
 
-        const emp = await resp.json();
-        setEmployee(emp);
+        const user = await resp.json();
+        setUser(user);
       } catch (e) {
         setUpdateErrMsg(e.message);                
       }
@@ -76,7 +66,7 @@ function AccountSettings({setLoginState}) {
     const state = submitEvent.target.state.value;
     const zipCode = submitEvent.target.zip.value;
 
-    const validationRes = ensureUpdateInformationProvided(
+    const validationRes = ensureEmployeeUpdateInformationProvided(
       firstName,
       lastName,
       ssn,
@@ -121,20 +111,20 @@ function AccountSettings({setLoginState}) {
             return;
           }
 
-          setEmployee({
-            ...employee,
-            firstName,
-            lastName,
-            ssn,            
-            username,
-            email,
-            phoneNumber,
-            addressLine1,
-            addressLine2,
-            city,
-            state,
-            zipCode,
-          });
+          // setUser({
+          //   ...user,
+          //   firstName,
+          //   lastName,
+          //   ssn,            
+          //   username,
+          //   email,
+          //   phoneNumber,
+          //   addressLine1,
+          //   addressLine2,
+          //   city,
+          //   state,
+          //   zipCode,
+          // });
           setUpdateErrMsg("");
           setDisplaySuccess(true);
         } catch (e) {
@@ -181,7 +171,7 @@ function AccountSettings({setLoginState}) {
                           name="firstName"
                           type="text"
                           placeholder="First name"
-                          defaultValue={employee.firstName}
+                          defaultValue={user === undefined ? "" : user.firstName}
                           isInvalid={validationMap.has("firstName")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -196,7 +186,7 @@ function AccountSettings({setLoginState}) {
                           name="lastName"
                           type="text"
                           placeholder="Last name"
-                          defaultValue={employee.lastName}
+                          defaultValue={user === undefined ? "" : user.lastName}
                           isInvalid={validationMap.has("lastName")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -211,7 +201,7 @@ function AccountSettings({setLoginState}) {
                           type="text"
                           placeholder="Username"
                           name="username"
-                          defaultValue={employee.username}
+                          defaultValue={user === undefined ? "" : user.username}
                           isInvalid={validationMap.has("username")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -228,7 +218,7 @@ function AccountSettings({setLoginState}) {
                           name="ssn"
                           type="text"
                           placeholder="SSN"
-                          defaultValue={employee.ssn}
+                          defaultValue={user === undefined ? "" : user.ssn}
                           isInvalid={validationMap.has("ssn")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -243,7 +233,7 @@ function AccountSettings({setLoginState}) {
                           name="phone"
                           type="text"
                           placeholder="Phone Number"
-                          defaultValue={employee.phoneNumber}
+                          defaultValue={user === undefined ? "" : user.phoneNumber}
                           isInvalid={validationMap.has("phone")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -258,7 +248,7 @@ function AccountSettings({setLoginState}) {
                           name="email"
                           type="email"
                           placeholder="Email Address"
-                          defaultValue={employee.emailAddress}
+                          defaultValue={user === undefined ? "" : user.emailAddress}
                           isInvalid={validationMap.has("email")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -275,7 +265,7 @@ function AccountSettings({setLoginState}) {
                           name="address1"
                           type="text"
                           placeholder="Address Line 1"
-                          defaultValue={employee.address.addressLine1}
+                          defaultValue={user === undefined ? "" : user.address.addressLine1}
                           isInvalid={validationMap.has("addressLine1")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -288,7 +278,7 @@ function AccountSettings({setLoginState}) {
                           type="text"
                           name="address2"
                           placeholder="Address Line 2"
-                          defaultValue={employee.address.addressLine2}
+                          defaultValue={user === undefined ? "" : user.address.addressLine2}
                         />
                       </Form.Group>
                     </Row>
@@ -301,7 +291,7 @@ function AccountSettings({setLoginState}) {
                           name="city"
                           type="text"
                           placeholder="City"
-                          defaultValue={employee.address.city}
+                          defaultValue={user === undefined ? "" : user.address.city}
                           isInvalid={validationMap.has("city")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -315,7 +305,7 @@ function AccountSettings({setLoginState}) {
                           name="state"
                           type="text"
                           placeholder="State"
-                          defaultValue={employee.address.state}
+                          defaultValue={user === undefined ? "" : user.address.state}
                           isInvalid={validationMap.has("state")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -329,7 +319,7 @@ function AccountSettings({setLoginState}) {
                           name="zip"
                           type="text"
                           placeholder="Zipcode"
-                          defaultValue={employee.address.zipCode}
+                          defaultValue={user === undefined ? "" : user.address.zipCode}
                           isInvalid={validationMap.has("zipCode")}
                         />
                         <Form.Control.Feedback type="invalid">

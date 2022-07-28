@@ -51,6 +51,15 @@ export const getAllClients = async function (page, recPerPage, keyword) {
   return await makeHttpRequest(url, "GET", { "Accept": "application/json"}, 200, undefined);  
 };
 
+export const getClientById = async function(){
+  var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
+  var url = baseUrl + "/client/" + id;
+
+  var id = parseInt(localStorage.getItem("id"));
+
+  return await makeHttpRequest(url, "GET", { "Accept": "application/json"}, 200, undefined);  
+}
+
 export const resetClientLockStatus = async function (id) {
   var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
   var url = baseUrl + "/client/" + id + "/locked";
