@@ -12,6 +12,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task AddBreed(Breed newBreed);
         Task DeleteBreedById(long id);
         Task<List<Breed>> GetAllBreedsByType(string type);
+        Task<Breed> GetBreedById(long id);
         Task UpdateBreed(Breed updateBreed);
     }
 
@@ -28,6 +29,14 @@ namespace ClientManagementService.Infrastructure.Persistence
                 breedList = await context.Breeds.Where(b => (b.Type.ToLower().Contains(type))).ToListAsync();
                 
                 return breedList;
+            }
+        }
+
+        public async Task<Breed> GetBreedById(long id)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Breeds.FirstOrDefaultAsync(b => b.Id == id);
             }
         }
 

@@ -2,6 +2,7 @@
 using ClientManagementService.Domain.Mappers.Database;
 using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
+using ClientManagementService.Infrastructure.Persistence.Filters.Client;
 using ClientManagementService.Infrastructure.Persistence.Filters.Pet;
 using System;
 using System.Collections.Generic;
@@ -24,10 +25,14 @@ namespace ClientManagementService.Domain.Services
     public class PetService : IPetService
     {
         private readonly IPetRepository _petRepository;
+        private readonly IClientRepository _clientRepository;
+        private readonly IBreedRepository _breedRepository;
 
-        public PetService(IPetRepository petRepository)
+        public PetService(IPetRepository petRepository, IClientRepository clientRepository, IBreedRepository breedRepository)
         {
             _petRepository = petRepository;
+            _clientRepository = clientRepository;
+            _breedRepository = breedRepository;
         }
 
         public async Task AddPet(Pet newPet)
@@ -63,6 +68,15 @@ namespace ClientManagementService.Domain.Services
                 return new PetsWithTotalPage(new List<Pet>(), 0);
             }
 
+            foreach(var pet in pets)
+            {
+                var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, pet.OwnerId));
+                var breed = await _breedRepository.GetBreedById(pet.BreedId);
+
+                pet.Owner = client;
+                pet.Breed = breed;
+            }
+
             return new PetsWithTotalPage(pets.Select(p => PetMapper.ToCorePet(p)).ToList(), totalPages);
         }
 
@@ -75,6 +89,12 @@ namespace ClientManagementService.Domain.Services
                 throw new PetNotFoundException();
             }
 
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, pet.OwnerId));
+            var breed = await _breedRepository.GetBreedById(pet.BreedId);
+
+            pet.Owner = client;
+            pet.Breed = breed;
+
             return PetMapper.ToCorePet(pet);
         }
 
@@ -86,6 +106,12 @@ namespace ClientManagementService.Domain.Services
             {
                 throw new PetNotFoundException();
             }
+
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, pet.OwnerId));
+            var breed = await _breedRepository.GetBreedById(pet.BreedId);
+
+            pet.Owner = client;
+            pet.Breed = breed;
 
             return PetMapper.ToCorePet(pet);
         }
@@ -103,6 +129,12 @@ namespace ClientManagementService.Domain.Services
 
             foreach (var pet in dbPets)
             {
+                var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, pet.OwnerId));
+                var breed = await _breedRepository.GetBreedById(pet.BreedId);
+
+                pet.Owner = client;
+                pet.Breed = breed;
+
                 pets.Add(PetMapper.ToCorePet(pet));
             }
 
