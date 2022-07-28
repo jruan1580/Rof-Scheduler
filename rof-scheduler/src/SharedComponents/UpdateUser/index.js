@@ -62,7 +62,7 @@ function UpdateUserModal({
     var inputValidations = new Map();
 
     if (userType === "Employee") {
-      inputValidations = ensureUpdateInformationProvided(
+      inputValidations = ensureEmployeeUpdateInformationProvided(
         firstName,
         lastName,
         ssn,
