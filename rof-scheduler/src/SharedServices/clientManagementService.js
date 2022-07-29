@@ -53,9 +53,9 @@ export const getAllClients = async function (page, recPerPage, keyword) {
 
 export const getClientById = async function(){
   var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
-  var url = baseUrl + "/client/" + id;
 
   var id = parseInt(localStorage.getItem("id"));
+  var url = baseUrl + "/client/" + id;
 
   return await makeHttpRequest(url, "GET", { "Accept": "application/json"}, 200, undefined);  
 }
