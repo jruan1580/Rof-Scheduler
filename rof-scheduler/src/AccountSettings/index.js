@@ -15,9 +15,9 @@ import {
   updateEmployeeInformation,
 } from "../SharedServices/employeeManagementService";
 
-import { getClientById } from "../SharedServices/clientManagementService";
+import { getClientById, updateClientInformation } from "../SharedServices/clientManagementService";
 
-import { ensureEmployeeUpdateInformationProvided } from "../SharedServices/inputValidationService";
+import { ensureEmployeeUpdateInformationProvided, ensureClientUpdateInformationProvided } from "../SharedServices/inputValidationService";
 
 import { useEffect, useState } from "react";
 
@@ -43,6 +43,7 @@ function AccountSettings({setLoginState}) {
         }
 
         const user = await resp.json();
+        console.log(user);
         setUser(user);
       } catch (e) {
         setUpdateErrMsg(e.message);                
@@ -57,29 +58,54 @@ function AccountSettings({setLoginState}) {
     const id = parseInt(localStorage.getItem("id"));
     const firstName = submitEvent.target.firstName.value;
     const lastName = submitEvent.target.lastName.value;
-    const ssn = submitEvent.target.ssn.value;
     const username = submitEvent.target.username.value;
     const email = submitEvent.target.email.value;
-    const phoneNumber = submitEvent.target.phone.value;
     const addressLine1 = submitEvent.target.address1.value;
     const addressLine2 = submitEvent.target.address2.value;
     const city = submitEvent.target.city.value;
     const state = submitEvent.target.state.value;
     const zipCode = submitEvent.target.zip.value;
 
-    const validationRes = ensureEmployeeUpdateInformationProvided(
-      firstName,
-      lastName,
-      ssn,
-      'noRole', //pass in some fake value to pass validation. we are not updating roles in account setting.
-      username,
-      email,
-      phoneNumber,
-      addressLine1,
-      city,
-      state,
-      zipCode
-    );
+    var phoneNumber = undefined;
+    var ssn = undefined;
+    var secondaryPhoneNum = undefined;
+
+    if (role.toLowerCase() !== 'client'){
+      ssn = submitEvent.target.ssn.value;
+      phoneNumber = submitEvent.target.phone.value;
+    }else{
+      phoneNumber = submitEvent.target.primaryPhone.value;
+      secondaryPhoneNum = submitEvent.target.secondaryPhone.value;
+    }
+    
+    var validationRes = new Map();
+    if (role.toLowerCase() !== 'client'){
+      validationRes = ensureEmployeeUpdateInformationProvided(
+        firstName,
+        lastName,
+        ssn,
+        'noRole', //pass in some fake value to pass validation. we are not updating roles in account setting.
+        username,
+        email,
+        phoneNumber,
+        addressLine1,
+        city,
+        state,
+        zipCode
+      );
+    }else{
+      validationRes = ensureClientUpdateInformationProvided(
+        firstName,
+        lastName,
+        username,
+        email,        
+        phoneNumber,
+        addressLine1,
+        city,
+        state,
+        zipCode
+      );
+    }
     
     setDisplaySuccess(false);
 
@@ -90,8 +116,10 @@ function AccountSettings({setLoginState}) {
       setLoading(true);
 
       (async function () {
+        var resp = undefined;
         try {
-          var resp = await updateEmployeeInformation(
+          if (role.toLowerCase() !== 'client'){
+            resp = await updateEmployeeInformation(
               id,
               firstName,
               lastName,
@@ -106,26 +134,28 @@ function AccountSettings({setLoginState}) {
               state,
               zipCode
             );
-
-          if (resp.status === 401){
+          }else{
+            resp = await updateClientInformation(
+              id,
+              firstName,
+              lastName,
+              username,
+              email,  
+              phoneNumber,
+              secondaryPhoneNum,
+              addressLine1,
+              addressLine2,
+              city,
+              state,
+              zipCode
+            );
+          }
+         
+          if (resp !== undefined && resp !== null && resp.status === 401){
             setLoginState(false);
             return;
           }
 
-          // setUser({
-          //   ...user,
-          //   firstName,
-          //   lastName,
-          //   ssn,            
-          //   username,
-          //   email,
-          //   phoneNumber,
-          //   addressLine1,
-          //   addressLine2,
-          //   city,
-          //   state,
-          //   zipCode,
-          // });
           setUpdateErrMsg("");
           setDisplaySuccess(true);
         } catch (e) {
@@ -264,7 +294,7 @@ function AccountSettings({setLoginState}) {
                             <Form.Label>Secondary Phone</Form.Label>
                             <Form.Control
                               required
-                              name="phone"
+                              name="secondaryPhone"
                               type="text"
                               placeholder="Secondary Phone Number (optional)"
                               defaultValue={user === undefined ? "" : user.secondaryPhoneNum}
