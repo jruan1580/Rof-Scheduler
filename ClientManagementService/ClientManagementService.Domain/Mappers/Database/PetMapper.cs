@@ -1,10 +1,12 @@
 ﻿using ClientManagementService.Domain.Models;
 using CorePet = ClientManagementService.Domain.Models.Pet;
 using DbPet = ClientManagementService.Infrastructure.Persistence.Entities.Pet;
+using CorePetType = ClientManagementService.Domain.Models.PetType;
+using DbPetType = ClientManagementService.Infrastructure.Persistence.Entities.PetType;
 
 namespace ClientManagementService.Domain.Mappers.Database
 {
-    public class PetMapper
+    public static class PetMapper
     {
         public static CorePet ToCorePet(DbPet dbPet)
         {
@@ -37,6 +39,16 @@ namespace ClientManagementService.Domain.Mappers.Database
             entity.OtherInfo = corePet.OtherInfo;
 
             return entity;
+        }
+
+        public static CorePetType ToCorePetType(DbPetType dbPetType)
+        {
+            var corePetType = new CorePetType();
+
+            corePetType.Id = dbPetType.Id;
+            corePetType.PetTypeName = dbPetType.PetTypeName;
+
+            return corePetType;
         }
     }
 }

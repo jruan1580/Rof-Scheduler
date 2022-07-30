@@ -12,6 +12,7 @@ namespace ClientManagementService.Infrastructure.Persistence
     {
         Task AddPet(Pet newPet);
         Task DeletePetById(long petId);
+        Task<List<PetType>> GetAllPetTypes();
         Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
         Task<List<Pet>> GetPetsByClientId(long clientId);
@@ -28,6 +29,18 @@ namespace ClientManagementService.Infrastructure.Persistence
                 context.Pets.Add(newPet);
 
                 await context.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Will be called when we want to retrieve a list of pet types for drop down list
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<PetType>> GetAllPetTypes()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.PetTypes.ToListAsync();
             }
         }
 
