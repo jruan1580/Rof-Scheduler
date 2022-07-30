@@ -14,7 +14,6 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task DeleteClientById(long id);
         Task<(List<Client>, int)> GetAllClientsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Client> GetClientByFilter<T>(GetClientFilterModel<T> filter);
-        Task<List<Client>> GetClientsByFilter<T>(GetClientFilterModel<T> filter);
         Task<short> IncrementClientFailedLoginAttempts(long id);
         Task UpdateClient(Client clientToUpdate);
         Task<bool> ClientAlreadyExists(long id, string email, string firstName, string lastName, string username);
@@ -112,23 +111,6 @@ namespace ClientManagementService.Infrastructure.Persistence
                 {
                     return await context.Clients.FirstOrDefaultAsync(c => c.EmailAddress.ToLower().Equals(Convert.ToString(filter.Value).ToLower()));
                 }                
-                else
-                {
-                    throw new ArgumentException("Invalid Filter Type.");
-                }
-            }
-        }
-
-        public async Task<List<Client>> GetClientsByFilter<T>(GetClientFilterModel<T> filter)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                if (filter.Filter == GetClientFilterEnum.ListOfIds)
-                {
-                    List<long> clientIds = filter.Value as List<long>;
-
-                    return await context.Clients.Where(c => clientIds.Any(id => c.Id == id)).ToListAsync();
-                }
                 else
                 {
                     throw new ArgumentException("Invalid Filter Type.");

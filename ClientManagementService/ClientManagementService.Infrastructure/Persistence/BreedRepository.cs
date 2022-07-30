@@ -9,7 +9,6 @@ namespace ClientManagementService.Infrastructure.Persistence
 {
     public interface IBreedRepository
     {
-        Task<List<Breed>> GetAllBreeds();
         Task AddBreed(Breed newBreed);
         Task DeleteBreedById(long id);
         Task<List<Breed>> GetAllBreedsByType(string type);
@@ -20,14 +19,6 @@ namespace ClientManagementService.Infrastructure.Persistence
 
     public class BreedRepository : IBreedRepository
     {
-        public async Task<List<Breed>> GetAllBreeds()
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                return await context.Breeds.ToListAsync();
-            }
-        }
-
         public async Task<List<Breed>> GetAllBreedsByType(string type)
         {
             using (var context = new RofSchedulerContext())
