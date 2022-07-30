@@ -3,7 +3,7 @@ using ClientManagementService.API.DTO;
 
 namespace ClientManagementService.API.DTOMapper
 {
-    public class ClientDTOMapper
+    public static class ClientDTOMapper
     {
         public static ClientDTO ToDTOClient(CoreClient coreClient)
         {

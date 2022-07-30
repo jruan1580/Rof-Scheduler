@@ -4,7 +4,7 @@ using CorePet = ClientManagementService.Domain.Models.Pet;
 
 namespace ClientManagementService.API.DTOMapper
 {
-    public class PetDTOMapper
+    public static class PetDTOMapper
     {
         public static PetDTO ToDTOPet(CorePet corePet)
         {
