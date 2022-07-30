@@ -3,7 +3,7 @@ import "./updateUser.css";
 import { useState } from "react";
 
 import {
-  ensureUpdateInformationProvided,
+  ensureEmployeeUpdateInformationProvided,
   ensureClientUpdateInformationProvided,
 } from "../../SharedServices/inputValidationService";
 import { updateEmployeeInformation } from "../../SharedServices/employeeManagementService";
@@ -62,7 +62,7 @@ function UpdateUserModal({
     var inputValidations = new Map();
 
     if (userType === "Employee") {
-      inputValidations = ensureUpdateInformationProvided(
+      inputValidations = ensureEmployeeUpdateInformationProvided(
         firstName,
         lastName,
         ssn,
