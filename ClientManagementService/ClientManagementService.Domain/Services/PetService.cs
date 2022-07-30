@@ -135,13 +135,9 @@ namespace ClientManagementService.Domain.Services
             origPet.Name = updatePet.Name;
             origPet.Weight = updatePet.Weight;
             origPet.Dob = updatePet.Dob;
-            origPet.BordetellaVax = updatePet.BordetellaVax;
-            origPet.RabieVax = updatePet.RabieVax;
-            origPet.Dhppvax = updatePet.Dhppvax;
             origPet.BreedId = updatePet.BreedId;
             origPet.OwnerId = updatePet.OwnerId;
             origPet.OtherInfo = updatePet.OtherInfo;
-            origPet.Picture = updatePet.Picture;
 
             await _petRepository.UpdatePet(origPet);
         }

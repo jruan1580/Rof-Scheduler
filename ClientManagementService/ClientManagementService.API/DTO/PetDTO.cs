@@ -11,7 +11,7 @@ namespace ClientManagementService.API.DTO
 
         public long OwnerId { get; set; }
 
-        public long BreedId { get; set; }
+        public short BreedId { get; set; }
 
         public string Name { get; set; }
 
@@ -19,15 +19,7 @@ namespace ClientManagementService.API.DTO
 
         public string Dob { get; set; }
 
-        public bool BordetellaVax { get; set; }
-
-        public bool Dhppvax { get; set; }
-
-        public bool RabieVax { get; set; }
-
         public string OtherInfo { get; set; }
-
-        public byte[] Picture { get; set; }
 
         public string OwnerFirstName { get; set; }
 

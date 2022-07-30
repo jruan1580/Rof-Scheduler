@@ -16,11 +16,7 @@ namespace ClientManagementService.Domain.Mappers.Database
             corePet.Name = dbPet.Name;
             corePet.Weight = dbPet.Weight;
             corePet.Dob = dbPet.Dob;
-            corePet.BordetellaVax = dbPet.BordetellaVax;
-            corePet.Dhppvax = dbPet.Dhppvax;
-            corePet.RabieVax = dbPet.RabieVax;
             corePet.OtherInfo = dbPet.OtherInfo;
-            corePet.Picture = dbPet.Picture;
 
             corePet.Owner = new Client() { Id = dbPet.OwnerId, FirstName = dbPet.Owner.FirstName, LastName = dbPet.Owner.LastName };
             corePet.BreedInfo = new Breed() { Id = dbPet.BreedId, BreedName = dbPet.Breed.BreedName };
@@ -38,11 +34,7 @@ namespace ClientManagementService.Domain.Mappers.Database
             entity.Name = corePet.Name;
             entity.Weight = corePet.Weight;
             entity.Dob = corePet.Dob;
-            entity.BordetellaVax = corePet.BordetellaVax;
-            entity.Dhppvax = corePet.Dhppvax;
-            entity.RabieVax = corePet.RabieVax;
             entity.OtherInfo = corePet.OtherInfo;
-            entity.Picture = corePet.Picture;
 
             return entity;
         }

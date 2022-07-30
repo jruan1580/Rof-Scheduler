@@ -10,10 +10,10 @@ namespace ClientManagementService.Infrastructure.Persistence
     public interface IBreedRepository
     {
         Task AddBreed(Breed newBreed);
-        Task DeleteBreedById(long id);
+        Task DeleteBreedById(short id);
         Task<List<Breed>> GetAllBreedsByType(string type);
-        Task<List<Breed>> GetBreedsByBreedIds(List<long> breedIds);
-        Task<Breed> GetBreedById(long id);
+        Task<List<Breed>> GetBreedsByBreedIds(List<short> breedIds);
+        Task<Breed> GetBreedById(short id);
         Task UpdateBreed(Breed updateBreed);
     }
 
@@ -23,17 +23,20 @@ namespace ClientManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                var breedList = new List<Breed>();
+                var petType = await context.PetTypes.FirstOrDefaultAsync(t => t.PetTypeName.ToLower() == type.ToLower());
 
-                type = type.ToLower();
+                //unable to find pet type, therefore no breeds
+                //return empty list
+                if (petType == null)
+                {
+                    return new List<Breed>();
+                }
 
-                breedList = await context.Breeds.Where(b => (b.Type.ToLower().Contains(type))).ToListAsync();
-                
-                return breedList;
+                return await context.Breeds.Where(b => b.PetTypeId == petType.Id).ToListAsync();                
             }
         }
 
-        public async Task<List<Breed>> GetBreedsByBreedIds(List<long> breedIds)
+        public async Task<List<Breed>> GetBreedsByBreedIds(List<short> breedIds)
         {
             using (var context = new RofSchedulerContext())
             {
@@ -41,7 +44,7 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<Breed> GetBreedById(long id)
+        public async Task<Breed> GetBreedById(short id)
         {
             using (var context = new RofSchedulerContext())
             {
@@ -69,7 +72,7 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task DeleteBreedById(long id)
+        public async Task DeleteBreedById(short id)
         {
             using (var context = new RofSchedulerContext())
             {
