@@ -68,13 +68,18 @@ namespace ClientManagementService.Domain.Services
                 return new PetsWithTotalPage(new List<Pet>(), 0);
             }
 
-            foreach(var pet in pets)
-            {
-                var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, pet.OwnerId));
-                var breed = await _breedRepository.GetBreedById(pet.BreedId);
+            var clientIds = pets.Select(p => p.OwnerId).Distinct().ToList();            
+            var clients = await _clientRepository.GetClientsByFilter(new GetClientFilterModel<List<long>>(GetClientFilterEnum.ListOfIds, clientIds));
 
-                pet.Owner = client;
-                pet.Breed = breed;
+            var breedIds = pets.Select(p => p.BreedId).Distinct().ToList();
+            var breeds = await _breedRepository.GetBreedsByBreedIds(breedIds);
+
+
+            foreach(var pet in pets)
+            {               
+                pet.Owner = clients.First(c => c.Id == pet.OwnerId);
+
+                pet.Breed = breeds.First(b => b.Id == pet.BreedId);
             }
 
             return new PetsWithTotalPage(pets.Select(p => PetMapper.ToCorePet(p)).ToList(), totalPages);
@@ -127,12 +132,17 @@ namespace ClientManagementService.Domain.Services
 
             var pets = new List<Pet>();
 
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, clientId));
+            
+            //this is okay because breed will not be a large DB
+            var breeds = await _breedRepository.GetAllBreeds();
+
             foreach (var pet in dbPets)
             {
-                var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, pet.OwnerId));
-                var breed = await _breedRepository.GetBreedById(pet.BreedId);
+                var breed = breeds.FirstOrDefault(b => b.Id == pet.BreedId);
 
                 pet.Owner = client;
+
                 pet.Breed = breed;
 
                 pets.Add(PetMapper.ToCorePet(pet));

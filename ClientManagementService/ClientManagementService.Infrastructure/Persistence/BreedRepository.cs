@@ -9,15 +9,25 @@ namespace ClientManagementService.Infrastructure.Persistence
 {
     public interface IBreedRepository
     {
+        Task<List<Breed>> GetAllBreeds();
         Task AddBreed(Breed newBreed);
         Task DeleteBreedById(long id);
         Task<List<Breed>> GetAllBreedsByType(string type);
+        Task<List<Breed>> GetBreedsByBreedIds(List<long> breedIds);
         Task<Breed> GetBreedById(long id);
         Task UpdateBreed(Breed updateBreed);
     }
 
     public class BreedRepository : IBreedRepository
     {
+        public async Task<List<Breed>> GetAllBreeds()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Breeds.ToListAsync();
+            }
+        }
+
         public async Task<List<Breed>> GetAllBreedsByType(string type)
         {
             using (var context = new RofSchedulerContext())
@@ -29,6 +39,14 @@ namespace ClientManagementService.Infrastructure.Persistence
                 breedList = await context.Breeds.Where(b => (b.Type.ToLower().Contains(type))).ToListAsync();
                 
                 return breedList;
+            }
+        }
+
+        public async Task<List<Breed>> GetBreedsByBreedIds(List<long> breedIds)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Breeds.Where(b => breedIds.Any(id => id == b.Id)).ToListAsync();
             }
         }
 
