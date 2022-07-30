@@ -3,7 +3,7 @@ using DbEmployee = EmployeeManagementService.Infrastructure.Persistence.Entities
 
 namespace EmployeeManagementService.Domain.Mappers.Database
 {
-    public class EmployeeMapper
+    public static class EmployeeMapper
     {
         public static CoreEmployee ToCoreEmployee(DbEmployee dbEmployee)
         {
