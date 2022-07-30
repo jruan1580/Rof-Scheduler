@@ -21,6 +21,9 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Country> Countries { get; set; }
         public virtual DbSet<Pet> Pets { get; set; }
+        public virtual DbSet<PetToVaccine> PetToVaccines { get; set; }
+        public virtual DbSet<PetType> PetTypes { get; set; }
+        public virtual DbSet<Vaccine> Vaccines { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -44,10 +47,10 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Type)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.HasOne(d => d.PetType)
+                    .WithMany(p => p.Breeds)
+                    .HasForeignKey(d => d.PetTypeId)
+                    .HasConstraintName("FK__Breed__PetTypeId__114A936A");
             });
 
             modelBuilder.Entity<Client>(entity =>
@@ -113,7 +116,7 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .WithMany(p => p.Clients)
                     .HasForeignKey(d => d.CountryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Client__CountryI__22401542");
+                    .HasConstraintName("FK__Client__CountryI__76969D2E");
             });
 
             modelBuilder.Entity<Country>(entity =>
@@ -130,7 +133,8 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
             {
                 entity.ToTable("Pet");
 
-                entity.Property(e => e.Dhppvax).HasColumnName("DHPPVax");
+                entity.HasIndex(e => new { e.OwnerId, e.Name }, "UC_PET")
+                    .IsUnique();
 
                 entity.Property(e => e.Dob)
                     .IsRequired()
@@ -153,13 +157,61 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .WithMany(p => p.Pets)
                     .HasForeignKey(d => d.BreedId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Pet__BreedId__40C49C62");
+                    .HasConstraintName("FK__Pet__BreedId__17036CC0");
 
                 entity.HasOne(d => d.Owner)
                     .WithMany(p => p.Pets)
                     .HasForeignKey(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Pet__OwnerId__3FD07829");
+                    .HasConstraintName("FK__Pet__OwnerId__151B244E");
+
+                entity.HasOne(d => d.PetType)
+                    .WithMany(p => p.Pets)
+                    .HasForeignKey(d => d.PetTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Pet__PetTypeId__160F4887");
+            });
+
+            modelBuilder.Entity<PetToVaccine>(entity =>
+            {
+                entity.ToTable("PetToVaccine");
+
+                entity.Property(e => e.Inoculated)
+                    .IsRequired()
+                    .HasDefaultValueSql("('0')");
+
+                entity.HasOne(d => d.Pet)
+                    .WithMany(p => p.PetToVaccines)
+                    .HasForeignKey(d => d.PetId)
+                    .HasConstraintName("FK__PetToVacc__PetId__19DFD96B");
+
+                entity.HasOne(d => d.Vax)
+                    .WithMany(p => p.PetToVaccines)
+                    .HasForeignKey(d => d.VaxId)
+                    .HasConstraintName("FK__PetToVacc__VaxId__1AD3FDA4");
+            });
+
+            modelBuilder.Entity<PetType>(entity =>
+            {
+                entity.ToTable("PetType");
+
+                entity.Property(e => e.PetTypeName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<Vaccine>(entity =>
+            {
+                entity.Property(e => e.VaxName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.PetType)
+                    .WithMany(p => p.Vaccines)
+                    .HasForeignKey(d => d.PetTypeId)
+                    .HasConstraintName("FK__Vaccines__PetTyp__7F2BE32F");
             });
 
             OnModelCreatingPartial(modelBuilder);
