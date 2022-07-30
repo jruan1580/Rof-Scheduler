@@ -35,7 +35,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                var pets = await context.Pets.Include(p => p.Owner).Where(p => p.OwnerId == clientId).ToListAsync();
+                var pets = await context.Pets.Where(p => p.OwnerId == clientId).ToListAsync();
 
                 var petList = new List<Pet>();
 

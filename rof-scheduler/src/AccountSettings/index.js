@@ -15,28 +15,14 @@ import {
   updateEmployeeInformation,
 } from "../SharedServices/employeeManagementService";
 
-import { ensureUpdateInformationProvided } from "../SharedServices/inputValidationService";
+import { getClientById, updateClientInformation } from "../SharedServices/clientManagementService";
+
+import { ensureEmployeeUpdateInformationProvided, ensureClientUpdateInformationProvided } from "../SharedServices/inputValidationService";
 
 import { useEffect, useState } from "react";
 
 function AccountSettings({setLoginState}) {
-  const ee = {
-    id: 0,
-    firstName: "",
-    lastName: "",
-    ssn: "",
-    role: "",
-    username: "",
-    address: {
-      addressLine1: "",
-      addressLine2: "",
-      city: "",
-      state: "",
-      zipCode: "",
-    },
-  };
-
-  const [employee, setEmployee] = useState(ee);
+  const [user, setUser] = useState(undefined);//user can be either employee, admin, or client
   const [loading, setLoading] = useState(false);
   const [updateErrMsg, setUpdateErrMsg] = useState("");
   const [validationMap, setValidationMap] = useState(new Map());
@@ -45,15 +31,20 @@ function AccountSettings({setLoginState}) {
   useEffect(() => {
     (async function () {
       try {
-        const resp = await getEmployeeById();
+        const role = localStorage.getItem("role");
+        
+        const resp = (role.toLowerCase() === "employee" || role.toLowerCase() === "administrator")
+          ? await getEmployeeById()
+          : await getClientById();
 
         if (resp.status === 401){
           setLoginState(false);
           return;
         }
 
-        const emp = await resp.json();
-        setEmployee(emp);
+        const user = await resp.json();
+        console.log(user);
+        setUser(user);
       } catch (e) {
         setUpdateErrMsg(e.message);                
       }
@@ -63,32 +54,58 @@ function AccountSettings({setLoginState}) {
   const handleSubmit = (submitEvent) => {
     submitEvent.preventDefault();
 
+    const role = localStorage.getItem("role");
     const id = parseInt(localStorage.getItem("id"));
     const firstName = submitEvent.target.firstName.value;
     const lastName = submitEvent.target.lastName.value;
-    const ssn = submitEvent.target.ssn.value;
     const username = submitEvent.target.username.value;
     const email = submitEvent.target.email.value;
-    const phoneNumber = submitEvent.target.phone.value;
     const addressLine1 = submitEvent.target.address1.value;
     const addressLine2 = submitEvent.target.address2.value;
     const city = submitEvent.target.city.value;
     const state = submitEvent.target.state.value;
     const zipCode = submitEvent.target.zip.value;
 
-    const validationRes = ensureUpdateInformationProvided(
-      firstName,
-      lastName,
-      ssn,
-      'noRole', //pass in some fake value to pass validation. we are not updating roles in account setting.
-      username,
-      email,
-      phoneNumber,
-      addressLine1,
-      city,
-      state,
-      zipCode
-    );
+    var phoneNumber = undefined;
+    var ssn = undefined;
+    var secondaryPhoneNum = undefined;
+
+    if (role.toLowerCase() !== 'client'){
+      ssn = submitEvent.target.ssn.value;
+      phoneNumber = submitEvent.target.phone.value;
+    }else{
+      phoneNumber = submitEvent.target.primaryPhone.value;
+      secondaryPhoneNum = submitEvent.target.secondaryPhone.value;
+    }
+    
+    var validationRes = new Map();
+    if (role.toLowerCase() !== 'client'){
+      validationRes = ensureEmployeeUpdateInformationProvided(
+        firstName,
+        lastName,
+        ssn,
+        'noRole', //pass in some fake value to pass validation. we are not updating roles in account setting.
+        username,
+        email,
+        phoneNumber,
+        addressLine1,
+        city,
+        state,
+        zipCode
+      );
+    }else{
+      validationRes = ensureClientUpdateInformationProvided(
+        firstName,
+        lastName,
+        username,
+        email,        
+        phoneNumber,
+        addressLine1,
+        city,
+        state,
+        zipCode
+      );
+    }
     
     setDisplaySuccess(false);
 
@@ -99,8 +116,10 @@ function AccountSettings({setLoginState}) {
       setLoading(true);
 
       (async function () {
+        var resp = undefined;
         try {
-          var resp = await updateEmployeeInformation(
+          if (role.toLowerCase() !== 'client'){
+            resp = await updateEmployeeInformation(
               id,
               firstName,
               lastName,
@@ -115,26 +134,28 @@ function AccountSettings({setLoginState}) {
               state,
               zipCode
             );
-
-          if (resp.status === 401){
+          }else{
+            resp = await updateClientInformation(
+              id,
+              firstName,
+              lastName,
+              username,
+              email,  
+              phoneNumber,
+              secondaryPhoneNum,
+              addressLine1,
+              addressLine2,
+              city,
+              state,
+              zipCode
+            );
+          }
+         
+          if (resp !== undefined && resp !== null && resp.status === 401){
             setLoginState(false);
             return;
           }
 
-          setEmployee({
-            ...employee,
-            firstName,
-            lastName,
-            ssn,            
-            username,
-            email,
-            phoneNumber,
-            addressLine1,
-            addressLine2,
-            city,
-            state,
-            zipCode,
-          });
           setUpdateErrMsg("");
           setDisplaySuccess(true);
         } catch (e) {
@@ -181,7 +202,7 @@ function AccountSettings({setLoginState}) {
                           name="firstName"
                           type="text"
                           placeholder="First name"
-                          defaultValue={employee.firstName}
+                          defaultValue={user === undefined ? "" : user.firstName}
                           isInvalid={validationMap.has("firstName")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -196,7 +217,7 @@ function AccountSettings({setLoginState}) {
                           name="lastName"
                           type="text"
                           placeholder="Last name"
-                          defaultValue={employee.lastName}
+                          defaultValue={user === undefined ? "" : user.lastName}
                           isInvalid={validationMap.has("lastName")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -211,7 +232,7 @@ function AccountSettings({setLoginState}) {
                           type="text"
                           placeholder="Username"
                           name="username"
-                          defaultValue={employee.username}
+                          defaultValue={user === undefined ? "" : user.username}
                           isInvalid={validationMap.has("username")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -221,36 +242,66 @@ function AccountSettings({setLoginState}) {
                     </Row>
 
                     <Row className="mb-3">
-                      <Form.Group as={Col} md="4">
-                        <Form.Label>SSN</Form.Label>
-                        <Form.Control
-                          required
-                          name="ssn"
-                          type="text"
-                          placeholder="SSN"
-                          defaultValue={employee.ssn}
-                          isInvalid={validationMap.has("ssn")}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          {validationMap.get("ssn")}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-
-                      <Form.Group as={Col} md="4">
-                        <Form.Label>Phone Number</Form.Label>
-                        <Form.Control
-                          required
-                          name="phone"
-                          type="text"
-                          placeholder="Phone Number"
-                          defaultValue={employee.phoneNumber}
-                          isInvalid={validationMap.has("phone")}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          {validationMap.get("phone")}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-
+                      {localStorage.getItem("role").toLowerCase() !== "client" &&
+                        <>
+                          <Form.Group as={Col} md="4">
+                            <Form.Label>SSN</Form.Label>
+                            <Form.Control
+                              required
+                              name="ssn"
+                              type="text"
+                              placeholder="SSN"
+                              defaultValue={user === undefined ? "" : user.ssn}
+                              isInvalid={validationMap.has("ssn")}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {validationMap.get("ssn")}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                          <Form.Group as={Col} md="4">
+                            <Form.Label>Phone Number</Form.Label>
+                            <Form.Control
+                              required
+                              name="phone"
+                              type="text"
+                              placeholder="Phone Number"
+                              defaultValue={user === undefined ? "" : user.phoneNumber}
+                              isInvalid={validationMap.has("phone")}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {validationMap.get("phone")}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                        </>                        
+                      }
+                      {localStorage.getItem("role").toLowerCase() === "client" &&
+                        <>
+                          <Form.Group as={Col} md="4">
+                            <Form.Label>Primary Phone</Form.Label>
+                            <Form.Control
+                              required
+                              name="primaryPhone"
+                              type="text"
+                              placeholder="Primary Phone Number"
+                              defaultValue={user === undefined ? "" : user.primaryPhoneNum}
+                              isInvalid={validationMap.has("phone")}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {validationMap.get("phone")}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                          <Form.Group as={Col} md="4">
+                            <Form.Label>Secondary Phone</Form.Label>
+                            <Form.Control
+                              required
+                              name="secondaryPhone"
+                              type="text"
+                              placeholder="Secondary Phone Number (optional)"
+                              defaultValue={user === undefined ? "" : user.secondaryPhoneNum}
+                            />                           
+                          </Form.Group>
+                        </>  
+                      }                      
                       <Form.Group as={Col} md="4">
                         <Form.Label>Email</Form.Label>
                         <Form.Control
@@ -258,7 +309,7 @@ function AccountSettings({setLoginState}) {
                           name="email"
                           type="email"
                           placeholder="Email Address"
-                          defaultValue={employee.emailAddress}
+                          defaultValue={user === undefined ? "" : user.emailAddress}
                           isInvalid={validationMap.has("email")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -275,7 +326,13 @@ function AccountSettings({setLoginState}) {
                           name="address1"
                           type="text"
                           placeholder="Address Line 1"
-                          defaultValue={employee.address.addressLine1}
+                          defaultValue={
+                            user === undefined ||
+                            user.address === undefined ||
+                            user.address === null
+                              ? ""
+                              : user.address.addressLine1
+                          }
                           isInvalid={validationMap.has("addressLine1")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -288,7 +345,13 @@ function AccountSettings({setLoginState}) {
                           type="text"
                           name="address2"
                           placeholder="Address Line 2"
-                          defaultValue={employee.address.addressLine2}
+                          defaultValue={
+                            user === undefined ||
+                            user.address === undefined ||
+                            user.address === null
+                              ? ""
+                              : user.address.addressLine2
+                          }
                         />
                       </Form.Group>
                     </Row>
@@ -301,7 +364,13 @@ function AccountSettings({setLoginState}) {
                           name="city"
                           type="text"
                           placeholder="City"
-                          defaultValue={employee.address.city}
+                          defaultValue={
+                            user === undefined ||
+                            user.address === undefined ||
+                            user.address === null
+                              ? ""
+                              : user.address.city
+                          }
                           isInvalid={validationMap.has("city")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -315,7 +384,13 @@ function AccountSettings({setLoginState}) {
                           name="state"
                           type="text"
                           placeholder="State"
-                          defaultValue={employee.address.state}
+                          defaultValue={
+                            user === undefined ||
+                            user.address === undefined ||
+                            user.address === null
+                              ? ""
+                              : user.address.state
+                          }
                           isInvalid={validationMap.has("state")}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -329,7 +404,13 @@ function AccountSettings({setLoginState}) {
                           name="zip"
                           type="text"
                           placeholder="Zipcode"
-                          defaultValue={employee.address.zipCode}
+                          defaultValue={
+                            user === undefined ||
+                            user.address === undefined ||
+                            user.address === null
+                              ? ""
+                              : user.address.zipCode
+                          }
                           isInvalid={validationMap.has("zipCode")}
                         />
                         <Form.Control.Feedback type="invalid">

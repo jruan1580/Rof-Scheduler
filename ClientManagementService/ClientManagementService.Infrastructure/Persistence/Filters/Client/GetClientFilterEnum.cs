@@ -3,6 +3,7 @@
     public enum GetClientFilterEnum
     {
         Id,
+        ListOfIds,
         Username,
         Email
     }
