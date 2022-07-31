@@ -27,6 +27,9 @@ namespace ClientManagementService.API
             services.AddSingleton<IClientRepository, ClientRepository>();
             services.AddTransient<IClientService, ClientService>();
             services.AddTransient<IPasswordService, PasswordService>();
+            services.AddSingleton<IPetRepository, PetRepository>();
+            services.AddTransient<IPetService, PetService>();
+            services.AddSingleton<IBreedRepository, BreedRepository>();
             services.AddControllers();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
