@@ -69,7 +69,19 @@ namespace ClientManagementService.Test.Service
                 OwnerId = 1,
                 BreedId = 1,
                 Dob = "1/1/2022",
-                Weight = 30
+                Weight = 30,
+                Owner = new Domain.Models.Client()
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+
+                },
+                BreedInfo = new Domain.Models.Breed()
+                {
+                    Id = 1,
+                    BreedName = "Corgi"            
+                }
             };
 
             var petService = new PetService(_petRepository.Object);
@@ -109,7 +121,19 @@ namespace ClientManagementService.Test.Service
                     BordetellaVax = true,
                     RabieVax = true,
                     OtherInfo = "",
-                    Picture = null
+                    Picture = null,
+                    Owner = new Client()
+                    {
+                        Id = 1,
+                        FirstName = "John",
+                        LastName = "Doe",
+
+                    },
+                    Breed = new Breed()
+                    {
+                        Id = 1,
+                        BreedName = "Corgi"            
+                    }
                 }
             };
 
@@ -131,6 +155,11 @@ namespace ClientManagementService.Test.Service
             Assert.IsTrue(result.Pets[0].RabieVax);
             Assert.IsEmpty(result.Pets[0].OtherInfo);
             Assert.IsNull(result.Pets[0].Picture);
+            Assert.AreEqual(1, result.Pets[0].Owner.Id);
+            Assert.AreEqual("John", result.Pets[0].Owner.FirstName);
+            Assert.AreEqual("Doe", result.Pets[0].Owner.LastName);
+            Assert.AreEqual(1, result.Pets[0].BreedInfo.Id);
+            Assert.AreEqual("Corgi", result.Pets[0].BreedInfo.BreedName);
         }
 
         [Test]
@@ -160,7 +189,19 @@ namespace ClientManagementService.Test.Service
                     BordetellaVax = true,
                     RabieVax = true,
                     OtherInfo = "",
-                    Picture = null
+                    Picture = null,
+                    Owner = new Client()
+                    {
+                        Id = 1,
+                        FirstName = "John",
+                        LastName = "Doe",
+
+                    },
+                    Breed = new Breed()
+                    {
+                        Id = 1,
+                        BreedName = "Corgi"
+                    }
                 });
 
             var petService = new PetService(_petRepository.Object);
@@ -179,6 +220,11 @@ namespace ClientManagementService.Test.Service
             Assert.IsTrue(pet.RabieVax);
             Assert.IsEmpty(pet.OtherInfo);
             Assert.IsNull(pet.Picture);
+            Assert.AreEqual(1, pet.Owner.Id);
+            Assert.AreEqual("John", pet.Owner.FirstName);
+            Assert.AreEqual("Doe", pet.Owner.LastName);
+            Assert.AreEqual(1, pet.BreedInfo.Id);
+            Assert.AreEqual("Corgi", pet.BreedInfo.BreedName);
         }
 
         [Test]
@@ -208,7 +254,19 @@ namespace ClientManagementService.Test.Service
                     BordetellaVax = true,
                     RabieVax = true,
                     OtherInfo = "",
-                    Picture = null
+                    Picture = null,
+                    Owner = new Client()
+                    {
+                        Id = 1,
+                        FirstName = "John",
+                        LastName = "Doe",
+
+                    },
+                    Breed = new Breed()
+                    {
+                        Id = 1,
+                        BreedName = "Corgi"
+                    }
                 });
 
             var petService = new PetService(_petRepository.Object);
@@ -227,6 +285,11 @@ namespace ClientManagementService.Test.Service
             Assert.IsTrue(pet.RabieVax);
             Assert.IsEmpty(pet.OtherInfo);
             Assert.IsNull(pet.Picture);
+            Assert.AreEqual(1, pet.Owner.Id);
+            Assert.AreEqual("John", pet.Owner.FirstName);
+            Assert.AreEqual("Doe", pet.Owner.LastName);
+            Assert.AreEqual(1, pet.BreedInfo.Id);
+            Assert.AreEqual("Corgi", pet.BreedInfo.BreedName);
         }
 
         [Test]
