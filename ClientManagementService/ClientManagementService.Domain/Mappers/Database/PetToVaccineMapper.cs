@@ -3,7 +3,7 @@ using DbVax = ClientManagementService.Infrastructure.Persistence.Entities.Vaccin
 
 namespace ClientManagementService.Domain.Mappers.Database
 {
-    public static class VaccineMapper
+    public static class PetToVaccineMapper
     {
         public static CoreVax ToCorePet(DbVax dbPet)
         {
