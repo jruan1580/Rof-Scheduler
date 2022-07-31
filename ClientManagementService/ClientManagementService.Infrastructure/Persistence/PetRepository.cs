@@ -10,25 +10,27 @@ namespace ClientManagementService.Infrastructure.Persistence
 {
     public interface IPetRepository
     {
-        Task AddPet(Pet newPet);
+        Task<long> AddPet(Pet newPet);
         Task DeletePetById(long petId);
         Task<List<PetType>> GetAllPetTypes();
         Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
         Task<List<Pet>> GetPetsByClientId(long clientId);
         Task UpdatePet(Pet updatePet);
-        Task<bool> PetAlreadyExists(long ownerId, long breedId, string name);
+        Task<bool> PetAlreadyExists(long ownerId, string name);
     }
 
     public class PetRepository : IPetRepository
     {
-        public async Task AddPet(Pet newPet)
+        public async Task<long> AddPet(Pet newPet)
         {
             using (var context = new RofSchedulerContext())
             {
                 context.Pets.Add(newPet);
 
                 await context.SaveChangesAsync();
+
+                return newPet.Id;
             }
         }
 
@@ -170,13 +172,13 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<bool> PetAlreadyExists(long ownerId, long breedId, string name)
+        public async Task<bool> PetAlreadyExists(long ownerId, string name)
         {
             using (var context = new RofSchedulerContext())
             {
                 name = name.ToLower();
 
-                return await context.Pets.AnyAsync(p => p.Name.ToLower().Equals(name) && p.OwnerId.Equals(ownerId) && p.BreedId.Equals(breedId));
+                return await context.Pets.AnyAsync(p => p.Name.ToLower().Equals(name) && p.OwnerId.Equals(ownerId));
             }
         }
     }

@@ -49,7 +49,17 @@ namespace ClientManagementService.Infrastructure.Persistence
                     return null;
                 }
 
-                return await context.PetToVaccines.Where(p => p.PetId == petId).ToListAsync();
+                var petToVaccines = await context.PetToVaccines.Where(p => p.PetId == petId).ToListAsync();
+                
+                var vaxIds = petToVaccines.Select(v => v.VaxId).Distinct().ToList();
+                var vaccines = await context.Vaccines.Where(v => vaxIds.Any(id => id == v.Id)).ToListAsync();
+
+                foreach(var petToVax in petToVaccines)
+                {
+                    petToVax.Vax = vaccines.First(v => v.Id == petToVax.VaxId);
+                }
+
+                return petToVaccines;
             }
         }
 

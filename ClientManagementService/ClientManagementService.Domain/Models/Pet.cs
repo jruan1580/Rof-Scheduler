@@ -7,6 +7,8 @@ namespace ClientManagementService.Domain.Models
         public long Id { get; set; }
         
         public long OwnerId { get; set; }
+
+        public short PetTypeId { get; set; }
         
         public short BreedId { get; set; }
         
@@ -21,6 +23,8 @@ namespace ClientManagementService.Domain.Models
         public Client Owner { get; set; }
 
         public Breed BreedInfo { get; set; }
+
+        public List<VaccineStatus> Vaccines { get; set; }
 
         public List<string> IsValidPetToCreate()
         {
@@ -49,6 +53,16 @@ namespace ClientManagementService.Domain.Models
             if(BreedId <= 0)
             {
                 invalidErr.Add("Need breed info.");
+            }
+
+            if (PetTypeId <= 0)
+            {
+                invalidErr.Add("Need to specify pet type.");
+            }
+
+            if (Vaccines == null || Vaccines.Count == 0)
+            {
+                invalidErr.Add("Vaccines were not specified for pet.");
             }
 
             return invalidErr;
@@ -86,6 +100,11 @@ namespace ClientManagementService.Domain.Models
             if (BreedId <= 0)
             {
                 invalidErr.Add("Need breed info.");
+            }
+
+            if (PetTypeId <= 0)
+            {
+                invalidErr.Add("Need to specific pet type.");
             }
 
             return invalidErr;
