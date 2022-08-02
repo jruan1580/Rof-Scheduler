@@ -31,9 +31,10 @@ namespace ClientManagementService.Domain.Mappers.Database
             {
                 var vaccineStatus = new VaccineStatus();
 
-                vaccineStatus.Id = petVaccine.Id;
+                vaccineStatus.Id = (short)petVaccine.VaxId;
                 vaccineStatus.VaxName = petVaccine.Vax.VaxName;
                 vaccineStatus.Inoculated = (bool)petVaccine.Inoculated;
+                vaccineStatus.PetToVaccineId = petVaccine.Id;
             }
 
             return vaccineStatuses;
@@ -55,6 +56,7 @@ namespace ClientManagementService.Domain.Mappers.Database
                 petToVaccine.VaxId = vaccine.Id;
                 petToVaccine.PetId = petId;
                 petToVaccine.Inoculated = vaccine.Inoculated;
+                petToVaccine.Id = vaccine.PetToVaccineId;
             }
 
             return petToVaccines;

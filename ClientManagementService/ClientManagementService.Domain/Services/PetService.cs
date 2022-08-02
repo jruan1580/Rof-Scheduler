@@ -180,6 +180,11 @@ namespace ClientManagementService.Domain.Services
             origPet.OtherInfo = updatePet.OtherInfo;
 
             await _petRepository.UpdatePet(origPet);
+
+            //update vaccines tied to pet
+            var petToVaccines = PetToVaccineMapper.ToPetToVaccine(origPet.Id, updatePet.Vaccines);
+
+            await _petToVaccinesRepository.UpdatePetToVaccines(petToVaccines);
         }
 
         public async Task DeletePetById(long petId)

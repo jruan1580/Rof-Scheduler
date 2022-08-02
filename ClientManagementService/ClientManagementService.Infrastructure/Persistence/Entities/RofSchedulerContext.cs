@@ -30,7 +30,7 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=LAPTOP-R3ND13SE\\SQLEXPRESS;Database=RofScheduler;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=LAPTOP-ES17IBF4;Database=RofScheduler;Trusted_Connection=True;");
             }
         }
 
@@ -183,12 +183,12 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                 entity.HasOne(d => d.Pet)
                     .WithMany(p => p.PetToVaccines)
                     .HasForeignKey(d => d.PetId)
-                    .HasConstraintName("FK__PetToVacc__PetId__19DFD96B");
+                    .HasConstraintName("FK__PetToVacc__PetId__1EA48E88");
 
                 entity.HasOne(d => d.Vax)
                     .WithMany(p => p.PetToVaccines)
                     .HasForeignKey(d => d.VaxId)
-                    .HasConstraintName("FK__PetToVacc__VaxId__1AD3FDA4");
+                    .HasConstraintName("FK__PetToVacc__VaxId__1F98B2C1");
             });
 
             modelBuilder.Entity<PetType>(entity =>

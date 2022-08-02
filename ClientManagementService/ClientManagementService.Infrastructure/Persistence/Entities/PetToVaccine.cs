@@ -7,7 +7,7 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
 {
     public partial class PetToVaccine
     {
-        public short Id { get; set; }
+        public long Id { get; set; }
         public long? PetId { get; set; }
         public short? VaxId { get; set; }
         public bool? Inoculated { get; set; }

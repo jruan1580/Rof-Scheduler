@@ -102,9 +102,9 @@ namespace ClientManagementService.Domain.Models
                 invalidErr.Add("Need breed info.");
             }
 
-            if (PetTypeId <= 0)
+            if (Vaccines == null || Vaccines.Count == 0)
             {
-                invalidErr.Add("Need to specific pet type.");
+                invalidErr.Add("Vaccines were not specified for pet.");
             }
 
             return invalidErr;

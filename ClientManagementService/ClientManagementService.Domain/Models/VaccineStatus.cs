@@ -7,6 +7,7 @@
     /// </summary>
     public class VaccineStatus : Vaccine
     {
+        public long PetToVaccineId { get; set; }
         public bool Inoculated { get; set; }
     }
 }
