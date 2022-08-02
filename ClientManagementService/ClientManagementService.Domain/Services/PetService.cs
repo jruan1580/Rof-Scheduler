@@ -18,7 +18,6 @@ namespace ClientManagementService.Domain.Services
         Task<Pet> GetPetById(long petId);
         Task<Pet> GetPetByName(string name);
         Task<List<Pet>> GetPetsByClientId(long clientId);
-        Task<List<PetType>> GetPetTypes();
         Task UpdatePet(Pet updatePet);
     }
 
@@ -134,19 +133,6 @@ namespace ClientManagementService.Domain.Services
             }
 
             return pets;
-        }
-
-        public async Task<List<PetType>> GetPetTypes()
-        {
-            var pt = await _petRepository.GetAllPetTypes();
-
-            var types = new List<PetType>();
-            foreach (var petType in pt)
-            {
-                types.Add(PetMapper.ToCorePetType(petType));
-            }
-
-            return types;
         }
 
         public async Task UpdatePet(Pet updatePet)

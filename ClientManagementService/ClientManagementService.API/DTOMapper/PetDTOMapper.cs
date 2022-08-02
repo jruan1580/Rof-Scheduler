@@ -20,6 +20,8 @@ namespace ClientManagementService.API.DTOMapper
             dtoPet.OwnerFirstName = corePet.Owner.FirstName;
             dtoPet.OwnerLastName = corePet.Owner.LastName;
             dtoPet.BreedName = corePet.BreedInfo.BreedName;
+            dtoPet.PetTypeId = corePet.PetTypeId;
+            dtoPet.PetTypeName = corePet.PetType.PetTypeName;
 
             return dtoPet;
         }
@@ -37,6 +39,7 @@ namespace ClientManagementService.API.DTOMapper
             corePet.OtherInfo = dtoPet.OtherInfo;
             corePet.Owner = new Client() { Id = dtoPet.OwnerId, FirstName = dtoPet.OwnerFirstName, LastName = dtoPet.OwnerLastName };
             corePet.BreedInfo = new Breed() { Id = dtoPet.BreedId, BreedName = dtoPet.BreedName };
+            corePet.PetType = new PetType() { Id = dtoPet.PetTypeId, PetTypeName = dtoPet.PetTypeName };
 
             return corePet;
         }
