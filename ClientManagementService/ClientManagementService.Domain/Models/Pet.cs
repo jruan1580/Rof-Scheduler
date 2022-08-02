@@ -24,6 +24,8 @@ namespace ClientManagementService.Domain.Models
 
         public Breed BreedInfo { get; set; }
 
+        public PetType PetType { get; set; }
+
         public List<VaccineStatus> Vaccines { get; set; }
 
         public List<string> IsValidPetToCreate()

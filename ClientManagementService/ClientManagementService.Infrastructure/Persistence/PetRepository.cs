@@ -52,23 +52,9 @@ namespace ClientManagementService.Infrastructure.Persistence
             {
                 var pets = await context.Pets.Where(p => p.OwnerId == clientId).ToListAsync();
 
-                var clientIds = pets.Select(p => p.OwnerId).Distinct().ToList();
-                var clients = await context.Clients.Where(c => clientIds.Any(id => c.Id == id)).ToListAsync();
+                await PopulateBreedOwnerAndPetType(context, pets);
 
-                var breedIds = pets.Select(p => p.BreedId).Distinct().ToList();
-                var breeds = await context.Breeds.Where(b => breedIds.Any(id => id == b.Id)).ToListAsync();
-
-                var petList = new List<Pet>();
-
-                foreach (var pet in pets)
-                {
-                    pet.Owner = clients.First(c => c.Id == pet.OwnerId);
-                    pet.Breed = breeds.First(b => b.Id == pet.BreedId);
-
-                    petList.Add(pet);
-                }
-
-                return petList;
+                return pets;
             }
         }
 
@@ -98,18 +84,8 @@ namespace ClientManagementService.Infrastructure.Persistence
 
                 var result = await pet.OrderByDescending(p => p.Id).Skip(skip).Take(offset).ToListAsync();
 
-                var clientIds = result.Select(p => p.OwnerId).Distinct().ToList();
-                var clients = await context.Clients.Where(c => clientIds.Any(id => c.Id == id)).ToListAsync();
-
-                var breedIds = result.Select(p => p.BreedId).Distinct().ToList();
-                var breeds = await context.Breeds.Where(b => breedIds.Any(id => id == b.Id)).ToListAsync();
-
-                foreach(var res in result)
-                {
-                    res.Owner = clients.First(c => c.Id == res.OwnerId);
-                    res.Breed = breeds.First(b => b.Id == res.BreedId);
-                }
-
+                await PopulateBreedOwnerAndPetType(context, result);
+    
                 return (result, totalPages);
             }
         }
@@ -140,6 +116,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 
                 pet.Owner = await context.Clients.FirstOrDefaultAsync(c => c.Id == pet.OwnerId);
                 pet.Breed = await context.Breeds.FirstOrDefaultAsync(b => b.Id == pet.BreedId);
+                pet.PetType = await context.PetTypes.FirstOrDefaultAsync(pt => pt.Id == pet.PetTypeId);
 
                 return pet;
             }
@@ -179,6 +156,25 @@ namespace ClientManagementService.Infrastructure.Persistence
                 name = name.ToLower();
 
                 return await context.Pets.AnyAsync(p => p.Name.ToLower().Equals(name) && p.OwnerId.Equals(ownerId));
+            }
+        }
+
+        private async Task PopulateBreedOwnerAndPetType(RofSchedulerContext context, List<Pet> pets)
+        {
+            var clientIds = pets.Select(p => p.OwnerId).Distinct().ToList();
+            var clients = await context.Clients.Where(c => clientIds.Any(id => c.Id == id)).ToListAsync();
+
+            var breedIds = pets.Select(p => p.BreedId).Distinct().ToList();
+            var breeds = await context.Breeds.Where(b => breedIds.Any(id => id == b.Id)).ToListAsync();
+
+            var petTypeIds = pets.Select(p => p.PetTypeId).Distinct().ToList();
+            var petTypes = await context.PetTypes.Where(pt => petTypeIds.Any(id => id == pt.Id)).ToListAsync();
+
+            foreach (var pet in pets)
+            {
+                pet.Owner = clients.First(c => c.Id == pet.OwnerId);
+                pet.Breed = breeds.First(b => b.Id == pet.BreedId);
+                pet.PetType = petTypes.First(pt => pt.Id == pet.PetTypeId);
             }
         }
     }

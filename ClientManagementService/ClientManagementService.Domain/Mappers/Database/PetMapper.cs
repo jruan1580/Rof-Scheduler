@@ -25,6 +25,7 @@ namespace ClientManagementService.Domain.Mappers.Database
 
             corePet.Owner = new Models.Client() { Id = dbPet.OwnerId, FirstName = dbPet.Owner.FirstName, LastName = dbPet.Owner.LastName };
             corePet.BreedInfo = new Models.Breed() { Id = dbPet.BreedId, BreedName = dbPet.Breed.BreedName };
+            corePet.PetType = new CorePetType() { Id = dbPet.PetType.Id, PetTypeName = dbPet.PetType.PetTypeName };
 
             if (petToVaccine != null && petToVaccine.Count > 0)
             {
