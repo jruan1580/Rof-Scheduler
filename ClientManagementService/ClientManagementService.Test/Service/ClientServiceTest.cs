@@ -287,7 +287,7 @@ namespace ClientManagementService.Test.Service
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            Assert.ThrowsAsync<ClientNotFoundException>(() => clientService.GetClientById(1));
+            Assert.ThrowsAsync<EntityNotFoundException>(() => clientService.GetClientById(1));
         }
 
         [Test]
@@ -730,7 +730,7 @@ namespace ClientManagementService.Test.Service
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
-            Assert.ThrowsAsync<ClientNotFoundException>(() => clientService.ResetClientFailedLoginAttempts(0));
+            Assert.ThrowsAsync<EntityNotFoundException>(() => clientService.ResetClientFailedLoginAttempts(0));
         }
 
         [Test]

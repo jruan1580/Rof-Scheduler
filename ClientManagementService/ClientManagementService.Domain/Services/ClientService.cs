@@ -86,7 +86,7 @@ namespace ClientManagementService.Domain.Services
             var origClient = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, client.Id));
             if (origClient == null)
             {
-                throw new ClientNotFoundException();
+                throw new EntityNotFoundException("Client");
             }
 
             origClient.FirstName = client.FirstName;
@@ -122,7 +122,7 @@ namespace ClientManagementService.Domain.Services
 
             if (client == null)
             {
-                throw new ClientNotFoundException();
+                throw new EntityNotFoundException("Client");
             }
 
             return ClientMapper.ToCoreClient(client);
@@ -146,7 +146,7 @@ namespace ClientManagementService.Domain.Services
 
             if (client == null)
             {
-                throw new ClientNotFoundException();
+                throw new EntityNotFoundException("Client");
             }
 
             if (client.IsLocked)
@@ -193,7 +193,7 @@ namespace ClientManagementService.Domain.Services
 
             if(client == null)
             {
-                throw new ClientNotFoundException();
+                throw new EntityNotFoundException("Client");
             }
 
             client.FailedLoginAttempts = 0;

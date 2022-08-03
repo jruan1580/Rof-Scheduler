@@ -82,7 +82,7 @@ namespace ClientManagementService.Domain.Services
 
             if (pet == null)
             {
-                throw new PetNotFoundException();
+                throw new EntityNotFoundException("Pet");
             }
 
             var petToVaccines = await _petToVaccinesRepository.GetPetToVaccineByPetId(pet.Id);
@@ -101,7 +101,7 @@ namespace ClientManagementService.Domain.Services
 
             if (pet == null)
             {
-                throw new PetNotFoundException();
+                throw new EntityNotFoundException("Pet");
             }
 
             var petToVaccines = await _petToVaccinesRepository.GetPetToVaccineByPetId(pet.Id);
@@ -155,7 +155,7 @@ namespace ClientManagementService.Domain.Services
             var origPet = await _petRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, updatePet.Id));
             if (origPet == null)
             {
-                throw new PetNotFoundException();
+                throw new EntityNotFoundException("Pet");
             }
 
             origPet.Name = updatePet.Name;
