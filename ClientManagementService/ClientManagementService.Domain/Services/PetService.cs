@@ -82,14 +82,14 @@ namespace ClientManagementService.Domain.Services
 
             if (pet == null)
             {
-                throw new EntityNotFoundException("Pet");
+                throw new EntityNotFoundException("Pet was not found");
             }
 
             var petToVaccines = await _petToVaccinesRepository.GetPetToVaccineByPetId(pet.Id);
 
             if (petToVaccines == null || petToVaccines.Count == 0)
             {
-
+                throw new EntityNotFoundException("Pet had no records of vaccines");
             }
 
             return PetMapper.ToCorePet(pet, petToVaccines);
@@ -101,14 +101,14 @@ namespace ClientManagementService.Domain.Services
 
             if (pet == null)
             {
-                throw new EntityNotFoundException("Pet");
+                throw new EntityNotFoundException("Pet was not found");
             }
 
             var petToVaccines = await _petToVaccinesRepository.GetPetToVaccineByPetId(pet.Id);
 
             if (petToVaccines == null || petToVaccines.Count == 0)
             {
-
+                throw new EntityNotFoundException("Pet had no records of vaccines");
             }
 
             return PetMapper.ToCorePet(pet, petToVaccines);
@@ -155,7 +155,7 @@ namespace ClientManagementService.Domain.Services
             var origPet = await _petRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, updatePet.Id));
             if (origPet == null)
             {
-                throw new EntityNotFoundException("Pet");
+                throw new EntityNotFoundException("Pet was not found. Failed to update.");
             }
 
             origPet.Name = updatePet.Name;
