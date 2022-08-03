@@ -1,5 +1,6 @@
 ﻿using ClientManagementService.API.DTO;
 using ClientManagementService.Domain.Models;
+using System.Collections.Generic;
 using CorePet = ClientManagementService.Domain.Models.Pet;
 
 namespace ClientManagementService.API.DTOMapper
@@ -23,6 +24,22 @@ namespace ClientManagementService.API.DTOMapper
             dtoPet.PetTypeId = corePet.PetTypeId;
             dtoPet.PetTypeName = corePet.PetType.PetTypeName;
 
+            dtoPet.Vaccines = new List<PetsVaccineDTO>();
+
+            if (corePet.Vaccines != null)
+            {
+                foreach (var vax in corePet.Vaccines)
+                {
+                    dtoPet.Vaccines.Add(new PetsVaccineDTO()
+                    {
+                        Id = vax.Id,
+                        PetsVaccineId = vax.PetToVaccineId,
+                        VaccineName = vax.VaxName,
+                        Innoculated = vax.Inoculated
+                    });
+                }
+            }
+
             return dtoPet;
         }
 
@@ -40,6 +57,22 @@ namespace ClientManagementService.API.DTOMapper
             corePet.Owner = new Client() { Id = dtoPet.OwnerId, FirstName = dtoPet.OwnerFirstName, LastName = dtoPet.OwnerLastName };
             corePet.BreedInfo = new Breed() { Id = dtoPet.BreedId, BreedName = dtoPet.BreedName };
             corePet.PetType = new PetType() { Id = dtoPet.PetTypeId, PetTypeName = dtoPet.PetTypeName };
+
+            corePet.Vaccines = new List<VaccineStatus>();
+
+            if (dtoPet.Vaccines != null)
+            {
+                foreach (var vax in dtoPet.Vaccines)
+                {
+                    corePet.Vaccines.Add(new VaccineStatus()
+                    {
+                        Id = vax.Id,
+                        PetToVaccineId = vax.PetsVaccineId,
+                        VaxName = vax.VaccineName,
+                        Inoculated = vax.Innoculated
+                    });
+                }
+            }      
 
             return corePet;
         }
