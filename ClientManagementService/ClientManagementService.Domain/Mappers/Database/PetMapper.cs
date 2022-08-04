@@ -33,8 +33,8 @@ namespace ClientManagementService.Domain.Mappers.Database
             var entity = new DbPet();
 
             entity.Id = corePet.Id;
-            entity.OwnerId = corePet.Owner.Id;
-            entity.BreedId = corePet.BreedInfo.Id;
+            entity.OwnerId = corePet.OwnerId;
+            entity.BreedId = corePet.BreedId;
             entity.Name = corePet.Name;
             entity.Weight = corePet.Weight;
             entity.Dob = corePet.Dob;
