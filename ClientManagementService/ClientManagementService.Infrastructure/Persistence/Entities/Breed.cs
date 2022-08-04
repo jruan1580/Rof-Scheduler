@@ -12,10 +12,11 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
             Pets = new HashSet<Pet>();
         }
 
-        public long Id { get; set; }
+        public short Id { get; set; }
+        public short? PetTypeId { get; set; }
         public string BreedName { get; set; }
-        public string Type { get; set; }
 
+        public virtual PetType PetType { get; set; }
         public virtual ICollection<Pet> Pets { get; set; }
     }
 }

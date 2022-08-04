@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ClientManagementService.API.DTO
 {
@@ -11,7 +8,17 @@ namespace ClientManagementService.API.DTO
 
         public long OwnerId { get; set; }
 
-        public long BreedId { get; set; }
+        public string OwnerFirstName { get; set; }
+
+        public string OwnerLastName { get; set; }
+
+        public short BreedId { get; set; }
+
+        public string BreedName { get; set; }
+
+        public short PetTypeId { get; set; }
+
+        public string PetTypeName { get; set; }
 
         public string Name { get; set; }
 
@@ -19,20 +26,8 @@ namespace ClientManagementService.API.DTO
 
         public string Dob { get; set; }
 
-        public bool BordetellaVax { get; set; }
-
-        public bool Dhppvax { get; set; }
-
-        public bool RabieVax { get; set; }
-
         public string OtherInfo { get; set; }
-
-        public byte[] Picture { get; set; }
-
-        public string OwnerFirstName { get; set; }
-
-        public string OwnerLastName { get; set; }
-
-        public string BreedName { get; set; }
+        
+        public List<PetsVaccineDTO> Vaccines { get; set; }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ClientManagementService.Domain.Models
 {
@@ -9,8 +7,10 @@ namespace ClientManagementService.Domain.Models
         public long Id { get; set; }
         
         public long OwnerId { get; set; }
+
+        public short PetTypeId { get; set; }
         
-        public long BreedId { get; set; }
+        public short BreedId { get; set; }
         
         public string Name { get; set; }
         
@@ -18,19 +18,15 @@ namespace ClientManagementService.Domain.Models
         
         public string Dob { get; set; }
         
-        public bool BordetellaVax { get; set; }
-        
-        public bool Dhppvax { get; set; }
-        
-        public bool RabieVax { get; set; }
-        
         public string OtherInfo { get; set; }
         
-        public byte[] Picture { get; set; }
-
         public Client Owner { get; set; }
 
         public Breed BreedInfo { get; set; }
+
+        public PetType PetType { get; set; }
+
+        public List<VaccineStatus> Vaccines { get; set; }
 
         public List<string> IsValidPetToCreate()
         {
@@ -59,6 +55,16 @@ namespace ClientManagementService.Domain.Models
             if(BreedId <= 0)
             {
                 invalidErr.Add("Need breed info.");
+            }
+
+            if (PetTypeId <= 0)
+            {
+                invalidErr.Add("Need to specify pet type.");
+            }
+
+            if (Vaccines == null || Vaccines.Count == 0)
+            {
+                invalidErr.Add("Vaccines were not specified for pet.");
             }
 
             return invalidErr;
@@ -96,6 +102,11 @@ namespace ClientManagementService.Domain.Models
             if (BreedId <= 0)
             {
                 invalidErr.Add("Need breed info.");
+            }
+
+            if (Vaccines == null || Vaccines.Count == 0)
+            {
+                invalidErr.Add("Vaccines were not specified for pet.");
             }
 
             return invalidErr;

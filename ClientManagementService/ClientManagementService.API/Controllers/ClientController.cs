@@ -76,9 +76,9 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok(ClientDTOMapper.ToDTOClient(client));
             }
-            catch (ClientNotFoundException)
+            catch (EntityNotFoundException notFound)
             {
-                return NotFound($"Client with id {id} not found");
+                return NotFound(notFound.Message);
             }
             catch (Exception ex)
             {
@@ -117,11 +117,11 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok(new { Id = clientLogIn.Id, FirstName = clientLogIn.FirstName, LastName = clientLogIn.LastName});
             }
-            catch (ClientNotFoundException)
+            catch (EntityNotFoundException notFound)
             {
-                return NotFound($"Client with username: {client} was not found");
+                return NotFound(notFound.Message);
             }
-            catch(ArgumentException argEx)
+            catch (ArgumentException argEx)
             {
                 return BadRequest(argEx.Message);
             }
@@ -141,9 +141,9 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (ClientNotFoundException)
+            catch (EntityNotFoundException notFound)
             {
-                return NotFound($"Client with id {id} not found");
+                return NotFound(notFound.Message);
             }
             catch (Exception ex)
             {
@@ -181,9 +181,9 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (ClientNotFoundException)
+            catch (EntityNotFoundException notFound)
             {
-                return NotFound();
+                return NotFound(notFound.Message);
             }
             catch (ArgumentException argEx)
             {
@@ -205,9 +205,9 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (ClientNotFoundException)
+            catch (EntityNotFoundException notFound)
             {
-                return NotFound();
+                return NotFound(notFound.Message);
             }
             catch (ArgumentException argEx)
             {

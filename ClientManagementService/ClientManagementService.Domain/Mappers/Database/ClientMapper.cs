@@ -3,7 +3,7 @@ using DbClient = ClientManagementService.Infrastructure.Persistence.Entities.Cli
 
 namespace ClientManagementService.Domain.Mappers.Database
 {
-    public class ClientMapper
+    public static class ClientMapper
     {
         public static CoreClient ToCoreClient(DbClient dbClient)
         {

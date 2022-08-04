@@ -70,9 +70,9 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok(PetDTOMapper.ToDTOPet(pet));
             }
-            catch (PetNotFoundException)
+            catch (EntityNotFoundException notFound)
             {
-                return NotFound($"Pet with id {id} not found");
+                return NotFound(notFound.Message);
             }
             catch (Exception ex)
             {
@@ -89,9 +89,9 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok(PetDTOMapper.ToDTOPet(pet));
             }
-            catch (PetNotFoundException)
+            catch (EntityNotFoundException notFound)
             {
-                return NotFound($"Pet with name {name} not found");
+                return NotFound(notFound.Message);
             }
             catch (Exception ex)
             {
@@ -123,9 +123,9 @@ namespace ClientManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (PetNotFoundException)
+            catch (EntityNotFoundException notFound)
             {
-                return NotFound();
+                return NotFound(notFound.Message);
             }
             catch (ArgumentException argEx)
             {

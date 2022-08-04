@@ -3,7 +3,7 @@ using EmployeeManagementService.API.DTO;
 
 namespace EmployeeManagementService.API.DTOMappers
 {
-    public class EmployeeDTOMapper
+    public static class EmployeeDTOMapper
     {
         public static EmployeeDTO ToDTOEmployee(CoreEmployee coreEmp)
         {

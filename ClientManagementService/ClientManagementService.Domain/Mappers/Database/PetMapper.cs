@@ -1,29 +1,36 @@
 ﻿using ClientManagementService.Domain.Models;
 using CorePet = ClientManagementService.Domain.Models.Pet;
 using DbPet = ClientManagementService.Infrastructure.Persistence.Entities.Pet;
+using CorePetType = ClientManagementService.Domain.Models.PetType;
+using DbPetType = ClientManagementService.Infrastructure.Persistence.Entities.PetType;
+using ClientManagementService.Infrastructure.Persistence.Entities;
+using System.Collections.Generic;
 
 namespace ClientManagementService.Domain.Mappers.Database
 {
-    public class PetMapper
+    public static class PetMapper
     {
-        public static CorePet ToCorePet(DbPet dbPet)
+        public static CorePet ToCorePet(DbPet dbPet, List<PetToVaccine> petToVaccine)
         {
             var corePet = new CorePet();
 
             corePet.Id = dbPet.Id;
             corePet.OwnerId = dbPet.OwnerId;
+            corePet.PetTypeId = dbPet.PetTypeId;
             corePet.BreedId = dbPet.BreedId;
             corePet.Name = dbPet.Name;
             corePet.Weight = dbPet.Weight;
             corePet.Dob = dbPet.Dob;
-            corePet.BordetellaVax = dbPet.BordetellaVax;
-            corePet.Dhppvax = dbPet.Dhppvax;
-            corePet.RabieVax = dbPet.RabieVax;
             corePet.OtherInfo = dbPet.OtherInfo;
-            corePet.Picture = dbPet.Picture;
 
-            corePet.Owner = new Client() { Id = dbPet.OwnerId, FirstName = dbPet.Owner.FirstName, LastName = dbPet.Owner.LastName };
-            corePet.BreedInfo = new Breed() { Id = dbPet.BreedId, BreedName = dbPet.Breed.BreedName };
+            corePet.Owner = new Models.Client() { Id = dbPet.OwnerId, FirstName = dbPet.Owner.FirstName, LastName = dbPet.Owner.LastName };
+            corePet.BreedInfo = new Models.Breed() { Id = dbPet.BreedId, BreedName = dbPet.Breed.BreedName };
+            corePet.PetType = new CorePetType() { Id = dbPet.PetType.Id, PetTypeName = dbPet.PetType.PetTypeName };
+
+            if (petToVaccine != null && petToVaccine.Count > 0)
+            {
+                corePet.Vaccines = PetToVaccineMapper.ToVaccineStatus(petToVaccine);
+            }
 
             return corePet;
         }
@@ -35,16 +42,23 @@ namespace ClientManagementService.Domain.Mappers.Database
             entity.Id = corePet.Id;
             entity.OwnerId = corePet.OwnerId;
             entity.BreedId = corePet.BreedId;
+            entity.PetTypeId = corePet.PetTypeId;
             entity.Name = corePet.Name;
             entity.Weight = corePet.Weight;
             entity.Dob = corePet.Dob;
-            entity.BordetellaVax = corePet.BordetellaVax;
-            entity.Dhppvax = corePet.Dhppvax;
-            entity.RabieVax = corePet.RabieVax;
             entity.OtherInfo = corePet.OtherInfo;
-            entity.Picture = corePet.Picture;
 
             return entity;
+        }
+
+        public static CorePetType ToCorePetType(DbPetType dbPetType)
+        {
+            var corePetType = new CorePetType();
+
+            corePetType.Id = dbPetType.Id;
+            corePetType.PetTypeName = dbPetType.PetTypeName;
+
+            return corePetType;
         }
     }
 }
