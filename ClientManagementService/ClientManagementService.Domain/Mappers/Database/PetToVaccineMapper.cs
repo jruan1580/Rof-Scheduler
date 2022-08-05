@@ -35,6 +35,8 @@ namespace ClientManagementService.Domain.Mappers.Database
                 vaccineStatus.VaxName = petVaccine.Vax.VaxName;
                 vaccineStatus.Inoculated = (bool)petVaccine.Inoculated;
                 vaccineStatus.PetToVaccineId = petVaccine.Id;
+
+                vaccineStatuses.Add(vaccineStatus);
             }
 
             return vaccineStatuses;
@@ -57,6 +59,8 @@ namespace ClientManagementService.Domain.Mappers.Database
                 petToVaccine.PetId = petId;
                 petToVaccine.Inoculated = vaccine.Inoculated;
                 petToVaccine.Id = vaccine.PetToVaccineId;
+
+                petToVaccines.Add(petToVaccine);
             }
 
             return petToVaccines;
