@@ -105,5 +105,19 @@ namespace ClientManagementService.Test.Mapper
             Assert.AreEqual("1/1/2022", entity.Dob);
             Assert.AreEqual(30, entity.Weight);
         }
+
+        [Test]
+        public void ToCorePetTypeTest()
+        {
+            var entity = new PetType();
+
+            entity.Id = 1;
+            entity.PetTypeName = "Dog";
+
+            var corePetType = PetMapper.ToCorePetType(entity);
+
+            Assert.AreEqual(entity.Id, corePetType.Id);
+            Assert.AreEqual(entity.PetTypeName, corePetType.PetTypeName);
+        }
     }
 }
