@@ -107,12 +107,12 @@ namespace ClientManagementService.API.Controllers
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
-        [HttpGet("{clientId}/clientId")]
-        public async Task<IActionResult> GetPetsByClientId(long clientId)
+        [HttpGet("clientId")]
+        public async Task<IActionResult> GetPetsByClientId([FromQuery] long clientId, [FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
             try
             {
-                var petList = await _petService.GetPetsByClientId(clientId);
+                var petList = await _petService.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
 
                 return Ok(petList);
             }

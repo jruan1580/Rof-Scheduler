@@ -15,7 +15,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task<List<PetType>> GetAllPetTypes();
         Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
-        Task<List<Pet>> GetPetsByClientId(long clientId);
+        Task<(List<Pet>, int)> GetPetsByClientIdAndKeyword(long clientId, int page = 1, int offset = 10, string keyword = "");
         Task UpdatePet(Pet updatePet);
         Task<bool> PetAlreadyExists(long ownerId, string name);
     }
@@ -46,15 +46,35 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<List<Pet>> GetPetsByClientId(long clientId)
+        public async Task<(List<Pet>, int)> GetPetsByClientIdAndKeyword(long clientId, int page = 1, int offset = 10, string keyword ="")
         {
             using (var context = new RofSchedulerContext())
             {
-                var pets = await context.Pets.Where(p => p.OwnerId == clientId).ToListAsync();
+                var skip = (page - 1) * offset;
+                IQueryable<Pet> pets = context.Pets.Where(p => p.OwnerId == clientId);
 
-                await PopulateBreedOwnerAndPetType(context, pets);
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    keyword = keyword.ToLower();
 
-                return pets;
+                    pets = context.Pets.Where(p => (p.Name.ToLower().Contains(keyword)));
+                }
+
+                var countByCriteria = await pets.CountAsync();
+                var fullPages = countByCriteria / offset;
+                var remaining = countByCriteria % offset;
+                var totalPages = (remaining > 0) ? fullPages + 1 : fullPages;
+
+                if (page > totalPages)
+                {
+                    throw new ArgumentException("No more pets.");
+                }
+
+                var res = await pets.Skip(skip).Take(offset).ToListAsync();
+
+                await PopulateBreedOwnerAndPetType(context, res);
+
+                return (res, totalPages);
             }
         }
 
