@@ -49,6 +49,7 @@ namespace ClientManagementService.API.DTOMapper
 
             corePet.Id = dtoPet.Id;
             corePet.OwnerId = dtoPet.OwnerId;
+            corePet.PetTypeId = dtoPet.PetTypeId;
             corePet.BreedId = dtoPet.BreedId;
             corePet.Name = dtoPet.Name;
             corePet.Weight = dtoPet.Weight;
