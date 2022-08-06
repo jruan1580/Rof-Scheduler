@@ -8,7 +8,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 {
     public interface IPetToVaccinesRepository
     {
-        Task<List<Vaccine>> GetVaccinesByPetType(int petTypeId);
+        Task<List<Vaccine>> GetVaccinesByPetType(short petTypeId);
         Task<List<PetToVaccine>> GetPetToVaccineByPetId(long petId);
 
         //takes a list because a pet usually have more than one vax. so adding/updating a list of vax is more common
@@ -23,7 +23,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         /// </summary>
         /// <param name="petTypeId"></param>
         /// <returns></returns>
-        public async Task<List<Vaccine>> GetVaccinesByPetType(int petTypeId)
+        public async Task<List<Vaccine>> GetVaccinesByPetType(short petTypeId)
         {
             using (var context = new RofSchedulerContext())
             {
