@@ -13,6 +13,7 @@ function PetManagement({ setLoginState }){
             <AddPetModal
                 show={showAddModal}
                 closeModal={() => setShowAddModal(false)}
+                setLoginState={setLoginState}
             />
             <Row>
                 <Form>

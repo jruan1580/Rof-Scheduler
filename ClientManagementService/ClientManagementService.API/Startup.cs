@@ -29,7 +29,7 @@ namespace ClientManagementService.API
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddSingleton<IPetRepository, PetRepository>();
             services.AddTransient<IPetService, PetService>();
-            services.AddSingleton<IBreedRepository, BreedRepository>();
+
             services.AddControllers();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

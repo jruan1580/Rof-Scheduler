@@ -1,8 +1,10 @@
-﻿using ClientManagementService.Domain.Models;
-using CorePet = ClientManagementService.Domain.Models.Pet;
+﻿using CorePet = ClientManagementService.Domain.Models.Pet;
 using DbPet = ClientManagementService.Infrastructure.Persistence.Entities.Pet;
 using CorePetType = ClientManagementService.Domain.Models.PetType;
 using DbPetType = ClientManagementService.Infrastructure.Persistence.Entities.PetType;
+using CoreBreed = ClientManagementService.Domain.Models.Breed;
+using DbBreed = ClientManagementService.Infrastructure.Persistence.Entities.Breed;
+
 using ClientManagementService.Infrastructure.Persistence.Entities;
 using System.Collections.Generic;
 
@@ -59,6 +61,16 @@ namespace ClientManagementService.Domain.Mappers.Database
             corePetType.PetTypeName = dbPetType.PetTypeName;
 
             return corePetType;
+        }
+
+        public static CoreBreed ToCoreBreed(DbBreed dbBreed)
+        {
+            var coreBreed = new CoreBreed();
+
+            coreBreed.Id = dbBreed.Id;
+            coreBreed.BreedName = dbBreed.BreedName;
+
+            return coreBreed;
         }
     }
 }

@@ -35,6 +35,16 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
+            _petRepository.Setup(p => p.GetPetBreedByPetTypeId(It.IsAny<short>()))
+                .ReturnsAsync(new List<Breed>()
+                {
+                    new Breed()
+                    {
+                        Id = 1,
+                        BreedName = "Golden Retriever"
+                    }
+                });
+
             _petToVaccinesRepository = new Mock<IPetToVaccinesRepository>();
 
             _petToVaccinesRepository.Setup(v => v.GetVaccinesByPetType(It.IsAny<short>()))
@@ -79,6 +89,19 @@ namespace ClientManagementService.Test.Service
             var cat = petTypes[1];
             Assert.AreEqual(2, cat.Id);
             Assert.AreEqual("Cat", cat.PetTypeName);
+        }
+
+        [Test]
+        public async Task GetPetBreedByPetTypeSuccess()
+        {
+            var breeds = await _dropdownService.GetBreedsByPetType(1);
+
+            Assert.IsNotNull(breeds);
+            Assert.AreEqual(1, breeds.Count);
+
+            var breed = breeds[0];
+            Assert.AreEqual(1, breed.Id);
+            Assert.AreEqual("Golden Retriever", breed.BreedName);
         }
     }
 }

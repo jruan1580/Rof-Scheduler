@@ -10,6 +10,7 @@ namespace ClientManagementService.Domain.Services
     {
         Task<List<PetType>> GetPetTypes();
         Task<List<Vaccine>> GetVaccinesByPetType(short petTypeId);
+        Task<List<Breed>> GetBreedsByPetType(short petTypeId);
     }
 
     public class DropdownService : IDropdownService
@@ -57,6 +58,24 @@ namespace ClientManagementService.Domain.Services
             }
 
             return vaccines;
+        }
+
+        /// <summary>
+        /// Returns a list of breeds by pet type.
+        /// Function is use to get breed for drop down list.
+        /// </summary>
+        /// <param name="petTypeId"></param>
+        /// <returns></returns>
+        public async Task<List<Breed>> GetBreedsByPetType(short petTypeId)
+        {
+            var breeds = new List<Breed>();
+
+            foreach (var breed in await _petRepository.GetPetBreedByPetTypeId(petTypeId))
+            {
+                breeds.Add(PetMapper.ToCoreBreed(breed));
+            }
+
+            return breeds;
         }
     }
 }

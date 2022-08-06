@@ -1,15 +1,71 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, Form, Row, Col, Button } from "react-bootstrap";
 import Select from 'react-select';
 
-function AddPetModal({show, closeModal}){
-    const [petTypeSelected, setPetTypeSelected] = useState(1);
+import { getPetTypes, getVaccinesByPetType } from "../../SharedServices/dropdownService";
+
+function AddPetModal({show, closeModal, setLoginState }){
+    const [petTypes, setPetTypes] = useState([]);
+    const [petTypeSelected, setPetTypeSelected] = useState(undefined);
+    const [breedByPetType, setBreedByPetType] = useState([]);
 
     const breed = [
         { label: 'Golden Retriever', value: 1 },
         { label: 'Husky', value: 2 }
       ];
       
+    //load pet types when we land on page
+    useEffect(() =>{
+        (async function(){
+            try{
+                const resp = await getPetTypes();
+                if (resp.status === 401){
+                    setLoginState(false);
+                    return;
+                }
+
+                const petTypes = await resp.json();
+                setPetTypes(petTypes);
+            }catch(e){
+
+            }
+        })();
+
+    }, []);
+
+    const goToAddPet = (e) =>{
+        e.preventDefault();
+
+        const petTypeIdSelected = parseInt(e.target.petType.value);
+
+        /*
+         *
+         */
+        (async function(){
+            try{
+                //grab breeds by pet type selected
+                var resp = await getBreedByPetType(petTypeIdSelected);
+                if (resp.status === 401){
+                    setLoginState(false);
+                    return;
+                }
+
+                const breeds = await resp.json();
+                const breedOptions = [];
+                for(var i = 0; i < breeds.length; i++){
+                    breedOptions.push({ label: breeds[i].vaccineName, value: breeds[i].id });
+                }
+
+                setBreedByPetType(breedOptions);
+
+            }catch(e){
+
+            }
+        })();
+
+        setPetTypeSelected(petTypeIdSelected);
+    }
+
     const addPet = (e) =>{
         e.preventDefault();
 
@@ -33,7 +89,7 @@ function AddPetModal({show, closeModal}){
                     </Modal.Header>
 
                     <Modal.Body>
-                        <Form>
+                        <Form onSubmit={goToAddPet}>
                             <Form.Group as={Row}>
                                 <Form.Label column lg={3} >Pet Type:</Form.Label>
                                 <Col lg={9}>
@@ -42,8 +98,13 @@ function AddPetModal({show, closeModal}){
                                         placeholder="petType"
                                         name="petType"
                                     >
-                                        <option value="dog">Dog</option>
-                                        <option value="cat">Cat</option>
+                                        {
+                                            petTypes.map((petType) =>{
+                                                return(
+                                                    <option key={petType.id} value={petType.id}>{petType.petTypeName}</option>
+                                                )
+                                            })
+                                        }                                      
                                     </Form.Select>
                                 </Col>                                             
                             </Form.Group>
@@ -88,7 +149,7 @@ function AddPetModal({show, closeModal}){
                                     <Form.Label>Breed</Form.Label>
                                     <Select
                                         name="breed"
-                                        options={breed}
+                                        options={breedByPetType}
                                     />                             
                                 </Form.Group>
 

@@ -50,5 +50,20 @@ namespace ClientManagementService.API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpGet("{petTypeId}/breeds")]
+        public async Task<IActionResult> GetBreedsByPetType(short petTypeId)
+        {
+            try
+            {
+                var vaccines = await _dropdownService.GetVaccinesByPetType(petTypeId);
+
+                return Ok(DropdownDTOMapper.ToVaccineDTO(vaccines));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
