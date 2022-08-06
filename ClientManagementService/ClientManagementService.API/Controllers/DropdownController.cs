@@ -1,4 +1,5 @@
-﻿using ClientManagementService.API.Filters;
+﻿using ClientManagementService.API.DTOMapper;
+using ClientManagementService.API.Filters;
 using ClientManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ namespace ClientManagementService.API.Controllers
             {
                 var petTypes = await _dropdownService.GetPetTypes();
 
-                return Ok(petTypes);
+                return Ok(DropdownDTOMapper.ToPetTypeDTO(petTypes));
             }
             catch(Exception ex)
             {
@@ -42,7 +43,7 @@ namespace ClientManagementService.API.Controllers
             {
                 var vaccines = await _dropdownService.GetVaccinesByPetType(petTypeId);
 
-                return Ok(vaccines);
+                return Ok(DropdownDTOMapper.ToVaccineDTO(vaccines));
             }
             catch(Exception ex)
             {

@@ -1,28 +1,42 @@
 ﻿using ClientManagementService.API.DTO;
 using ClientManagementService.Domain.Models;
+using System.Collections.Generic;
 
 namespace ClientManagementService.API.DTOMapper
 {
-    public class DropdownDTOMapper
+    public static class DropdownDTOMapper
     {
-        public VaccineDTO ToVaccineDTO(Vaccine vaccine)
+        public static List<VaccineDTO> ToVaccineDTO(List<Vaccine> vaccines)
         {
-            var dto = new VaccineDTO();
+            var dtos = new List<VaccineDTO>();
+            foreach(var vaccine in vaccines)
+            {
+                var dto = new VaccineDTO();
 
-            dto.Id = vaccine.Id;
-            dto.VaccineName = vaccine.VaxName;
+                dto.Id = vaccine.Id;
+                dto.VaccineName = vaccine.VaxName;
 
-            return dto;
+                dtos.Add(dto);
+            }
+           
+            return dtos;
         }
 
-        public PetTypeDTO ToPetTypeDTO(PetType petType)
+        public static List<PetTypeDTO> ToPetTypeDTO(List<PetType> petTypes)
         {
-            var dto = new PetTypeDTO();
+            var dtos = new List<PetTypeDTO>();
 
-            dto.Id = petType.Id;
-            dto.PetTypeName = petType.PetTypeName;
+            foreach(var petType in petTypes)
+            {
+                var dto = new PetTypeDTO();
 
-            return dto;
+                dto.Id = petType.Id;
+                dto.PetTypeName = petType.PetTypeName;
+
+                dtos.Add(dto);
+            }
+          
+            return dtos;
         }
     }
 }

@@ -28,12 +28,23 @@ namespace ClientManagementService.Test.Controller
             {
                 OwnerId = 1,
                 BreedId = 1,
+                PetTypeId = 1,
                 Name = "Pet1",
                 Weight = 30,
                 Dob = "1/1/2022",
                 OwnerFirstName = "John",
                 OwnerLastName = "Doe",
-                BreedName = "Corgi"
+                BreedName = "Corgi",
+                Vaccines = new List<API.DTO.PetsVaccineDTO>()
+                {
+                    new API.DTO.PetsVaccineDTO()
+                    {
+                        Id = 1,
+                        PetsVaccineId = 1,
+                        VaccineName = "Bordetella",
+                        Innoculated = true
+                    }
+                }
             };
 
             _petService.Setup(p => p.AddPet(It.IsAny<Domain.Models.Pet>()))
@@ -91,6 +102,7 @@ namespace ClientManagementService.Test.Controller
                     Id = 1,
                     OwnerId = 1,
                     BreedId = 1,
+                    PetTypeId = 1,
                     Name = "Pet1",
                     Weight = 30,
                     Dob = "1/1/2022",
@@ -104,6 +116,11 @@ namespace ClientManagementService.Test.Controller
                     {
                         Id = 1,
                         BreedName = "Corgi"
+                    },
+                    PetType = new Domain.Models.PetType()
+                    {
+                        Id = 1,
+                        PetTypeName = "Dog"
                     }
                 }
             };
@@ -150,6 +167,7 @@ namespace ClientManagementService.Test.Controller
                     Id = 1,
                     OwnerId = 1,
                     BreedId = 1,
+                    PetTypeId = 1,
                     Name = "Pet1",
                     Weight = 30,
                     Dob = "1/1/2022",
@@ -163,6 +181,21 @@ namespace ClientManagementService.Test.Controller
                     {
                         Id = 1,
                         BreedName = "Corgi"
+                    },
+                    PetType = new Domain.Models.PetType()
+                    {
+                        Id = 1,
+                        PetTypeName = "Dog"
+                    },
+                    Vaccines = new List<Domain.Models.VaccineStatus>()
+                    {
+                        new Domain.Models.VaccineStatus()
+                        {
+                            Id = 1,
+                            PetToVaccineId = 1,
+                            VaxName = "Bordetella",
+                            Inoculated = true
+                        }
                     }
                 });
 
@@ -205,6 +238,7 @@ namespace ClientManagementService.Test.Controller
                     Id = 1,
                     OwnerId = 1,
                     BreedId = 1,
+                    PetTypeId = 1,
                     Name = "Pet1",
                     Weight = 30,
                     Dob = "1/1/2022",
@@ -218,6 +252,21 @@ namespace ClientManagementService.Test.Controller
                     {
                         Id = 1,
                         BreedName = "Corgi"
+                    },
+                    PetType = new Domain.Models.PetType()
+                    {
+                        Id = 1,
+                        PetTypeName = "Dog"
+                    },
+                    Vaccines = new List<Domain.Models.VaccineStatus>()
+                    {
+                        new Domain.Models.VaccineStatus()
+                        {
+                            Id = 1,
+                            PetToVaccineId = 1,
+                            VaxName = "Bordetella",
+                            Inoculated = true
+                        }
                     }
                 });
 
@@ -261,6 +310,7 @@ namespace ClientManagementService.Test.Controller
                     Id = 1,
                     OwnerId = 1,
                     BreedId = 1,
+                    PetTypeId = 1,
                     Name = "Pet1",
                     Weight = 30,
                     Dob = "1/1/2022",
@@ -274,6 +324,11 @@ namespace ClientManagementService.Test.Controller
                     {
                         Id = 1,
                         BreedName = "Corgi"
+                    },
+                    PetType = new Domain.Models.PetType()
+                    {
+                        Id = 1,
+                        PetTypeName = "Dog"
                     }
                 }
             };
@@ -319,12 +374,23 @@ namespace ClientManagementService.Test.Controller
                 Id = 1,
                 OwnerId = 1,
                 BreedId = 1,
+                PetTypeId = 1,
                 Name = "Pet1",
                 Weight = 30,
                 Dob = "1/1/2022",
                 OwnerFirstName = "John",
                 OwnerLastName = "Doe",
-                BreedName = "Corgi"
+                BreedName = "Corgi",
+                Vaccines = new List<API.DTO.PetsVaccineDTO>()
+                {
+                    new API.DTO.PetsVaccineDTO()
+                    {
+                        Id = 1,
+                        PetsVaccineId = 1,
+                        VaccineName = "Bordetella",
+                        Innoculated = true
+                    }
+                }
             };
 
             _petService.Setup(p => p.UpdatePet(It.IsAny<Domain.Models.Pet>()))
