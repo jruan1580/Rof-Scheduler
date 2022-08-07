@@ -7,6 +7,13 @@ export const getPetTypes = async function(){
     return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
 }
 
+export const getBreedByPetType = async function(petTypeId){
+    var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
+    var url = baseUrl + "/dropdown/" + petTypeId + "/breeds";
+  
+    return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
+}
+
 export const getVaccinesByPetType = async function(petTypeId){
     var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
     var url = baseUrl + "/dropdown/" + petTypeId + "/vaccine";

@@ -2,17 +2,13 @@ import { useEffect, useState } from "react";
 import { Modal, Form, Row, Col, Button } from "react-bootstrap";
 import Select from 'react-select';
 
-import { getPetTypes, getVaccinesByPetType } from "../../SharedServices/dropdownService";
+import { getPetTypes, getBreedByPetType, getVaccinesByPetType } from "../../SharedServices/dropdownService";
 
 function AddPetModal({show, closeModal, setLoginState }){
     const [petTypes, setPetTypes] = useState([]);
     const [petTypeSelected, setPetTypeSelected] = useState(undefined);
     const [breedByPetType, setBreedByPetType] = useState([]);
-
-    const breed = [
-        { label: 'Golden Retriever', value: 1 },
-        { label: 'Husky', value: 2 }
-      ];
+    const [vaccinesByPetType, setVaccinesByPetType] = useState([]);
       
     //load pet types when we land on page
     useEffect(() =>{
@@ -39,7 +35,9 @@ function AddPetModal({show, closeModal, setLoginState }){
         const petTypeIdSelected = parseInt(e.target.petType.value);
 
         /*
-         *
+         * get breeds by pet type.
+         * get vaccines by pet type.
+         * then hide pet type ddl and go to (unhide) add pet modal
          */
         (async function(){
             try{
@@ -51,19 +49,68 @@ function AddPetModal({show, closeModal, setLoginState }){
                 }
 
                 const breeds = await resp.json();
-                const breedOptions = [];
-                for(var i = 0; i < breeds.length; i++){
-                    breedOptions.push({ label: breeds[i].vaccineName, value: breeds[i].id });
+                constructBreedOptions(breeds);
+                
+                //grab vaccines by pet type selected
+                resp = await getVaccinesByPetType(petTypeIdSelected);
+                if (resp.status === 401){
+                    setLoginState(false);
+                    return;
                 }
 
-                setBreedByPetType(breedOptions);
+                const vaccines = await resp.json();
+                constructVaccinesByPetType(vaccines);
 
             }catch(e){
 
             }
         })();
 
+        //this will hide pet type ddl and unhide add pet modal
         setPetTypeSelected(petTypeIdSelected);
+    }
+    
+    const constructBreedOptions = (breeds) =>{
+        const breedOptions = [];
+        for(var i = 0; i < breeds.length; i++){
+            breedOptions.push({ label: breeds[i].vaccineName, value: breeds[i].id });
+        }
+
+        setBreedByPetType(breedOptions);
+    }
+
+    const constructVaccinesByPetType = (vaccines) => {
+        //on the ui, we are going to break vaccines up into 4 columns
+        //so we will evenly split vaccines up into group of 4
+        const vaccinesByCol = [];
+        //push 4 empty lists first represent 4 columns of list of vaccines
+        vaccinesByCol.push([]);
+        vaccinesByCol.push([]);
+        vaccinesByCol.push([]);
+        vaccinesByCol.push([]);
+
+        //loop through vaccine and push each vaccine into each column.
+        //when we hit last column, then reset back to first column
+        var col = 0; //start at first column
+        for(var i = 0; i < vaccines.length; i++){
+            const vax = { vaxId: vaccines[i].id, vaxName: vaccines[i].vaccineName, checked: false }; //since its new, checked is false
+            vaccinesByCol[col].push(vax);
+
+            col++; //go to next column
+            if (col == 4){
+                //when col == 3, that means we were at 4th column already (zero indexed). 
+                //col ++ will increment to 4 meaning we need to reset back to fist column
+                col = 0; 
+            }
+        }   
+        
+        setVaccinesByPetType(vaccinesByCol);
+    }
+
+    const setVaccineValue = (colIndex, vaccineIndex) =>{
+        //value equals opposite of what it currently is
+        ((vaccinesByPetType[colIndex])[vaccineIndex]).checked = !((vaccinesByPetType[colIndex])[vaccineIndex]).checked;
+        setVaccinesByPetType(vaccinesByPetType);
     }
 
     const addPet = (e) =>{
@@ -188,52 +235,68 @@ function AddPetModal({show, closeModal, setLoginState }){
                             <br />
                             <Row>
                                 <Form.Group as={Col} lg={3}>
-                                    <Form.Check
-                                        label="Bordetella"
-                                        name="group1"
-                                        type="checkbox"
-                                    />
-                                    <Form.Check
-                                        label="2"
-                                        name="group1"
-                                        type="checkbox"
-                                    />
+                                {
+                                    //first column
+                                    vaccinesByPetType[0].map((vaccine, index) =>{
+                                        return(
+                                            <Form.Check
+                                                key={vaccine.id}
+                                                type="checkbox"
+                                                label={vaccine.vaxName}
+                                                value={vaccine.checked}
+                                                onChange={() => setVaccineValue(0, index)}//first param tells us which column, second param tells us which index value to update
+                                            />
+                                        )
+                                    })
+                                }                                
                                 </Form.Group>
                                 <Form.Group as={Col} lg={3}>
-                                    <Form.Check
-                                        label="Bordetella"
-                                        name="group1"
-                                        type="checkbox"
-                                    />
-                                    <Form.Check
-                                        label="2"
-                                        name="group1"
-                                        type="checkbox"
-                                    />
+                                {
+                                    //second column
+                                    vaccinesByPetType[1].map((vaccine, index) =>{
+                                        return(
+                                            <Form.Check
+                                                key={vaccine.id}
+                                                type="checkbox"
+                                                label={vaccine.vaxName}
+                                                value={vaccine.checked}
+                                                onChange={() => setVaccineValue(1, index)} //first param tells us which column, second param tells us which index value to update
+                                            />
+                                        )
+                                    })
+                                }     
                                 </Form.Group>
                                 <Form.Group as={Col} lg={3}>
-                                    <Form.Check
-                                        label="Bordetella"
-                                        name="group1"
-                                        type="checkbox"
-                                    />
-                                    <Form.Check
-                                        label="2"
-                                        name="group1"
-                                        type="checkbox"
-                                    />
+                                {
+                                    //third column
+                                    vaccinesByPetType[2].map((vaccine, index) =>{
+                                        return(
+                                            <Form.Check
+                                                key={vaccine.id}
+                                                type="checkbox"
+                                                label={vaccine.vaxName}
+                                                value={vaccine.checked}
+                                                onChange={() => setVaccineValue(2, index)}//first param tells us which column, second param tells us which index value to update
+                                            />
+                                        )
+                                    })
+                                }     
                                 </Form.Group>
                                 <Form.Group as={Col} lg={3}>
-                                    <Form.Check
-                                        label="Bordetella"
-                                        name="group1"
-                                        type="checkbox"
-                                    />
-                                    <Form.Check
-                                        label="2"
-                                        name="group1"
-                                        type="checkbox"
-                                    />
+                                {
+                                    //fourth column
+                                    vaccinesByPetType[3].map((vaccine, index) =>{
+                                        return(
+                                            <Form.Check
+                                                key={vaccine.id}
+                                                type="checkbox"
+                                                label={vaccine.vaxName}
+                                                value={vaccine.checked}
+                                                onChange={() => setVaccineValue(3, index)}//first param tells us which column, second param tells us which index value to update
+                                            />
+                                        )
+                                    })
+                                }         
                                 </Form.Group>
                                 
                             </Row>
