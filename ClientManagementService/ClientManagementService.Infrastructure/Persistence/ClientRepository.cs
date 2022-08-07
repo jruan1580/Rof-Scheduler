@@ -12,6 +12,7 @@ namespace ClientManagementService.Infrastructure.Persistence
     {
         Task CreateClient(Client newClient);
         Task DeleteClientById(long id);
+        Task<List<Client>> GetClientsForDropdown();
         Task<(List<Client>, int)> GetAllClientsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Client> GetClientByFilter<T>(GetClientFilterModel<T> filter);
         Task<short> IncrementClientFailedLoginAttempts(long id);
@@ -53,6 +54,14 @@ namespace ClientManagementService.Infrastructure.Persistence
                 context.Remove(client);
 
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Client>> GetClientsForDropdown()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Clients.Select(c => new Client() { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName}).ToListAsync();
             }
         }
 

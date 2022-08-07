@@ -13,6 +13,8 @@ namespace ClientManagementService.Test.Service
     {
         private Mock<IPetRepository> _petRepository;
         private Mock<IPetToVaccinesRepository> _petToVaccinesRepository;
+        private Mock<IClientRepository> _clientRepository;
+
         private DropdownService _dropdownService;
 
         [SetUp]
@@ -58,7 +60,20 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
-            _dropdownService = new DropdownService(_petRepository.Object, _petToVaccinesRepository.Object);
+            _clientRepository = new Mock<IClientRepository>();
+
+            _clientRepository.Setup(c => c.GetClientsForDropdown())
+                .ReturnsAsync(new List<Client>()
+                {
+                    new Client()
+                    {
+                        Id = 1,
+                        FirstName = "Test",
+                        LastName = "User",
+                    }
+                });
+
+            _dropdownService = new DropdownService(_clientRepository.Object, _petRepository.Object, _petToVaccinesRepository.Object);
         }
 
         [Test]
@@ -102,6 +117,21 @@ namespace ClientManagementService.Test.Service
             var breed = breeds[0];
             Assert.AreEqual(1, breed.Id);
             Assert.AreEqual("Golden Retriever", breed.BreedName);
+        }
+
+        [Test]
+        public async Task GetClientsSuccess()
+        {
+            var clients = await _dropdownService.GetClients();
+
+            Assert.IsNotNull(clients);
+            Assert.AreEqual(1, clients.Count);
+
+            var client = clients[0];
+            Assert.AreEqual(1, client.Id);
+            Assert.AreEqual("Test", client.FirstName);
+            Assert.AreEqual("User", client.LastName);
+            Assert.AreEqual("Test User", client.FullName);
         }
     }
 }

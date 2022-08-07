@@ -21,6 +21,21 @@ namespace ClientManagementService.API.Controllers
             _dropdownService = dropdownService;
         }
 
+        [HttpGet("clients")]
+        public async Task<IActionResult> GetClients()
+        {
+            try
+            {
+                var clients = await _dropdownService.GetClients();
+
+                return Ok(DropdownDTOMapper.ToClientDTO(clients));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         [HttpGet("petType")]
         public async Task<IActionResult> GetPetTypes()
         {

@@ -9,6 +9,7 @@ function AddPetModal({show, closeModal, setLoginState }){
     const [petTypeSelected, setPetTypeSelected] = useState(undefined);
     const [breedByPetType, setBreedByPetType] = useState([]);
     const [vaccinesByPetType, setVaccinesByPetType] = useState([]);
+    const [owners, setOwners] = useState([]);
       
     //load pet types when we land on page
     useEffect(() =>{
@@ -37,6 +38,10 @@ function AddPetModal({show, closeModal, setLoginState }){
         /*
          * get breeds by pet type.
          * get vaccines by pet type.
+         * 
+         * depending on use role, we may or may not need to grab list of clients.
+         * if role == client, that means that owner is the client currently logged on.
+         * if role == employee or admin, they are adding pet for a client. so we will need to grab a list of clients.
          * then hide pet type ddl and go to (unhide) add pet modal
          */
         (async function(){
@@ -60,6 +65,11 @@ function AddPetModal({show, closeModal, setLoginState }){
 
                 const vaccines = await resp.json();
                 constructVaccinesByPetType(vaccines);
+
+                //employee or admin, need to get a list of clients
+                if (localStorage.getItem("role") !== "client"){
+
+                }
 
             }catch(e){
 
@@ -230,6 +240,9 @@ function AddPetModal({show, closeModal, setLoginState }){
                                     />
                                 </Form.Group>
                             </Row><br/>
+                            {
+
+                            }
                             
                             <h4>Vaccines</h4>
                             <br />

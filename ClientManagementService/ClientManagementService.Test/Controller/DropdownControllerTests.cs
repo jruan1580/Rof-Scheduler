@@ -48,6 +48,31 @@ namespace ClientManagementService.Test.Controller
                         BreedName = "Golden Retriever"
                     }
                 });
+
+            _dropdownService.Setup(d => d.GetClients())
+                .ReturnsAsync(new List<Domain.Models.Client>()
+                {
+                    new Domain.Models.Client()
+                    {
+                        Id = 1,
+                        FullName = "Test User"
+                    }
+                });
+        }
+
+        [Test]
+        public async Task GetClientTest()
+        {
+            var controller = new DropdownController(_dropdownService.Object);
+
+            var result = await controller.GetClients();
+
+            Assert.NotNull(result);
+            Assert.AreEqual(typeof(OkObjectResult), result.GetType());
+
+            var okObj = (OkObjectResult)result;
+
+            Assert.AreEqual(okObj.StatusCode, 200);
         }
 
         [Test]
