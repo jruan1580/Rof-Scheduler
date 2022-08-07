@@ -56,9 +56,9 @@ namespace ClientManagementService.API.Controllers
         {
             try
             {
-                var vaccines = await _dropdownService.GetVaccinesByPetType(petTypeId);
+                var breeds = await _dropdownService.GetBreedsByPetType(petTypeId);
 
-                return Ok(DropdownDTOMapper.ToVaccineDTO(vaccines));
+                return Ok(DropdownDTOMapper.ToBreedDTO(breeds));
             }
             catch (Exception ex)
             {
