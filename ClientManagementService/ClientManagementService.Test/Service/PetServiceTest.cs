@@ -469,60 +469,63 @@ namespace ClientManagementService.Test.Service
         [Test]
         public async Task GetPetsByClientId_NoPets()
         {
-            _petRepository.Setup(p => p.GetPetsByClientId(It.IsAny<long>()))
-                .ReturnsAsync(new List<Pet>());
+            _petRepository.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync((new List<Pet>(), 0));
 
             var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
 
-            var result = await petService.GetPetsByClientId(1);
+            var result = await petService.GetPetsByClientIdAndKeyword(1, 1, 10, "");
 
-            Assert.IsEmpty(result);
+            Assert.IsEmpty(result.Pets);
+            Assert.AreEqual(0, result.TotalPages);
         }
 
         [Test]
         public async Task GetPetsByClientId_Success()
         {
-            _petRepository.Setup(p => p.GetPetsByClientId(It.IsAny<long>()))
-                .ReturnsAsync(new List<Pet>()
+            var pets = new List<Pet>()
+            {
+                new Pet()
                 {
-                    new Pet()
+                    Id = 1,
+                    Name = "Pet1",
+                    OwnerId = 1,
+                    PetTypeId = 1,
+                    BreedId = 1,
+                    Dob = "1/1/2022",
+                    Weight = 30,
+                    OtherInfo = "",
+                    Owner = new Client()
                     {
                         Id = 1,
-                        Name = "Pet1",
-                        OwnerId = 1,
-                        PetTypeId = 1,
-                        BreedId = 1,
-                        Dob = "1/1/2022",
-                        Weight = 30,
-                        OtherInfo = "",
-                        Owner = new Client()
-                        {
-                            Id = 1,
-                            FirstName = "John",
-                            LastName = "Doe",
+                        FirstName = "John",
+                        LastName = "Doe",
 
-                        },
-                        Breed = new Breed()
-                        {
-                            Id = 1,
-                            BreedName = "Corgi"
-                        },
-                        PetType = new PetType()
-                        {
-                            Id = 1,
-                            PetTypeName = "Dog"
-                        }
+                    },
+                    Breed = new Breed()
+                    {
+                        Id = 1,
+                        BreedName = "Corgi"
+                    },
+                    PetType = new PetType()
+                    {
+                        Id = 1,
+                        PetTypeName = "Dog"
                     }
-                });
+                }
+            };
+
+            _petRepository.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync((pets, 1));
 
             var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
 
-            var result = await petService.GetPetsByClientId(1);
+            var result = await petService.GetPetsByClientIdAndKeyword(1, 1, 10, "");
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            Assert.IsNotEmpty(result.Pets);
 
-            var pet = result[0];
+            var pet = result.Pets[0];
+
             Assert.IsNotNull(pet);
             Assert.AreEqual(1, pet.Id);
             Assert.AreEqual(1, pet.OwnerId);

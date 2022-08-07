@@ -333,12 +333,12 @@ namespace ClientManagementService.Test.Controller
                 }
             };
 
-            _petService.Setup(p => p.GetPetsByClientId(It.IsAny<long>()))
-                .ReturnsAsync(pets);
+            _petService.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(new Domain.Models.PetsWithTotalPage(pets, 1));
 
             var controller = new PetController(_petService.Object);
 
-            var response = await controller.GetPetsByClientId(1);
+            var response = await controller.GetPetsByClientId(1, 1, 10, "");
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
@@ -351,12 +351,12 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetPetsByClientId_InternalServerError()
         {
-            _petService.Setup(p => p.GetPetsByClientId(It.IsAny<long>()))
+            _petService.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
             var controller = new PetController(_petService.Object);
 
-            var response = await controller.GetPetsByClientId(1);
+            var response = await controller.GetPetsByClientId(1, 1, 10, "");
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(ObjectResult));

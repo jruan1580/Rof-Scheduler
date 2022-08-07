@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClientManagementService.API.DTO;
 using ClientManagementService.API.DTOMapper;
+using ClientManagementService.API.Filters;
 using ClientManagementService.Domain.Exceptions;
 using ClientManagementService.Domain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientManagementService.API.Controllers
 {
+    [CookieActionFilter]
     [Route("api/[controller]")]
     [ApiController]
     public class PetController : ControllerBase
@@ -20,6 +23,7 @@ namespace ClientManagementService.API.Controllers
             _petService = petService;
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpPost]
         public async Task<IActionResult> AddPet([FromBody] PetDTO pet)
         {
@@ -39,6 +43,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee")]
         [HttpGet]
         public async Task<IActionResult> GetAllPets([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
@@ -61,6 +66,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPetById(long id)
         {
@@ -80,6 +86,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{name}/name")]
         public async Task<IActionResult> GetPetByName(string name)
         {
@@ -99,12 +106,13 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
-        [HttpGet("{clientId}/clientId")]
-        public async Task<IActionResult> GetPetsByClientId(long clientId)
+        [Authorize(Roles = "Administrator,Employee,Client")]
+        [HttpGet("clientId")]
+        public async Task<IActionResult> GetPetsByClientId([FromQuery] long clientId, [FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
             try
             {
-                var petList = await _petService.GetPetsByClientId(clientId);
+                var petList = await _petService.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
 
                 return Ok(petList);
             }
@@ -114,6 +122,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpPut("updatePet")]
         public async Task<IActionResult> UpdatePetInfo([FromBody] PetDTO pet)
         {
@@ -137,6 +146,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePetById(long id)
         {
