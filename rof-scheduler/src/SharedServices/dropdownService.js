@@ -2,7 +2,14 @@ import  { makeHttpRequest } from './httpClientWrapper';
 
 export const getPetTypes = async function(){
     var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
-    var url = baseUrl + "/dropdown/petType";
+    var url = baseUrl + "/dropdown/petTypes";
+  
+    return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
+}
+
+export const getClients = async function(){
+    var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
+    var url = baseUrl + "/dropdown/clients";
   
     return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
 }
@@ -16,7 +23,7 @@ export const getBreedByPetType = async function(petTypeId){
 
 export const getVaccinesByPetType = async function(petTypeId){
     var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
-    var url = baseUrl + "/dropdown/" + petTypeId + "/vaccine";
+    var url = baseUrl + "/dropdown/" + petTypeId + "/vaccines";
   
     return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
 }

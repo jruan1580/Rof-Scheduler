@@ -277,3 +277,35 @@ export const ensureClientUpdateInformationProvided = function (
 
   return validationErrors;
 };
+
+export const ensureAddPetInformationProvided = function(
+  petName,
+  breed,
+  weight,
+  dob,
+  client
+){
+  var validationErrors = new Map();
+
+  if (petName === undefined || petName === ""){
+    validationErrors.set("petName", "Please enter pet's name.");
+  }
+
+  if (breed === undefined || breed <= 0){
+    validationErrors.set("breed", "Please select pet's breed.");
+  }
+
+  if (weight === undefined){
+    validationErrors.set("weight", "Please enter pet's weight");
+  }
+
+  if (dob === undefined){
+    validationErrors.set("dob", "Please enter pet's DOB");
+  }
+
+  if (localStorage.getItem("role").toLowerCase() !== "client" && (client === undefined || client <= 0)){
+    validationErrors.set("client", "Please select pet's owner");
+  }
+
+  return validationErrors;
+}

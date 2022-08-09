@@ -12,7 +12,7 @@ function PetManagement({ setLoginState }){
             <br/>
             <AddPetModal
                 show={showAddModal}
-                closeModal={() => setShowAddModal(false)}
+                handleHide={() => setShowAddModal(false)}
                 setLoginState={setLoginState}
             />
             <Row>

@@ -36,7 +36,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
-        [HttpGet("petType")]
+        [HttpGet("petTypes")]
         public async Task<IActionResult> GetPetTypes()
         {
             try
@@ -51,7 +51,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
-        [HttpGet("{petTypeId}/vaccine")]
+        [HttpGet("{petTypeId}/vaccines")]
         public async Task<IActionResult> GetVaccineByPetType(short petTypeId)
         {
             try

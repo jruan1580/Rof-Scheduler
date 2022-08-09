@@ -1,16 +1,24 @@
 import { useEffect, useState } from "react";
-import { Modal, Form, Row, Col, Button } from "react-bootstrap";
+import { Modal, Form, Row, Col, Button, Spinner, Alert } from "react-bootstrap";
 import Select from 'react-select';
 
-import { getPetTypes, getBreedByPetType, getVaccinesByPetType } from "../../SharedServices/dropdownService";
+import { getPetTypes, getBreedByPetType, getVaccinesByPetType, getClients } from "../../SharedServices/dropdownService";
+import { ensureAddPetInformationProvided } from "../../SharedServices/inputValidationService";
+import { addPet } from "../../SharedServices/petManagementService";
 
-function AddPetModal({show, closeModal, setLoginState }){
+function AddPetModal({show, handleHide, setLoginState }){
+    //TODO - many states here, switch to useReduce later
     const [petTypes, setPetTypes] = useState([]);
     const [petTypeSelected, setPetTypeSelected] = useState(undefined);
     const [breedByPetType, setBreedByPetType] = useState([]);
     const [vaccinesByPetType, setVaccinesByPetType] = useState([]);
     const [owners, setOwners] = useState([]);
-      
+    const [validationMap, setValidationMap] = useState(new Map());
+    const [errMsg, setErrMsg] = useState(undefined);
+    const [successMsg, setSuccessMsg] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [disableBtns, setDisableBtns] = useState(false);
+
     //load pet types when we land on page
     useEffect(() =>{
         (async function(){
@@ -67,17 +75,25 @@ function AddPetModal({show, closeModal, setLoginState }){
                 constructVaccinesByPetType(vaccines);
 
                 //employee or admin, need to get a list of clients
-                if (localStorage.getItem("role") !== "client"){
+                if (localStorage.getItem("role").toLowerCase() !== "client"){
+                    resp = await getClients();
+                    if (resp.status === 401){
+                        setLoginState(false);
+                        return;
+                    }
 
+                    const clients = await resp.json();
+                    constructClientsOption(clients);
                 }
 
+                //this will hide pet type ddl and unhide add pet modal
+                setErrMsg(undefined);
+                setPetTypeSelected(petTypeIdSelected);
             }catch(e){
-
+                setErrMsg(e.message);
+                return;
             }
-        })();
-
-        //this will hide pet type ddl and unhide add pet modal
-        setPetTypeSelected(petTypeIdSelected);
+        })();        
     }
     
     const constructBreedOptions = (breeds) =>{
@@ -103,7 +119,7 @@ function AddPetModal({show, closeModal, setLoginState }){
         //when we hit last column, then reset back to first column
         var col = 0; //start at first column
         for(var i = 0; i < vaccines.length; i++){
-            const vax = { vaxId: vaccines[i].id, vaxName: vaccines[i].vaccineName, checked: false }; //since its new, checked is false
+            const vax = { id: vaccines[i].id, vaxName: vaccines[i].vaccineName, checked: false }; //since its new, checked is false
             vaccinesByCol[col].push(vax);
 
             col++; //go to next column
@@ -117,19 +133,86 @@ function AddPetModal({show, closeModal, setLoginState }){
         setVaccinesByPetType(vaccinesByCol);
     }
 
+    const constructClientsOption = (clients) =>{
+        const clientOptions = [];
+        for(var i = 0; i < clients.length; i++){
+            clientOptions.push({ label: clients[i].fullName, value: clients[i].id });
+        }
+
+        setOwners(clientOptions);
+    }
+
     const setVaccineValue = (colIndex, vaccineIndex) =>{
         //value equals opposite of what it currently is
         ((vaccinesByPetType[colIndex])[vaccineIndex]).checked = !((vaccinesByPetType[colIndex])[vaccineIndex]).checked;
         setVaccinesByPetType(vaccinesByPetType);
     }
 
-    const addPet = (e) =>{
+    const addPetSubmit = (e) =>{
         e.preventDefault();
 
-        console.log(e.target.breed.value);
-        console.log(e.target.dob.value);
-        console.log(e);
+        setErrMsg(undefined);
+
+        const petName = e.target.petName.value;
+        const breed = e.target.breed.value;
+        const dob = e.target.dob.value;
+        const weight = e.target.weight.value;
+        const otherInfo = e.target.additionalInfo.value;
+
+        var client = undefined;
+        if (localStorage.getItem("role").toLowerCase() != "client"){
+            client = e.target.client.value;
+        }
+
+        var inputValidations = ensureAddPetInformationProvided(petName, breed, weight, dob, client);
+        if (inputValidations.size > 0){
+            setValidationMap(inputValidations);
+            return;
+        }
+
+        setValidationMap(new Map());
+        setLoading(true);
+
+        const vaccineStatus = [];
+        for(var row = 0; row < vaccinesByPetType.length; row++){
+            const vaxRow = vaccinesByPetType[row];
+            for(var col = 0; col < vaxRow.length; col++){
+                vaccineStatus.push({ id: vaxRow[col].id, vaccineName: vaxRow[col].vaxName, innoculated: vaxRow[col].checked });
+            }
+        }
+
+        (async function(){
+            try{
+                //if current user is client, get id from local storage.
+                //else its the selected client from dropdown list
+                const ownerId = (localStorage.getItem("role").toLowerCase() !== "client") ? client : parseInt(localStorage.getItem("id"));
+                const resp = await addPet(ownerId, petTypeSelected, breed, petName, dob, weight, otherInfo, vaccineStatus);
+
+                if (resp !== undefined && resp.status === 401){
+                    setLoginState(false);
+                    return;
+                }
+    
+                setErrMsg(undefined);
+                setDisableBtns(true);
+    
+                setSuccessMsg(true);
+            }catch(e){
+                setErrMsg(e.message);
+                return;
+            }finally{
+                setLoading(false);
+            }
+        })();
     }
+
+    //reset everything when we close modal
+    const closeModal = function () {
+        setValidationMap(new Map());
+        setErrMsg(undefined);
+        handleHide();
+      };
+
     return(
         <>
             {
@@ -139,7 +222,7 @@ function AddPetModal({show, closeModal, setLoginState }){
                     show={show}
                     onHide={closeModal}
                 >
-                    <Modal.Header className="modal-header-color" closeButton>
+                    <Modal.Header className="modal-header-color" closeModal>
                         <Modal.Title>
                             Add Pet
                         </Modal.Title>
@@ -189,7 +272,15 @@ function AddPetModal({show, closeModal, setLoginState }){
                         </Modal.Title>
                     </Modal.Header>
                       <Modal.Body>
-                        <Form onSubmit={addPet}>
+                        <Form onSubmit={addPetSubmit}>
+                            {errMsg !== undefined && <Alert variant="danger">{errMsg}</Alert>}
+                            {
+                                successMsg &&                         
+                                <Alert variant="success">
+                                    Pet successfully added! Page will reload in 3 seconds and new pet will be available....
+                                </Alert>
+                            }
+
                             <h4>Pet Information</h4>
                             <br />
 
@@ -199,7 +290,11 @@ function AddPetModal({show, closeModal, setLoginState }){
                                     <Form.Control 
                                         placeholder="Pet Name"
                                         name="petName"
+                                        isInvalid={validationMap.has("petName")}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        {validationMap.get("petName")}
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                                 
                                 <Form.Group as={Col} lg={3}>
@@ -207,7 +302,11 @@ function AddPetModal({show, closeModal, setLoginState }){
                                     <Select
                                         name="breed"
                                         options={breedByPetType}
-                                    />                             
+                                        isInvalid={validationMap.has("breed")}
+                                    /> 
+                                    <Form.Control.Feedback type="invalid">
+                                        {validationMap.get("breed")}
+                                    </Form.Control.Feedback>                            
                                 </Form.Group>
 
                                 <Form.Group as={Col} lg={3}>
@@ -216,7 +315,11 @@ function AddPetModal({show, closeModal, setLoginState }){
                                         type="date"
                                         placeholder="DOB"
                                         name="dob"
+                                        isInvalid={validationMap.has("dob")}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        {validationMap.get("dob")}
+                                    </Form.Control.Feedback>  
                                 </Form.Group>
 
                                 <Form.Group as={Col} lg={3}>
@@ -225,10 +328,31 @@ function AddPetModal({show, closeModal, setLoginState }){
                                         type="number"
                                         placeholder="weight"
                                         name="weight"
+                                        isInvalid={validationMap.has("weight")}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        {validationMap.get("weight")}
+                                    </Form.Control.Feedback> 
                                 </Form.Group>
                             </Row><br/>
-                           
+                            {
+                                localStorage.getItem("role").toLowerCase() !== "client" &&
+                                <>
+                                    <Row>
+                                        <Form.Group as={Col} lg={4}>
+                                            <Form.Label>Select Owner</Form.Label>
+                                            <Select
+                                                name="client"
+                                                options={owners}
+                                                isInvalid={validationMap.has("client")}
+                                            />        
+                                            <Form.Control.Feedback type="invalid">
+                                                {validationMap.get("client")}
+                                            </Form.Control.Feedback>                                  
+                                        </Form.Group>
+                                    </Row><br/>
+                                </>                                
+                            }
                             <Row>
                                 <Form.Group as={Col} lg={12}>
                                     <Form.Label>Additional Information (Optional)</Form.Label>
@@ -239,10 +363,7 @@ function AddPetModal({show, closeModal, setLoginState }){
                                         rows={5}
                                     />
                                 </Form.Group>
-                            </Row><br/>
-                            {
-
-                            }
+                            </Row><br/>                         
                             
                             <h4>Vaccines</h4>
                             <br />
@@ -316,9 +437,43 @@ function AddPetModal({show, closeModal, setLoginState }){
 
                             <br />
                             <hr></hr>
-                            <Button type="submit" className="float-end">
-                                Create
-                            </Button>
+                            {(loading || disableBtns) && (
+                                <Button
+                                    type="button"
+                                    variant="danger"
+                                    className="float-end ms-2"
+                                    disabled
+                                >
+                                    Cancel
+                                </Button>
+                            )}
+                            {!loading && !disableBtns && (
+                                <Button
+                                    type="button"
+                                    variant="danger"
+                                    onClick={() => closeModal()}
+                                    className="float-end ms-2"
+                                >
+                                    Cancel
+                                </Button>
+                            )}
+                            {(loading || disableBtns) && (
+                                <Button variant="primary" className="float-end" disabled>
+                                    <Spinner
+                                        as="span"
+                                        animation="grow"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                    />
+                                    Loading...
+                                </Button>
+                            )}
+                            {!loading && !disableBtns && (
+                                <Button type="submit" className="float-end">
+                                    Create
+                                </Button>
+                            )}
                         </Form>
                         
                     </Modal.Body>
