@@ -268,7 +268,7 @@ function AddPetModal({show, handleHide, setLoginState }){
                     onHide={closeModal}
                     dialogClassName="add-modal80"
                 >
-                    <Modal.Header className="modal-header-color" closeButton>
+                    <Modal.Header className="modal-header-color">
                         <Modal.Title>
                             Add Pet
                         </Modal.Title>
