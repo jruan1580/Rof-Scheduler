@@ -5,6 +5,7 @@ import Select from 'react-select';
 import { getPetTypes, getBreedByPetType, getVaccinesByPetType, getClients } from "../../SharedServices/dropdownService";
 import { ensureAddPetInformationProvided } from "../../SharedServices/inputValidationService";
 import { addPet } from "../../SharedServices/petManagementService";
+import "./addPet.css";
 
 function AddPetModal({show, handleHide, setLoginState }){
     //TODO - many states here, switch to useReduce later
@@ -99,7 +100,7 @@ function AddPetModal({show, handleHide, setLoginState }){
     const constructBreedOptions = (breeds) =>{
         const breedOptions = [];
         for(var i = 0; i < breeds.length; i++){
-            breedOptions.push({ label: breeds[i].vaccineName, value: breeds[i].id });
+            breedOptions.push({ value: breeds[i].id, label: breeds[i].breedName });
         }
 
         setBreedByPetType(breedOptions);
@@ -154,17 +155,18 @@ function AddPetModal({show, handleHide, setLoginState }){
         setErrMsg(undefined);
 
         const petName = e.target.petName.value;
-        const breed = e.target.breed.value;
+        const breed = parseInt(e.target.breed.value);
         const dob = e.target.dob.value;
-        const weight = e.target.weight.value;
+        const weight = parseFloat(e.target.weight.value);
         const otherInfo = e.target.additionalInfo.value;
 
         var client = undefined;
         if (localStorage.getItem("role").toLowerCase() != "client"){
-            client = e.target.client.value;
+            client = parseInt(e.target.client.value);
         }
 
         var inputValidations = ensureAddPetInformationProvided(petName, breed, weight, dob, client);
+        console.log(inputValidations);
         if (inputValidations.size > 0){
             setValidationMap(inputValidations);
             return;
@@ -210,6 +212,7 @@ function AddPetModal({show, handleHide, setLoginState }){
     const closeModal = function () {
         setValidationMap(new Map());
         setErrMsg(undefined);
+        setPetTypeSelected(undefined);
         handleHide();
       };
 
@@ -222,7 +225,7 @@ function AddPetModal({show, handleHide, setLoginState }){
                     show={show}
                     onHide={closeModal}
                 >
-                    <Modal.Header className="modal-header-color" closeModal>
+                    <Modal.Header className="modal-header-color" closeButton>
                         <Modal.Title>
                             Add Pet
                         </Modal.Title>
@@ -235,7 +238,6 @@ function AddPetModal({show, handleHide, setLoginState }){
                                 <Col lg={9}>
                                     <Form.Select
                                         type="select"
-                                        placeholder="petType"
                                         name="petType"
                                     >
                                         {
@@ -250,7 +252,7 @@ function AddPetModal({show, handleHide, setLoginState }){
                             </Form.Group>
                             <br />
                             <hr></hr>
-                            <Button type="button" className="float-end">
+                            <Button type="submit" className="float-end">
                                 Next
                             </Button>
                         </Form>
@@ -299,14 +301,30 @@ function AddPetModal({show, handleHide, setLoginState }){
                                 
                                 <Form.Group as={Col} lg={3}>
                                     <Form.Label>Breed</Form.Label>
+                                    {/* <Form.Select
+                                        type="select"
+                                        name="breed"
+                                        isInvalid={validationMap.has("breed")}
+                                    >
+                                        {
+                                            breedByPetType.map((breed) =>{
+                                                return(
+                                                    <option key={breed.id} value={breed.id}>{breed.breedName}</option>
+                                                )
+                                            })
+                                        }                                      
+                                    </Form.Select> */}
                                     <Select
                                         name="breed"
                                         options={breedByPetType}
+                                        defaultValue={{ label: "Select Breed", value: 0 }}
                                         isInvalid={validationMap.has("breed")}
+                                        style={{borderColor:'red'}}
                                     /> 
-                                    <Form.Control.Feedback type="invalid">
+                                    <div className="dropdown-invalid"> {validationMap.get("breed")}</div>
+                                    {/* <Form.Control.Feedback type="invalid">
                                         {validationMap.get("breed")}
-                                    </Form.Control.Feedback>                            
+                                    </Form.Control.Feedback>                             */}
                                 </Form.Group>
 
                                 <Form.Group as={Col} lg={3}>
@@ -343,12 +361,11 @@ function AddPetModal({show, handleHide, setLoginState }){
                                             <Form.Label>Select Owner</Form.Label>
                                             <Select
                                                 name="client"
+                                                defaultValue={{label: "Select Owner", value:0}}
                                                 options={owners}
-                                                isInvalid={validationMap.has("client")}
                                             />        
-                                            <Form.Control.Feedback type="invalid">
-                                                {validationMap.get("client")}
-                                            </Form.Control.Feedback>                                  
+                                            <div className="dropdown-invalid"> {validationMap.get("client")}</div>
+                                                                         
                                         </Form.Group>
                                     </Row><br/>
                                 </>                                

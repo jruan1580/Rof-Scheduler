@@ -1,3 +1,5 @@
+import  { makeHttpRequest } from './httpClientWrapper';
+
 export const addPet = async function(
     ownerId,
     petTypeId,
