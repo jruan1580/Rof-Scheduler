@@ -300,20 +300,7 @@ function AddPetModal({show, handleHide, setLoginState }){
                                 </Form.Group>
                                 
                                 <Form.Group as={Col} lg={3}>
-                                    <Form.Label>Breed</Form.Label>
-                                    {/* <Form.Select
-                                        type="select"
-                                        name="breed"
-                                        isInvalid={validationMap.has("breed")}
-                                    >
-                                        {
-                                            breedByPetType.map((breed) =>{
-                                                return(
-                                                    <option key={breed.id} value={breed.id}>{breed.breedName}</option>
-                                                )
-                                            })
-                                        }                                      
-                                    </Form.Select> */}
+                                    <Form.Label>Breed</Form.Label>                                    
                                     <Select
                                         name="breed"
                                         options={breedByPetType}
