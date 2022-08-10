@@ -491,6 +491,16 @@ function AddPetModal({show, handleHide, setLoginState }){
                                     Create
                                 </Button>
                             )}
+                            {(loading || disableBtns) && (
+                                <Button variant="primary" className="float-end" disabled>                                   
+                                    Back
+                                </Button>
+                            )}
+                            {!loading && !disableBtns && (
+                                <Button type="button" className="float-end" onClick={() => setPetTypeSelected(undefined)}>
+                                    Back
+                                </Button>
+                            )}
                         </Form>
                         
                     </Modal.Body>
