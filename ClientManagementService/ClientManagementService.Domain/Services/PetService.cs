@@ -17,7 +17,7 @@ namespace ClientManagementService.Domain.Services
         Task<PetsWithTotalPage> GetAllPetsByKeyword(int page, int offset, string keyword);
         Task<Pet> GetPetById(long petId);
         Task<Pet> GetPetByName(string name);
-        Task<List<Pet>> GetPetsByClientId(long clientId);
+        Task<PetsWithTotalPage> GetPetsByClientIdAndKeyword(long clientId, int page, int offset, string keyword);
         Task UpdatePet(Pet updatePet);
     }
 
@@ -114,25 +114,18 @@ namespace ClientManagementService.Domain.Services
             return PetMapper.ToCorePet(pet, petToVaccines);
         }
 
-        public async Task<List<Pet>> GetPetsByClientId(long clientId)
+        public async Task<PetsWithTotalPage> GetPetsByClientIdAndKeyword(long clientId, int page, int offset, string keyword)
         {
-            var dbPets = await _petRepository.GetPetsByClientId(clientId);
+            var result = await _petRepository.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
+            var pets = result.Item1;
+            var totalPages = result.Item2;
 
-            var pets = new List<Pet>();
-
-            if (dbPets.Count == 0)
+            if (pets == null || pets.Count == 0)
             {
-                return pets;
-            }
-         
-            foreach (var pet in dbPets)
-            {
-                //when displaying a list of pets in table, we will not display vaccines.
-                //otw, table will be very big and congested
-                pets.Add(PetMapper.ToCorePet(pet, null));
+                return new PetsWithTotalPage(new List<Pet>(), 0);
             }
 
-            return pets;
+            return new PetsWithTotalPage(pets.Select(p => PetMapper.ToCorePet(p, null)).ToList(), totalPages);
         }
 
         public async Task UpdatePet(Pet updatePet)
