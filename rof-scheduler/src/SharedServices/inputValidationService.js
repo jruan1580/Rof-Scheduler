@@ -295,11 +295,11 @@ export const ensureAddPetInformationProvided = function(
     validationErrors.set("breed", "Please select pet's breed.");
   }
 
-  if (weight === undefined || weight === ""){
+  if (weight === undefined || isNaN(weight)){
     validationErrors.set("weight", "Please enter pet's weight");
   }
 
-  if (dob === undefined || weight === ""){
+  if (dob === undefined || dob === ""){
     validationErrors.set("dob", "Please enter pet's DOB");
   }
 

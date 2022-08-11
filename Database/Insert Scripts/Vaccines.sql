@@ -15,6 +15,8 @@ Values
  (@dogTypeId, 'Bordetella'),
  (@dogTypeId, 'Rabies'),
  (@dogTypeId, 'Leptospirosis'), 
+ (@dogTypeId, 'DHPP/DA2PP/DHLPP'),
+ (@dogTypeId, 'Kennel Cough'),
  (@catTypeId, 'Rabies'),
  (@catTypeId, 'FVRCP'),
  (@catTypeId, 'Feline Leukemia');

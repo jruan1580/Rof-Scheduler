@@ -42,6 +42,7 @@ function AddPetModal({show, handleHide, setLoginState }){
     const goToAddPet = (e) =>{
         e.preventDefault();
 
+        resetStates();
         const petTypeIdSelected = parseInt(e.target.petType.value);
 
         /*
@@ -166,7 +167,6 @@ function AddPetModal({show, handleHide, setLoginState }){
         }
 
         var inputValidations = ensureAddPetInformationProvided(petName, breed, weight, dob, client);
-        console.log(inputValidations);
         if (inputValidations.size > 0){
             setValidationMap(inputValidations);
             return;
@@ -210,11 +210,18 @@ function AddPetModal({show, handleHide, setLoginState }){
 
     //reset everything when we close modal
     const closeModal = function () {
+        resetStates();
+        handleHide();
+    };
+
+    const resetStates = function() {
         setValidationMap(new Map());
         setErrMsg(undefined);
+        setSuccessMsg(undefined);
+        setLoading(false);
+        setDisableBtns(false);
         setPetTypeSelected(undefined);
-        handleHide();
-      };
+    }
 
     return(
         <>
@@ -462,7 +469,7 @@ function AddPetModal({show, handleHide, setLoginState }){
                                 </Button>
                             )}
                             {(loading || disableBtns) && (
-                                <Button variant="primary" className="float-end" disabled>
+                                <Button variant="primary" className="float-end ms-2" disabled>
                                     <Spinner
                                         as="span"
                                         animation="grow"
@@ -474,7 +481,7 @@ function AddPetModal({show, handleHide, setLoginState }){
                                 </Button>
                             )}
                             {!loading && !disableBtns && (
-                                <Button type="submit" className="float-end">
+                                <Button type="submit" className="float-end ms-2">
                                     Create
                                 </Button>
                             )}
