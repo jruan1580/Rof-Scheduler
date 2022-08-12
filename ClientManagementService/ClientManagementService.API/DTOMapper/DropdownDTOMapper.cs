@@ -38,5 +38,39 @@ namespace ClientManagementService.API.DTOMapper
           
             return dtos;
         }
+
+        public static List<BreedDTO> ToBreedDTO(List<Breed> breeds)
+        {
+            var dtos = new List<BreedDTO>();
+
+            foreach(var breed in breeds)
+            {
+                var dto = new BreedDTO()
+                {
+                    Id = breed.Id,
+                    BreedName = breed.BreedName
+                };
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+
+        public static List<ClientDTO> ToClientDTO(List<Client> clients)
+        {
+            var dtos = new List<ClientDTO>();
+
+            foreach(var client in clients)
+            {
+                dtos.Add(new ClientDTO()
+                {
+                    Id = client.Id,
+                    FullName = client.FullName
+                });
+            }
+
+            return dtos;
+        }
     }
 }

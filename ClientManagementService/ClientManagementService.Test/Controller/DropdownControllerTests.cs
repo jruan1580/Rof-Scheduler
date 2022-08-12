@@ -38,10 +38,45 @@ namespace ClientManagementService.Test.Controller
                         VaxName = "Bordetella"
                     }
                 });
+
+            _dropdownService.Setup(d => d.GetBreedsByPetType(It.IsAny<short>()))
+                .ReturnsAsync(new List<Domain.Models.Breed>()
+                {
+                    new Domain.Models.Breed()
+                    {
+                        Id = 1,
+                        BreedName = "Golden Retriever"
+                    }
+                });
+
+            _dropdownService.Setup(d => d.GetClients())
+                .ReturnsAsync(new List<Domain.Models.Client>()
+                {
+                    new Domain.Models.Client()
+                    {
+                        Id = 1,
+                        FullName = "Test User"
+                    }
+                });
         }
 
         [Test]
-        public async Task GetPetTypes()
+        public async Task GetClientTest()
+        {
+            var controller = new DropdownController(_dropdownService.Object);
+
+            var result = await controller.GetClients();
+
+            Assert.NotNull(result);
+            Assert.AreEqual(typeof(OkObjectResult), result.GetType());
+
+            var okObj = (OkObjectResult)result;
+
+            Assert.AreEqual(okObj.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task GetPetTypesTest()
         {
             var controller = new DropdownController(_dropdownService.Object);
 
@@ -56,11 +91,26 @@ namespace ClientManagementService.Test.Controller
         }
 
         [Test]
-        public async Task GetVaccinesByPetType()
+        public async Task GetVaccinesByPetTypeTest()
         {
             var controller = new DropdownController(_dropdownService.Object);
 
             var result = await controller.GetVaccineByPetType(1);
+
+            Assert.NotNull(result);
+            Assert.AreEqual(typeof(OkObjectResult), result.GetType());
+
+            var okObj = (OkObjectResult)result;
+
+            Assert.AreEqual(okObj.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task GetBreedByPetTypeTest()
+        {
+            var controller = new DropdownController(_dropdownService.Object);
+
+            var result = await controller.GetBreedsByPetType(1);
 
             Assert.NotNull(result);
             Assert.AreEqual(typeof(OkObjectResult), result.GetType());

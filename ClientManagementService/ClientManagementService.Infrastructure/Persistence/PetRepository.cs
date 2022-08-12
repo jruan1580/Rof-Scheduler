@@ -16,6 +16,8 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
         Task<(List<Pet>, int)> GetPetsByClientIdAndKeyword(long clientId, int page = 1, int offset = 10, string keyword = "");
+        Task<List<Pet>> GetPetsByClientId(long clientId);
+        Task<List<Breed>> GetPetBreedByPetTypeId(short petTypeId);
         Task UpdatePet(Pet updatePet);
         Task<bool> PetAlreadyExists(long ownerId, string name);
     }
@@ -139,6 +141,19 @@ namespace ClientManagementService.Infrastructure.Persistence
                 pet.PetType = await context.PetTypes.FirstOrDefaultAsync(pt => pt.Id == pet.PetTypeId);
 
                 return pet;
+            }
+        }
+
+        /// <summary>
+        /// Will call to retrieve a list of breeds after pet type has been selected
+        /// </summary>
+        /// <param name="petTypeId"></param>
+        /// <returns></returns>
+        public async Task<List<Breed>> GetPetBreedByPetTypeId(short petTypeId)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Breeds.Where(b => b.PetTypeId == petTypeId).ToListAsync();
             }
         }
 

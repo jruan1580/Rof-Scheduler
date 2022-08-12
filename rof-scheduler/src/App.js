@@ -8,6 +8,7 @@ import AccountSettings from "./AccountSettings";
 import CreateClient from "./CreateClient";
 import EmployeeManagement from "./EmployeeManagement";
 import ClientManagement from "./ClientManagement";
+import PetManagement from "./PetManagement";
 
 
 function App() {
@@ -44,7 +45,8 @@ function App() {
             <Route exact path="/accountsettings" element={!isLogin ? <Navigate to="/"/> : <AccountSettings setLoginState={setLogin}/>} />
             {/* <Route exact path="/calendar" element={<Calendar />} /> */}
             <Route exact path="/employeemanagement" element={!isLogin ? <Navigate to="/"/> : <EmployeeManagement setLoginState={setLogin}/>} />
-            <Route exact path ="/clientmanagement" element={!isLogin? <Navigate to="/"/> : <ClientManagement setLoginState={setLogin}/> } />
+            <Route exact path="/clientmanagement" element={!isLogin? <Navigate to="/"/> : <ClientManagement setLoginState={setLogin}/> } />
+            <Route exact path="/petmanagement" element={<PetManagement setLoginState={setLogin} />} />
           </Routes>
         </Container>
       </BrowserRouter>

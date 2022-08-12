@@ -4,8 +4,6 @@ using CorePet = ClientManagementService.Domain.Models.Pet;
 using ClientManagementService.Domain.Mappers.Database;
 using DbClient = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 using DbBreed = ClientManagementService.Infrastructure.Persistence.Entities.Breed;
-using CoreClient = ClientManagementService.Domain.Models.Client;
-using CoreBreed = ClientManagementService.Domain.Models.Breed;
 using ClientManagementService.Infrastructure.Persistence.Entities;
 using System.Collections.Generic;
 
@@ -118,6 +116,22 @@ namespace ClientManagementService.Test.Mapper
 
             Assert.AreEqual(entity.Id, corePetType.Id);
             Assert.AreEqual(entity.PetTypeName, corePetType.PetTypeName);
+        }
+
+        [Test]
+        public void ToCoreBreedTest()
+        {
+            var entity = new DbBreed();
+
+            entity.Id = 1;
+            entity.BreedName = "Golden Retriever";
+
+            var core = PetMapper.ToCoreBreed(entity);
+
+            Assert.IsNotNull(core);
+
+            Assert.AreEqual(1, core.Id);
+            Assert.AreEqual("Golden Retriever", core.BreedName);
         }
     }
 }

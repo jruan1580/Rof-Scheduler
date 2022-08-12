@@ -13,6 +13,8 @@ namespace ClientManagementService.Test.Service
     {
         private Mock<IPetRepository> _petRepository;
         private Mock<IPetToVaccinesRepository> _petToVaccinesRepository;
+        private Mock<IClientRepository> _clientRepository;
+
         private DropdownService _dropdownService;
 
         [SetUp]
@@ -35,6 +37,16 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
+            _petRepository.Setup(p => p.GetPetBreedByPetTypeId(It.IsAny<short>()))
+                .ReturnsAsync(new List<Breed>()
+                {
+                    new Breed()
+                    {
+                        Id = 1,
+                        BreedName = "Golden Retriever"
+                    }
+                });
+
             _petToVaccinesRepository = new Mock<IPetToVaccinesRepository>();
 
             _petToVaccinesRepository.Setup(v => v.GetVaccinesByPetType(It.IsAny<short>()))
@@ -48,7 +60,20 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
-            _dropdownService = new DropdownService(_petRepository.Object, _petToVaccinesRepository.Object);
+            _clientRepository = new Mock<IClientRepository>();
+
+            _clientRepository.Setup(c => c.GetClientsForDropdown())
+                .ReturnsAsync(new List<Client>()
+                {
+                    new Client()
+                    {
+                        Id = 1,
+                        FirstName = "Test",
+                        LastName = "User",
+                    }
+                });
+
+            _dropdownService = new DropdownService(_clientRepository.Object, _petRepository.Object, _petToVaccinesRepository.Object);
         }
 
         [Test]
@@ -79,6 +104,34 @@ namespace ClientManagementService.Test.Service
             var cat = petTypes[1];
             Assert.AreEqual(2, cat.Id);
             Assert.AreEqual("Cat", cat.PetTypeName);
+        }
+
+        [Test]
+        public async Task GetPetBreedByPetTypeSuccess()
+        {
+            var breeds = await _dropdownService.GetBreedsByPetType(1);
+
+            Assert.IsNotNull(breeds);
+            Assert.AreEqual(1, breeds.Count);
+
+            var breed = breeds[0];
+            Assert.AreEqual(1, breed.Id);
+            Assert.AreEqual("Golden Retriever", breed.BreedName);
+        }
+
+        [Test]
+        public async Task GetClientsSuccess()
+        {
+            var clients = await _dropdownService.GetClients();
+
+            Assert.IsNotNull(clients);
+            Assert.AreEqual(1, clients.Count);
+
+            var client = clients[0];
+            Assert.AreEqual(1, client.Id);
+            Assert.AreEqual("Test", client.FirstName);
+            Assert.AreEqual("User", client.LastName);
+            Assert.AreEqual("Test User", client.FullName);
         }
     }
 }

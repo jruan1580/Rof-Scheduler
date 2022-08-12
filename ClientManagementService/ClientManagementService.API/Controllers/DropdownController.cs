@@ -21,7 +21,22 @@ namespace ClientManagementService.API.Controllers
             _dropdownService = dropdownService;
         }
 
-        [HttpGet("petType")]
+        [HttpGet("clients")]
+        public async Task<IActionResult> GetClients()
+        {
+            try
+            {
+                var clients = await _dropdownService.GetClients();
+
+                return Ok(DropdownDTOMapper.ToClientDTO(clients));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("petTypes")]
         public async Task<IActionResult> GetPetTypes()
         {
             try
@@ -36,7 +51,7 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
-        [HttpGet("{petTypeId}/vaccine")]
+        [HttpGet("{petTypeId}/vaccines")]
         public async Task<IActionResult> GetVaccineByPetType(short petTypeId)
         {
             try
@@ -46,6 +61,21 @@ namespace ClientManagementService.API.Controllers
                 return Ok(DropdownDTOMapper.ToVaccineDTO(vaccines));
             }
             catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("{petTypeId}/breeds")]
+        public async Task<IActionResult> GetBreedsByPetType(short petTypeId)
+        {
+            try
+            {
+                var breeds = await _dropdownService.GetBreedsByPetType(petTypeId);
+
+                return Ok(DropdownDTOMapper.ToBreedDTO(breeds));
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
