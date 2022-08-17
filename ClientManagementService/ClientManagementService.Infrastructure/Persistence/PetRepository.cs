@@ -16,7 +16,6 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
         Task<(List<Pet>, int)> GetPetsByClientIdAndKeyword(long clientId, int page = 1, int offset = 10, string keyword = "");
-        Task<List<Pet>> GetPetsByClientId(long clientId);
         Task<List<Breed>> GetPetBreedByPetTypeId(short petTypeId);
         Task UpdatePet(Pet updatePet);
         Task<bool> PetAlreadyExists(long ownerId, string name);
