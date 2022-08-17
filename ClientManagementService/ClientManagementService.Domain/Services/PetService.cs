@@ -12,7 +12,7 @@ namespace ClientManagementService.Domain.Services
 {
     public interface IPetService
     {
-        Task AddPet(Pet newPet);
+        Task<long> AddPet(Pet newPet);
         Task DeletePetById(long petId);
         Task<PetsWithTotalPage> GetAllPetsByKeyword(int page, int offset, string keyword);
         Task<Pet> GetPetById(long petId);
@@ -33,7 +33,7 @@ namespace ClientManagementService.Domain.Services
             _petToVaccinesRepository = petToVaccinesRepository;
         }
 
-        public async Task AddPet(Pet newPet)
+        public async Task<long> AddPet(Pet newPet)
         {
             var invalidErrs = newPet.IsValidPetToCreate().ToArray();
 
@@ -58,6 +58,8 @@ namespace ClientManagementService.Domain.Services
             var petsToVaccine = PetToVaccineMapper.ToPetToVaccine(petId, newPet.Vaccines);
 
             await _petToVaccinesRepository.AddPetToVaccines(petsToVaccine);
+
+            return petId;
         }
 
         public async Task<PetsWithTotalPage> GetAllPetsByKeyword(int page, int offset, string keyword)
