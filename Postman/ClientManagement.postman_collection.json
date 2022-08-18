@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c909760b-9722-4d86-9074-2929bdb269f6",
+		"_postman_id": "f4de0b8f-8aef-49e1-937a-ebb0fce8ae88",
 		"name": "ClientManagement",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -884,6 +884,476 @@
 			]
 		},
 		{
+			"name": "Pet Test",
+			"item": [
+				{
+					"name": "Add Pet",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", () => {\r",
+									"  pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Id was returned\", () => {\r",
+									"  pm.expect(jsonData).to.be.an(\"object\");\r",
+									"  pm.expect(jsonData.id).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"petId\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"OwnerId\": {{clientId}},\r\n    \"OwnerFirstName\": \"Test\",\r\n    \"OwnerLastName\": \"Client\",\r\n    \"BreedId\": 1,\r\n    \"BreedName\": \"Golden Retriever\",\r\n    \"PetTypeId\": 1,\r\n    \"PetTypeName\": \"Dog\",\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 70,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [{\r\n        \"Id\" : 1,\r\n        \"VaccineName\": \"Bordetella\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 2,\r\n        \"VaccineName\": \"Rabies\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 3,\r\n        \"VaccineName\": \"Leptospirosis\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 4,\r\n        \"VaccineName\": \"DHPP/DA2PP/DHLPP\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 5,\r\n        \"VaccineName\": \"Kennel Cough\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true\r\n        }]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Pet Duplicate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"OwnerId\": {{clientId}},\r\n    \"OwnerFirstName\": \"Test\",\r\n    \"OwnerLastName\": \"Client\",\r\n    \"BreedId\": 1,\r\n    \"BreedName\": \"Golden Retriever\",\r\n    \"PetTypeId\": 1,\r\n    \"PetTypeName\": \"Dog\",\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 70,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [{\r\n        \"Id\" : 1,\r\n        \"VaccineName\": \"Bordetella\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 2,\r\n        \"VaccineName\": \"Rabies\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 3,\r\n        \"VaccineName\": \"Leptospirosis\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 4,\r\n        \"VaccineName\": \"DHPP/DA2PP/DHLPP\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 5,\r\n        \"VaccineName\": \"Kennel Cough\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true\r\n        }]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pet By Id Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {\r",
+									"  pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/999",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								"999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pet By Id Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/{{petId}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pet By Name Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {\r",
+									"  pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/aaa/name",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								"aaa",
+								"name"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pet By Name Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/Layla/name",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								"Layla",
+								"name"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pets By Client Id No Pets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/clientId/?clientId=999&page=1&offset=10",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								"clientId",
+								""
+							],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "999"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "offset",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pets By Client Id Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/clientId/?clientId={{clientId}}&page=1&offset=10",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								"clientId",
+								""
+							],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "{{clientId}}"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "offset",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pet Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", () => {\r",
+									"  pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Id\": 999,\r\n    \"OwnerId\": 999,\r\n    \"OwnerFirstName\": \"Test\",\r\n    \"OwnerLastName\": \"Client\",\r\n    \"BreedId\": 1,\r\n    \"BreedName\": \"Golden Retriever\",\r\n    \"PetTypeId\": 1,\r\n    \"PetTypeName\": \"Dog\",\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 70,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [{\r\n        \"Id\" : 1,\r\n        \"VaccineName\": \"Bordetella\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 2,\r\n        \"VaccineName\": \"Rabies\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 3,\r\n        \"VaccineName\": \"Leptospirosis\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 4,\r\n        \"VaccineName\": \"DHPP/DA2PP/DHLPP\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 5,\r\n        \"VaccineName\": \"Kennel Cough\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true\r\n        }]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/updatePet",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								"updatePet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pet Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clientToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Id\": {{petId}},\r\n    \"OwnerId\": {{clientId}},\r\n    \"OwnerFirstName\": \"Test\",\r\n    \"OwnerLastName\": \"Client2\",\r\n    \"BreedId\": 1,\r\n    \"BreedName\": \"Golden Retriever\",\r\n    \"PetTypeId\": 1,\r\n    \"PetTypeName\": \"Dog\",\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 65,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [{\r\n        \"Id\" : 1,\r\n        \"VaccineName\": \"Bordetella\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 2,\r\n        \"VaccineName\": \"Rabies\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 3,\r\n        \"VaccineName\": \"Leptospirosis\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 4,\r\n        \"VaccineName\": \"DHPP/DA2PP/DHLPP\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 5,\r\n        \"VaccineName\": \"Kennel Cough\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true\r\n        }]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/updatePet",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								"updatePet"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Client Logout",
 			"item": [
 				{
@@ -1027,7 +1497,7 @@
 			]
 		},
 		{
-			"name": "Get All Client",
+			"name": "Get All",
 			"item": [
 				{
 					"name": "Get All Clients Success",
@@ -1073,6 +1543,142 @@
 									"key": "offset",
 									"value": "10"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Pets Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/?page=1&offset=10",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "offset",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dropdown Tests",
+			"item": [
+				{
+					"name": "Get Clients Success",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/dropdown/clients",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"dropdown",
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pet Types Success",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/dropdown/petTypes",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"dropdown",
+								"petTypes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vaccine By Pet Type Success",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/dropdown/1/vaccines",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"dropdown",
+								"1",
+								"vaccines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Breeds By Pet Type Success",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/dropdown/1/breeds",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"dropdown",
+								"1",
+								"breeds"
 							]
 						}
 					},
@@ -1212,6 +1818,45 @@
 		{
 			"name": "Clean Up",
 			"item": [
+				{
+					"name": "Delete Pet Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/pet/{{petId}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Delete Client Success",
 					"event": [

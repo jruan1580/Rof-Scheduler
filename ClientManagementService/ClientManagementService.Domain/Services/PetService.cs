@@ -12,7 +12,7 @@ namespace ClientManagementService.Domain.Services
 {
     public interface IPetService
     {
-        Task AddPet(Pet newPet);
+        Task<long> AddPet(Pet newPet);
         Task DeletePetById(long petId);
         Task<PetsWithTotalPage> GetAllPetsByKeyword(int page, int offset, string keyword);
         Task<Pet> GetPetById(long petId);
@@ -33,7 +33,7 @@ namespace ClientManagementService.Domain.Services
             _petToVaccinesRepository = petToVaccinesRepository;
         }
 
-        public async Task AddPet(Pet newPet)
+        public async Task<long> AddPet(Pet newPet)
         {
             var invalidErrs = newPet.IsValidPetToCreate().ToArray();
 
@@ -58,6 +58,8 @@ namespace ClientManagementService.Domain.Services
             var petsToVaccine = PetToVaccineMapper.ToPetToVaccine(petId, newPet.Vaccines);
 
             await _petToVaccinesRepository.AddPetToVaccines(petsToVaccine);
+
+            return petId;
         }
 
         public async Task<PetsWithTotalPage> GetAllPetsByKeyword(int page, int offset, string keyword)
@@ -139,11 +141,11 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var petExists = await _petRepository.PetAlreadyExists(updatePet.OwnerId, updatePet.Name);
-            if (petExists)
-            {
-                throw new ArgumentException($"Pet with same name and breed already exist under this owner id {updatePet.OwnerId}");
-            }
+            //var petExists = await _petRepository.PetAlreadyExists(updatePet.OwnerId, updatePet.Name);
+            //if (petExists)
+            //{
+            //    throw new ArgumentException($"Pet with same name and breed already exist under this owner id {updatePet.OwnerId}");
+            //}
 
             var origPet = await _petRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, updatePet.Id));
             if (origPet == null)
