@@ -16,6 +16,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
         Task<(List<Pet>, int)> GetPetsByClientIdAndKeyword(long clientId, int page = 1, int offset = 10, string keyword = "");
+        Task<List<Pet>> GetPetsByClientId(long clientId);
         Task<List<Breed>> GetPetBreedByPetTypeId(short petTypeId);
         Task UpdatePet(Pet updatePet);
         Task<bool> PetAlreadyExists(long ownerId, string name);
@@ -62,12 +63,6 @@ namespace ClientManagementService.Infrastructure.Persistence
                 }
 
                 var countByCriteria = await pets.CountAsync();
-
-                if (countByCriteria == 0)
-                {
-                    return (new List<Pet>(), 0);
-                }
-
                 var fullPages = countByCriteria / offset;
                 var remaining = countByCriteria % offset;
                 var totalPages = (remaining > 0) ? fullPages + 1 : fullPages;
@@ -100,12 +95,6 @@ namespace ClientManagementService.Infrastructure.Persistence
                 }
 
                 var countByCriteria = await pet.CountAsync();
-
-                if (countByCriteria == 0)
-                {
-                    return (new List<Pet>(), 0);
-                }
-
                 var fullPages = countByCriteria / offset;
                 var remaining = countByCriteria % offset;
                 var totalPages = (remaining > 0) ? fullPages + 1 : fullPages;
@@ -182,8 +171,6 @@ namespace ClientManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                var petToVax = await context.PetToVaccines.Where(v => v.PetId == petId).ToListAsync();
-
                 var pet = await context.Pets.FirstOrDefaultAsync(p => p.Id == petId);
 
                 if (pet == null)
@@ -191,7 +178,6 @@ namespace ClientManagementService.Infrastructure.Persistence
                     throw new ArgumentException($"No pet with Id: {petId} found.");
                 }
 
-                context.RemoveRange(petToVax);
                 context.Remove(pet);
 
                 await context.SaveChangesAsync();
