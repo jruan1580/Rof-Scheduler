@@ -141,11 +141,11 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var petExists = await _petRepository.PetAlreadyExists(updatePet.OwnerId, updatePet.Name);
-            if (petExists)
-            {
-                throw new ArgumentException($"Pet with same name and breed already exist under this owner id {updatePet.OwnerId}");
-            }
+            //var petExists = await _petRepository.PetAlreadyExists(updatePet.OwnerId, updatePet.Name);
+            //if (petExists)
+            //{
+            //    throw new ArgumentException($"Pet with same name and breed already exist under this owner id {updatePet.OwnerId}");
+            //}
 
             var origPet = await _petRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, updatePet.Id));
             if (origPet == null)
