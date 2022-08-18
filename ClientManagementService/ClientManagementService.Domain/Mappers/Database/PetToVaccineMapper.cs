@@ -58,7 +58,7 @@ namespace ClientManagementService.Domain.Mappers.Database
                 petToVaccine.VaxId = vaccine.Id;
                 petToVaccine.PetId = petId;
                 petToVaccine.Inoculated = vaccine.Inoculated;
-                petToVaccine.Id = vaccine.PetToVaccineId;
+                //petToVaccine.Id = vaccine.PetToVaccineId;
 
                 petToVaccines.Add(petToVaccine);
             }
