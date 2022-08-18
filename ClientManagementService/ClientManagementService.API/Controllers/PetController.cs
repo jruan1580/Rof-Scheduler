@@ -29,9 +29,9 @@ namespace ClientManagementService.API.Controllers
         {
             try
             {
-                var petId = await _petService.AddPet(PetDTOMapper.FromDTOPet(pet));
+                await _petService.AddPet(PetDTOMapper.FromDTOPet(pet));
 
-                return Ok(new { Id = petId });
+                return StatusCode(201);
             }
             catch (ArgumentException argEx)
             {
