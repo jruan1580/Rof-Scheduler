@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f4de0b8f-8aef-49e1-937a-ebb0fce8ae88",
+		"_postman_id": "55fce89f-2a89-4835-aa21-163846b2f62a",
 		"name": "ClientManagement",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -884,6 +884,176 @@
 			]
 		},
 		{
+			"name": "Dropdown Tests",
+			"item": [
+				{
+					"name": "Get Clients Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/dropdown/clients",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"dropdown",
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pet Types Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const jsonData = pm.response.json();\r",
+									"if (jsonData.length == 0){\r",
+									"    pm.expect.fail(\"No pet types returned\");\r",
+									"}else{\r",
+									"    const firstPetType = jsonData[0];\r",
+									"    pm.expect(firstPetType.id).to.be.a(\"number\");\r",
+									"    pm.environment.set(\"petTypeId\", firstPetType.id);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/dropdown/petTypes",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"dropdown",
+								"petTypes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vaccine By Pet Type Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const jsonData = pm.response.json();\r",
+									"if (jsonData.length == 0){\r",
+									"    pm.expect.fail(\"No vaccines returned\");\r",
+									"}else{\r",
+									"    const firstVaccine = jsonData[0];\r",
+									"    pm.expect(firstVaccine.id).to.be.a(\"number\");\r",
+									"    pm.environment.set(\"vaxId\", firstVaccine.id);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/dropdown/{{petTypeId}}/vaccines",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"dropdown",
+								"{{petTypeId}}",
+								"vaccines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Breeds By Pet Type Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const jsonData = pm.response.json();\r",
+									"if (jsonData.length == 0){\r",
+									"    pm.expect.fail(\"No breeds returned\");\r",
+									"}else{\r",
+									"    const firstBreed = jsonData[0];\r",
+									"    pm.expect(firstBreed.id).to.be.a(\"number\");\r",
+									"    pm.environment.set(\"breedId\", firstBreed.id);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}:{{port}}/api/dropdown/{{petTypeId}}/breeds",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"dropdown",
+								"{{petTypeId}}",
+								"breeds"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Pet Test",
 			"item": [
 				{
@@ -893,8 +1063,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 201\", () => {\r",
-									"  pm.response.to.have.status(201);\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
 									"const jsonData = pm.response.json();\r",
@@ -921,7 +1091,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"OwnerId\": {{clientId}},\r\n    \"OwnerFirstName\": \"Test\",\r\n    \"OwnerLastName\": \"Client\",\r\n    \"BreedId\": 1,\r\n    \"BreedName\": \"Golden Retriever\",\r\n    \"PetTypeId\": 1,\r\n    \"PetTypeName\": \"Dog\",\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 70,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [{\r\n        \"Id\" : 1,\r\n        \"VaccineName\": \"Bordetella\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 2,\r\n        \"VaccineName\": \"Rabies\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 3,\r\n        \"VaccineName\": \"Leptospirosis\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 4,\r\n        \"VaccineName\": \"DHPP/DA2PP/DHLPP\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 5,\r\n        \"VaccineName\": \"Kennel Cough\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true\r\n        }]\r\n}",
+							"raw": "{\r\n    \"OwnerId\": {{clientId}},\r\n    \"BreedId\": {{breedId}},\r\n    \"PetTypeId\": {{petTypeId}},\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 70,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [\r\n        {\r\n            \"Id\" : {{vaxId}},\r\n            \"Innoculated\": true \r\n        }\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -968,7 +1138,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"OwnerId\": {{clientId}},\r\n    \"OwnerFirstName\": \"Test\",\r\n    \"OwnerLastName\": \"Client\",\r\n    \"BreedId\": 1,\r\n    \"BreedName\": \"Golden Retriever\",\r\n    \"PetTypeId\": 1,\r\n    \"PetTypeName\": \"Dog\",\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 70,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [{\r\n        \"Id\" : 1,\r\n        \"VaccineName\": \"Bordetella\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 2,\r\n        \"VaccineName\": \"Rabies\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 3,\r\n        \"VaccineName\": \"Leptospirosis\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 4,\r\n        \"VaccineName\": \"DHPP/DA2PP/DHLPP\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 5,\r\n        \"VaccineName\": \"Kennel Cough\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true\r\n        }]\r\n}",
+							"raw": "{\r\n    \"OwnerId\": {{clientId}},\r\n    \"BreedId\": {{breedId}},\r\n    \"PetTypeId\": {{petTypeId}},\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 70,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [\r\n        {\r\n            \"Id\" : {{vaxId}},\r\n            \"Innoculated\": true \r\n        }\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1592,93 +1762,6 @@
 									"key": "offset",
 									"value": "10"
 								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Dropdown Tests",
-			"item": [
-				{
-					"name": "Get Clients Success",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host}}:{{port}}/api/dropdown/clients",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"dropdown",
-								"clients"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Pet Types Success",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host}}:{{port}}/api/dropdown/petTypes",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"dropdown",
-								"petTypes"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Vaccine By Pet Type Success",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host}}:{{port}}/api/dropdown/1/vaccines",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"dropdown",
-								"1",
-								"vaccines"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Breeds By Pet Type Success",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host}}:{{port}}/api/dropdown/1/breeds",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"dropdown",
-								"1",
-								"breeds"
 							]
 						}
 					},
