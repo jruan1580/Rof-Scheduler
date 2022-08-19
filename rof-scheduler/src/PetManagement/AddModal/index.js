@@ -337,7 +337,6 @@ function AddPetModal({show, handleHide, setLoginState }){
                                 <Form.Group as={Col} lg={3}>
                                     <Form.Label>Weight</Form.Label>
                                     <Form.Control 
-                                        type="number"
                                         placeholder="weight"
                                         name="weight"
                                         isInvalid={validationMap.has("weight")}
