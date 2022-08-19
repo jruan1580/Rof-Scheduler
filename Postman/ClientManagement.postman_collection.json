@@ -1207,7 +1207,18 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", () => {\r",
 									"  pm.response.to.have.status(200);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.response.to.have.jsonBody(\"vaccines\");\r",
+									"var jsonData = pm.response.json();\r",
+									"if (jsonData.vaccines.length == 0){\r",
+									"    pm.expect.fail(\"No pet to vaccines\");\r",
+									"}else{\r",
+									"    const firstVax = jsonData.vaccines[0];\r",
+									"    pm.expect(firstVax.id).to.be.a(\"number\");\r",
+									"    pm.environment.set(\"petToVaccineId\", firstVax.petsVaccineId);\r",
+									"}\r",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -1499,7 +1510,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Id\": {{petId}},\r\n    \"OwnerId\": {{clientId}},\r\n    \"OwnerFirstName\": \"Test\",\r\n    \"OwnerLastName\": \"Client2\",\r\n    \"BreedId\": 1,\r\n    \"BreedName\": \"Golden Retriever\",\r\n    \"PetTypeId\": 1,\r\n    \"PetTypeName\": \"Dog\",\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 65,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [{\r\n        \"Id\" : 1,\r\n        \"VaccineName\": \"Bordetella\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 2,\r\n        \"VaccineName\": \"Rabies\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 3,\r\n        \"VaccineName\": \"Leptospirosis\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 4,\r\n        \"VaccineName\": \"DHPP/DA2PP/DHLPP\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true },\r\n        {\r\n        \"Id\" : 5,\r\n        \"VaccineName\": \"Kennel Cough\",\r\n        \"PetsVaccineId\": 1,\r\n        \"Innoculated\": true\r\n        }]\r\n}",
+							"raw": "{\r\n    \"Id\": {{petId}},\r\n    \"OwnerId\": {{clientId}},\r\n    \"BreedId\": {{breedId}},\r\n    \"PetTypeId\": {{petTypeId}},\r\n    \"Name\": \"Layla\",\r\n    \"Weight\": 65,\r\n    \"Dob\": \"3/14/2019\",\r\n    \"Vaccines\": [{\r\n        \"Id\" : {{vaxId}},\r\n        \"PetsVaccineId\": {{petToVaccineId}},\r\n        \"Innoculated\": false \r\n        }\r\n     ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

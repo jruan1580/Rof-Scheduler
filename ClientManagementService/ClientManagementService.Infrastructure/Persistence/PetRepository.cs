@@ -18,7 +18,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task<(List<Pet>, int)> GetPetsByClientIdAndKeyword(long clientId, int page = 1, int offset = 10, string keyword = "");
         Task<List<Breed>> GetPetBreedByPetTypeId(short petTypeId);
         Task UpdatePet(Pet updatePet);
-        Task<bool> PetAlreadyExists(long ownerId, string name);
+        Task<bool> PetAlreadyExists(long petId, long ownerId, string name);
     }
 
     public class PetRepository : IPetRepository
@@ -198,13 +198,13 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
         }
 
-        public async Task<bool> PetAlreadyExists(long ownerId, string name)
+        public async Task<bool> PetAlreadyExists(long petId, long ownerId, string name)
         {
             using (var context = new RofSchedulerContext())
             {
                 name = name.ToLower();
 
-                return await context.Pets.AnyAsync(p => p.Name.ToLower().Equals(name) && p.OwnerId.Equals(ownerId));
+                return await context.Pets.AnyAsync(p => p.Id != petId && p.Name.ToLower().Equals(name) && p.OwnerId.Equals(ownerId));
             }
         }
 
@@ -214,10 +214,10 @@ namespace ClientManagementService.Infrastructure.Persistence
             var clients = await context.Clients.Where(c => clientIds.Any(id => c.Id == id)).ToListAsync();
 
             var breedIds = pets.Select(p => p.BreedId).Distinct().ToList();
-            var breeds = await context.Breeds.Where(b => breedIds.Any(id => id == b.Id)).ToListAsync();
+            var breeds = await context.Breeds.Where(b => breedIds.Contains(b.Id)).ToListAsync();
 
             var petTypeIds = pets.Select(p => p.PetTypeId).Distinct().ToList();
-            var petTypes = await context.PetTypes.Where(pt => petTypeIds.Any(id => id == pt.Id)).ToListAsync();
+            var petTypes = await context.PetTypes.Where(pt => petTypeIds.Contains(pt.Id)).ToListAsync();
 
             foreach (var pet in pets)
             {

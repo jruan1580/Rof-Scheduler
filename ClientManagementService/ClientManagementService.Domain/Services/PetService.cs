@@ -44,7 +44,7 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var petExists = await _petRepository.PetAlreadyExists(newPet.OwnerId, newPet.Name);
+            var petExists = await _petRepository.PetAlreadyExists(0, newPet.OwnerId, newPet.Name);
             if (petExists)
             {
                 throw new ArgumentException($"This pet already exists under Owner with id: {newPet.OwnerId}.");
@@ -141,7 +141,7 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var petExists = await _petRepository.PetAlreadyExists(updatePet.OwnerId, updatePet.Name);
+            var petExists = await _petRepository.PetAlreadyExists(updatePet.Id, updatePet.OwnerId, updatePet.Name);
             if (petExists)
             {
                 throw new ArgumentException($"Pet with same name and breed already exist under this owner id {updatePet.OwnerId}");
@@ -162,10 +162,15 @@ namespace ClientManagementService.Domain.Services
 
             await _petRepository.UpdatePet(origPet);
 
-            //update vaccines tied to pet
-            var petToVaccines = PetToVaccineMapper.ToPetToVaccine(origPet.Id, updatePet.Vaccines);
+            var origPetToVaccines = await _petToVaccinesRepository.GetPetToVaccineByPetId(origPet.Id);
+            foreach(var updatedPetToVaccine in updatePet.Vaccines)
+            {
+                var origPetToVaccine = origPetToVaccines.FirstOrDefault(o => o.Id == updatedPetToVaccine.PetToVaccineId);
+                origPetToVaccine.Inoculated = updatedPetToVaccine.Inoculated;
 
-            await _petToVaccinesRepository.UpdatePetToVaccines(petToVaccines);
+            }         
+
+            await _petToVaccinesRepository.UpdatePetToVaccines(origPetToVaccines);
         }
 
         public async Task DeletePetById(long petId)
