@@ -66,7 +66,7 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _petRepository.Setup(p => p.PetAlreadyExists(It.IsAny<long>(), It.IsAny<string>()))
+            _petRepository.Setup(p => p.PetAlreadyExists(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
             var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
@@ -574,7 +574,7 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _petRepository.Setup(p => p.PetAlreadyExists(It.IsAny<long>(), It.IsAny<string>()))
+            _petRepository.Setup(p => p.PetAlreadyExists(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
                .ReturnsAsync(true);
 
             var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
@@ -610,6 +610,15 @@ namespace ClientManagementService.Test.Service
                 .ReturnsAsync(new Pet() { Id = 1 });
 
             _petRepository.Setup(p => p.UpdatePet(It.IsAny<Pet>())).Returns(Task.CompletedTask);
+            _petToVaccinesRepository.Setup(v => v.GetPetToVaccineByPetId(It.IsAny<long>()))
+                .ReturnsAsync(new List<PetToVaccine>()
+                {
+                    new PetToVaccine()
+                    {
+                        Id = 1,
+                        Inoculated = false
+                    }
+                });
             _petToVaccinesRepository.Setup(v => v.UpdatePetToVaccines(It.IsAny<List<PetToVaccine>>())).Returns(Task.CompletedTask);
 
             var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
