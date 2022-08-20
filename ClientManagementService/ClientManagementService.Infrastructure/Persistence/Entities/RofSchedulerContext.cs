@@ -50,7 +50,8 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                 entity.HasOne(d => d.PetType)
                     .WithMany(p => p.Breeds)
                     .HasForeignKey(d => d.PetTypeId)
-                    .HasConstraintName("FK__Breed__PetTypeId__114A936A");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Breed__PetTypeId__2EDAF651");
             });
 
             modelBuilder.Entity<Client>(entity =>
@@ -157,19 +158,19 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                     .WithMany(p => p.Pets)
                     .HasForeignKey(d => d.BreedId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Pet__BreedId__17036CC0");
+                    .HasConstraintName("FK__Pet__BreedId__37703C52");
 
                 entity.HasOne(d => d.Owner)
                     .WithMany(p => p.Pets)
                     .HasForeignKey(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Pet__OwnerId__151B244E");
+                    .HasConstraintName("FK__Pet__OwnerId__3587F3E0");
 
                 entity.HasOne(d => d.PetType)
                     .WithMany(p => p.Pets)
                     .HasForeignKey(d => d.PetTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Pet__PetTypeId__160F4887");
+                    .HasConstraintName("FK__Pet__PetTypeId__367C1819");
             });
 
             modelBuilder.Entity<PetToVaccine>(entity =>
@@ -183,12 +184,14 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                 entity.HasOne(d => d.Pet)
                     .WithMany(p => p.PetToVaccines)
                     .HasForeignKey(d => d.PetId)
-                    .HasConstraintName("FK__PetToVacc__PetId__1EA48E88");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__PetToVacc__PetId__3A4CA8FD");
 
                 entity.HasOne(d => d.Vax)
                     .WithMany(p => p.PetToVaccines)
                     .HasForeignKey(d => d.VaxId)
-                    .HasConstraintName("FK__PetToVacc__VaxId__1F98B2C1");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__PetToVacc__VaxId__3B40CD36");
             });
 
             modelBuilder.Entity<PetType>(entity =>
@@ -211,7 +214,8 @@ namespace ClientManagementService.Infrastructure.Persistence.Entities
                 entity.HasOne(d => d.PetType)
                     .WithMany(p => p.Vaccines)
                     .HasForeignKey(d => d.PetTypeId)
-                    .HasConstraintName("FK__Vaccines__PetTyp__7F2BE32F");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Vaccines__PetTyp__31B762FC");
             });
 
             OnModelCreatingPartial(modelBuilder);
