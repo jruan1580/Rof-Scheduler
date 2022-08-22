@@ -32,14 +32,21 @@ function NavigationBar({loginState, handleLoginState}){
                     {loginState && <Nav.Item><Nav.Link href="/">Home</Nav.Link></Nav.Item>}
                     {
                         loginState && localStorage.getItem('role') === 'Administrator' &&
-                        <NavDropdown title='Admin Management'>         
+                        <NavDropdown title='Admininstrator'>         
                             <NavDropdown.Item as={Link} to="/employeemanagement">Employee</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/clientmanagement">Client</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/petmanagement">Pet</NavDropdown.Item>
                         </NavDropdown>  
                     }
                     {
-                        loginState && localStorage.getItem('role') !== 'Administrator' &&
+                        loginState && localStorage.getItem('role') === 'Employee' &&
+                        <NavDropdown title='Admininstrator'>         
+                            <NavDropdown.Item as={Link} to="/clientmanagement">Client</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/petmanagement">Pet</NavDropdown.Item>
+                        </NavDropdown>  
+                    }
+                    {
+                        loginState && localStorage.getItem('role') === 'Client' &&
                         <Nav.Item><Nav.Link href="/petmanagement">Pet Management</Nav.Link></Nav.Item>
                     }
                     {
