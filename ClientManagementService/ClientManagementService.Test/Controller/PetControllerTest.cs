@@ -48,18 +48,18 @@ namespace ClientManagementService.Test.Controller
             };
 
             _petService.Setup(p => p.AddPet(It.IsAny<Domain.Models.Pet>()))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(1);
 
             var controller = new PetController(_petService.Object);
 
             var response = await controller.AddPet(newPet);
 
             Assert.NotNull(response);
-            Assert.AreEqual(typeof(StatusCodeResult), response.GetType());
+            Assert.AreEqual(typeof(OkObjectResult), response.GetType());
 
-            var statusCode = (StatusCodeResult)response;
+            var okObj = (OkObjectResult)response;
 
-            Assert.AreEqual(statusCode.StatusCode, 201);
+            Assert.AreEqual(okObj.StatusCode, 200);
         }
 
         [Test]

@@ -52,7 +52,7 @@ namespace ClientManagementService.Infrastructure.Persistence
                 var petToVaccines = await context.PetToVaccines.Where(p => p.PetId == petId).ToListAsync();
                 
                 var vaxIds = petToVaccines.Select(v => v.VaxId).Distinct().ToList();
-                var vaccines = await context.Vaccines.Where(v => vaxIds.Any(id => id == v.Id)).ToListAsync();
+                var vaccines = await context.Vaccines.Where(v => vaxIds.Contains(v.Id)).ToListAsync();
 
                 foreach(var petToVax in petToVaccines)
                 {
@@ -97,9 +97,9 @@ namespace ClientManagementService.Infrastructure.Persistence
             }
 
             using (var context = new RofSchedulerContext())
-            {
+            {              
                 context.PetToVaccines.UpdateRange(petToVaccines);
-
+                
                 await context.SaveChangesAsync();
             }
         }
