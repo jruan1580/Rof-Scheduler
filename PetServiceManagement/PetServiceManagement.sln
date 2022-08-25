@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetServiceManagement.Infras
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetServiceManagement.Domain", "PetServiceManagement.Domain\PetServiceManagement.Domain.csproj", "{71E03E00-A67A-4595-BBCE-82544EC56D0A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetServiceManagement.Tests", "PetServiceManagement.Tests\PetServiceManagement.Tests.csproj", "{D1412F20-D97B-4442-9701-B99FEDACA2CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{71E03E00-A67A-4595-BBCE-82544EC56D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71E03E00-A67A-4595-BBCE-82544EC56D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71E03E00-A67A-4595-BBCE-82544EC56D0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1412F20-D97B-4442-9701-B99FEDACA2CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1412F20-D97B-4442-9701-B99FEDACA2CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1412F20-D97B-4442-9701-B99FEDACA2CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1412F20-D97B-4442-9701-B99FEDACA2CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
