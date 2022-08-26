@@ -11,6 +11,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         Task<short> AddPetService(PetServices service);
         Task<(List<PetServices>, int)> GetAllPetServices(int page, int offset, string keyword = null);
         Task UpdatePetService(PetServices service);
+        Task DeletePetService(PetServices service);
     }
 
     public class PetServiceRepository : IPetServiceRepository
@@ -89,6 +90,21 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
             using (var context = new RofSchedulerContext())
             {
                 context.PetServices.Update(service);
+
+                await context.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Removes a pet service.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <returns></returns>
+        public async Task DeletePetService(PetServices service)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                context.PetServices.Remove(service);
 
                 await context.SaveChangesAsync();
             }
