@@ -16,7 +16,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         Task DeletePetService(short petServiceId);
     }
 
-    public class PetServiceRepository : IPetServiceRepository
+    public class PetServiceRepository : BaseRepository, IPetServiceRepository
     {
         /// <summary>
         /// Displays a list of pet services base on the page.
@@ -47,10 +47,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
                     petServices = context.PetServices.AsQueryable();
                 }
 
-                var fullCount = petServices.Count();
-                var fullPages = fullCount / offset; //full pages with example 23 count and offset is 10. we will get 2 full pages (10 each page)
-                var remaining = fullCount % offset; //remaining will be 3 which will be an extra page
-                var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; //therefore total pages is sum of full pages plus one more page is any remains.
+                var totalPages = base.GetTotalPages(petServices.Count(), offset);
 
                 //not more pet services
                 if (page > totalPages)
@@ -85,10 +82,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task<PetServices> GetPetServiceById(short id)
         {
-            using(var context = new RofSchedulerContext())
-            {
-                return await context.PetServices.FirstOrDefaultAsync(p => p.Id == id);
-            }
+            return await base.GetEntityById<PetServices>(id);
         }
 
         /// <summary>
@@ -98,14 +92,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task<short> AddPetService(PetServices service)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                context.PetServices.Add(service);
-
-                await context.SaveChangesAsync();
-
-                return service.Id;
-            }
+            return (await base.CreateEntity(service)).Id;
         }
 
         /// <summary>
@@ -115,12 +102,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task UpdatePetService(PetServices service)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                context.PetServices.Update(service);
-
-                await context.SaveChangesAsync();
-            }
+            await base.UpdateEntity(service);
         }
 
         /// <summary>
@@ -130,14 +112,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task DeletePetService(short petServiceId)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                var service = await context.PetServices.FirstOrDefaultAsync(p => p.Id == petServiceId);
-
-                context.PetServices.Remove(service);
-
-                await context.SaveChangesAsync();
-            }
+            await base.DeleteEntity<PetServices>(petServiceId);
         }
     }
 }

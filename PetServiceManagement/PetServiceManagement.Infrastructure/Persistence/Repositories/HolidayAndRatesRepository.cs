@@ -6,7 +6,22 @@ using System.Threading.Tasks;
 
 namespace PetServiceManagement.Infrastructure.Persistence.Repositories
 {
-    public class HolidayAndRatesRepository 
+    public interface IHolidayAndRatesRepository
+    {
+        Task<short> AddHoliday(Holidays holiday);
+        Task<int> CreateHolidayRates(HolidayRates holidayRates);
+        Task DeleteHolidayRates(int id);
+        Task<List<Holidays>> GetAllHolidaysForDropdowns();
+        Task<Holidays> GetHolidayById(short id);
+        Task<HolidayRates> GetHolidayRatesById(int id);
+        Task<(List<HolidayRates>, int)> GetHolidayRatesByPageAndKeyword(int page, int pageSize, string keyword = null);
+        Task<(List<Holidays>, int)> GetHolidaysByPagesAndSearch(int page, int pageSize, string keyword = null);
+        Task RemoveHoliday(short id);
+        Task UpdateHoliday(Holidays holiday);
+        Task UpdateHolidayRates(HolidayRates holidayRates);
+    }
+
+    public class HolidayAndRatesRepository : BaseRepository, IHolidayAndRatesRepository
     {
         /// <summary>
         /// gets holidays by search keyword and returns the proper page size.
@@ -18,7 +33,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task<(List<Holidays>, int)> GetHolidaysByPagesAndSearch(int page, int pageSize, string keyword = null)
         {
-            using(var context = new RofSchedulerContext())
+            using (var context = new RofSchedulerContext())
             {
                 IQueryable<Holidays> holidays = null;
 
@@ -32,10 +47,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
                     holidays = context.Holidays.Where(h => h.HolidayName.ToLower().Contains(keyword));
                 }
 
-                var fullCount = holidays.Count();
-                var fullPages = fullCount / pageSize; //full pages with example 23 count and offset is 10. we will get 2 full pages (10 each page)
-                var remaining = fullCount % pageSize; //remaining will be 3 which will be an extra page
-                var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; //therefore total pages is sum of full pages plus one more page is any remains.
+                var totalPages = base.GetTotalPages(holidays.Count(), pageSize);
 
                 //not more pets
                 if (page > totalPages)
@@ -60,7 +72,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Holidays.FirstOrDefaultAsync(h => h.Id == id);
+                return await base.GetEntityById<Holidays>(id);
             }
         }
 
@@ -83,14 +95,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task<short> AddHoliday(Holidays holiday)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                context.Holidays.Add(holiday);
-
-                await context.SaveChangesAsync();
-
-                return holiday.Id;
-            }
+            return (await base.CreateEntity(holiday)).Id;
         }
 
         /// <summary>
@@ -100,12 +105,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task UpdateHoliday(Holidays holiday)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                context.Holidays.Update(holiday);
-
-                await context.SaveChangesAsync();
-            }
+            await base.UpdateEntity(holiday);
         }
 
         /// <summary>
@@ -115,14 +115,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task RemoveHoliday(short id)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                var holiday = await context.Holidays.FirstOrDefaultAsync(h => h.Id == id);
-
-                context.Holidays.Remove(holiday);
-
-                await context.SaveChangesAsync();
-            }
+            await base.DeleteEntity<Holidays>(id);
         }
 
         /// <summary>
@@ -156,14 +149,11 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
                         .Select(p => p.Id)
                         .ToListAsync();
                 }
-            
+
                 //get all rates that has keyword in either holiday naming or service naming
                 var holidayRates = context.HolidayRates.Where(r => holidays.Contains(r.HolidayDateId) || petServices.Contains(r.PetServiceId)).AsQueryable();
 
-                var fullCount = holidayRates.Count();
-                var fullPages = fullCount / pageSize; //full pages with example 23 count and offset is 10. we will get 2 full pages (10 each page)
-                var remaining = fullCount % pageSize; //remaining will be 3 which will be an extra page
-                var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; //therefore total pages is sum of full pages plus one more page is any remains.
+                var totalPages = base.GetTotalPages(holidayRates.Count(), pageSize);
 
                 //not more pet services
                 if (page > totalPages)
@@ -185,10 +175,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task<HolidayRates> GetHolidayRatesById(int id)
         {
-            using(var context = new RofSchedulerContext())
-            {
-                return await context.HolidayRates.FirstOrDefaultAsync(r => r.Id == id);
-            }
+            return await base.GetEntityById<HolidayRates>(id);
         }
 
         /// <summary>
@@ -198,14 +185,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task<int> CreateHolidayRates(HolidayRates holidayRates)
         {
-            using(var context = new RofSchedulerContext())
-            {
-                context.HolidayRates.Add(holidayRates);
-
-                await context.SaveChangesAsync();
-
-                return holidayRates.Id;
-            }
+            return (await base.CreateEntity(holidayRates)).Id;
         }
 
         /// <summary>
@@ -215,12 +195,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task UpdateHolidayRates(HolidayRates holidayRates)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                context.HolidayRates.Update(holidayRates);
-
-                await context.SaveChangesAsync();
-            }
+            await base.UpdateEntity(holidayRates);
         }
 
         /// <summary>
@@ -230,14 +205,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task DeleteHolidayRates(int id)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                var holidayRate = await context.HolidayRates.FirstOrDefaultAsync(h => h.Id == id);
-
-                context.HolidayRates.Remove(holidayRate);
-
-                await context.SaveChangesAsync();
-            }
+            await base.DeleteEntity<HolidayRates>(id);
         }
     }
 }
