@@ -43,7 +43,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
                     .WithMany(p => p.HolidayRates)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__HolidayRa__PetSe__40F9A68C");
+                    .HasConstraintName("FK__HolidayRa__PetSe__43D61337");
             });
 
             modelBuilder.Entity<PetServices>(entity =>

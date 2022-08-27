@@ -9,7 +9,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
 {
     public partial class HolidayRates
     {
-        public short Id { get; set; }
+        public int Id { get; set; }
         public short PetServiceId { get; set; }
         public DateTime HolidayDate { get; set; }
         public decimal HolidayRate { get; set; }
