@@ -9,9 +9,11 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
     public interface IPetServiceRepository
     {
         Task<short> AddPetService(PetServices service);
-        Task<(List<PetServices>, int)> GetAllPetServices(int page, int offset, string keyword = null);
+        Task<(List<PetServices>, int)> GetAllPetServicesByPageAndKeyword(int page, int offset, string keyword = null);
+        Task<List<PetServices>> GetAllPetServicesForDropdown();
+        Task<PetServices> GetPetServiceById(short id);
         Task UpdatePetService(PetServices service);
-        Task DeletePetService(PetServices service);
+        Task DeletePetService(short petServiceId);
     }
 
     public class PetServiceRepository : IPetServiceRepository
@@ -25,41 +27,67 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <param name="offset"></param>
         /// <param name="keyword"></param>
         /// <returns></returns>
-        public async Task<(List<PetServices>, int)> GetAllPetServices(int page, int offset, string keyword = null)
+        public async Task<(List<PetServices>, int)> GetAllPetServicesByPageAndKeyword(int page, int offset, string keyword = null)
         {
             using (var context = new RofSchedulerContext())
             {
-                List<PetServices> petServices = null;
+                IQueryable<PetServices> petServices = null;
 
                 if (!string.IsNullOrEmpty(keyword))
                 {
                     keyword = keyword.Trim().ToLower();
 
-                    petServices = await context.PetServices.Where(p =>
+                    petServices = context.PetServices.Where(p =>
                         p.ServiceName.ToLower().Contains(keyword)
                         || p.Description.ToLower().Contains(keyword)
-                     ).ToListAsync();
+                     );
                 }
                 else
                 {
-                    petServices = await context.PetServices.ToListAsync();
+                    petServices = context.PetServices.AsQueryable();
                 }
 
-                var fullCount = petServices.Count;
+                var fullCount = petServices.Count();
                 var fullPages = fullCount / offset; //full pages with example 23 count and offset is 10. we will get 2 full pages (10 each page)
                 var remaining = fullCount % offset; //remaining will be 3 which will be an extra page
                 var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; //therefore total pages is sum of full pages plus one more page is any remains.
 
-                //not more pets
+                //not more pet services
                 if (page > totalPages)
                 {
                     return (new List<PetServices>(), totalPages);
                 }
 
                 var skip = (page - 1) * offset;
-                var result = petServices.OrderByDescending(p => p.Id).Skip(skip).Take(10).ToList();
+                var result = await petServices.OrderByDescending(p => p.Id).Skip(skip).Take(10).ToListAsync();
 
                 return (result, totalPages);
+            }
+        }
+
+        /// <summary>
+        /// gets a list of all pet services for dropdown purposes
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<PetServices>> GetAllPetServicesForDropdown()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.PetServices.ToListAsync();
+            }
+        }
+
+        /// <summary>
+        /// When we update, we get the current original version of pet service to do a merge.
+        /// This method is used to support that
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<PetServices> GetPetServiceById(short id)
+        {
+            using(var context = new RofSchedulerContext())
+            {
+                return await context.PetServices.FirstOrDefaultAsync(p => p.Id == id);
             }
         }
 
@@ -100,10 +128,12 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// </summary>
         /// <param name="service"></param>
         /// <returns></returns>
-        public async Task DeletePetService(PetServices service)
+        public async Task DeletePetService(short petServiceId)
         {
             using (var context = new RofSchedulerContext())
             {
+                var service = await context.PetServices.FirstOrDefaultAsync(p => p.Id == petServiceId);
+
                 context.PetServices.Remove(service);
 
                 await context.SaveChangesAsync();
