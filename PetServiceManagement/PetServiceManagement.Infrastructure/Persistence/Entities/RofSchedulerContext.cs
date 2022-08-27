@@ -20,6 +20,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
         }
 
         public virtual DbSet<HolidayRates> HolidayRates { get; set; }
+        public virtual DbSet<Holidays> Holidays { get; set; }
         public virtual DbSet<PetServices> PetServices { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -35,15 +36,24 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
         {
             modelBuilder.Entity<HolidayRates>(entity =>
             {
-                entity.Property(e => e.HolidayDate).HasColumnType("date");
-
                 entity.Property(e => e.HolidayRate).HasColumnType("decimal(5, 2)");
+
+                entity.HasOne(d => d.HolidayDate)
+                    .WithMany(p => p.HolidayRates)
+                    .HasForeignKey(d => d.HolidayDateId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__HolidayRa__Holid__4B7734FF");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.HolidayRates)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__HolidayRa__PetSe__43D61337");
+                    .HasConstraintName("FK__HolidayRa__PetSe__4A8310C6");
+            });
+
+            modelBuilder.Entity<Holidays>(entity =>
+            {
+                entity.Property(e => e.HolidayDate).HasColumnType("date");
             });
 
             modelBuilder.Entity<PetServices>(entity =>
