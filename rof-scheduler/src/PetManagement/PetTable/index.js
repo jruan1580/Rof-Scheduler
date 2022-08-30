@@ -46,10 +46,10 @@ function PetTable({ userType, pets, showUpdateModal }) {
                 </tr>
               );
             })}
-          {users.length == 0 && (
+          {pets.length == 0 && (
             <tr>
               <td colSpan={7} style={{ textAlign: "center" }}>
-                No user data available. Please add an user.
+                No pet data available. Please add a pet.
               </td>
             </tr>
           )}

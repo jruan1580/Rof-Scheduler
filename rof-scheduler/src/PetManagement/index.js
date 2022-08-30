@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Form, Button, Row, Col, Pagination } from "react-bootstrap";
 import PetTable from "./PetTable";
 import AddPetModal from "./AddModal";
 

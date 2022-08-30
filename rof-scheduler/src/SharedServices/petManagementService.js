@@ -63,3 +63,27 @@ export const getPetById = async function (id) {
     undefined
   );
 };
+
+export const getPetsByClientId = async function (page, recPerPage, keyword) {
+  var clientId = parseInt(localStorage.getItem("id"));
+
+  var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
+  var url =
+    baseUrl +
+    "/pet/clientId?clientId=" +
+    clientId +
+    "&page=" +
+    page +
+    "&offset=" +
+    recPerPage +
+    "&keyword=" +
+    keyword;
+
+  return await makeHttpRequest(
+    url,
+    "GET",
+    { Accept: "application/json" },
+    200,
+    undefined
+  );
+};
