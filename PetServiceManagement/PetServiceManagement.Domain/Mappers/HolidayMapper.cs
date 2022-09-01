@@ -1,5 +1,6 @@
 ﻿using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
+using System.Collections.Generic;
 
 namespace PetServiceManagement.Domain.Mappers
 {
