@@ -3,9 +3,9 @@ using PetServiceManagement.Infrastructure.Persistence.Entities;
 
 namespace PetServiceManagement.Domain.Mappers
 {
-    public class HolidayRatesMapper
+    public static class HolidayRatesMapper
     {
-        public HolidayRate ToDomainHolidayRate(HolidayRates holidayRates)
+        public static HolidayRate ToDomainHolidayRate(HolidayRates holidayRates)
         {
             if (holidayRates == null)
             {
@@ -14,6 +14,7 @@ namespace PetServiceManagement.Domain.Mappers
 
             var holidayRate = new HolidayRate();
             
+            holidayRate.Id = holidayRates.Id;
             holidayRate.Rate = holidayRates.HolidayRate;
             
             if (holidayRates.PetService != null)
@@ -29,7 +30,7 @@ namespace PetServiceManagement.Domain.Mappers
             return holidayRate;
         }
 
-        public HolidayRates FromDomainHolidayRate(HolidayRate holidayRate)
+        public static HolidayRates FromDomainHolidayRate(HolidayRate holidayRate)
         {
             if (holidayRate == null)
             {
