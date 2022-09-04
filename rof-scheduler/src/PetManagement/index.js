@@ -96,6 +96,8 @@ function PetManagement({ setLoginState }) {
               <th>Id</th>
               <th>Name</th>
               {userType == "Employee" && <th>Owner</th>}
+              <th>Breed</th>
+              <th>Pet Type</th>
               <th colSpan={2}></th>
             </tr>
           </thead>
@@ -111,6 +113,8 @@ function PetManagement({ setLoginState }) {
                         {pet.ownerFirstName} {pet.ownerLastName}
                       </td>
                     )}
+                    <td>{pet.breedName}</td>
+                    <td>{pet.petTypeName}</td>
                     {
                       <td>
                         <OverlayTrigger
