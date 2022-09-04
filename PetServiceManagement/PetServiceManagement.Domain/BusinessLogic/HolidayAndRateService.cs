@@ -133,7 +133,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             if (holidayRateEntity == null)
             {
-                throw new ArgumentException($"Unable to find holiday rate with id: {holidayRateEntity.Id}");
+                throw new ArgumentException($"Unable to find holiday rate with id: {holidayRate.Id}");
             }
 
             holidayRateEntity.PetServiceId = holidayRate.PetService.Id;
