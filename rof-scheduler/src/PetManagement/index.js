@@ -8,6 +8,7 @@ import {
   OverlayTrigger,
   Table,
   Tooltip,
+  Alert,
 } from "react-bootstrap";
 import AddPetModal from "./AddModal";
 import "./index.css";
@@ -32,7 +33,6 @@ function PetManagement({ setLoginState }) {
 
         if (localStorage.getItem("role") === "Client") {
           setUserType("Client");
-
           resp = await getPetsByClientId(currPage, 10, keyword);
         } else {
           setUserType("Employee");
@@ -69,7 +69,7 @@ function PetManagement({ setLoginState }) {
         setLoginState={setLoginState}
       />
       <Row>
-        <Form>
+        <Form onSubmit={search}>
           <Row className="align-items-center">
             <Col lg={4}>
               <Form.Control
@@ -88,6 +88,7 @@ function PetManagement({ setLoginState }) {
         </Form>
       </Row>
       <br />
+      {errMsg !== undefined && <Alert variant="danger">{errMsg}</Alert>}
       <Row>
         <Table responsive striped bordered>
           <thead>
@@ -95,7 +96,7 @@ function PetManagement({ setLoginState }) {
               <th>Id</th>
               <th>Name</th>
               {userType == "Employee" && <th>Owner</th>}
-              <th colSpan={"2"}></th>
+              <th colSpan={2}></th>
             </tr>
           </thead>
           <tbody>
@@ -105,7 +106,11 @@ function PetManagement({ setLoginState }) {
                   <tr key={pet.id}>
                     <td>{pet.id}</td>
                     <td>{pet.name}</td>
-                    {userType == "Employee" && <td>{pet.Owner}</td>}
+                    {userType == "Employee" && (
+                      <td>
+                        {pet.ownerFirstName} {pet.ownerLastName}
+                      </td>
+                    )}
                     {
                       <td>
                         <OverlayTrigger
