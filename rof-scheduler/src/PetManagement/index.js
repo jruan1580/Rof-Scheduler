@@ -52,9 +52,9 @@ function PetManagement({ setLoginState }) {
   const search = (searchEvent) => {
     searchEvent.preventDefault();
     const searchTerm =
-      searchEvent.target.searchClient.value === undefined
+      searchEvent.target.searchPet.value === undefined
         ? ""
-        : searchEvent.target.searchClient.value;
+        : searchEvent.target.searchPet.value;
     setKeyword(searchTerm);
     setCurrPage(1);
   };
