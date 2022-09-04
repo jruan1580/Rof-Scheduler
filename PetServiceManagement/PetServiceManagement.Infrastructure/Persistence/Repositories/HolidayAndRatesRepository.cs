@@ -109,13 +109,35 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         }
 
         /// <summary>
-        /// Removes a holiday date from DB
+        /// Removes a holiday date from DB.
+        /// 
+        /// Due to foreign key dependencies, need to delete holiday rate tied to holiday first.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public async Task RemoveHoliday(short id)
         {
-            await base.DeleteEntity<Holidays>(id);
+            using(var context = new RofSchedulerContext())
+            {
+                var holidayRates = await context.HolidayRates.Where(r => r.HolidayDateId == id).ToListAsync();
+
+                if (holidayRates.Count > 0)
+                {
+                    //delete holiday rates tied to holiday
+                    context.HolidayRates.RemoveRange(holidayRates);
+                }
+
+                var holiday = await context.Holidays.FirstOrDefaultAsync(h => h.Id == id);
+
+                if (holiday == null)
+                {
+                    return;
+                }
+
+                context.Holidays.Remove(holiday);
+
+                await context.SaveChangesAsync();
+            }            
         }
 
         /// <summary>
@@ -222,6 +244,6 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         public async Task DeleteHolidayRates(int id)
         {
             await base.DeleteEntity<HolidayRates>(id);
-        }
+        }       
     }
 }

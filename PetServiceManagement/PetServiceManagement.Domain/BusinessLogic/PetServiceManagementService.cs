@@ -94,10 +94,6 @@ namespace PetServiceManagement.Domain.BusinessLogic
         /// <returns></returns>
         public async Task DeletePetServiceById(short id)
         {
-            //we cannot simply delete pet service because holidayRates has a foreign key to pet services.
-            //we need to delete all holiday rate set on pet service first before removing pet services.
-
-
             await _petServiceRepository.DeletePetService(id);
         }
 
