@@ -26,7 +26,7 @@ export const addPet = async function (
     url,
     "POST",
     { "Content-Type": "application/json" },
-    201,
+    200,
     data
   );
 };
