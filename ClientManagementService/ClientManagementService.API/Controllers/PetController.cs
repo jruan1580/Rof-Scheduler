@@ -112,9 +112,16 @@ namespace ClientManagementService.API.Controllers
         {
             try
             {
-                var petList = await _petService.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
+                var petList = new List<PetDTO>();
 
-                return Ok(petList);
+                var result = await _petService.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
+
+                foreach (var pet in result.Pets)
+                {
+                    petList.Add(PetDTOMapper.ToDTOPet(pet));
+                }
+
+                return Ok(new { pets = petList, totalPages = result.TotalPages });
             }
             catch (Exception ex)
             {
