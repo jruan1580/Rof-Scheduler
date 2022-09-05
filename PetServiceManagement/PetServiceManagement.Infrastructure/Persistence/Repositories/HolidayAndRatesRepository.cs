@@ -109,13 +109,35 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         }
 
         /// <summary>
-        /// Removes a holiday date from DB
+        /// Removes a holiday date from DB.
+        /// 
+        /// Due to foreign key dependencies, need to delete holiday rate tied to holiday first.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public async Task RemoveHoliday(short id)
         {
-            await base.DeleteEntity<Holidays>(id);
+            using(var context = new RofSchedulerContext())
+            {
+                var holidayRates = await context.HolidayRates.Where(r => r.HolidayDateId == id).ToListAsync();
+
+                if (holidayRates.Count > 0)
+                {
+                    //delete holiday rates tied to holiday
+                    context.HolidayRates.RemoveRange(holidayRates);
+                }
+
+                var holiday = await context.Holidays.FirstOrDefaultAsync(h => h.Id == id);
+
+                if (holiday == null)
+                {
+                    return;
+                }
+
+                context.Holidays.Remove(holiday);
+
+                await context.SaveChangesAsync();
+            }            
         }
 
         /// <summary>
@@ -130,39 +152,55 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         {
             using (var context = new RofSchedulerContext())
             {
-                var holidays = new List<short>();
-                var petServices = new List<short>();
+                var holidayIds = new List<short>();
+                var petServiceIds = new List<short>();
+
+                var holidayRates = context.HolidayRates.AsQueryable();
 
                 if (!string.IsNullOrEmpty(keyword))
                 {
                     keyword = keyword.ToLower();
 
                     //search for all holidays with name that contains keyword
-                    holidays = await context.Holidays
+                    holidayIds = await context.Holidays
                         .Where(h => h.HolidayName.ToLower().Contains(keyword))
                         .Select(h => h.Id)
                         .ToListAsync();
 
                     //search can also be searching on pet service name
-                    petServices = await context.PetServices
+                    petServiceIds = await context.PetServices
                         .Where(p => p.ServiceName.ToLower().Contains(keyword))
                         .Select(p => p.Id)
                         .ToListAsync();
+
+                    //get all rates that has keyword in either holiday naming or service naming
+                    holidayRates = holidayRates.Where(r => holidayIds.Contains(r.HolidayDateId) || petServiceIds.Contains(r.PetServiceId)).AsQueryable();
                 }
-
-                //get all rates that has keyword in either holiday naming or service naming
-                var holidayRates = context.HolidayRates.Where(r => holidays.Contains(r.HolidayDateId) || petServices.Contains(r.PetServiceId)).AsQueryable();
-
+                
                 var totalPages = base.GetTotalPages(holidayRates.Count(), pageSize);
 
                 //not more pet services
                 if (page > totalPages)
                 {
                     return (new List<HolidayRates>(), totalPages);
-                }
+                }               
 
                 var skip = (page - 1) * pageSize;
                 var result = await holidayRates.OrderByDescending(p => p.Id).Skip(skip).Take(10).ToListAsync();
+
+                //populate holiday and pet service
+                //doing it here because we only need to grab up to pageSize count of petServiceIds and HolidayIds - less load
+                var uniquePetServiceIds = result.Select(r => r.PetServiceId).Distinct().ToList();
+                var uniqueHolidayIds = result.Select(r => r.HolidayDateId).Distinct().ToList();
+
+                var petServices = context.PetServices.Where(p => uniquePetServiceIds.Contains(p.Id));
+                var holidays = context.Holidays.Where(h => uniqueHolidayIds.Contains(h.Id));
+
+                foreach(var holidayRate in result)
+                {
+                    holidayRate.PetService = petServices.FirstOrDefault(p => p.Id == holidayRate.PetServiceId);
+                    holidayRate.HolidayDate = holidays.FirstOrDefault(h => h.Id == holidayRate.HolidayDateId);
+                }
 
                 return (result, totalPages);
             }
@@ -206,6 +244,6 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         public async Task DeleteHolidayRates(int id)
         {
             await base.DeleteEntity<HolidayRates>(id);
-        }
+        }       
     }
 }

@@ -107,12 +107,34 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
 
         /// <summary>
         /// Removes a pet service.
+        /// 
+        /// Due to foreign key dependency, need to remove holiday rate tied to pet service first.
         /// </summary>
         /// <param name="service"></param>
         /// <returns></returns>
         public async Task DeletePetService(short petServiceId)
         {
-            await base.DeleteEntity<PetServices>(petServiceId);
+            using (var context = new RofSchedulerContext())
+            {
+                var holidayRates = await context.HolidayRates.Where(r => r.PetServiceId == petServiceId).ToListAsync();
+
+                if (holidayRates.Count > 0)
+                {
+                    //foreign key - need to remove all holiday rates tied to this pet service
+                    context.HolidayRates.RemoveRange(holidayRates);
+                }
+              
+                var petService = await context.PetServices.FirstOrDefaultAsync(p => p.Id == petServiceId);
+
+                if (petService == null)
+                {
+                    return;
+                }
+
+                context.PetServices.Remove(petService);
+
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
