@@ -4,5 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PetServiceManagement.Domain\PetServiceManagement.Domain.csproj" />
+  </ItemGroup>
+
 
 </Project>
