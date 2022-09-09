@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PetServiceManagement.Domain.BusinessLogic;
+using PetServiceManagement.Infrastructure.Persistence.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +27,13 @@ namespace PetServiceManagement.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IPetServiceRepository, PetServiceRepository>();
+            services.AddSingleton<IHolidayAndRatesRepository, HolidayAndRatesRepository>();
+
+            services.AddTransient<IDropDownService, DropDownService>();
+            services.AddTransient<IPetServiceManagementService, PetServiceManagementService>();
+            services.AddTransient<IHolidayAndRateService, HolidayAndRateService>();
+
             services.AddControllers();
         }
 
