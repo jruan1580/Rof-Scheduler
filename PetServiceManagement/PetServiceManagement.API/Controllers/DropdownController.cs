@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PetServiceManagement.API.DTO;
 using PetServiceManagement.API.DtoMapper;
 using PetServiceManagement.Domain.BusinessLogic;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace PetServiceManagement.API.Controllers
 {
+    [Authorize("Administrator")]
     [Route("api/[controller]")]
     [ApiController]
     public class DropdownController : ControllerBase

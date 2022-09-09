@@ -1,16 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using PetServiceManagement.Domain.BusinessLogic;
 using PetServiceManagement.Infrastructure.Persistence.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PetServiceManagement.API
@@ -35,6 +32,36 @@ namespace PetServiceManagement.API
             services.AddTransient<IHolidayAndRateService, HolidayAndRateService>();
 
             services.AddControllers();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+             .AddJwtBearer(options =>
+             {
+                 options.TokenValidationParameters = new TokenValidationParameters
+                 {
+                     ValidateIssuer = true,
+                     ValidateAudience = true,
+                     ValidateLifetime = true,
+                     ValidateIssuerSigningKey = true,
+                     ValidIssuer = Configuration.GetSection("Jwt:Issuer").Value,
+                     ValidAudience = Configuration.GetSection("Jwt:Audience").Value,
+                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("Jwt:Key").Value))
+                 };
+                 options.Events = new JwtBearerEvents()
+                 {
+                     OnMessageReceived = context =>
+                     {
+                         //no auth header, get it out of cookie, otw, it is in auth header
+                         if (!context.Request.Headers.ContainsKey("Authorization"))
+                         {
+                             if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
+                             {
+                                 context.Token = context.Request.Cookies["X-Access-Token-Admin"];
+                             }                           
+                         }
+
+                         return Task.CompletedTask;
+                     }
+                 };
+             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,6 +75,14 @@ namespace PetServiceManagement.API
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(x => x
+                .WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()); // allow credentials
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
