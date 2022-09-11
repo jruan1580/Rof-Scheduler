@@ -7,7 +7,19 @@ using System.Threading.Tasks;
 
 namespace PetServiceManagement.Domain.BusinessLogic
 {
-    public class HolidayAndRateService
+    public interface IHolidayAndRateService
+    {
+        Task AddHoliday(Holiday holiday);
+        Task AddHolidayRate(HolidayRate holidayRate);
+        Task DeleteHolidayById(short id);
+        Task DeleteHolidayRateById(int id);
+        Task<(List<HolidayRate>, int)> GetHolidayRatesByPageAndKeyword(int page, int pageSize, string keyword = null);
+        Task<(List<Holiday>, int)> GetHolidaysByPageAndKeyword(int page, int pageSize, string keyword = null);
+        Task UpdateHoliday(Holiday holiday);
+        Task UpdateHolidayRate(HolidayRate holidayRate);
+    }
+
+    public class HolidayAndRateService : IHolidayAndRateService
     {
         private readonly IHolidayAndRatesRepository _holidayAndRatesRepository;
         private readonly IPetServiceRepository _petServiceRepository;
