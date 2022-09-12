@@ -22,9 +22,9 @@ namespace PetServiceManagement.Domain.Mappers
                 holidayRate.PetService = PetServiceMapper.ToDomainPetService(holidayRates.PetService);
             }
 
-            if (holidayRates.HolidayDate != null)
+            if (holidayRates.Holiday != null)
             {
-                holidayRate.Holiday = HolidayMapper.ToHolidayDomain(holidayRates.HolidayDate);
+                holidayRate.Holiday = HolidayMapper.ToHolidayDomain(holidayRates.Holiday);
             }
 
             return holidayRate;
@@ -51,7 +51,7 @@ namespace PetServiceManagement.Domain.Mappers
             //really only need the ids - don't map more than necessary
             if (holidayRate.Holiday != null)
             {
-                holidayRates.HolidayDateId = holidayRate.Holiday.Id;
+                holidayRates.HolidayId = holidayRate.Holiday.Id;
             }
 
             return holidayRates;

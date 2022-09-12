@@ -119,7 +119,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         {
             using(var context = new RofSchedulerContext())
             {
-                var holidayRates = await context.HolidayRates.Where(r => r.HolidayDateId == id).ToListAsync();
+                var holidayRates = await context.HolidayRates.Where(r => r.HolidayId == id).ToListAsync();
 
                 if (holidayRates.Count > 0)
                 {
@@ -174,7 +174,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
                         .ToListAsync();
 
                     //get all rates that has keyword in either holiday naming or service naming
-                    holidayRates = holidayRates.Where(r => holidayIds.Contains(r.HolidayDateId) || petServiceIds.Contains(r.PetServiceId)).AsQueryable();
+                    holidayRates = holidayRates.Where(r => holidayIds.Contains(r.HolidayId) || petServiceIds.Contains(r.PetServiceId)).AsQueryable();
                 }
                 
                 var totalPages = base.GetTotalPages(holidayRates.Count(), pageSize);
@@ -191,7 +191,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
                 //populate holiday and pet service
                 //doing it here because we only need to grab up to pageSize count of petServiceIds and HolidayIds - less load
                 var uniquePetServiceIds = result.Select(r => r.PetServiceId).Distinct().ToList();
-                var uniqueHolidayIds = result.Select(r => r.HolidayDateId).Distinct().ToList();
+                var uniqueHolidayIds = result.Select(r => r.HolidayId).Distinct().ToList();
 
                 var petServices = context.PetServices.Where(p => uniquePetServiceIds.Contains(p.Id));
                 var holidays = context.Holidays.Where(h => uniqueHolidayIds.Contains(h.Id));
@@ -199,7 +199,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
                 foreach(var holidayRate in result)
                 {
                     holidayRate.PetService = petServices.FirstOrDefault(p => p.Id == holidayRate.PetServiceId);
-                    holidayRate.HolidayDate = holidays.FirstOrDefault(h => h.Id == holidayRate.HolidayDateId);
+                    holidayRate.Holiday = holidays.FirstOrDefault(h => h.Id == holidayRate.HolidayId);
                 }
 
                 return (result, totalPages);
