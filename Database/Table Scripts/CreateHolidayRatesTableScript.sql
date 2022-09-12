@@ -6,6 +6,7 @@ END
 CREATE TABLE dbo.HolidayRates(
 	Id INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
 	PetServiceId SMALLINT NOT NULL FOREIGN KEY REFERENCES dbo.PetServices(Id),
-	HolidayDateId SMALLINT NOT NULL FOREIGN KEY REFERENCES dbo.Holidays(Id),
-	HolidayRate DECIMAL(5, 2) NOT NULL -- percentage
+	HolidayId SMALLINT NOT NULL FOREIGN KEY REFERENCES dbo.Holidays(Id),
+	HolidayRate DECIMAL(5, 2) NOT NULL, -- percentage
+	CONSTRAINT UC_PetServiceId_HolidayId UNIQUE(PetServiceId, HolidayId)
 );

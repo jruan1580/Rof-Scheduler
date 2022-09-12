@@ -34,7 +34,8 @@ namespace PetServiceManagement.Tests.Controllers
                 {
                     Id = 1,
                     Name = "CNY",
-                    HolidayDate = new DateTime(2022, 9, 22)
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 }
             };
 
@@ -55,7 +56,7 @@ namespace PetServiceManagement.Tests.Controllers
             Assert.AreEqual(1, holidayDto.Count);
             Assert.AreEqual(holidays[0].Id, holidayDto[0].Id);
             Assert.AreEqual(holidays[0].Name, holidayDto[0].Name);
-            Assert.AreEqual(holidays[0].HolidayDate.ToString("MM/dd/yyyy"), holidayDto[0].Date);
+            Assert.AreEqual($"01/28/{DateTime.Now.Year}", holidayDto[0].Date);
         }
 
         [Test]

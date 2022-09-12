@@ -28,7 +28,8 @@ namespace PetServiceManagement.Tests.DtoMappers
                 {
                     Id = 1,
                     Name = "CNY",
-                    HolidayDate = DateTime.Now
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 }
             };
 
@@ -48,7 +49,7 @@ namespace PetServiceManagement.Tests.DtoMappers
             Assert.IsNotNull(holidayRateDto.Holiday);
             Assert.AreEqual(holidayRate.Holiday.Id, holidayRateDto.Holiday.Id);
             Assert.AreEqual(holidayRate.Holiday.Name, holidayRateDto.Holiday.Name);
-            Assert.AreEqual(holidayRate.Holiday.HolidayDate.ToString("MM/dd/yyyy"), holidayRateDto.Holiday.Date);
+            Assert.AreEqual($"01/28/{DateTime.Now.Year}", holidayRateDto.Holiday.Date);
         }
 
         [Test]
@@ -90,7 +91,10 @@ namespace PetServiceManagement.Tests.DtoMappers
             Assert.IsNotNull(holidayRate.Holiday);
             Assert.AreEqual(holidayRateDto.Holiday.Id, holidayRate.Holiday.Id);
             Assert.AreEqual(holidayRateDto.Holiday.Name, holidayRate.Holiday.Name);
-            Assert.AreEqual(holidayRateDto.Holiday.Date, holidayRate.Holiday.HolidayDate.ToString("MM/dd/yyyy"));
+
+            var holidayDate = DateTime.Parse(holidayRateDto.Holiday.Date);
+            Assert.AreEqual(holidayDate.Month, holidayRate.Holiday.HolidayMonth);
+            Assert.AreEqual(holidayDate.Day, holidayRate.Holiday.HolidayDay);
         }
     }
 }

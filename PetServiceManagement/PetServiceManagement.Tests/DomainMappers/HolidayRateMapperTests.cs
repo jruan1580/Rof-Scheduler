@@ -25,12 +25,13 @@ namespace PetServiceManagement.Tests.DomainMappers
                     Price = 20.99m,
                     Description = "Waling dog for 30 minutes"
                 },
-                HolidayDateId = 1,
-                HolidayDate = new Holidays()
+                HolidayId = 1,
+                Holiday = new Holidays()
                 {
                     Id = 1,
                     HolidayName = "CNY",
-                    HolidayDate = DateTime.Now
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 }
             };
 
@@ -48,9 +49,9 @@ namespace PetServiceManagement.Tests.DomainMappers
             Assert.AreEqual(holidayRateEntity.PetService.EmployeeRate, holidayRateDomain.PetService.EmployeeRate);
 
             Assert.IsNotNull(holidayRateDomain.Holiday);
-            Assert.AreEqual(holidayRateEntity.HolidayDateId, holidayRateDomain.Holiday.Id);
-            Assert.AreEqual(holidayRateEntity.HolidayDate.HolidayName, holidayRateDomain.Holiday.Name);
-            Assert.AreEqual(holidayRateEntity.HolidayDate.HolidayDate, holidayRateDomain.Holiday.HolidayDate);
+            Assert.AreEqual(holidayRateEntity.HolidayId, holidayRateDomain.Holiday.Id);
+            Assert.AreEqual(holidayRateEntity.Holiday.HolidayName, holidayRateDomain.Holiday.Name);
+            Assert.AreEqual(holidayRateEntity.Holiday.HolidayMonth, holidayRateDomain.Holiday.HolidayMonth);
         }
 
         [Test]
@@ -72,7 +73,8 @@ namespace PetServiceManagement.Tests.DomainMappers
                 {
                     Id = 1,
                     Name = "CNY",
-                    HolidayDate = DateTime.Now
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 }
             };
 
@@ -82,7 +84,7 @@ namespace PetServiceManagement.Tests.DomainMappers
             Assert.AreEqual(holidayRateDomain.Id, holidayRateEntity.Id);
             Assert.AreEqual(holidayRateDomain.Rate, holidayRateEntity.HolidayRate);
             Assert.AreEqual(holidayRateDomain.PetService.Id, holidayRateEntity.PetServiceId);
-            Assert.AreEqual(holidayRateDomain.Holiday.Id, holidayRateEntity.HolidayDateId);
+            Assert.AreEqual(holidayRateDomain.Holiday.Id, holidayRateEntity.HolidayId);
         }
     }
 }

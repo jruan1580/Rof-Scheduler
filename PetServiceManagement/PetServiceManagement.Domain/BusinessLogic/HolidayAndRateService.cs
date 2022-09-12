@@ -85,7 +85,8 @@ namespace PetServiceManagement.Domain.BusinessLogic
             }
 
             holidayEntity.HolidayName = holiday.Name;
-            holidayEntity.HolidayDate = holiday.HolidayDate;
+            holidayEntity.HolidayMonth = holiday.HolidayMonth;
+            holidayEntity.HolidayDay = holiday.HolidayDay;
 
             await _holidayAndRatesRepository.UpdateHoliday(holidayEntity);
         }
@@ -149,7 +150,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
             }
 
             holidayRateEntity.PetServiceId = holidayRate.PetService.Id;
-            holidayRateEntity.HolidayDateId = holidayRate.Holiday.Id;
+            holidayRateEntity.HolidayId = holidayRate.Holiday.Id;
             holidayRateEntity.HolidayRate = holidayRate.Rate;
 
             await _holidayAndRatesRepository.UpdateHolidayRates(holidayRateEntity);

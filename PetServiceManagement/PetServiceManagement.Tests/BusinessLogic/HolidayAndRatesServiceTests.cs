@@ -35,7 +35,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
             var holiday = new Holiday()
             {
                 Id = 1,
-                HolidayDate = DateTime.Now
+                HolidayMonth = 1,
+                HolidayDay = 28
             };
 
             Assert.ThrowsAsync<ArgumentException>(() => _holidayAndRateService.AddHoliday(holiday));
@@ -52,7 +53,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
             {
                 Id = 1,
                 Name = "CNY",
-                HolidayDate = DateTime.Now
+                HolidayMonth = 1,
+                HolidayDay = 28
             };
 
             Assert.ThrowsAsync<ArgumentException>(() => _holidayAndRateService.UpdateHoliday(holiday));
@@ -67,7 +69,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 {
                     Id = 1,
                     HolidayName = "CNY",
-                    HolidayDate = DateTime.Now
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 }
             };
 
@@ -85,7 +88,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
 
             Assert.AreEqual(holidays[0].Id, holiday.Id);
             Assert.AreEqual(holidays[0].HolidayName, holiday.Name);
-            Assert.AreEqual(holidays[0].HolidayDate, holiday.HolidayDate);
+            Assert.AreEqual(holidays[0].HolidayMonth, holiday.HolidayMonth);
         }
 
         [Test]
@@ -95,7 +98,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
             {
                 Id = 1,
                 Name = "CNY",
-                HolidayDate = DateTime.Now
+                HolidayMonth = 1,
+                HolidayDay = 28
             };
 
             _holidayAndRateRepo.Setup(h => h.AddHoliday(It.IsAny<Holidays>())).ReturnsAsync((short)1);
@@ -112,7 +116,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
             {
                 Id = 1,
                 Name = "CNY",
-                HolidayDate = DateTime.Now
+                HolidayMonth = 1,
+                HolidayDay = 28
             };
 
             _holidayAndRateRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
@@ -120,7 +125,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
                    {
                        Id = 1,
                        HolidayName = "Name to be updated",
-                       HolidayDate = DateTime.Now
+                       HolidayMonth = 1,
+                       HolidayDay = 28
                    });
 
             _holidayAndRateRepo.Setup(h => h.UpdateHoliday(It.IsAny<Holidays>())).Returns(Task.CompletedTask);
@@ -159,7 +165,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
             {
                 Id = 1,
                 Name = "CNY",
-                HolidayDate = DateTime.Now
+                HolidayMonth = 1,
+                HolidayDay = 28
             };
             
             Assert.ThrowsAsync<ArgumentException>(() => _holidayAndRateService.AddHolidayRate(null));
@@ -206,7 +213,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 {
                     Id = 1,
                     HolidayName = "CNY",
-                    HolidayDate = DateTime.Today
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 });
 
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
@@ -235,7 +243,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 {
                     Id = 1,
                     Name = "CNY",
-                    HolidayDate = DateTime.Now
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 },
                 Rate = 20m
             };
@@ -252,7 +261,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 {
                     Id = 1,
                     PetServiceId = 1,
-                    HolidayDateId = 1,
+                    HolidayId = 1,
                     PetService = new PetServices()
                     {
                         Id = 1,
@@ -260,11 +269,12 @@ namespace PetServiceManagement.Tests.BusinessLogic
                         ServiceName = "Dog Walking",
                         Description = "Walking dog"
                     },
-                    HolidayDate = new Holidays()
+                    Holiday = new Holidays()
                     {
                         Id = 1,
                         HolidayName = "CNY",
-                        HolidayDate = DateTime.Today
+                        HolidayMonth = 1,
+                        HolidayDay = 28
                     },
                     HolidayRate = 20m
                 }                
@@ -291,9 +301,10 @@ namespace PetServiceManagement.Tests.BusinessLogic
             Assert.AreEqual(holidayRates[0].PetService.Description, holidayRate.PetService.Description);
 
             Assert.IsNotNull(holidayRate.Holiday);
-            Assert.AreEqual(holidayRates[0].HolidayDate.Id, holidayRate.Holiday.Id);
-            Assert.AreEqual(holidayRates[0].HolidayDate.HolidayName, holidayRate.Holiday.Name);
-            Assert.AreEqual(holidayRates[0].HolidayDate.HolidayDate, holidayRate.Holiday.HolidayDate);
+            Assert.AreEqual(holidayRates[0].Holiday.Id, holidayRate.Holiday.Id);
+            Assert.AreEqual(holidayRates[0].Holiday.HolidayName, holidayRate.Holiday.Name);
+            Assert.AreEqual(holidayRates[0].Holiday.HolidayMonth, holidayRate.Holiday.HolidayMonth);
+            Assert.AreEqual(holidayRates[0].Holiday.HolidayDay, holidayRate.Holiday.HolidayDay);
         }
 
 
@@ -305,7 +316,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 {
                     Id = 1,
                     HolidayName = "CNY",
-                    HolidayDate = DateTime.Today
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 });
 
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
@@ -331,7 +343,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 {
                     Id = 1,
                     Name = "CNY",
-                    HolidayDate = DateTime.Now
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 },
                 Rate = 30m
             };
@@ -351,7 +364,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 {
                     Id = 1,
                     HolidayName = "CNY",
-                    HolidayDate = DateTime.Today
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 });
 
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
@@ -377,7 +391,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 {
                     Id = 1,
                     Name = "CNY",
-                    HolidayDate = DateTime.Now
+                    HolidayMonth = 1,
+                    HolidayDay = 28
                 },
                 Rate = 30m
             };
@@ -387,7 +402,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
                    {
                        Id = 1,
                        PetServiceId = 2,
-                       HolidayDateId = 2,
+                       HolidayId = 2,
                        HolidayRate = 20m
                    });
 
