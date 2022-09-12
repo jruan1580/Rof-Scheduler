@@ -11,10 +11,10 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
     {
         public int Id { get; set; }
         public short PetServiceId { get; set; }
-        public short HolidayDateId { get; set; }
+        public short HolidayId { get; set; }
         public decimal HolidayRate { get; set; }
 
-        public virtual Holidays HolidayDate { get; set; }
+        public virtual Holidays Holiday { get; set; }
         public virtual PetServices PetService { get; set; }
     }
 }

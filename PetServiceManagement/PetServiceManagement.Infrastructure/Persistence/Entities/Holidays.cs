@@ -16,7 +16,8 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
 
         public short Id { get; set; }
         public string HolidayName { get; set; }
-        public DateTime HolidayDate { get; set; }
+        public short HolidayMonth { get; set; }
+        public short HolidayDay { get; set; }
 
         public virtual ICollection<HolidayRates> HolidayRates { get; set; }
     }

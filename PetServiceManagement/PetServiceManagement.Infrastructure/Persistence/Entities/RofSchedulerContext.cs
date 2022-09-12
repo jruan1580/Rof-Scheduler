@@ -36,24 +36,30 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
         {
             modelBuilder.Entity<HolidayRates>(entity =>
             {
+                entity.HasIndex(e => new { e.PetServiceId, e.HolidayId })
+                    .HasName("UC_PetServiceId_HolidayId")
+                    .IsUnique();
+
                 entity.Property(e => e.HolidayRate).HasColumnType("decimal(5, 2)");
 
-                entity.HasOne(d => d.HolidayDate)
+                entity.HasOne(d => d.Holiday)
                     .WithMany(p => p.HolidayRates)
-                    .HasForeignKey(d => d.HolidayDateId)
+                    .HasForeignKey(d => d.HolidayId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__HolidayRa__Holid__5224328E");
+                    .HasConstraintName("FK__HolidayRa__Holid__69FBBC1F");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.HolidayRates)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__HolidayRa__PetSe__51300E55");
+                    .HasConstraintName("FK__HolidayRa__PetSe__690797E6");
             });
 
             modelBuilder.Entity<Holidays>(entity =>
             {
-                entity.Property(e => e.HolidayDate).HasColumnType("date");
+                entity.HasIndex(e => e.HolidayName)
+                    .HasName("UC_HolidayName")
+                    .IsUnique();
 
                 entity.Property(e => e.HolidayName)
                     .IsRequired()
@@ -63,6 +69,10 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
 
             modelBuilder.Entity<PetServices>(entity =>
             {
+                entity.HasIndex(e => e.ServiceName)
+                    .HasName("UC_ServiceName")
+                    .IsUnique();
+
                 entity.Property(e => e.Description)
                     .HasMaxLength(2000)
                     .IsUnicode(false);
