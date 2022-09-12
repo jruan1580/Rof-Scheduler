@@ -8,5 +8,6 @@ CREATE TABLE dbo.PetServices(
 	ServiceName VARCHAR(255) NOT NULL,
 	Price DECIMAL(10, 2) NOT NULL,
 	EmployeeRate DECIMAL(5,2) NOT NULL, -- percentage
-	[Description] VARCHAR(2000) NULL
+	[Description] VARCHAR(2000) NULL,
+	CONSTRAINT UC_ServiceName UNIQUE(ServiceName)
 );
