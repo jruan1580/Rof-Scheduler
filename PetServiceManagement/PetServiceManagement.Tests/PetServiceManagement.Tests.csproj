@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PetServiceManagement.API\PetServiceManagement.API.csproj" />
     <ProjectReference Include="..\PetServiceManagement.Domain\PetServiceManagement.Domain.csproj" />
     <ProjectReference Include="..\PetServiceManagement.Infrastructure\PetServiceManagement.Infrastructure.csproj" />
   </ItemGroup>
