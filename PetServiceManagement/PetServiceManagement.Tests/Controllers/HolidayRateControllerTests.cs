@@ -108,7 +108,8 @@ namespace PetServiceManagement.Tests.Controllers
                 {
                     Id = 1,
                     Name = "CNY",
-                    Date = "09/06/2022"
+                    Month = 1,
+                    Day = 28
                 }
             });
 
@@ -137,7 +138,8 @@ namespace PetServiceManagement.Tests.Controllers
                 {
                     Id = 1,
                     Name = "CNY",
-                    Date = "09/06/2022"
+                    Month = 1,
+                    Day = 28
                 }
             });
 
@@ -171,7 +173,8 @@ namespace PetServiceManagement.Tests.Controllers
                 {
                     Id = 1,
                     Name = "CNY",
-                    Date = "09/06/2022"
+                    Month = 1,
+                    Day = 28
                 }
             });
 
@@ -200,7 +203,8 @@ namespace PetServiceManagement.Tests.Controllers
                 {
                     Id = 1,
                     Name = "CNY",
-                    Date = "09/06/2022"
+                    Month = 1,
+                    Day = 28
                 }
             });
 

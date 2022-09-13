@@ -35,7 +35,8 @@ namespace PetServiceManagement.Tests.DtoMappers
             {
                 Id = 1,
                 Name = "CNY",
-                Date = "09/06/2022"
+                Month = 1,
+                Day = 28
             };
 
             var domain = HolidayDtoMapper.FromHolidayDTO(dto);
