@@ -177,6 +177,12 @@ namespace PetServiceManagement.Domain.BusinessLogic
             {
                 throw new ArgumentException("Holiday name was not provided");
             }
+
+            var holidayDate = $"{holiday.HolidayMonth}/{holiday.HolidayDay}/{DateTime.Now.Year}";
+            if (!DateTime.TryParse(holidayDate, out var date))
+            {
+                throw new ArgumentException("Invalid holiday month and day supplied");
+            }     
         }
 
         private async Task ValidateHolidayRate(HolidayRate holidayRate)

@@ -41,6 +41,26 @@ namespace PetServiceManagement.Tests.BusinessLogic
 
             Assert.ThrowsAsync<ArgumentException>(() => _holidayAndRateService.AddHoliday(holiday));
             Assert.ThrowsAsync<ArgumentException>(() => _holidayAndRateService.UpdateHoliday(holiday));
+
+            var invalidHolidayDate = new Holiday()
+            {
+                Id = 1,
+                HolidayDay = 13,
+                HolidayMonth = 13
+            };
+
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayAndRateService.AddHoliday(holiday));
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayAndRateService.UpdateHoliday(holiday));
+
+            invalidHolidayDate = new Holiday()
+            {
+                Id = 1,
+                HolidayDay = 33,
+                HolidayMonth = 12
+            };
+
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayAndRateService.AddHoliday(holiday));
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayAndRateService.UpdateHoliday(holiday));
         }
 
         [Test]
