@@ -11,6 +11,7 @@ import {
 
 function UpdatePetModal({
   pet,
+  vaccines,
   show,
   handleHide,
   postUpdateAction,
@@ -20,22 +21,7 @@ function UpdatePetModal({
   const [updating, setUpdating] = useState(false);
   const [errMsg, setErrMsg] = useState(undefined);
   const [successMsg, setSuccessMsg] = useState(false);
-  //   const [pet, setPet] = useState(pet);
-
-  //   useEffect(() => {
-  //     (async function () {
-  //       try {
-  //         const resp = await getPetById(pet.id);
-  //         if (resp.status === 401) {
-  //           setLoginState(false);
-  //           return;
-  //         }
-
-  //         const pet = await resp.json();
-  //         setPetInfo(pet);
-  //       } catch (e) {}
-  //     })();
-  //   }, []);
+  const [vaccine, setVaccine] = useState([]);
 
   const resetStates = function () {
     setValidationMap(new Map());
@@ -48,21 +34,26 @@ function UpdatePetModal({
     handleHide();
   };
 
+  const setVaccineValue = (colIndex, vaccineIndex) => {
+    //value equals opposite of what it currently is
+    vaccines[colIndex][vaccineIndex].checked =
+      !vaccines[colIndex][vaccineIndex].checked;
+    setVaccine(vaccines);
+  };
+
   const handleUpdate = (e) => {
     e.preventDefault();
 
     setErrMsg(undefined);
     setSuccessMsg(false);
 
-    console.log(e.target.breed.value);
     var petName = e.target.petName.value;
     var weight = parseFloat(e.target.weight.value);
     var dob = e.target.dob.value;
-    var breed = e.target.breed.value;
-    var owner = e.target.client.value;
-    // var breed = parseInt(e.target.breed.value);
-    // var owner = parseInt(e.target.client.value);
+    var breedId = pet.breedId;
+    var ownerId = pet.ownerId;
     var otherInfo = e.target.otherInfo.value;
+
     var vaccineStatus = undefined;
 
     var inputValidations = new Map();
@@ -71,8 +62,8 @@ function UpdatePetModal({
       petName,
       weight,
       dob,
-      breed,
-      owner
+      breedId,
+      ownerId
     );
 
     if (inputValidations.size > 0) {
@@ -92,8 +83,8 @@ function UpdatePetModal({
             petName,
             weight,
             dob,
-            breed,
-            owner,
+            ownerId,
+            breedId,
             otherInfo,
             vaccineStatus
           );
@@ -101,8 +92,8 @@ function UpdatePetModal({
           updatedFields.set("petName", petName);
           updatedFields.set("weight", weight);
           updatedFields.set("dob", dob);
-          updatedFields.set("breed", breed);
-          updatedFields.set("owner", owner);
+          updatedFields.set("breed", breedId);
+          updatedFields.set("client", ownerId);
           updatedFields.set("otherInfo", otherInfo);
 
           if (resp !== undefined && resp.status === 401) {
@@ -236,10 +227,10 @@ function UpdatePetModal({
             <br />
 
             <Row>
-              {/* <Form.Group as={Col} lg={3}>
+              <Form.Group as={Col} lg={3}>
                 {
                   //first column
-                  vaccinesByPetType[0].map((vaccine, index) => {
+                  vaccines[0].map((vaccine, index) => {
                     return (
                       <Form.Check
                         key={vaccine.id}
@@ -255,7 +246,7 @@ function UpdatePetModal({
               <Form.Group as={Col} lg={3}>
                 {
                   //second column
-                  vaccinesByPetType[1].map((vaccine, index) => {
+                  vaccines[1].map((vaccine, index) => {
                     return (
                       <Form.Check
                         key={vaccine.id}
@@ -271,7 +262,7 @@ function UpdatePetModal({
               <Form.Group as={Col} lg={3}>
                 {
                   //third column
-                  vaccinesByPetType[2].map((vaccine, index) => {
+                  vaccines[2].map((vaccine, index) => {
                     return (
                       <Form.Check
                         key={vaccine.id}
@@ -287,7 +278,7 @@ function UpdatePetModal({
               <Form.Group as={Col} lg={3}>
                 {
                   //fourth column
-                  vaccinesByPetType[3].map((vaccine, index) => {
+                  vaccines[3].map((vaccine, index) => {
                     return (
                       <Form.Check
                         key={vaccine.id}
@@ -299,7 +290,7 @@ function UpdatePetModal({
                     );
                   })
                 }
-              </Form.Group> */}
+              </Form.Group>
             </Row>
             <hr></hr>
             {updating && (

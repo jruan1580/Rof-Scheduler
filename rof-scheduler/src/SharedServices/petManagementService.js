@@ -93,8 +93,8 @@ export const updatePetInformation = async function (
   petName,
   weight,
   dob,
-  breedId,
   ownerId,
+  breedId,
   otherInfo,
   vaccines
 ) {
@@ -104,8 +104,8 @@ export const updatePetInformation = async function (
     name: petName,
     weight,
     dob,
-    breedId,
     ownerId,
+    breedId,
     otherInfo,
     vaccines,
   };

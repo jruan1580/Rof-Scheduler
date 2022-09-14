@@ -317,8 +317,8 @@ export const ensurePetUpdateInformationProvided = function (
   petName,
   weight,
   dob,
-  breed,
-  owner
+  breedId,
+  ownerId
 ) {
   var validationErrors = new Map();
 
@@ -334,11 +334,11 @@ export const ensurePetUpdateInformationProvided = function (
     validationErrors.set("dob", "Please enter pet's DOB");
   }
 
-  if (breed === undefined || breed <= 0) {
+  if (breedId === undefined || breedId <= 0) {
     validationErrors.set("breed", "Please select pet's breed.");
   }
 
-  if (owner === undefined || owner <= 0) {
+  if (ownerId === undefined || ownerId <= 0) {
     validationErrors.set("owner", "Please select pet's owner");
   }
 
