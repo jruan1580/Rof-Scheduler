@@ -11,6 +11,7 @@ import {
   Alert,
 } from "react-bootstrap";
 import AddPetModal from "./AddModal";
+import UpdatePetModal from "./UpdateModal";
 import "./index.css";
 import {
   getAllPets,
@@ -25,6 +26,8 @@ function PetManagement({ setLoginState }) {
   const [keyword, setKeyword] = useState("");
   const [totalPages, setTotalPages] = useState(0);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [currPetToUpdate, setCurrPetToUpdate] = useState(undefined);
 
   useEffect(() => {
     (async function () {
@@ -59,6 +62,24 @@ function PetManagement({ setLoginState }) {
     setCurrPage(1);
   };
 
+  const loadUpdateModal = (pet) => {
+    setCurrPetToUpdate(pet);
+
+    setShowUpdateModal(true);
+  };
+
+  const postUpdatePetAction = (updatedFieldsMap) => {
+    for (var i = 0; i < pets.length; i++) {
+      if (pets[i].id === updatedFieldsMap.get("id")) {
+        pets[i].name = updatedFieldsMap.get("petName");
+        pets[i].ownerId = updatedFieldsMap.get("client");
+        pets[i].breedId = updatedFieldsMap.get("breed");
+        break;
+      }
+    }
+    setPets(pets);
+  };
+
   return (
     <>
       <h1>Pets Management</h1>
@@ -66,6 +87,13 @@ function PetManagement({ setLoginState }) {
       <AddPetModal
         show={showAddModal}
         handleHide={() => setShowAddModal(false)}
+        setLoginState={setLoginState}
+      />
+      <UpdatePetModal
+        pet={currPetToUpdate}
+        show={showUpdateModal}
+        handleHide={() => setShowUpdateModal(false)}
+        postUpdateAction={postUpdatePetAction}
         setLoginState={setLoginState}
       />
       <Row>
@@ -96,8 +124,8 @@ function PetManagement({ setLoginState }) {
               <th>Id</th>
               <th>Name</th>
               {userType == "Employee" && <th>Owner</th>}
+              <th>Weight</th>
               <th>Breed</th>
-              <th>Pet Type</th>
               <th colSpan={2}></th>
             </tr>
           </thead>
@@ -113,14 +141,14 @@ function PetManagement({ setLoginState }) {
                         {pet.ownerFirstName} {pet.ownerLastName}
                       </td>
                     )}
+                    <td>{pet.weight} lbs</td>
                     <td>{pet.breedName}</td>
-                    <td>{pet.petTypeName}</td>
                     <td>
                       <OverlayTrigger
                         placement="top"
                         overlay={<Tooltip>Update</Tooltip>}
                       >
-                        <Button>
+                        <Button onClick={() => loadUpdateModal(pet)}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="16"
@@ -145,7 +173,7 @@ function PetManagement({ setLoginState }) {
                             width="16"
                             height="16"
                             fill="currentColor"
-                            class="bi bi-trash3"
+                            className="bi bi-trash3"
                             viewBox="0 0 16 16"
                           >
                             <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />

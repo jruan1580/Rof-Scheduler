@@ -87,3 +87,36 @@ export const getPetsByClientId = async function (page, recPerPage, keyword) {
     undefined
   );
 };
+
+export const updatePetInformation = async function (
+  id,
+  petName,
+  weight,
+  dob,
+  breedId,
+  ownerId,
+  otherInfo,
+  vaccines
+) {
+  var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
+  var data = {
+    id,
+    name: petName,
+    weight,
+    dob,
+    breedId,
+    ownerId,
+    otherInfo,
+    vaccines,
+  };
+
+  var url = baseUrl + "/pet/updatePet";
+
+  return await makeHttpRequest(
+    url,
+    "PUT",
+    { "Content-Type": "application/json" },
+    200,
+    data
+  );
+};

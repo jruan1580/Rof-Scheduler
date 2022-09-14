@@ -278,34 +278,69 @@ export const ensureClientUpdateInformationProvided = function (
   return validationErrors;
 };
 
-export const ensureAddPetInformationProvided = function(
+export const ensureAddPetInformationProvided = function (
   petName,
   breed,
   weight,
   dob,
   client
-){
+) {
   var validationErrors = new Map();
 
-  if (petName === undefined || petName === ""){
+  if (petName === undefined || petName === "") {
     validationErrors.set("petName", "Please enter pet's name.");
   }
 
-  if (breed === undefined || breed <= 0){
+  if (breed === undefined || breed <= 0) {
     validationErrors.set("breed", "Please select pet's breed.");
   }
 
-  if (weight === undefined || isNaN(weight)){
+  if (weight === undefined || isNaN(weight)) {
     validationErrors.set("weight", "Please enter pet's weight");
   }
 
-  if (dob === undefined || dob === ""){
+  if (dob === undefined || dob === "") {
     validationErrors.set("dob", "Please enter pet's DOB");
   }
 
-  if (localStorage.getItem("role").toLowerCase() !== "client" && (client === undefined || client <= 0)){
+  if (
+    localStorage.getItem("role").toLowerCase() !== "client" &&
+    (client === undefined || client <= 0)
+  ) {
     validationErrors.set("client", "Please select pet's owner");
   }
 
   return validationErrors;
-}
+};
+
+export const ensurePetUpdateInformationProvided = function (
+  petName,
+  weight,
+  dob,
+  breed,
+  owner
+) {
+  var validationErrors = new Map();
+
+  if (petName === undefined || petName === "") {
+    validationErrors.set("petName", "Please enter pet's name.");
+  }
+
+  if (weight === undefined || isNaN(weight)) {
+    validationErrors.set("weight", "Please enter pet's weight");
+  }
+
+  if (dob === undefined || dob === "") {
+    validationErrors.set("dob", "Please enter pet's DOB");
+  }
+
+  if (breed === undefined || breed <= 0) {
+    validationErrors.set("breed", "Please select pet's breed.");
+  }
+
+  if (owner === undefined || owner <= 0) {
+    validationErrors.set("owner", "Please select pet's owner");
+  }
+
+  return validationErrors;
+};
