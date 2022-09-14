@@ -54,11 +54,14 @@ function UpdatePetModal({
     setErrMsg(undefined);
     setSuccessMsg(false);
 
+    console.log(e.target.breed.value);
     var petName = e.target.petName.value;
-    var weight = e.target.weight.value;
+    var weight = parseFloat(e.target.weight.value);
     var dob = e.target.dob.value;
     var breed = e.target.breed.value;
     var owner = e.target.client.value;
+    // var breed = parseInt(e.target.breed.value);
+    // var owner = parseInt(e.target.client.value);
     var otherInfo = e.target.otherInfo.value;
     var vaccineStatus = undefined;
 
@@ -194,9 +197,9 @@ function UpdatePetModal({
               <>
                 <Row>
                   <Form.Group as={Col} lg={4}>
-                    <Form.Label>Select Owner</Form.Label>
+                    <Form.Label>Owner</Form.Label>
                     <Form.Control
-                      placeholder="Breed"
+                      placeholder="Owner"
                       name="client"
                       defaultValue={
                         pet === undefined
@@ -219,11 +222,8 @@ function UpdatePetModal({
               <Form.Group as={Col} lg={12}>
                 <Form.Label>Additional Information (Optional)</Form.Label>
                 <Form.Control
-                  defaultValue={
-                    pet === undefined || pet.otherInfo === ""
-                      ? "Additional Information"
-                      : pet.otherInfo
-                  }
+                  placeholder="Additional Info"
+                  defaultValue={pet === undefined ? "" : pet.otherInfo}
                   name="otherInfo"
                   as="textarea"
                   rows={5}
