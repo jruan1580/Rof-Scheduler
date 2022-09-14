@@ -1,6 +1,5 @@
 ﻿using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
-using System.Collections.Generic;
 
 namespace PetServiceManagement.Domain.Mappers
 {
@@ -17,7 +16,8 @@ namespace PetServiceManagement.Domain.Mappers
 
             holiday.Id = holidays.Id;
             holiday.Name = holidays.HolidayName;
-            holiday.HolidayDate = holidays.HolidayDate;
+            holiday.HolidayMonth = holidays.HolidayMonth;
+            holiday.HolidayDay = holidays.HolidayDay;
 
             return holiday;
         }
@@ -33,7 +33,8 @@ namespace PetServiceManagement.Domain.Mappers
 
             holidays.Id = holiday.Id;
             holidays.HolidayName = holiday.Name;
-            holidays.HolidayDate = holiday.HolidayDate;
+            holidays.HolidayMonth = holiday.HolidayMonth;
+            holidays.HolidayDay = holiday.HolidayDay;
 
             return holidays;
         }

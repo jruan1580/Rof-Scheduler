@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PetServiceManagement.Domain.Models
+﻿namespace PetServiceManagement.Domain.Models
 {
     public class Holiday
     {
@@ -8,6 +6,8 @@ namespace PetServiceManagement.Domain.Models
 
         public string Name { get; set; }
 
-        public DateTime HolidayDate { get; set; }
+        public short HolidayMonth { get; set; }
+
+        public short HolidayDay { get; set; }
     }
 }

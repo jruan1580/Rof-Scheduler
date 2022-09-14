@@ -72,7 +72,8 @@ namespace PetServiceManagement.Tests.Controllers
                     {
                         Id = 1,
                         Name = "CNY",
-                        HolidayDate = new DateTime(2022, 9, 22)
+                        HolidayMonth = 9,
+                        HolidayDay = 22
                     }
                 });
 

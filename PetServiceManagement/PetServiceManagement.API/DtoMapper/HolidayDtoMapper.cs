@@ -16,7 +16,8 @@ namespace PetServiceManagement.API.DtoMapper
             var dto = new HolidayDTO();
             dto.Id = holidayDomain.Id;
             dto.Name = holidayDomain.Name;
-            dto.Date = holidayDomain.HolidayDate.ToString("MM/dd/yyyy"); //convert to string of this format
+            dto.Month = holidayDomain.HolidayMonth;
+            dto.Day = holidayDomain.HolidayDay;
 
             return dto;
         }
@@ -31,10 +32,8 @@ namespace PetServiceManagement.API.DtoMapper
             var domain = new Holiday();
             domain.Id = holidayDto.Id;
             domain.Name = holidayDto.Name;
-            if (DateTime.TryParse(holidayDto.Date, out var date))
-            {
-                domain.HolidayDate = date;
-            }
+            domain.HolidayMonth = holidayDto.Month;
+            domain.HolidayDay = holidayDto.Day;
 
             return domain;
         }

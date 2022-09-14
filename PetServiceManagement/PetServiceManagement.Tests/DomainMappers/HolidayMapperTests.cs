@@ -2,9 +2,6 @@
 using PetServiceManagement.Domain.Mappers;
 using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PetServiceManagement.Tests.DomainMappers
 {
@@ -14,12 +11,12 @@ namespace PetServiceManagement.Tests.DomainMappers
         [Test]
         public void MapToDomainHolidayTest()
         {
-            var cny = DateTime.Today;
             var holidayEntity = new Holidays()
             {
                 Id = 1,
                 HolidayName = "CNY",
-                HolidayDate = cny
+                HolidayMonth = 1,
+                HolidayDay = 28
             };
 
             var domainHoliday = HolidayMapper.ToHolidayDomain(holidayEntity);
@@ -27,17 +24,18 @@ namespace PetServiceManagement.Tests.DomainMappers
             Assert.IsNotNull(domainHoliday);
             Assert.AreEqual(holidayEntity.Id, domainHoliday.Id);
             Assert.AreEqual(holidayEntity.HolidayName, domainHoliday.Name);
-            Assert.AreEqual(holidayEntity.HolidayDate, domainHoliday.HolidayDate);
+            Assert.AreEqual(holidayEntity.HolidayMonth, domainHoliday.HolidayMonth);
+            Assert.AreEqual(holidayEntity.HolidayDay, domainHoliday.HolidayDay);
         }
 
         [Test]
         public void MapFromDomainHolidayTest()
         {
-            var cny = DateTime.Today;
             var domainHoliday = new Holiday()
             {
                 Id = 1,
-                HolidayDate = cny,
+                HolidayMonth = 1,
+                HolidayDay = 28,
                 Name = "CNY"
             };
 
@@ -46,7 +44,8 @@ namespace PetServiceManagement.Tests.DomainMappers
             Assert.IsNotNull (entityHoliday);
             Assert.AreEqual(domainHoliday.Id, entityHoliday.Id);
             Assert.AreEqual(domainHoliday.Name, entityHoliday.HolidayName);
-            Assert.AreEqual(domainHoliday.HolidayDate, entityHoliday.HolidayDate);
+            Assert.AreEqual(domainHoliday.HolidayMonth, entityHoliday.HolidayMonth);
+            Assert.AreEqual(domainHoliday.HolidayDay, entityHoliday.HolidayDay);
         }
     }
 }

@@ -30,7 +30,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
                     {
                         Id = 1,
                         HolidayName = "CNY",
-                        HolidayDate = DateTime.Now
+                        HolidayMonth = 1,
+                        HolidayDay = 28
                     }
                 });
 
