@@ -29,7 +29,6 @@ function PetManagement({ setLoginState }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [currPetToUpdate, setCurrPetToUpdate] = useState(undefined);
-  const [vaccinesByPetType, setVaccinesByPetType] = useState([]);
 
   useEffect(() => {
     (async function () {
@@ -66,64 +65,8 @@ function PetManagement({ setLoginState }) {
 
   const loadUpdateModal = (pet) => {
     setCurrPetToUpdate(pet);
-    (async function () {
-      try {
-        //grab vaccines by pet type selected
-        var resp = await getVaccinesByPetType(pet.petTypeId);
-        if (resp.status === 401) {
-          setLoginState(false);
-          return;
-        }
 
-        const vaccines = await resp.json();
-        constructVaccinesByPetType(vaccines);
-
-        setErrMsg(undefined);
-      } catch (e) {
-        setErrMsg(e.message);
-        return;
-      }
-    })();
     setShowUpdateModal(true);
-  };
-
-  const constructVaccinesByPetType = (vaccines) => {
-    //on the ui, we are going to break vaccines up into 4 columns
-    //so we will evenly split vaccines up into group of 4
-    const vaccinesByCol = [];
-    //push 4 empty lists first represent 4 columns of list of vaccines
-    vaccinesByCol.push([]);
-    vaccinesByCol.push([]);
-    vaccinesByCol.push([]);
-    vaccinesByCol.push([]);
-
-    //loop through vaccine and push each vaccine into each column.
-    //when we hit last column, then reset back to first column
-    var col = 0; //start at first column
-    for (var i = 0; i < vaccines.length; i++) {
-      const vax = {
-        id: vaccines[i].id,
-        vaxName: vaccines[i].vaccineName,
-        checked: false,
-      }; //since its new, checked is false
-      vaccinesByCol[col].push(vax);
-
-      col++; //go to next column
-      if (col == 4) {
-        //when col == 3, that means we were at 4th column already (zero indexed).
-        //col ++ will increment to 4 meaning we need to reset back to fist column
-        col = 0;
-      }
-    }
-
-    setVaccinesByPetType(vaccinesByCol);
-  };
-
-  const setVaccineValue = (colIndex, vaccineIndex) => {
-    //value equals opposite of what it currently is
-    vaccinesByPetType[colIndex][vaccineIndex].checked =
-      !vaccinesByPetType[colIndex][vaccineIndex].checked;
-    setVaccinesByPetType(vaccinesByPetType);
   };
 
   const postUpdatePetAction = (updatedFieldsMap) => {
@@ -149,7 +92,6 @@ function PetManagement({ setLoginState }) {
       />
       <UpdatePetModal
         pet={currPetToUpdate}
-        vaccines={vaccinesByPetType}
         show={showUpdateModal}
         handleHide={() => setShowUpdateModal(false)}
         postUpdateAction={postUpdatePetAction}

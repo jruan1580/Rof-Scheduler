@@ -4,14 +4,15 @@ import { useState, useEffect } from "react";
 import Select from "react-select";
 
 import { ensurePetUpdateInformationProvided } from "../../SharedServices/inputValidationService";
+import { updatePetInformation } from "../../SharedServices/petManagementService";
 import {
-  updatePetInformation,
-  getPetById,
-} from "../../SharedServices/petManagementService";
+  getBreedByPetType,
+  getVaccinesByPetType,
+  getClients,
+} from "../../SharedServices/dropdownService";
 
 function UpdatePetModal({
   pet,
-  vaccines,
   show,
   handleHide,
   postUpdateAction,
@@ -21,7 +22,41 @@ function UpdatePetModal({
   const [updating, setUpdating] = useState(false);
   const [errMsg, setErrMsg] = useState(undefined);
   const [successMsg, setSuccessMsg] = useState(false);
-  const [vaccine, setVaccine] = useState([]);
+  const [breedByPetType, setBreedByPetType] = useState([]);
+  const [owners, setOwners] = useState([]);
+  const [vaccinesByPetType, setVaccinesByPetType] = useState([]);
+
+  useEffect(() => {
+    (async function () {
+      try {
+        var petTypeId = parseInt(pet.petTypeId);
+
+        console.log(pet);
+
+        var resp = await getBreedByPetType(petTypeId);
+        if (resp.status === 401) {
+          setLoginState(false);
+          return;
+        }
+
+        const breeds = await resp.json();
+        constructBreedOptions(breeds);
+
+        resp = await getClients();
+        if (resp.status === 401) {
+          setLoginState(false);
+          return;
+        }
+
+        const clients = await resp.json();
+        constructOwnersOption(clients);
+
+        setErrMsg(undefined);
+      } catch (e) {
+        setErrMsg(e.message);
+      }
+    })();
+  }, [pet]);
 
   const resetStates = function () {
     setValidationMap(new Map());
@@ -34,11 +69,22 @@ function UpdatePetModal({
     handleHide();
   };
 
-  const setVaccineValue = (colIndex, vaccineIndex) => {
-    //value equals opposite of what it currently is
-    vaccines[colIndex][vaccineIndex].checked =
-      !vaccines[colIndex][vaccineIndex].checked;
-    setVaccine(vaccines);
+  const constructBreedOptions = (breeds) => {
+    const breedOptions = [];
+    for (var i = 0; i < breeds.length; i++) {
+      breedOptions.push({ value: breeds[i].id, label: breeds[i].breedName });
+    }
+
+    setBreedByPetType(breedOptions);
+  };
+
+  const constructOwnersOption = (owners) => {
+    const ownerOptions = [];
+    for (var i = 0; i < owners.length; i++) {
+      ownerOptions.push({ label: owners[i].fullName, value: owners[i].id });
+    }
+
+    setOwners(ownerOptions);
   };
 
   const handleUpdate = (e) => {
@@ -145,16 +191,22 @@ function UpdatePetModal({
 
               <Form.Group as={Col} lg={3}>
                 <Form.Label>Breed</Form.Label>
-                <Form.Control
-                  placeholder="Breed"
-                  name="breed"
-                  defaultValue={pet === undefined ? "" : pet.breedName}
-                  isInvalid={validationMap.has("breed")}
-                  disabled
-                />
-                <Form.Control.Feedback type="invalid">
+                {pet !== undefined && (
+                  <Select
+                    name="breed"
+                    options={breedByPetType}
+                    defaultValue={{
+                      label: pet.breedName,
+                      value: pet.breedId,
+                    }}
+                    isInvalid={validationMap.has("breed")}
+                    style={{ borderColor: "red" }}
+                  />
+                )}
+                <div className="dropdown-invalid">
+                  {" "}
                   {validationMap.get("breed")}
-                </Form.Control.Feedback>
+                </div>
               </Form.Group>
 
               <Form.Group as={Col} lg={3}>
@@ -189,20 +241,20 @@ function UpdatePetModal({
                 <Row>
                   <Form.Group as={Col} lg={4}>
                     <Form.Label>Owner</Form.Label>
-                    <Form.Control
-                      placeholder="Owner"
-                      name="client"
-                      defaultValue={
-                        pet === undefined
-                          ? ""
-                          : pet.ownerFirstName + " " + pet.ownerLastName
-                      }
-                      isInvalid={validationMap.has("")}
-                      disabled
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {validationMap.get("owner")}
-                    </Form.Control.Feedback>
+                    {pet !== undefined && (
+                      <Select
+                        name="client"
+                        defaultValue={{
+                          label: pet.ownerFirstName + " " + pet.ownerLastName,
+                          value: pet.ownerId,
+                        }}
+                        options={owners}
+                      />
+                    )}
+                    <div className="dropdown-invalid">
+                      {" "}
+                      {validationMap.get("client")}
+                    </div>
                   </Form.Group>
                 </Row>
                 <br />
@@ -227,7 +279,7 @@ function UpdatePetModal({
             <br />
 
             <Row>
-              <Form.Group as={Col} lg={3}>
+              {/* <Form.Group as={Col} lg={3}>
                 {
                   //first column
                   vaccines[0].map((vaccine, index) => {
@@ -242,8 +294,8 @@ function UpdatePetModal({
                     );
                   })
                 }
-              </Form.Group>
-              <Form.Group as={Col} lg={3}>
+              </Form.Group> */}
+              {/* <Form.Group as={Col} lg={3}>
                 {
                   //second column
                   vaccines[1].map((vaccine, index) => {
@@ -290,7 +342,7 @@ function UpdatePetModal({
                     );
                   })
                 }
-              </Form.Group>
+              </Form.Group> */}
             </Row>
             <hr></hr>
             {updating && (
