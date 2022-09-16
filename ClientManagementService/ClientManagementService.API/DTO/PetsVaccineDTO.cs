@@ -4,6 +4,6 @@
     {
         public long PetsVaccineId { get;set; }
 
-        public bool Innoculated { get; set; }   
+        public bool Inoculated { get; set; }   
     }
 }

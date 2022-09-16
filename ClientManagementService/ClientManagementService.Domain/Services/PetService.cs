@@ -19,6 +19,7 @@ namespace ClientManagementService.Domain.Services
         Task<Pet> GetPetByName(string name);
         Task<PetsWithTotalPage> GetPetsByClientIdAndKeyword(long clientId, int page, int offset, string keyword);
         Task UpdatePet(Pet updatePet);
+        Task<List<VaccineStatus>> GetVaccinesByPetId(long petId);
     }
 
     public class PetService : IPetService
@@ -176,6 +177,18 @@ namespace ClientManagementService.Domain.Services
         public async Task DeletePetById(long petId)
         {
             await _petRepository.DeletePetById(petId);
-        }       
+        }
+
+        public async Task<List<VaccineStatus>> GetVaccinesByPetId(long petId)
+        {
+            var petToVaccines = await _petToVaccinesRepository.GetPetToVaccineByPetId(petId); //list of petToVax with Id, PetId, VaxId, and Innoculated
+
+            if (petToVaccines == null || petToVaccines.Count == 0)
+            {
+                throw new EntityNotFoundException("Pet had no records of vaccines");
+            }            
+
+            return PetToVaccineMapper.ToVaccineStatus(petToVaccines);
+        }
     }
 }
