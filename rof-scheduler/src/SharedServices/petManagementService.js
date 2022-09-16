@@ -127,7 +127,7 @@ export const getVaccinesByPetId = async function (petId) {
 
   return await makeHttpRequest(
     url,
-    "PUT",
+    "GET",
     { "Content-Type": "application/json" },
     200,
     undefined
