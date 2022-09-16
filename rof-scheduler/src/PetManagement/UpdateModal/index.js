@@ -239,25 +239,27 @@ function UpdatePetModal({
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} lg={3}>
-                <Form.Label>Breed</Form.Label>
-                {pet !== undefined && (
-                  <Select
-                    name="breed"
-                    options={breedByPetType}
-                    defaultValue={{
-                      label: pet.breedName,
-                      value: pet.breedId,
-                    }}
-                    isInvalid={validationMap.has("breed")}
-                    style={{ borderColor: "red" }}
-                  />
-                )}
-                <div className="dropdown-invalid">
-                  {" "}
-                  {validationMap.get("breed")}
-                </div>
-              </Form.Group>
+              {localStorage.getItem("role").toLowerCase() !== "client" && (
+                <Form.Group as={Col} lg={3}>
+                  <Form.Label>Breed</Form.Label>
+                  {pet !== undefined && (
+                    <Select
+                      name="breed"
+                      options={breedByPetType}
+                      defaultValue={{
+                        label: pet.breedName,
+                        value: pet.breedId,
+                      }}
+                      isInvalid={validationMap.has("breed")}
+                      style={{ borderColor: "red" }}
+                    />
+                  )}
+                  <div className="dropdown-invalid">
+                    {" "}
+                    {validationMap.get("breed")}
+                  </div>
+                </Form.Group>
+              )}
 
               <Form.Group as={Col} lg={3}>
                 <Form.Label>DOB</Form.Label>
@@ -329,7 +331,7 @@ function UpdatePetModal({
             <br />
 
             <Row>
-              {pet !== undefined &&
+              {/* {pet !== undefined &&
                 (<Form.Group as={Col} lg={3}>
                   {
                     //first column
@@ -396,7 +398,7 @@ function UpdatePetModal({
                       })
                     }
                   </Form.Group>
-                )}
+                )} */}
             </Row>
             <hr></hr>
             {updating && (
