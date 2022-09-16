@@ -120,3 +120,16 @@ export const updatePetInformation = async function (
     data
   );
 };
+
+export const getVaccinesByPetId = async function (petId) {
+  var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
+  var url = baseUrl + "/pet/" + petId + "/vax";
+
+  return await makeHttpRequest(
+    url,
+    "PUT",
+    { "Content-Type": "application/json" },
+    200,
+    undefined
+  );
+};
