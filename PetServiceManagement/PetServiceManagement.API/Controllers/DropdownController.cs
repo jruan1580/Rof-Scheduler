@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PetServiceManagement.API.Controllers
 {
-    [Authorize("Administrator")]
+    [Authorize(Roles = "Administrator")]
     [Route("api/[controller]")]
     [ApiController]
     public class DropdownController : ControllerBase

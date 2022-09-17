@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PetServiceManagement.API.Controllers
 {
-    [Authorize("Administrator")]
+    [Authorize(Roles = "Administrator")]
     [Route("api/[controller]")]
     [ApiController]
     public class HolidayRateController : ControllerBase
@@ -57,6 +57,10 @@ namespace PetServiceManagement.API.Controllers
             }
             catch(Exception e)
             {
+                if (e.InnerException != null && e.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"))
+                {
+                    return BadRequest("Holiday rate attached to pet service and holiday already exists");
+                }
                 return StatusCode(500, e.Message);
             }
         }
@@ -82,7 +86,7 @@ namespace PetServiceManagement.API.Controllers
             }
         }
 
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHolidayRate(int id)
         {
             try
