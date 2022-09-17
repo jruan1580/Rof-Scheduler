@@ -127,6 +127,8 @@ function UpdatePetModal({
       }
     }
 
+    console.log(vaccinesByCol);
+
     setPetVaxes(vaccinesByCol);
   };
 
@@ -134,6 +136,7 @@ function UpdatePetModal({
     //value equals opposite of what it currently is
     petVaxes[colIndex][vaccineIndex].checked =
       !petVaxes[colIndex][vaccineIndex].checked;
+
     setPetVaxes(petVaxes);
   };
 
@@ -150,7 +153,7 @@ function UpdatePetModal({
     var ownerId = pet.ownerId;
     var otherInfo = e.target.otherInfo.value;
 
-    var vaccineStatus = undefined;
+    var vaccineStatus = petVaxes;
 
     var inputValidations = new Map();
 
@@ -331,23 +334,27 @@ function UpdatePetModal({
             <br />
 
             <Row>
-              {/* {pet !== undefined &&
-                (<Form.Group as={Col} lg={3}>
-                  {
-                    //first column
-                    petVaxes[0].map((vaccine, index) => {
-                      return (
-                        <Form.Check
-                          key={vaccine.id}
-                          type="checkbox"
-                          label={vaccine.vaxName}
-                          value={vaccine.checked}
-                          onChange={() => setVaccineValue(0, index)} //first param tells us which column, second param tells us which index value to update
-                        />
-                      );
-                    })
-                  }
-                </Form.Group>)(
+              {pet !== undefined &&
+                petVaxes.length >
+                  0(
+                    <Form.Group as={Col} lg={3}>
+                      {
+                        //first column
+                        petVaxes[0].map((vaccine, index) => {
+                          return (
+                            <Form.Check
+                              key={vaccine.id}
+                              type="checkbox"
+                              label={vaccine.vaxName}
+                              value={vaccine.checked}
+                              onChange={() => setVaccineValue(0, index)} //first param tells us which column, second param tells us which index value to update
+                            />
+                          );
+                        })
+                      }
+                    </Form.Group>
+                  )}
+              {/* (
                   <Form.Group as={Col} lg={3}>
                     {
                       //second column
@@ -398,7 +405,7 @@ function UpdatePetModal({
                       })
                     }
                   </Form.Group>
-                )} */}
+                ) */}
             </Row>
             <hr></hr>
             {updating && (
