@@ -59,6 +59,10 @@ function PetManagement({ setLoginState }) {
     setCurrPage(1);
   };
 
+  const reloadAfterThreeSeconds = () => {
+    setTimeout(() => window.location.reload(), 3000);
+  };
+
   return (
     <>
       <h1>Pets Management</h1>
@@ -66,6 +70,7 @@ function PetManagement({ setLoginState }) {
       <AddPetModal
         show={showAddModal}
         handleHide={() => setShowAddModal(false)}
+        handleAddPetSuccess={reloadAfterThreeSeconds}
         setLoginState={setLoginState}
       />
       <Row>

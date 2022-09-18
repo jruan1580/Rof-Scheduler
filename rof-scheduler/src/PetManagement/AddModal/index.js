@@ -12,7 +12,7 @@ import { ensureAddPetInformationProvided } from "../../SharedServices/inputValid
 import { addPet } from "../../SharedServices/petManagementService";
 import "./addPet.css";
 
-function AddPetModal({ show, handleHide, setLoginState }) {
+function AddPetModal({ show, handleHide, handleAddPetSuccess, setLoginState }) {
   //TODO - many states here, switch to useReduce later
   const [petTypes, setPetTypes] = useState([]);
   const [petTypeSelected, setPetTypeSelected] = useState(undefined);
@@ -228,6 +228,8 @@ function AddPetModal({ show, handleHide, setLoginState }) {
         setDisableBtns(true);
 
         setSuccessMsg(true);
+
+        handleAddPetSuccess();
       } catch (e) {
         setErrMsg(e.message);
         return;
