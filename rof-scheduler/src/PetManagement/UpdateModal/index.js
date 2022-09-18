@@ -26,25 +26,28 @@ function UpdatePetModal({
     (async function () {
       try {
         var petTypeId = parseInt(pet.petTypeId);
-        var petId = parseFloat(pet.id);
+        var petId = parseInt(pet.id);
+        var resp = undefined;
 
-        var resp = await getBreedByPetType(petTypeId);
-        if (resp.status === 401) {
-          setLoginState(false);
-          return;
+        if (localStorage.getItem("role").toLowerCase() !== "client"){
+          resp = await getBreedByPetType(petTypeId);
+          if (resp.status === 401) {
+            setLoginState(false);
+            return;
+          }
+
+          const breeds = await resp.json();
+          constructBreedOptions(breeds);
+
+          resp = await getClients();
+          if (resp.status === 401) {
+            setLoginState(false);
+            return;
+          }
+
+          const clients = await resp.json();
+          constructOwnersOption(clients);
         }
-
-        const breeds = await resp.json();
-        constructBreedOptions(breeds);
-
-        resp = await getClients();
-        if (resp.status === 401) {
-          setLoginState(false);
-          return;
-        }
-
-        const clients = await resp.json();
-        constructOwnersOption(clients);
 
         resp = await getVaccinesByPetId(petId);
         if (resp.status === 401) {
@@ -140,9 +143,17 @@ function UpdatePetModal({
     var petName = e.target.petName.value;
     var weight = parseFloat(e.target.weight.value);
     var dob = e.target.dob.value;
-    var breedId = parseFloat(e.target.breed.value);
-    var ownerId = parseFloat(e.target.client.value);
     var otherInfo = e.target.otherInfo.value;
+    var breedId = undefined;
+    var ownerId = undefined;
+
+    if(localStorage.getItem("role").toLowerCase() !== "client"){
+      breedId = parseInt(e.target.breed.value);
+      ownerId = parseInt(e.target.client.value);
+    }else{
+      breedId = pet.breedId;
+      ownerId = pet.ownerId;
+    }
 
     var inputValidations = new Map();
 
@@ -280,7 +291,7 @@ function UpdatePetModal({
               </Form.Group>
 
               <Form.Group as={Col} lg={3}>
-                <Form.Label>Weight</Form.Label>
+                <Form.Label>Weight (lbs)</Form.Label>
                 <Form.Control
                   defaultValue={pet === undefined ? "weight" : pet.weight}
                   name="weight"
