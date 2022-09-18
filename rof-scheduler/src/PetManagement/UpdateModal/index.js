@@ -27,7 +27,6 @@ function UpdatePetModal({
   const [successMsg, setSuccessMsg] = useState(false);
   const [breedByPetType, setBreedByPetType] = useState([]);
   const [owners, setOwners] = useState([]);
-  const [vaccinesByPetType, setVaccinesByPetType] = useState([]);
   const [petVaxes, setPetVaxes] = useState([]);
 
   useEffect(() => {
@@ -153,8 +152,6 @@ function UpdatePetModal({
     var ownerId = pet.ownerId;
     var otherInfo = e.target.otherInfo.value;
 
-    var vaccineStatus = petVaxes;
-
     var inputValidations = new Map();
 
     inputValidations = ensurePetUpdateInformationProvided(
@@ -167,48 +164,60 @@ function UpdatePetModal({
 
     if (inputValidations.size > 0) {
       setValidationMap(inputValidations);
-    } else {
-      setValidationMap(new Map());
-      setUpdating(true);
-
-      (async function () {
-        try {
-          var updatedFields = new Map();
-          updatedFields.set("id", pet.id);
-          var resp = undefined;
-
-          resp = await updatePetInformation(
-            pet.id,
-            petName,
-            weight,
-            dob,
-            ownerId,
-            breedId,
-            otherInfo,
-            vaccineStatus
-          );
-
-          updatedFields.set("petName", petName);
-          updatedFields.set("weight", weight);
-          updatedFields.set("dob", dob);
-          updatedFields.set("breed", breedId);
-          updatedFields.set("client", ownerId);
-          updatedFields.set("otherInfo", otherInfo);
-
-          if (resp !== undefined && resp.status === 401) {
-            setLoginState(false);
-            return;
-          }
-
-          postUpdateAction(updatedFields);
-          setSuccessMsg(true);
-        } catch (e) {
-          setErrMsg(e.message);
-        } finally {
-          setUpdating(false);
-        }
-      })();
+      return;
     }
+    setValidationMap(new Map());
+    setUpdating(true);
+
+    const vaccineStatus = [];
+    for (var row = 0; row < petVaxes.length; row++) {
+      const vaxRow = petVaxes[row];
+      for (var col = 0; col < vaxRow.length; col++) {
+        vaccineStatus.push({
+          id: vaxRow[col].id,
+          vaccineName: vaxRow[col].vaxName,
+          inoculated: vaxRow[col].checked,
+        });
+      }
+    }
+
+    (async function () {
+      try {
+        var updatedFields = new Map();
+        updatedFields.set("id", pet.id);
+        var resp = undefined;
+
+        resp = await updatePetInformation(
+          pet.id,
+          petName,
+          weight,
+          dob,
+          ownerId,
+          breedId,
+          otherInfo,
+          vaccineStatus
+        );
+
+        updatedFields.set("petName", petName);
+        updatedFields.set("weight", weight);
+        updatedFields.set("dob", dob);
+        updatedFields.set("breed", breedId);
+        updatedFields.set("client", ownerId);
+        updatedFields.set("otherInfo", otherInfo);
+
+        if (resp !== undefined && resp.status === 401) {
+          setLoginState(false);
+          return;
+        }
+
+        postUpdateAction(updatedFields);
+        setSuccessMsg(true);
+      } catch (e) {
+        setErrMsg(e.message);
+      } finally {
+        setUpdating(false);
+      }
+    })();
   };
 
   return (
