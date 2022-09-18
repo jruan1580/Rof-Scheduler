@@ -4,15 +4,8 @@ import { useState, useEffect } from "react";
 import Select from "react-select";
 
 import { ensurePetUpdateInformationProvided } from "../../SharedServices/inputValidationService";
-import {
-  updatePetInformation,
-  getVaccinesByPetId,
-} from "../../SharedServices/petManagementService";
-import {
-  getBreedByPetType,
-  getVaccinesByPetType,
-  getClients,
-} from "../../SharedServices/dropdownService";
+import { updatePetInformation, getVaccinesByPetId } from "../../SharedServices/petManagementService";
+import { getBreedByPetType, getClients } from "../../SharedServices/dropdownService";
 
 function UpdatePetModal({
   pet,
@@ -27,7 +20,7 @@ function UpdatePetModal({
   const [successMsg, setSuccessMsg] = useState(false);
   const [breedByPetType, setBreedByPetType] = useState([]);
   const [owners, setOwners] = useState([]);
-  const [petVaxes, setPetVaxes] = useState([]);
+  const [petVaxes, setPetVaxes] = useState([[], [], [], []]);
 
   useEffect(() => {
     (async function () {
@@ -114,6 +107,7 @@ function UpdatePetModal({
         id: petVaccines[i].id,
         vaxName: petVaccines[i].vaccineName,
         checked: petVaccines[i].inoculated,
+        petVaccineId: petVaccines[i].petsVaccineId
       }; //not new anymore, so checked value is what's in DB
 
       vaccinesByCol[col].push(vax);
@@ -125,8 +119,6 @@ function UpdatePetModal({
         col = 0;
       }
     }
-
-    console.log(vaccinesByCol);
 
     setPetVaxes(vaccinesByCol);
   };
@@ -148,8 +140,8 @@ function UpdatePetModal({
     var petName = e.target.petName.value;
     var weight = parseFloat(e.target.weight.value);
     var dob = e.target.dob.value;
-    var breedId = pet.breedId;
-    var ownerId = pet.ownerId;
+    var breedId = parseFloat(e.target.breed.value);
+    var ownerId = parseFloat(e.target.client.value);
     var otherInfo = e.target.otherInfo.value;
 
     var inputValidations = new Map();
@@ -177,6 +169,7 @@ function UpdatePetModal({
           id: vaxRow[col].id,
           vaccineName: vaxRow[col].vaxName,
           inoculated: vaxRow[col].checked,
+          petsVaccineId: vaxRow[col].petVaccineId
         });
       }
     }
@@ -343,78 +336,61 @@ function UpdatePetModal({
             <br />
 
             <Row>
-              {pet !== undefined &&
-                petVaxes.length >
-                  0(
-                    <Form.Group as={Col} lg={3}>
-                      {
-                        //first column
-                        petVaxes[0].map((vaccine, index) => {
-                          return (
-                            <Form.Check
-                              key={vaccine.id}
-                              type="checkbox"
-                              label={vaccine.vaxName}
-                              value={vaccine.checked}
-                              onChange={() => setVaccineValue(0, index)} //first param tells us which column, second param tells us which index value to update
-                            />
-                          );
-                        })
-                      }
-                    </Form.Group>
-                  )}
-              {/* (
-                  <Form.Group as={Col} lg={3}>
-                    {
-                      //second column
-                      petVaxes[1].map((vaccine, index) => {
-                        return (
-                          <Form.Check
-                            key={vaccine.id}
-                            type="checkbox"
-                            label={vaccine.vaxName}
-                            value={vaccine.checked}
-                            onChange={() => setVaccineValue(1, index)} //first param tells us which column, second param tells us which index value to update
-                          />
-                        );
-                      })
-                    }
-                  </Form.Group>
-                )(
-                  <Form.Group as={Col} lg={3}>
-                    {
-                      //third column
-                      petVaxes[2].map((vaccine, index) => {
-                        return (
-                          <Form.Check
-                            key={vaccine.id}
-                            type="checkbox"
-                            label={vaccine.vaxName}
-                            value={vaccine.checked}
-                            onChange={() => setVaccineValue(2, index)} //first param tells us which column, second param tells us which index value to update
-                          />
-                        );
-                      })
-                    }
-                  </Form.Group>
-                )(
-                  <Form.Group as={Col} lg={3}>
-                    {
-                      //fourth column
-                      petVaxes[3].map((vaccine, index) => {
-                        return (
-                          <Form.Check
-                            key={vaccine.id}
-                            type="checkbox"
-                            label={vaccine.vaxName}
-                            value={vaccine.checked}
-                            onChange={() => setVaccineValue(3, index)} //first param tells us which column, second param tells us which index value to update
-                          />
-                        );
-                      })
-                    }
-                  </Form.Group>
-                ) */}
+              <Form.Group as={Col} lg={3}>
+                {pet !== undefined && petVaxes !== undefined && petVaxes[0].map((vaccine, index) => {
+                    return (
+                      <Form.Check
+                        key={vaccine.id}
+                        type="checkbox"
+                        label={vaccine.vaxName}
+                        defaultChecked={vaccine.checked}
+                        onChange={() => setVaccineValue(0, index)} //first param tells us which column, second param tells us which index value to update
+                      />
+                    );
+                  })}
+                </Form.Group>
+
+              <Form.Group as={Col} lg={3}>
+                {pet !== undefined && petVaxes !== undefined && petVaxes[1].map((vaccine, index) => {
+                    return (
+                      <Form.Check
+                        key={vaccine.id}
+                        type="checkbox"
+                        label={vaccine.vaxName}
+                        defaultChecked={vaccine.checked}
+                        onChange={() => setVaccineValue(1, index)} //first param tells us which column, second param tells us which index value to update
+                      />
+                    );
+                  })}
+                </Form.Group>
+
+                <Form.Group as={Col} lg={3}>
+                {pet !== undefined && petVaxes !== undefined && petVaxes[2].map((vaccine, index) => {
+                    return (
+                      <Form.Check
+                        key={vaccine.id}
+                        type="checkbox"
+                        label={vaccine.vaxName}
+                        defaultChecked={vaccine.checked}
+                        onChange={() => setVaccineValue(2, index)} //first param tells us which column, second param tells us which index value to update
+                      />
+                    );
+                  })}
+                </Form.Group>
+
+                <Form.Group as={Col} lg={3}>
+                {pet !== undefined && petVaxes !== undefined && petVaxes[3].map((vaccine, index) => {
+                    return (
+                      <Form.Check
+                        key={vaccine.id}
+                        type="checkbox"
+                        label={vaccine.vaxName}
+                        defaultChecked={vaccine.checked}
+                        onChange={() => setVaccineValue(3, index)} //first param tells us which column, second param tells us which index value to update
+                      />
+                    );
+                  })}
+                </Form.Group>
             </Row>
             <hr></hr>
             {updating && (

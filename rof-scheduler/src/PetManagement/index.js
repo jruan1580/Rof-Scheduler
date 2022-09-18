@@ -75,10 +75,11 @@ function PetManagement({ setLoginState }) {
         pets[i].name = updatedFieldsMap.get("petName");
         pets[i].ownerId = updatedFieldsMap.get("client");
         pets[i].breedId = updatedFieldsMap.get("breed");
-        pets[i].weight = updatedFields.get("weight");
+        pets[i].weight = updatedFieldsMap.get("weight");
         break;
       }
     }
+    
     setPets(pets);
   };
 
