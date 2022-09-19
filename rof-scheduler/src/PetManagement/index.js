@@ -75,7 +75,7 @@ function PetManagement({ setLoginState }) {
         pets[i].name = updatedFieldsMap.get("petName");
         pets[i].ownerId = updatedFieldsMap.get("client");
         pets[i].breedId = updatedFieldsMap.get("breed");
-        pets[i].weight = updatedFieldsMap.get("weight");
+        pets[i].dob = updatedFieldsMap.get("dob");
         break;
       }
     }
@@ -127,7 +127,7 @@ function PetManagement({ setLoginState }) {
               <th>Id</th>
               <th>Name</th>
               {userType == "Employee" && <th>Owner</th>}
-              <th>Weight</th>
+              <th>Dob</th>
               <th>Breed</th>
               <th colSpan={2}></th>
             </tr>
@@ -144,7 +144,7 @@ function PetManagement({ setLoginState }) {
                         {pet.ownerFirstName} {pet.ownerLastName}
                       </td>
                     )}
-                    <td>{pet.weight} lbs</td>
+                    <td>{pet.dob}</td>
                     <td>{pet.breedName}</td>
                     <td>
                       <OverlayTrigger
