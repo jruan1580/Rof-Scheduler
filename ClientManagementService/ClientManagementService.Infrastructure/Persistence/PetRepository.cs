@@ -172,7 +172,17 @@ namespace ClientManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                context.Pets.Update(updatePet);
+                var origPet = await context.Pets.FirstOrDefaultAsync(p => p.Id == updatePet.Id);
+
+                origPet.Name = updatePet.Name;
+                origPet.Weight = updatePet.Weight;
+                origPet.Dob = updatePet.Dob;
+           
+                origPet.BreedId = updatePet.BreedId;
+                origPet.OwnerId = updatePet.OwnerId;
+                origPet.OtherInfo = updatePet.OtherInfo;
+
+                context.Pets.Update(origPet);
 
                 await context.SaveChangesAsync();
             }

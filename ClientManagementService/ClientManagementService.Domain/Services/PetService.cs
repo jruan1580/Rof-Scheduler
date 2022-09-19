@@ -153,22 +153,16 @@ namespace ClientManagementService.Domain.Services
             {
                 throw new EntityNotFoundException("Pet was not found. Failed to update.");
             }
+            
+            var petEntity = PetMapper.FromCorePet(updatePet);
 
-            origPet.Name = updatePet.Name;
-            origPet.Weight = updatePet.Weight;
-            origPet.Dob = updatePet.Dob;
-            origPet.BreedId = updatePet.BreedId;
-            origPet.OwnerId = updatePet.OwnerId;
-            origPet.OtherInfo = updatePet.OtherInfo;
-
-            await _petRepository.UpdatePet(origPet);
+            await _petRepository.UpdatePet(petEntity);
 
             var origPetToVaccines = await _petToVaccinesRepository.GetPetToVaccineByPetId(origPet.Id);
             foreach(var updatedPetToVaccine in updatePet.Vaccines)
             {
                 var origPetToVaccine = origPetToVaccines.FirstOrDefault(o => o.Id == updatedPetToVaccine.PetToVaccineId);
                 origPetToVaccine.Inoculated = updatedPetToVaccine.Inoculated;
-
             }         
 
             await _petToVaccinesRepository.UpdatePetToVaccines(origPetToVaccines);

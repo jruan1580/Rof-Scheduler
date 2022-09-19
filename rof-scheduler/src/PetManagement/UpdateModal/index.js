@@ -25,6 +25,10 @@ function UpdatePetModal({
   useEffect(() => {
     (async function () {
       try {
+        if (pet === undefined){
+          return;
+        }
+        
         var petTypeId = parseInt(pet.petTypeId);
         var petId = parseFloat(pet.id);
 
@@ -143,6 +147,8 @@ function UpdatePetModal({
     var breedId = parseFloat(e.target.breed.value);
     var ownerId = parseFloat(e.target.client.value);
     var otherInfo = e.target.otherInfo.value;
+
+    console.log(breedId);    
 
     var inputValidations = new Map();
 
