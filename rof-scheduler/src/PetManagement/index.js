@@ -76,6 +76,8 @@ function PetManagement({ setLoginState }) {
         pets[i].ownerId = updatedFieldsMap.get("client");
         pets[i].breedId = updatedFieldsMap.get("breed");
         pets[i].dob = updatedFieldsMap.get("dob");
+        pets[i].weight = updatedFieldsMap.get("weight");
+        pets[i].otherInfo = updatedFieldsMap.get("otherInfo");
         break;
       }
     }
