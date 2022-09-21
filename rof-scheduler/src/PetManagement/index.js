@@ -73,11 +73,16 @@ function PetManagement({ setLoginState }) {
     for (var i = 0; i < pets.length; i++) {
       if (pets[i].id === updatedFieldsMap.get("id")) {
         pets[i].name = updatedFieldsMap.get("petName");
-        pets[i].ownerId = updatedFieldsMap.get("client");
-        pets[i].breedId = updatedFieldsMap.get("breed");
+        pets[i].ownerId = updatedFieldsMap.get("clientId");
+        pets[i].breedId = updatedFieldsMap.get("breedId");
         pets[i].dob = updatedFieldsMap.get("dob");
         pets[i].weight = updatedFieldsMap.get("weight");
         pets[i].otherInfo = updatedFieldsMap.get("otherInfo");
+        pets[i].breedName = updatedFieldsMap.get("breedName");
+        pets[i].ownerFirstName = updatedFieldsMap.get("ownerFirstName");
+        pets[i].ownerLastName = updatedFieldsMap.get("ownerLastName");
+
+        console.log(pets[i]);
         break;
       }
     }

@@ -159,8 +159,6 @@ function UpdatePetModal({
       ownerId = pet.ownerId;
     }
 
-    console.log(breedId);    
-
     var inputValidations = new Map();
 
     inputValidations = ensurePetUpdateInformationProvided(
@@ -175,6 +173,7 @@ function UpdatePetModal({
       setValidationMap(inputValidations);
       return;
     }
+
     setValidationMap(new Map());
     setUpdating(true);
 
@@ -208,12 +207,37 @@ function UpdatePetModal({
           vaccineStatus
         );
 
+        var breedName = undefined;
+        var clientName = undefined;
+
+        for (var i = 0; i < breedByPetType.length; i++) {
+          if(breedByPetType[i].value === breedId){
+            breedName = breedByPetType[i].label;
+            break;
+          }
+        }
+
+        for (var i = 0; i < owners.length; i++) {
+          if(owners[i].value === ownerId){
+            clientName = owners[i].label;
+            break;
+          }
+        }
+        
+        var ownerName = clientName.split(" ");
+
+        var ownerFirstName = ownerName[0];
+        var ownerLastName = ownerName[1];
+
         updatedFields.set("petName", petName);
         updatedFields.set("weight", weight);
         updatedFields.set("dob", dob);
-        updatedFields.set("breed", breedId);
-        updatedFields.set("client", ownerId);
+        updatedFields.set("breedId", breedId);
+        updatedFields.set("clientId", ownerId);
         updatedFields.set("otherInfo", otherInfo);
+        updatedFields.set("breedName", breedName);
+        updatedFields.set("ownerFirstName", ownerFirstName);
+        updatedFields.set("ownerLastName", ownerLastName);
 
         if (resp !== undefined && resp.status === 401) {
           setLoginState(false);
