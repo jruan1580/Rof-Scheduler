@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using CorePet = ClientManagementService.Domain.Models.Pet;
 using DTOPet = ClientManagementService.API.DTO.PetDTO;
+using CorePetVax = ClientManagementService.API.DTO.PetsVaccineDTO;
 
 namespace ClientManagementService.Test.Mapper
 {
@@ -57,7 +58,7 @@ namespace ClientManagementService.Test.Mapper
             Assert.AreEqual(1, vax.Id);
             Assert.AreEqual(1, vax.PetsVaccineId);
             Assert.AreEqual("Bordetella", vax.VaccineName);
-            Assert.IsTrue(vax.Innoculated);
+            Assert.IsTrue(vax.Inoculated);
         }
 
         [Test]
@@ -82,7 +83,7 @@ namespace ClientManagementService.Test.Mapper
                     Id = 1,
                     PetsVaccineId = 1,
                     VaccineName = "Bordetella",
-                    Innoculated = true
+                    Inoculated = true
                 }
             };
 
@@ -118,6 +119,22 @@ namespace ClientManagementService.Test.Mapper
             Assert.AreEqual(1, vax.PetToVaccineId);
             Assert.AreEqual("Bordetella", vax.VaxName);
             Assert.IsTrue(vax.Inoculated);
+        }
+
+        [Test]
+        public void TestToDTOPetsVaccine()
+        {
+            var corePetVax = new CorePetVax();
+
+            corePetVax.Id = 1;
+            corePetVax.PetsVaccineId = 1;
+            corePetVax.VaccineName = "Bordetella";
+            corePetVax.Inoculated = true;
+
+            Assert.AreEqual(1, corePetVax.Id);
+            Assert.AreEqual(1, corePetVax.PetsVaccineId);
+            Assert.AreEqual("Bordetella", corePetVax.VaccineName);
+            Assert.IsTrue(corePetVax.Inoculated);
         }
     }
 }

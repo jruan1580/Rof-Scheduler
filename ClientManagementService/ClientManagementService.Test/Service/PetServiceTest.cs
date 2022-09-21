@@ -652,5 +652,37 @@ namespace ClientManagementService.Test.Service
 
             _petRepository.Verify(p => p.DeletePetById(It.IsAny<long>()), Times.Once);
         }
+
+        [Test]
+        public async Task GetVaccinesByPetId_Success()
+        {
+            var petToVax = new List<PetToVaccine>()
+            {
+                new PetToVaccine()
+                {
+                    Id = 1,
+                    PetId = 1,
+                    VaxId = 1,
+                    Inoculated = true,
+                    Vax = new Vaccine() {
+                        Id = 1,
+                        VaxName = "Bordetella"
+                    }
+                }
+            };
+
+            _petToVaccinesRepository.Setup(pv => pv.GetPetToVaccineByPetId(It.IsAny<long>()))
+                .ReturnsAsync(petToVax);
+
+            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+
+            var result = await petService.GetVaccinesByPetId(1);
+
+            Assert.IsNotEmpty(result);
+            Assert.AreEqual(1, result[0].Id);
+            Assert.AreEqual(1, result[0].PetToVaccineId);
+            Assert.AreEqual("Bordetella", result[0].VaxName);
+            Assert.IsTrue(result[0].Inoculated);
+        }
     }
 }
