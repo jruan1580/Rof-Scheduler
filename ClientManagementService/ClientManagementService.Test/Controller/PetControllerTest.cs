@@ -42,7 +42,7 @@ namespace ClientManagementService.Test.Controller
                         Id = 1,
                         PetsVaccineId = 1,
                         VaccineName = "Bordetella",
-                        Innoculated = true
+                        Inoculated = true
                     }
                 }
             };
@@ -388,7 +388,7 @@ namespace ClientManagementService.Test.Controller
                         Id = 1,
                         PetsVaccineId = 1,
                         VaccineName = "Bordetella",
-                        Innoculated = true
+                        Inoculated = true
                     }
                 }
             };
@@ -473,6 +473,53 @@ namespace ClientManagementService.Test.Controller
             var obj = (BadRequestObjectResult)response;
 
             Assert.AreEqual(obj.StatusCode, 400);
+        }
+
+        [Test]
+        public async Task GetVaccinesByPetId_Success()
+        {
+            var vaxStats = new List<Domain.Models.VaccineStatus>();
+            {
+                new Domain.Models.VaccineStatus()
+                {
+                    Id = 1,
+                    PetToVaccineId = 1,
+                    VaxName = "Bordetella",
+                    Inoculated = true
+                };
+            };
+
+            _petService.Setup(p => p.GetVaccinesByPetId(It.IsAny<long>()))
+                .ReturnsAsync(new List<Domain.Models.VaccineStatus>());
+
+            var controller = new PetController(_petService.Object);
+
+            var response = await controller.GetVaccinesByPetId(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+
+            var okObj = (OkObjectResult)response;
+
+            Assert.AreEqual(okObj.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task GetVaccinesByPetId_InternalServerError()
+        {
+            _petService.Setup(p => p.GetVaccinesByPetId(It.IsAny<long>()))
+                .ThrowsAsync(new Exception());
+
+            var controller = new PetController(_petService.Object);
+
+            var response = await controller.GetVaccinesByPetId(1);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+
+            var obj = (ObjectResult)response;
+
+            Assert.AreEqual(obj.StatusCode, 500);
         }
     }
 }

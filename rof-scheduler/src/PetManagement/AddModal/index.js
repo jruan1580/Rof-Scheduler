@@ -195,7 +195,7 @@ function AddPetModal({ show, handleHide, handleAddPetSuccess, setLoginState }) {
         vaccineStatus.push({
           id: vaxRow[col].id,
           vaccineName: vaxRow[col].vaxName,
-          innoculated: vaxRow[col].checked,
+          inoculated: vaxRow[col].checked,
         });
       }
     }

@@ -2,6 +2,7 @@
 using ClientManagementService.Domain.Models;
 using System.Collections.Generic;
 using CorePet = ClientManagementService.Domain.Models.Pet;
+using CoreVaxStat = ClientManagementService.Domain.Models.VaccineStatus;
 
 namespace ClientManagementService.API.DTOMapper
 {
@@ -35,7 +36,7 @@ namespace ClientManagementService.API.DTOMapper
                         Id = vax.Id,
                         PetsVaccineId = vax.PetToVaccineId,
                         VaccineName = vax.VaxName,
-                        Innoculated = vax.Inoculated
+                        Inoculated = vax.Inoculated
                     });
                 }
             }
@@ -70,12 +71,24 @@ namespace ClientManagementService.API.DTOMapper
                         Id = vax.Id,
                         PetToVaccineId = vax.PetsVaccineId,
                         VaxName = vax.VaccineName,
-                        Inoculated = vax.Innoculated
+                        Inoculated = vax.Inoculated
                     });
                 }
             }      
 
             return corePet;
+        }
+
+        public static PetsVaccineDTO ToDTOPetsVaccine(CoreVaxStat coreVaxStat)
+        {
+            var dtoPetsVaccine = new PetsVaccineDTO();
+
+            dtoPetsVaccine.Id = coreVaxStat.Id;
+            dtoPetsVaccine.PetsVaccineId = coreVaxStat.PetToVaccineId;
+            dtoPetsVaccine.VaccineName = coreVaxStat.VaxName;
+            dtoPetsVaccine.Inoculated = coreVaxStat.Inoculated;
+
+            return dtoPetsVaccine;
         }
     }
 }
