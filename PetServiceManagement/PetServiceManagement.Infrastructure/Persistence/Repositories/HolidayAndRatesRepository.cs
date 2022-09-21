@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -233,7 +234,23 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         public async Task UpdateHolidayRates(HolidayRates holidayRates)
         {
-            await base.UpdateEntity(holidayRates);
+            using(var context = new RofSchedulerContext())
+            {
+                var holidayRateEntity = await context.HolidayRates.FirstOrDefaultAsync(h => h.Id == holidayRates.Id);
+
+                if (holidayRateEntity == null)
+                {
+                    throw new Exception("Holiday Rate is null");
+                }
+
+                holidayRateEntity.PetServiceId = holidayRates.PetServiceId;
+                holidayRateEntity.HolidayId = holidayRates.HolidayId;
+                holidayRateEntity.HolidayRate = holidayRates.HolidayRate;
+
+                context.Update(holidayRateEntity);
+                
+                await context.SaveChangesAsync();
+            }            
         }
 
         /// <summary>
