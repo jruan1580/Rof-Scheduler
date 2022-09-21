@@ -149,11 +149,9 @@ namespace PetServiceManagement.Domain.BusinessLogic
                 throw new ArgumentException($"Unable to find holiday rate with id: {holidayRate.Id}");
             }
 
-            holidayRateEntity.PetServiceId = holidayRate.PetService.Id;
-            holidayRateEntity.HolidayId = holidayRate.Holiday.Id;
-            holidayRateEntity.HolidayRate = holidayRate.Rate;
+            var holidayRateToUpdate = HolidayRatesMapper.FromDomainHolidayRate(holidayRate);
 
-            await _holidayAndRatesRepository.UpdateHolidayRates(holidayRateEntity);
+            await _holidayAndRatesRepository.UpdateHolidayRates(holidayRateToUpdate);
         }
 
         /// <summary>
@@ -177,6 +175,12 @@ namespace PetServiceManagement.Domain.BusinessLogic
             {
                 throw new ArgumentException("Holiday name was not provided");
             }
+
+            var holidayDate = $"{holiday.HolidayMonth}/{holiday.HolidayDay}/{DateTime.Now.Year}";
+            if (!DateTime.TryParse(holidayDate, out var date))
+            {
+                throw new ArgumentException("Invalid holiday month and day supplied");
+            }     
         }
 
         private async Task ValidateHolidayRate(HolidayRate holidayRate)

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PetServiceManagement.API.Controllers
 {
-    [Authorize("Administrator")]
+    [Authorize(Roles = "Administrator")]
     [Route("api/[controller]")]
     [ApiController]
     public class PetServiceController : ControllerBase
@@ -57,6 +57,11 @@ namespace PetServiceManagement.API.Controllers
             }
             catch(Exception e)
             {
+                if (e.InnerException != null && e.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"))
+                {
+                    return BadRequest("Pet Service with same name already exists");
+                }
+
                 return StatusCode(500, e.Message);
             }
         }
@@ -82,7 +87,7 @@ namespace PetServiceManagement.API.Controllers
             }
         }
 
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePetService(short id)
         {
             try
