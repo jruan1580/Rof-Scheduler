@@ -19,8 +19,9 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
 
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
-        public virtual DbSet<Event> Events { get; set; }
+        public virtual DbSet<JobEvent> JobEvents { get; set; }
         public virtual DbSet<Pet> Pets { get; set; }
+        public virtual DbSet<PetService> PetServices { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -169,25 +170,38 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<Event>(entity =>
+            modelBuilder.Entity<JobEvent>(entity =>
             {
+                entity.ToTable("JobEvent");
+
+                entity.HasIndex(e => new { e.EmployeeId, e.PetId, e.PetServiceId, e.EventDate }, "UC_EVENT")
+                    .IsUnique();
+
+                entity.Property(e => e.EventDate).HasColumnType("date");
+
                 entity.HasOne(d => d.Client)
-                    .WithMany(p => p.Events)
+                    .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.ClientId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Events__ClientId__0169315C");
+                    .HasConstraintName("FK__JobEvent__Client__2A6B46EF");
 
                 entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.Events)
+                    .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Events__Employee__00750D23");
+                    .HasConstraintName("FK__JobEvent__Employ__297722B6");
 
                 entity.HasOne(d => d.Pet)
-                    .WithMany(p => p.Events)
+                    .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Events__PetId__025D5595");
+                    .HasConstraintName("FK__JobEvent__PetId__2B5F6B28");
+
+                entity.HasOne(d => d.PetService)
+                    .WithMany(p => p.JobEvents)
+                    .HasForeignKey(d => d.PetServiceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__JobEvent__PetSer__2C538F61");
             });
 
             modelBuilder.Entity<Pet>(entity =>
@@ -219,6 +233,25 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
                     .HasForeignKey(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Pet__OwnerId__53A266AC");
+            });
+
+            modelBuilder.Entity<PetService>(entity =>
+            {
+                entity.HasIndex(e => e.ServiceName, "UC_ServiceName")
+                    .IsUnique();
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(2000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeRate).HasColumnType("decimal(5, 2)");
+
+                entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.ServiceName)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);

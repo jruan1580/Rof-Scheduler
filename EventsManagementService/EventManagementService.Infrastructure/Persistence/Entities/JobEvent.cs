@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace EventManagementService.Infrastructure.Persistence.Entities
 {
-    public partial class Event
+    public partial class JobEvent
     {
         public int Id { get; set; }
         public long EmployeeId { get; set; }
@@ -13,9 +13,11 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
         public long PetId { get; set; }
         public short PetServiceId { get; set; }
         public DateTime EventDate { get; set; }
+        public bool Completed { get; set; }
 
         public virtual Client Client { get; set; }
         public virtual Employee Employee { get; set; }
         public virtual Pet Pet { get; set; }
+        public virtual PetService PetService { get; set; }
     }
 }

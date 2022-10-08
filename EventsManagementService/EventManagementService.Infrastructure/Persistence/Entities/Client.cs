@@ -9,7 +9,7 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
     {
         public Client()
         {
-            Events = new HashSet<Event>();
+            JobEvents = new HashSet<JobEvent>();
             Pets = new HashSet<Pet>();
         }
 
@@ -32,7 +32,7 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
         public string State { get; set; }
         public string ZipCode { get; set; }
 
-        public virtual ICollection<Event> Events { get; set; }
+        public virtual ICollection<JobEvent> JobEvents { get; set; }
         public virtual ICollection<Pet> Pets { get; set; }
     }
 }

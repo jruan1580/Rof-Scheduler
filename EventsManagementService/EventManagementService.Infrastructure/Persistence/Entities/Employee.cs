@@ -9,7 +9,7 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
     {
         public Employee()
         {
-            Events = new HashSet<Event>();
+            JobEvents = new HashSet<JobEvent>();
         }
 
         public long Id { get; set; }
@@ -33,6 +33,6 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
         public string State { get; set; }
         public string ZipCode { get; set; }
 
-        public virtual ICollection<Event> Events { get; set; }
+        public virtual ICollection<JobEvent> JobEvents { get; set; }
     }
 }
