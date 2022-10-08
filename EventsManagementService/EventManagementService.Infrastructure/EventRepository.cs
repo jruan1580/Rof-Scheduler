@@ -9,7 +9,7 @@ namespace EventManagementService.Infrastructure
     public interface IEventRepository
     {
         Task AddEvent(JobEvent jobEvent);
-        Task DeleteJobEvent(int id);
+        Task DeleteJobEventById(int id);
         Task<List<JobEvent>> GetAllJobEvents();
         Task<JobEvent> GetJobEventById(int id);
         Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, short petServiceId, DateTime eventDate);
@@ -80,7 +80,7 @@ namespace EventManagementService.Infrastructure
         /// <param name="id"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task DeleteJobEvent(int id)
+        public async Task DeleteJobEventById(int id)
         {
             using (var context = new RofSchedulerContext())
             {

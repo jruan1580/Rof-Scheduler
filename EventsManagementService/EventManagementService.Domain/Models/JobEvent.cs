@@ -49,5 +49,37 @@ namespace EventManagementService.Domain.Models
 
             return invalidErr;
         }
+
+        public List<string> IsValidEventToUpdate()
+        {
+            var invalidErr = new List<string>();
+
+            if(Id <= 0)
+            {
+                invalidErr.Add($"Invalid Id: {Id}.");
+            }
+
+            if (EmployeeId <= 0)
+            {
+                invalidErr.Add($"Invalid EmployeeId: {EmployeeId}.");
+            }
+
+            if (PetId <= 0)
+            {
+                invalidErr.Add($"Invalid PetId: {PetId}.");
+            }
+
+            if (PetServiceId <= 0)
+            {
+                invalidErr.Add($"Invalid PetServiceId: {PetServiceId}.");
+            }
+
+            if (EventDate == null)
+            {
+                invalidErr.Add("Please set date and time for event.");
+            }
+
+            return invalidErr;
+        }
     }
 }

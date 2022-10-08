@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace EventManagementService.Domain.Models
+﻿namespace EventManagementService.Domain.Models
 {
     public class PetService
     {
