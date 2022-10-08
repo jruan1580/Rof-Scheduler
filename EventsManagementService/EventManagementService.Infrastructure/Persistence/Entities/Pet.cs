@@ -21,7 +21,6 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
         public string Dob { get; set; }
         public string OtherInfo { get; set; }
 
-        public virtual Client Owner { get; set; }
         public virtual ICollection<JobEvent> JobEvents { get; set; }
     }
 }

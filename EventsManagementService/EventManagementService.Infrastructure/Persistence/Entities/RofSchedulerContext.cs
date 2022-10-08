@@ -17,7 +17,6 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
         {
         }
 
-        public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<JobEvent> JobEvents { get; set; }
         public virtual DbSet<Pet> Pets { get; set; }
@@ -35,66 +34,6 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
-
-            modelBuilder.Entity<Client>(entity =>
-            {
-                entity.ToTable("Client");
-
-                entity.Property(e => e.AddressLine1)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.AddressLine2)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.City)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.EmailAddress)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.FirstName)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.LastName)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Password).IsRequired();
-
-                entity.Property(e => e.PrimaryPhoneNum)
-                    .IsRequired()
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.SecondaryPhoneNum)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.State)
-                    .IsRequired()
-                    .HasMaxLength(2)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Username)
-                    .IsRequired()
-                    .HasMaxLength(32)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ZipCode)
-                    .IsRequired()
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-            });
 
             modelBuilder.Entity<Employee>(entity =>
             {
@@ -179,29 +118,23 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
 
                 entity.Property(e => e.EventDate).HasColumnType("date");
 
-                entity.HasOne(d => d.Client)
-                    .WithMany(p => p.JobEvents)
-                    .HasForeignKey(d => d.ClientId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__Client__2A6B46EF");
-
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__Employ__297722B6");
+                    .HasConstraintName("FK__JobEvent__Employ__30242045");
 
                 entity.HasOne(d => d.Pet)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetId__2B5F6B28");
+                    .HasConstraintName("FK__JobEvent__PetId__3118447E");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetSer__2C538F61");
+                    .HasConstraintName("FK__JobEvent__PetSer__320C68B7");
             });
 
             modelBuilder.Entity<Pet>(entity =>
@@ -227,12 +160,6 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.Weight).HasColumnType("decimal(18, 0)");
-
-                entity.HasOne(d => d.Owner)
-                    .WithMany(p => p.Pets)
-                    .HasForeignKey(d => d.OwnerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Pet__OwnerId__53A266AC");
             });
 
             modelBuilder.Entity<PetService>(entity =>
