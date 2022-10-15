@@ -42,7 +42,7 @@ namespace EventManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var eventExists = await _eventRepository.JobEventAlreadyExists(0, newEvent.EmployeeId, newEvent.PetId, newEvent.PetServiceId, newEvent.EventDate);
+            var eventExists = await _eventRepository.JobEventAlreadyExists(0, newEvent.EmployeeId, newEvent.PetId, newEvent.EventDate);
             if (eventExists)
             {
                 throw new ArgumentException("This Pet Service for this Pet is already scheduled under this Employee at this date and time.");
@@ -112,7 +112,7 @@ namespace EventManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var eventExists = await _eventRepository.JobEventAlreadyExists(updateEvent.Id, updateEvent.EmployeeId, updateEvent.PetId, updateEvent.PetServiceId, updateEvent.EventDate);
+            var eventExists = await _eventRepository.JobEventAlreadyExists(updateEvent.Id, updateEvent.EmployeeId, updateEvent.PetId, updateEvent.EventDate);
             if (eventExists)
             {
                 throw new ArgumentException("This Pet Service for this Pet is already scheduled under this Employee at this date and time.");
