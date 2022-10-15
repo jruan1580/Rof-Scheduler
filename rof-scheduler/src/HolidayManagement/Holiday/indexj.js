@@ -11,6 +11,10 @@ import {
   Alert,
 } from "react-bootstrap";
 
+import{
+    getAllHolidays
+} from "../../SharedServices/holidayAndHolidayRateService";
+
 function Holidaymanagement(){
     const [errMsg, setErrMsg] = useState(undefined);
     const [holidays, setHolidays] = useState([]);
@@ -63,7 +67,7 @@ function Holidaymanagement(){
                                     <>
                                         <tr key={holiday.id}>
                                             <td>{holiday.name}</td>
-                                            <td>{holiday.date}</td>
+                                            <td>{holiday.month}/{holiday.day}</td>
                                             <td>
                                                 <OverlayTrigger
                                                     placement="top"
