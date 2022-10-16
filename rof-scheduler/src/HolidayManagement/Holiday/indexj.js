@@ -15,16 +15,34 @@ import{
     getAllHolidays
 } from "../../SharedServices/holidayAndHolidayRateService";
 
-function Holidaymanagement(){
+function Holidaymanagement({setLoginState}){
     const [errMsg, setErrMsg] = useState(undefined);
     const [holidays, setHolidays] = useState([]);
     const [currPage, setCurrPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [searchBar, setSearchBar] = useState("");
+
+    useEffect(() =>{
+        (async function () {
+            try {
+                var resp = await getAllHolidays(currPage, 10, searchBar);
+                
+                if (resp.status === 401) {
+                    setLoginState(false);
+                    return;
+                }
+
+                
+            } catch (e) {
+              setErrMsg(e.message);
+            }
+          })();
+    }, [currPage, searchBar]);
 
     const search = (searchEvent) => {
         searchEvent.preventDefault();
-       
-      };
+    
+    };
       
     return(
         <>
