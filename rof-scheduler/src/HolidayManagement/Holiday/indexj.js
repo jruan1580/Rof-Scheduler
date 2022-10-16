@@ -31,7 +31,11 @@ function Holidaymanagement({setLoginState}){
                     setLoginState(false);
                     return;
                 }
+                
+                const holidaysWithTotalPages = await resp.json();
 
+                setHolidays(holidaysWithTotalPages.holidays);
+                setTotalPages(holidaysWithTotalPages.totalPages);
                 
             } catch (e) {
               setErrMsg(e.message);
@@ -42,6 +46,12 @@ function Holidaymanagement({setLoginState}){
     const search = (searchEvent) => {
         searchEvent.preventDefault();
     
+        const searchTerm = searchEvent.target.searchHoliday.value === undefined
+          ? ""
+          : searchEvent.target.searchHoliday.value;
+
+        setSearchBar(searchTerm);
+        setCurrPage(1);
     };
       
     return(

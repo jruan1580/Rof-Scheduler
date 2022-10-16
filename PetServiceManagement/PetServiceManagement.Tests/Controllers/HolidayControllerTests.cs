@@ -50,13 +50,18 @@ namespace PetServiceManagement.Tests.Controllers
             Assert.IsNotNull(okObj);
             Assert.AreEqual(200, okObj.StatusCode);
 
-            Assert.AreEqual(typeof(List<HolidayDTO>), okObj.Value.GetType());
-            var holidayDto = (List<HolidayDTO>)okObj.Value;
+            Assert.AreEqual(typeof(HolidayWithTotalPagesDto), okObj.Value.GetType());
+            var holidayWithTotalPagesDto = (HolidayWithTotalPagesDto)okObj.Value;
 
+            var holidayDto = holidayWithTotalPagesDto.Holidays;
+
+            Assert.IsNotNull(holidayDto);
             Assert.AreEqual(1, holidayDto.Count);
             Assert.AreEqual(holidays[0].Id, holidayDto[0].Id);
             Assert.AreEqual(holidays[0].Name, holidayDto[0].Name);
             Assert.AreEqual($"01/28/{DateTime.Now.Year}", holidayDto[0].Date);
+
+            Assert.AreEqual(1, holidayWithTotalPagesDto.TotalPages);
         }
 
         [Test]

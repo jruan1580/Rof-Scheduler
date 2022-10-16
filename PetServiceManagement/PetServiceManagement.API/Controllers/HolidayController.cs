@@ -32,7 +32,7 @@ namespace PetServiceManagement.API.Controllers
 
                 holidays.Item1.ForEach(h => holidayDtos.Add(HolidayDtoMapper.ToHolidayDTO(h)));
 
-                return Ok(holidayDtos);
+                return Ok(new HolidayWithTotalPagesDto(holidayDtos, holidays.Item2));
             }
             catch (Exception e)
             {
