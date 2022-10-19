@@ -113,28 +113,28 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
             {
                 entity.ToTable("JobEvent");
 
-                entity.HasIndex(e => new { e.EmployeeId, e.PetId, e.PetServiceId, e.EventDate }, "UC_EVENT")
+                entity.HasIndex(e => new { e.EmployeeId, e.PetId, e.EventDate }, "UC_EVENT")
                     .IsUnique();
 
-                entity.Property(e => e.EventDate).HasColumnType("date");
+                entity.Property(e => e.EventDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__Employ__30242045");
+                    .HasConstraintName("FK__JobEvent__Employ__3B95D2F1");
 
                 entity.HasOne(d => d.Pet)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetId__3118447E");
+                    .HasConstraintName("FK__JobEvent__PetId__3C89F72A");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetSer__320C68B7");
+                    .HasConstraintName("FK__JobEvent__PetSer__3D7E1B63");
             });
 
             modelBuilder.Entity<Pet>(entity =>

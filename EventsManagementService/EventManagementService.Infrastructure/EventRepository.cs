@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventManagementService.Infrastructure
@@ -10,7 +11,7 @@ namespace EventManagementService.Infrastructure
     {
         Task AddEvent(JobEvent jobEvent);
         Task DeleteJobEventById(int id);
-        Task<List<JobEvent>> GetAllJobEvents();
+        Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate);
         Task<JobEvent> GetJobEventById(int id);
         Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventDate);
         Task UpdateJobEvent(JobEvent jobEvent);
@@ -48,14 +49,18 @@ namespace EventManagementService.Infrastructure
         }
 
         /// <summary>
-        /// Displays all job events
+        /// Displays all job events for specific month & year
         /// </summary>
         /// <returns></returns>
-        public async Task<List<JobEvent>> GetAllJobEvents() //update to make by categories (month/year, service, employee, pet)?
+        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate) 
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.JobEvents.ToListAsync();
+                IQueryable<JobEvent> allEvents = context.JobEvents;
+
+                var result = await allEvents.Where(e => e.EventDate.Month == eventDate.Month && e.EventDate.Year == eventDate.Year).ToListAsync();
+
+                return result;
             }
         }
 

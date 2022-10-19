@@ -3,6 +3,7 @@ using EventManagementService.Domain.Models;
 using EventManagementService.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventManagementService.Domain.Services
@@ -11,7 +12,7 @@ namespace EventManagementService.Domain.Services
     {
         Task AddEvent(JobEvent newEvent);
         Task DeleteEventById(int id);
-        Task<List<JobEvent>> GetAllJobEvents();
+        Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate);
         Task<JobEvent> GetJobEventById(int id);
         Task UpdateJobEvent(JobEvent updateEvent);
     }
@@ -54,28 +55,20 @@ namespace EventManagementService.Domain.Services
         }
 
         /// <summary>
-        /// Grabs all events
+        /// Grabs all events by month and year
         /// </summary>
         /// <returns></returns>
-        public async Task<List<JobEvent>> GetAllJobEvents() //categories?
+        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate) 
         {
-            var results = await _eventRepository.GetAllJobEvents();
-
-            var jobEvents = new List<JobEvent>();
+            var results = await _eventRepository.GetAllJobEventsByMonthAndYear(eventDate);
 
             if (results == null || results.Count == 0)
             {
-                return jobEvents;
+                return new List<JobEvent>();
             }
 
-            foreach (var jobEvent in results)
-            {
-                jobEvents.Add(EventMapper.ToCoreEvent(jobEvent));
-            }
-
-            return jobEvents;
+            return new List<JobEvent>(results.Select(e => EventMapper.ToCoreEvent(e))).ToList();
         }
-
 
         /// <summary>
         /// Gets info for specific event for more info and details
