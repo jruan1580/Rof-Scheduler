@@ -1,4 +1,5 @@
-﻿using CoreEvent = EventManagementService.Domain.Models.JobEvent;
+﻿using System.Data;
+using CoreEvent = EventManagementService.Domain.Models.JobEvent;
 using DbEvent = EventManagementService.Infrastructure.Persistence.Entities.JobEvent;
 
 namespace EventManagementService.Domain.Mappers
@@ -15,10 +16,38 @@ namespace EventManagementService.Domain.Mappers
             coreEvent.PetServiceId = dbEvent.PetServiceId;
             coreEvent.EventDate = dbEvent.EventDate;
             coreEvent.Completed = dbEvent.Completed;
+            coreEvent.Canceled = dbEvent.Canceled;
 
-            coreEvent.Employee = new Models.Employee() { Id = dbEvent.EmployeeId, FirstName = dbEvent.Employee.FirstName, LastName = dbEvent.Employee.LastName, Role = dbEvent.Employee.Role };
-            coreEvent.Pet = new Models.Pet() { Id = dbEvent.PetId, Name = dbEvent.Pet.Name };
-            coreEvent.PetService = new Models.PetService() { Id = dbEvent.PetServiceId, ServiceName = dbEvent.PetService.ServiceName, Description = dbEvent.PetService.Description, Price = dbEvent.PetService.Price };
+            if(dbEvent.Employee != null)
+            {
+                coreEvent.Employee = new Models.Employee()
+                {
+                    Id = dbEvent.EmployeeId,
+                    FirstName = dbEvent.Employee.FirstName,
+                    LastName = dbEvent.Employee.LastName,
+                    Role = dbEvent.Employee.Role
+                };
+            }
+
+            if(dbEvent.Pet != null)
+            {
+                coreEvent.Pet = new Models.Pet()
+                {
+                    Id = dbEvent.PetId,
+                    Name = dbEvent.Pet.Name
+                };
+            }
+
+            if(dbEvent.PetService != null)
+            {
+                coreEvent.PetService = new Models.PetService()
+                {
+                    Id = dbEvent.PetServiceId,
+                    ServiceName = dbEvent.PetService.ServiceName,
+                    Description = dbEvent.PetService.Description,
+                    Price = dbEvent.PetService.Price
+                };
+            }
 
             return coreEvent;
         }
