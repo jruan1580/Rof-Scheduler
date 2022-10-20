@@ -10,5 +10,6 @@ CREATE TABLE dbo.JobEvent(
 	PetServiceId SMALLINT NOT NULL FOREIGN KEY REFERENCES dbo.PetServices(Id),
 	EventDate DATETIME NOT NULL,
 	Completed BIT NOT NULL,
+	Canceled BIT NOT NULL,
 	CONSTRAINT UC_EVENT UNIQUE (EmployeeId, PetId, EventDate)
 );
