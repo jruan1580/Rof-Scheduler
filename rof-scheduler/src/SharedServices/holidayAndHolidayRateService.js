@@ -15,3 +15,11 @@ export const addHoliday = async function(name, month, day){
 
   return await makeHttpRequest(baseUrl, "POST", {"Content-Type": "application/json"}, 200, data); 
 }
+
+export const updateHoliday = async function(id, name, month, day){
+  var baseUrl = process.env.REACT_APP_PET_SERVICE_BASE_URL + "/holiday";
+
+  var data = { id, name, month, day };
+
+  return await makeHttpRequest(baseUrl, "PUT", {"Content-Type": "application/json"}, 200, data); 
+}
