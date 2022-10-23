@@ -1,4 +1,5 @@
-﻿using EventManagementService.Domain.Mappers;
+﻿using EventManagementService.Domain.Exceptions;
+using EventManagementService.Domain.Mappers;
 using EventManagementService.Domain.Models;
 using EventManagementService.Infrastructure;
 using System;
@@ -82,7 +83,7 @@ namespace EventManagementService.Domain.Services
 
             if (jobEvent == null)
             {
-                throw new EntryPointNotFoundException("Event not found.");
+                throw new EntityNotFoundException("Event not found.");
             }
 
             return EventMapper.ToCoreEvent(jobEvent);
@@ -108,7 +109,7 @@ namespace EventManagementService.Domain.Services
             var eventExists = await _eventRepository.JobEventAlreadyExists(updateEvent.Id, updateEvent.EmployeeId, updateEvent.PetId, updateEvent.EventDate);
             if (eventExists)
             {
-                throw new ArgumentException("This Pet Service for this Pet is already scheduled under this Employee at this date and time.");
+                throw new ArgumentException("This Pet or Employee is already scheduled for another service at this date and time.");
             }
 
             var origEvent = GetJobEventById(updateEvent.Id);
