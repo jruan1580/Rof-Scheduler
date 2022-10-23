@@ -442,14 +442,19 @@
 									"});\r",
 									"\r",
 									"var jsonData = pm.response.json();\r",
-									"if (jsonData.length == 0){\r",
+									"\r",
+									"pm.test(\"Has holiday dto\", () =>{\r",
+									"    pm.expect(jsonData).to.have.property('holidays');\r",
+									"})\r",
+									"\r",
+									"var holidays = jsonData.holidays;\r",
+									"if (holidays.length == 0){\r",
 									"    pm.expect.fail(\"No holidays returned.\");\r",
 									"}else{\r",
-									"    const firstHoliday = jsonData[0];\r",
+									"    const firstHoliday = holidays[0];\r",
 									"    pm.expect(firstHoliday.id).to.be.a(\"number\");\r",
 									"    pm.environment.set(\"holidayId\", firstHoliday.id);\r",
-									"}\r",
-									""
+									"}"
 								],
 								"type": "text/javascript"
 							}
