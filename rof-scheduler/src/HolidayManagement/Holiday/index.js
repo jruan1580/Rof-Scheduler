@@ -32,7 +32,7 @@ function Holidaymanagement({setLoginState}){
     useEffect(() =>{
         (async function () {
             try {
-                var resp = await getAllHolidays(currPage, 3, searchBar);
+                var resp = await getAllHolidays(currPage, 10, searchBar);
                 
                 if (resp.status === 401) {
                     setLoginState(false);
@@ -101,7 +101,7 @@ function Holidaymanagement({setLoginState}){
                 }   
                 
                 //get holidays for current page again to reload after delete
-                resp = await getAllHolidays(pageToRequery, 3, searchBar);
+                resp = await getAllHolidays(pageToRequery, 10, searchBar);
                 if (resp.status === 401) {
                     setLoginState(false);
                     return;
