@@ -1,54 +1,51 @@
-import { Modal, Button, Row, Form, Col, Alert, Spinner } from "react-bootstrap";
+import { Modal, Row, Form, Col, Button, Spinner, Alert } from "react-bootstrap";
 
 import { useState } from "react";
 
-import { addHoliday } from "../../../SharedServices/holidayAndHolidayRateService";
-
 import "../holiday.css";
+import { updateHoliday } from "../../../SharedServices/holidayAndHolidayRateService";
 
-function AddHoliday({ show, handleHide, setLoginState }){
-    const [loading, setLoading] = useState(false);
+function UpdateHoliday({holiday, show, hide, setLoginState}){
+    const [updating, setUpdating] = useState(false);
     const [errMsg, setErrMsg] = useState(undefined);
     const [successMsg, setSuccessMsg] = useState(false);
-    const [disableBtns, setDisableBtns] = useState(false);
-
+  
     const closeModal = function () {
-        setErrMsg(undefined);
-        handleHide();
+      setErrMsg(undefined);
+      setSuccessMsg(false);
+      hide();
     };
 
-    const handleAddHoliday = function(e){
+    const handleUpdateHoliday  = function(e){
         e.preventDefault();
 
-        successMsg(false);
         setErrMsg(undefined);
-        setLoading(true);      
+        setSuccessMsg(false);
+        setUpdating(true);
 
         (async function(){
             try{
                 const name = e.target.name.value;
                 const month = parseInt(e.target.month.value);
                 const day = parseInt(e.target.day.value);
+                
+                var resp = await updateHoliday(holiday.id, name, month, day);
 
-                var resp = await addHoliday(name, month, day);
                 if (resp !== undefined && resp.status === 401){
                     setLoginState(false);
                     return;
                 }
-    
-                setErrMsg(undefined);
-                setDisableBtns(true);
-    
+
                 setSuccessMsg(true);
             }catch(e){
                 setErrMsg(e.message);
             }finally{
-                setLoading(false);
+                setUpdating(false);
             }
         })();
     }
 
-    return (
+    return(
         <>
             <Modal
                 show={show}
@@ -58,23 +55,23 @@ function AddHoliday({ show, handleHide, setLoginState }){
             >
                 <Modal.Header className="modal-header-color">
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Add Holiday
+                        Update Holiday
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form onSubmit={handleAddHoliday}>
+                    <Form onSubmit={handleUpdateHoliday}>
                         {errMsg !== undefined && <Alert variant="danger">{errMsg}</Alert>}
                         {successMsg && (
-                            <Alert variant="success">
-                                Holiday successfully added! Page will reload in 3 seconds and new Holiday will be available....
-                            </Alert>
+                            <Alert variant="success">Holiday successfully updated.</Alert>
                         )}
+
                         <Row>
                             <Form.Group as={Col} md="6">
                                 <Form.Label>Holiday Name</Form.Label>
                                 <Form.Control
                                     placeholder="Holiday Name"
                                     name="name"
+                                    defaultValue={holiday === undefined ? "" : holiday.name}
                                     required
                                 />                            
                             </Form.Group>
@@ -84,6 +81,7 @@ function AddHoliday({ show, handleHide, setLoginState }){
                                     type="number"
                                     placeholder="Month"
                                     name="month"
+                                    defaultValue={holiday === undefined ? "" : holiday.month}
                                     min={1}
                                     max={12}
                                     required
@@ -95,14 +93,16 @@ function AddHoliday({ show, handleHide, setLoginState }){
                                     type="number"
                                     placeholder="Day"
                                     name="day"
+                                    defaultValue={holiday === undefined ? "" : holiday.day}
                                     min={1}
                                     max={31}
                                     required
                                 />
                             </Form.Group>
-                        </Row> <br />
+                        </Row><br/>
+
                         <hr></hr>
-                        {(loading || disableBtns) && (
+                        {updating && (
                             <Button
                                 type="button"
                                 variant="danger"
@@ -111,8 +111,8 @@ function AddHoliday({ show, handleHide, setLoginState }){
                             >
                                 Cancel
                             </Button>
-                            )}
-                            {!loading && !disableBtns && (
+                        )}
+                        {!updating && (
                             <Button
                                 type="button"
                                 variant="danger"
@@ -121,8 +121,8 @@ function AddHoliday({ show, handleHide, setLoginState }){
                             >
                                 Cancel
                             </Button>
-                            )}
-                            {(loading || disableBtns) && (
+                        )}
+                        {updating && (
                             <Button variant="primary" className="float-end" disabled>
                                 <Spinner
                                 as="span"
@@ -131,12 +131,12 @@ function AddHoliday({ show, handleHide, setLoginState }){
                                 role="status"
                                 aria-hidden="true"
                                 />
-                                Loading...
+                                Updating...
                             </Button>
-                            )}
-                            {!loading && !disableBtns && (
+                        )}
+                        {!updating && (
                             <Button type="submit" className="float-end">
-                                Add
+                                Update
                             </Button>
                         )}
                     </Form>
@@ -146,4 +146,4 @@ function AddHoliday({ show, handleHide, setLoginState }){
     );
 }
 
-export default AddHoliday;
+export default UpdateHoliday;

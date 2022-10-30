@@ -9,7 +9,7 @@ import CreateClient from "./CreateClient";
 import EmployeeManagement from "./EmployeeManagement";
 import ClientManagement from "./ClientManagement";
 import PetManagement from "./PetManagement";
-import Holidaymanagement from "./HolidayManagement/Holiday/indexj";
+import Holidaymanagement from "./HolidayManagement/Holiday/index";
 
 
 function App() {

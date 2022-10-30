@@ -15,6 +15,7 @@ import{
     getAllHolidays
 } from "../../SharedServices/holidayAndHolidayRateService";
 import AddHoliday from "./AddHoliday";
+import UpdateHoliday from "./UpdateHoliday";
 
 function Holidaymanagement({setLoginState}){
     const [errMsg, setErrMsg] = useState(undefined);
@@ -23,7 +24,9 @@ function Holidaymanagement({setLoginState}){
     const [totalPages, setTotalPages] = useState(0);
     const [searchBar, setSearchBar] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
-
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [currHolidayToUpdate, setCurrHolidayToUpdate] = useState(undefined);
+;
     useEffect(() =>{
         (async function () {
             try {
@@ -55,6 +58,12 @@ function Holidaymanagement({setLoginState}){
         setSearchBar(searchTerm);
         setCurrPage(1);
     };
+
+    const loadUpdateModal = (holidayToUpdate) => {
+        setCurrHolidayToUpdate(holidayToUpdate);
+    
+        setShowUpdateModal(true);
+      };
       
     return(
         <>
@@ -63,6 +72,14 @@ function Holidaymanagement({setLoginState}){
                 handleHide={() => setShowAddModal(false)}
                 setLoginState={setLoginState}
             />
+
+            <UpdateHoliday
+                holiday={currHolidayToUpdate}
+                show={showUpdateModal}
+                hide={() => setShowUpdateModal(false)}
+                setLoginState={setLoginState}
+            />
+
             <Row>
                 <Form onSubmit={search}>
                     <Row className="align-items-center">
@@ -107,7 +124,7 @@ function Holidaymanagement({setLoginState}){
                                                 placement="top"
                                                 overlay={<Tooltip>Update</Tooltip>}
                                             >
-                                                <Button>
+                                                <Button onClick={() => loadUpdateModal(holiday)}>
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         width="16"
