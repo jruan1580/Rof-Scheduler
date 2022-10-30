@@ -5,7 +5,7 @@ import { useState } from "react";
 import "../holiday.css";
 import { updateHoliday } from "../../../SharedServices/holidayAndHolidayRateService";
 
-function UpdateHoliday({holiday, show, hide, setLoginState}){
+function UpdateHoliday({holiday, show, hide, setLoginState, postUpdatePetAction}){
     const [updating, setUpdating] = useState(false);
     const [errMsg, setErrMsg] = useState(undefined);
     const [successMsg, setSuccessMsg] = useState(false);
@@ -36,6 +36,13 @@ function UpdateHoliday({holiday, show, hide, setLoginState}){
                     return;
                 }
 
+                const map = new Map();
+                map.set('id', holiday.id);
+                map.set('name', name);
+                map.set('month', month);
+                map.set('day', day);
+
+                postUpdatePetAction(map)
                 setSuccessMsg(true);
             }catch(e){
                 setErrMsg(e.message);
