@@ -57,7 +57,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
                 }
 
                 var skip = (page - 1) * pageSize;
-                var result = await holidays.OrderByDescending(p => p.Id).Skip(skip).Take(10).ToListAsync();
+                var result = await holidays.OrderByDescending(p => p.Id).Skip(skip).Take(pageSize).ToListAsync();
 
                 return (result, totalPages);
             }

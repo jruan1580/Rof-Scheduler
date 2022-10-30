@@ -6,7 +6,7 @@ import { addHoliday } from "../../../SharedServices/holidayAndHolidayRateService
 
 import "../holiday.css";
 
-function AddHoliday({ show, handleHide, setLoginState }){
+function AddHoliday({ show, handleHide, setLoginState, reloadAfterThreeSeconds }){
     const [loading, setLoading] = useState(false);
     const [errMsg, setErrMsg] = useState(undefined);
     const [successMsg, setSuccessMsg] = useState(false);
@@ -20,7 +20,7 @@ function AddHoliday({ show, handleHide, setLoginState }){
     const handleAddHoliday = function(e){
         e.preventDefault();
 
-        successMsg(false);
+        setSuccessMsg(false);
         setErrMsg(undefined);
         setLoading(true);      
 
@@ -40,6 +40,7 @@ function AddHoliday({ show, handleHide, setLoginState }){
                 setDisableBtns(true);
     
                 setSuccessMsg(true);
+                reloadAfterThreeSeconds();
             }catch(e){
                 setErrMsg(e.message);
             }finally{
