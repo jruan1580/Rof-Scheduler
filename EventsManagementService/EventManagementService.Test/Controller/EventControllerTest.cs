@@ -170,9 +170,97 @@ namespace EventManagementService.Test.Controller
         }
 
         [Test]
+        public async Task GetJobEventById_NotFound()
+        {
+            _eventService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
+                .ThrowsAsync(new EntityNotFoundException("test"));
+
+            var controller = new EventController(_eventService.Object);
+
+            var response = await controller.GetJobEventById(1);
+
+            Assert.IsNotNull(response);
+            Assert.AreEqual(typeof(NotFoundObjectResult), response.GetType());
+
+            var notFoundObj = (NotFoundObjectResult)response;
+            Assert.AreEqual(typeof(string), notFoundObj.Value.GetType());
+            Assert.AreEqual("test", notFoundObj.Value.ToString());
+        }
+
+        [Test]
         public async Task UpdateJobEvent_Success()
         {
+            var updateEvent = new EventDTO()
+            {
+                EmployeeId = 1,
+                EmployeeFullName = "John Doe",
+                PetId = 1,
+                PetName = "Dog1",
+                PetServiceId = 1,
+                PetServiceName = "Walk",
+                EventDate = DateTime.Now,
+                Completed = true,
+                Canceled = false
+            };
 
+            _eventService.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new EventController(_eventService.Object);
+
+            var response = await controller.UpdateJobEvent(updateEvent);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(typeof(OkResult), response.GetType());
+
+            var ok = (OkResult)response;
+
+            Assert.AreEqual(ok.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task UpdateJobEvent_BadRequest()
+        {
+            var updateEvent = new EventDTO()
+            {
+                EmployeeId = 1,
+                EmployeeFullName = "John Doe",
+                PetId = 1,
+                PetName = "Dog1",
+                PetServiceId = 1,
+                PetServiceName = "Walk",
+                EventDate = DateTime.Now,
+                Completed = true,
+                Canceled = false
+            };
+
+            _eventService.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))
+                .ThrowsAsync(new ArgumentException("test"));
+
+            var controller = new EventController(_eventService.Object);
+
+            var response = await controller.UpdateJobEvent(updateEvent);
+
+            Assert.IsNotNull(response);
+            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
+
+            var badRequestObj = (BadRequestObjectResult)response;
+            Assert.AreEqual(typeof(string), badRequestObj.Value.GetType());
+            Assert.AreEqual("test", badRequestObj.Value.ToString());
+        }
+
+        [Test]
+        public async Task DeleteEventById_Success()
+        {
+            _eventService.Setup(e => e.DeleteEventById(It.IsAny<int>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new EventController(_eventService.Object);
+
+            var response = await controller.DeleteEventById(1);
+
+            Assert.IsNotNull(response);
+            Assert.AreEqual(typeof(OkResult), response.GetType());
         }
     }
 }
