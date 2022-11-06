@@ -2,8 +2,6 @@
 using EventManagementService.Infrastructure.Persistence.Entities;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EventManagementService.Test.Mapper
 {
