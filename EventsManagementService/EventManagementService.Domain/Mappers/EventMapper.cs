@@ -62,6 +62,7 @@ namespace EventManagementService.Domain.Mappers
             entity.PetServiceId = coreEvent.PetServiceId;
             entity.EventDate = coreEvent.EventDate;
             entity.Completed = coreEvent.Completed;
+            entity.Canceled = coreEvent.Canceled;
 
             return entity;
         }
