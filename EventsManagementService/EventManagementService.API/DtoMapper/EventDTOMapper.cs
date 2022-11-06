@@ -57,9 +57,9 @@ namespace EventManagementService.API.DtoMapper
             jobEvent.EventDate = eventDTO.EventDate;
             jobEvent.Completed = eventDTO.Completed;
             jobEvent.Canceled = eventDTO.Canceled;
-            jobEvent.Employee.FullName = eventDTO.EmployeeFullName;
-            jobEvent.Pet.Name = eventDTO.PetName;
-            jobEvent.PetService.ServiceName = eventDTO.PetServiceName;
+            jobEvent.Employee = new Employee() { Id = eventDTO.EmployeeId, FullName = eventDTO.EmployeeFullName };
+            jobEvent.Pet = new Pet() { Id = eventDTO.PetId, Name = eventDTO.PetName };
+            jobEvent.PetService = new PetService() { Id = eventDTO.PetServiceId, ServiceName = eventDTO.PetServiceName };
 
             return jobEvent;
         }
