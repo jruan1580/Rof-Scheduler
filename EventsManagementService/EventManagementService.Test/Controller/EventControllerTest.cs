@@ -89,6 +89,7 @@ namespace EventManagementService.Test.Controller
             {
                 new JobEvent()
                 {
+                    Id = 1,
                     EmployeeId = 1,
                     PetId = 1,
                     PetServiceId = 1,
@@ -124,38 +125,57 @@ namespace EventManagementService.Test.Controller
             Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
 
             var okObj = (OkObjectResult)response;
-
+            Assert.IsNotNull(okObj);
             Assert.AreEqual(okObj.StatusCode, 200);
+
+            Assert.AreEqual(typeof(List<EventDTO>), okObj.Value.GetType());
+            
+            var eventDTO = (List<EventDTO>)okObj.Value;
+            Assert.AreEqual(1, eventDTO.Count);
+            Assert.AreEqual(events[0].Id, eventDTO[0].Id);
+            Assert.AreEqual(events[0].EmployeeId, eventDTO[0].EmployeeId);
+            Assert.AreEqual(events[0].PetId, eventDTO[0].PetId);
+            Assert.AreEqual(events[0].PetServiceId, eventDTO[0].PetServiceId);
+            Assert.AreEqual(events[0].EventDate, eventDTO[0].EventDate);
+            Assert.AreEqual(events[0].Completed, eventDTO[0].Completed);
+            Assert.AreEqual(events[0].Canceled, eventDTO[0].Canceled);
+
+            Assert.AreEqual(events[0].Employee.FullName, eventDTO[0].EmployeeFullName);
+            Assert.AreEqual(events[0].Pet.Name, eventDTO[0].PetName);
+            Assert.AreEqual(events[0].PetService.ServiceName, eventDTO[0].PetServiceName);
         }
 
         [Test]
         public async Task GetJobEventById_Success()
         {
-            _eventService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
-                .ReturnsAsync(new JobEvent()
+            var jobEvent = new JobEvent()
+            {
+                Id = 1,
+                EmployeeId = 1,
+                PetId = 1,
+                PetServiceId = 1,
+                EventDate = DateTime.Today,
+                Completed = false,
+                Canceled = false,
+                Employee = new Employee()
                 {
-                    EmployeeId = 1,
-                    PetId = 1,
-                    PetServiceId = 1,
-                    EventDate = DateTime.Today,
-                    Completed = false,
-                    Canceled = false,
-                    Employee = new Employee()
-                    {
-                        Id = 1,
-                        FullName = "John Doe"
-                    },
-                    Pet = new Pet()
-                    {
-                        Id = 1,
-                        Name = "Dog1"
-                    },
-                    PetService = new PetService()
-                    {
-                        Id = 1,
-                        ServiceName = "Walk"
-                    }
-                });
+                    Id = 1,
+                    FullName = "John Doe"
+                },
+                Pet = new Pet()
+                {
+                    Id = 1,
+                    Name = "Dog1"
+                },
+                PetService = new PetService()
+                {
+                    Id = 1,
+                    ServiceName = "Walk"
+                }
+            };
+
+            _eventService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
+                .ReturnsAsync(jobEvent);
 
             var controller = new EventController(_eventService.Object);
 
@@ -165,8 +185,23 @@ namespace EventManagementService.Test.Controller
             Assert.AreEqual(typeof(OkObjectResult), response.GetType());
 
             var okObj = (OkObjectResult)response;
-
+            Assert.IsNotNull(okObj);
             Assert.AreEqual(okObj.StatusCode, 200);
+
+            Assert.AreEqual(typeof(EventDTO), okObj.Value.GetType());
+
+            var eventDTO = (EventDTO)okObj.Value;
+            Assert.AreEqual(jobEvent.Id, eventDTO.Id);
+            Assert.AreEqual(jobEvent.EmployeeId, eventDTO.EmployeeId);
+            Assert.AreEqual(jobEvent.PetId, eventDTO.PetId);
+            Assert.AreEqual(jobEvent.PetServiceId, eventDTO.PetServiceId);
+            Assert.AreEqual(jobEvent.EventDate, eventDTO.EventDate);
+            Assert.AreEqual(jobEvent.Completed, eventDTO.Completed);
+            Assert.AreEqual(jobEvent.Canceled, eventDTO.Canceled);
+
+            Assert.AreEqual(jobEvent.Employee.FullName, eventDTO.EmployeeFullName);
+            Assert.AreEqual(jobEvent.Pet.Name, eventDTO.PetName);
+            Assert.AreEqual(jobEvent.PetService.ServiceName, eventDTO.PetServiceName);
         }
 
         [Test]
