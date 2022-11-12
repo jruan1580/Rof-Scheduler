@@ -32,7 +32,7 @@ namespace PetServiceManagement.API.Controllers
 
                 petServices.Item1.ForEach(service => petServicesDto.Add(PetServiceDtoMapper.ToPetServiceDTO(service)));
 
-                return Ok(petServicesDto);
+                return Ok(new PetServicesWithTotalPageDTO(petServicesDto, petServices.Item2));
             }
             catch(Exception e)
             {
