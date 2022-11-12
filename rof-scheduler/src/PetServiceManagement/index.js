@@ -15,12 +15,15 @@ import{
     getAllPetServices
 } from "../SharedServices/petServiceManagementService";
 
+import AddPetService from "./AddPetService";
+
 function PetService({ setLoginState }){
     const [errMsg, setErrMsg] = useState(undefined);
     const [petServices, setPetServices] = useState([]);
     const [currPage, setCurrPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [showAddModal, setShowAddModal] = useState(false);
 
     useEffect(() =>{
         (async function () {
@@ -53,8 +56,19 @@ function PetService({ setLoginState }){
         setCurrPage(1);
     };
 
+    const reloadAfterThreeSeconds = () => {
+        setTimeout(() => window.location.reload(), 3000);
+    };
+
     return(
         <>
+            <AddPetService 
+                show={showAddModal}
+                handleHide={() => setShowAddModal(false)}
+                setLoginState={setLoginState}
+                reloadAfterThreeSeconds={reloadAfterThreeSeconds}
+            />
+            
             <Row>
                 <Form onSubmit={search}>
                     <Row className="align-items-center">
@@ -69,7 +83,7 @@ function PetService({ setLoginState }){
                             <Button type="submit">Search</Button>
                         </Col>
                         <Col lg={2}>
-                            <Button>Add Service</Button>
+                            <Button onClick={() => setShowAddModal(true)}>Add Service</Button>
                         </Col>
                     </Row>
                 </Form>
