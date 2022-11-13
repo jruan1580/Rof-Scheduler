@@ -2,7 +2,7 @@ import { Modal, Row, Form, Col, Button, Spinner, Alert } from "react-bootstrap";
 
 import { useState } from "react";
 
-import "../holiday.css";
+import "../../../SharedCSS/modal.css";
 import { updateHoliday } from "../../../SharedServices/holidayAndHolidayRateService";
 
 function UpdateHoliday({holiday, show, hide, setLoginState, postUpdatePetAction}){

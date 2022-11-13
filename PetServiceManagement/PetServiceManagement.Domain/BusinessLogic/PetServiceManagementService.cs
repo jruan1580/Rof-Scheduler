@@ -109,6 +109,16 @@ namespace PetServiceManagement.Domain.BusinessLogic
             {
                 throw new ArgumentException("Pet service's name is not provided");
             }
+
+            if (petService.Price < 0)
+            {
+                throw new ArgumentException("Pet service rate must be greater than 0");
+            }
+
+            if (petService.EmployeeRate > 100 || petService.EmployeeRate < 0)
+            {
+                throw new ArgumentException("Employee rate should be between 0 and 100");
+            }
         }
     }
 }
