@@ -52,8 +52,10 @@ namespace PetServiceManagement.Tests.Controllers
             Assert.IsNotNull(okObj);
             Assert.AreEqual(200, okObj.StatusCode);
 
-            Assert.AreEqual(typeof(List<PetServiceDTO>), okObj.Value.GetType());
-            var petServicesDTO = (List<PetServiceDTO>)okObj.Value;
+            Assert.AreEqual(typeof(PetServicesWithTotalPageDTO), okObj.Value.GetType());
+            var petServicesWithTotalPage = (PetServicesWithTotalPageDTO)okObj.Value;
+
+            var petServicesDTO = petServicesWithTotalPage.PetServices;
 
             Assert.AreEqual(1, petServicesDTO.Count);
             Assert.AreEqual(petServices[0].Id, petServicesDTO[0].Id);
@@ -61,6 +63,8 @@ namespace PetServiceManagement.Tests.Controllers
             Assert.AreEqual(petServices[0].Price, petServicesDTO[0].Rate);
             Assert.AreEqual(petServices[0].Description, petServicesDTO[0].Description);
             Assert.AreEqual(petServices[0].EmployeeRate, petServicesDTO[0].EmployeeRate);
+
+            Assert.AreEqual(1, petServicesWithTotalPage.TotalPages);
         }
 
         [Test]

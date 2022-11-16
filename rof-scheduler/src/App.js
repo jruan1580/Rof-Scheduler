@@ -10,6 +10,7 @@ import EmployeeManagement from "./EmployeeManagement";
 import ClientManagement from "./ClientManagement";
 import PetManagement from "./PetManagement";
 import Holidaymanagement from "./HolidayManagement/Holiday/index";
+import PetService from "./PetServiceManagement";
 
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
             <Route exact path="/clientmanagement" element={!isLogin ? <Navigate to="/"/> : <ClientManagement setLoginState={setLogin}/> } />
             <Route exact path="/petmanagement" element={!isLogin ? <Navigate to="/" /> : <PetManagement setLoginState={setLogin} />} />
             <Route exact path="/holidaymanagement" element={!isLogin ? <Navigate to="/" /> : <Holidaymanagement setLoginState={setLogin} />} />
+            <Route exact path="/petservicemanagement" element={!isLogin ? <Navigate to="/" /> : <PetService setLoginState={setLogin} />} />
           </Routes>
         </Container>
       </BrowserRouter>

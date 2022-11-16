@@ -4,7 +4,8 @@ import { useState } from "react";
 
 import { addHoliday } from "../../../SharedServices/holidayAndHolidayRateService";
 
-import "../holiday.css";
+import "../../../SharedCSS/modal.css";
+import AddEntityBtn from "../../../SharedComponents/AddEntityBtn";
 
 function AddHoliday({ show, handleHide, setLoginState, reloadAfterThreeSeconds }){
     const [loading, setLoading] = useState(false);
@@ -102,44 +103,8 @@ function AddHoliday({ show, handleHide, setLoginState, reloadAfterThreeSeconds }
                                 />
                             </Form.Group>
                         </Row> <br />
-                        <hr></hr>
-                        {(loading || disableBtns) && (
-                            <Button
-                                type="button"
-                                variant="danger"
-                                className="float-end ms-2"
-                                disabled
-                            >
-                                Cancel
-                            </Button>
-                            )}
-                            {!loading && !disableBtns && (
-                            <Button
-                                type="button"
-                                variant="danger"
-                                onClick={() => closeModal()}
-                                className="float-end ms-2"
-                            >
-                                Cancel
-                            </Button>
-                            )}
-                            {(loading || disableBtns) && (
-                            <Button variant="primary" className="float-end" disabled>
-                                <Spinner
-                                as="span"
-                                animation="grow"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                />
-                                Loading...
-                            </Button>
-                            )}
-                            {!loading && !disableBtns && (
-                            <Button type="submit" className="float-end">
-                                Add
-                            </Button>
-                        )}
+
+                        <AddEntityBtn loading={loading} disableBtns={disableBtns} closeModal={closeModal}/>                      
                     </Form>
                 </Modal.Body>
             </Modal>
