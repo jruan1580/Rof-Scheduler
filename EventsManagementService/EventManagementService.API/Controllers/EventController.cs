@@ -1,9 +1,9 @@
 ﻿using EventManagementService.API.DTO;
 using EventManagementService.API.DtoMapper;
+using EventManagementService.API.Filters;
 using EventManagementService.Domain.Exceptions;
-using EventManagementService.Domain.Mappers;
 using EventManagementService.Domain.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace EventManagementService.API.Controllers
 {
+    [CookieActionFilter]
     [Route("api/[controller]")]
     [ApiController]
     public class EventController : ControllerBase
@@ -22,6 +23,7 @@ namespace EventManagementService.API.Controllers
             _eventService = eventService;
         }
 
+        [Authorize(Roles = "Administrator,Employee")]
         [HttpPost]
         public async Task<IActionResult> AddEvent([FromBody] EventDTO newEvent)
         {
@@ -41,6 +43,7 @@ namespace EventManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet]
         public async Task<IActionResult> GetAllJobEventsByMonthAndYear([FromQuery] DateTime date)
         {
@@ -63,6 +66,7 @@ namespace EventManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{eventId}")]
         public async Task<IActionResult> GetJobEventById(int eventId)
         {
@@ -82,6 +86,7 @@ namespace EventManagementService.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrator,Employee")]
         [HttpPut]
         public async Task<IActionResult> UpdateJobEvent([FromBody] EventDTO updateEvent)
         {
@@ -103,12 +108,13 @@ namespace EventManagementService.API.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEventById(int id)
+        [Authorize(Roles = "Administrator,Employee")]
+        [HttpDelete("{eventId}")]
+        public async Task<IActionResult> DeleteEventById(int eventId)
         {
             try
             {
-                await _eventService.DeleteEventById(id);
+                await _eventService.DeleteEventById(eventId);
 
                 return Ok();
             }
