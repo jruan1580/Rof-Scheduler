@@ -1,6 +1,6 @@
 ﻿using EventManagementService.Domain.Exceptions;
 using EventManagementService.Domain.Services;
-using EventManagementService.Infrastructure;
+using EventManagementService.Infrastructure.Persistence;
 using EventManagementService.Infrastructure.Persistence.Entities;
 using Moq;
 using NUnit.Framework;
@@ -29,7 +29,10 @@ namespace EventManagementService.Test.SerivceTest
                 EmployeeId = 0,
                 PetId = 0,
                 PetServiceId = 0,
-                EventDate = DateTime.Now,
+                EventStartTime = DateTime.Now,
+                EventEndTime = DateTime.Now,
+                Canceled = false,
+                Completed = false
             };
 
             var eventService = new EventService(_eventRepository.Object);
@@ -45,10 +48,13 @@ namespace EventManagementService.Test.SerivceTest
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventDate = DateTime.Now,
+                EventStartTime = DateTime.Now,
+                EventEndTime = DateTime.Now,
+                Canceled = false,
+                Completed = false
             };
 
-            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>()))
+            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(true);
 
             var eventService = new EventService(_eventRepository.Object);
@@ -64,7 +70,10 @@ namespace EventManagementService.Test.SerivceTest
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventDate = DateTime.Now,
+                EventStartTime = DateTime.Now,
+                EventEndTime = DateTime.Now,
+                Canceled = false,
+                Completed = false
             };
 
             _eventRepository.Setup(e => e.AddEvent(It.IsAny<JobEvent>()))
@@ -100,7 +109,8 @@ namespace EventManagementService.Test.SerivceTest
                     EmployeeId = 1,
                     PetId = 1,
                     PetServiceId = 1,
-                    EventDate = DateTime.Today,
+                    EventStartTime = DateTime.Today,
+                    EventEndTime = DateTime.Today,
                     Completed = false,
                     Canceled = false,
                     Employee = new Employee()
@@ -134,7 +144,8 @@ namespace EventManagementService.Test.SerivceTest
             Assert.AreEqual(1, results[0].EmployeeId);
             Assert.AreEqual(1, results[0].PetId);
             Assert.AreEqual(1, results[0].PetServiceId);
-            Assert.AreEqual(DateTime.Today, results[0].EventDate);
+            Assert.AreEqual(DateTime.Today, results[0].EventStartTime);
+            Assert.AreEqual(DateTime.Today, results[0].EventEndTime);
             Assert.IsFalse(results[0].Completed);
             Assert.IsFalse(results[0].Canceled);
 
@@ -173,7 +184,8 @@ namespace EventManagementService.Test.SerivceTest
                     EmployeeId = 1,
                     PetId = 1,
                     PetServiceId = 1,
-                    EventDate = DateTime.Today,
+                    EventStartTime = DateTime.Today,
+                    EventEndTime = DateTime.Today,
                     Completed = false,
                     Canceled = false,
                     Employee = new Employee()
@@ -203,7 +215,8 @@ namespace EventManagementService.Test.SerivceTest
             Assert.AreEqual(1, result.EmployeeId);
             Assert.AreEqual(1, result.PetId);
             Assert.AreEqual(1, result.PetServiceId);
-            Assert.AreEqual(DateTime.Today, result.EventDate);
+            Assert.AreEqual(DateTime.Today, result.EventStartTime);
+            Assert.AreEqual(DateTime.Today, result.EventEndTime);
             Assert.IsFalse(result.Completed);
             Assert.IsFalse(result.Canceled);
 
@@ -230,7 +243,8 @@ namespace EventManagementService.Test.SerivceTest
                 EmployeeId = 0,
                 PetId = 0,
                 PetServiceId = 0,
-                EventDate = DateTime.Now,
+                EventStartTime = DateTime.Now,
+                EventEndTime = DateTime.Now
             };
 
             var eventService = new EventService(_eventRepository.Object);
@@ -247,10 +261,11 @@ namespace EventManagementService.Test.SerivceTest
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventDate = DateTime.Now,
+                EventStartTime = DateTime.Now,
+                EventEndTime = DateTime.Now
             };
 
-            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>()))
+            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(true);
 
             var eventService = new EventService(_eventRepository.Object);
@@ -267,7 +282,8 @@ namespace EventManagementService.Test.SerivceTest
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventDate = DateTime.Now,
+                EventStartTime = DateTime.Now,
+                EventEndTime = DateTime.Now
             };
 
             _eventRepository.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))
