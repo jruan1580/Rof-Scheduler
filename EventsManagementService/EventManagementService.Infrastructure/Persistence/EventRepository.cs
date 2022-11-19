@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EventManagementService.Infrastructure
+namespace EventManagementService.Infrastructure.Persistence
 {
     public interface IEventRepository
     {
@@ -13,7 +13,7 @@ namespace EventManagementService.Infrastructure
         Task DeleteJobEventById(int id);
         Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate);
         Task<JobEvent> GetJobEventById(int id);
-        Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventDate);
+        Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart, DateTime eventEnd);
         Task UpdateJobEvent(JobEvent jobEvent);
     }
 
@@ -52,13 +52,13 @@ namespace EventManagementService.Infrastructure
         /// Displays all job events for specific month & year
         /// </summary>
         /// <returns></returns>
-        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate) 
+        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate)
         {
             using (var context = new RofSchedulerContext())
             {
                 IQueryable<JobEvent> allEvents = context.JobEvents;
 
-                var result = await allEvents.Where(e => e.EventDate.Month == eventDate.Month && e.EventDate.Year == eventDate.Year).ToListAsync();
+                var result = await allEvents.Where(e => e.EventStartTime.Month == eventDate.Month && e.EventStartTime.Year == eventDate.Year).ToListAsync();
 
                 return result;
             }
@@ -91,7 +91,7 @@ namespace EventManagementService.Infrastructure
             {
                 var job = await context.JobEvents.FirstOrDefaultAsync(j => j.Id == id);
 
-                if (job != null)
+                if (job == null)
                 {
                     throw new ArgumentException($"No job event with id: {id} found.");
                 }
@@ -109,13 +109,14 @@ namespace EventManagementService.Infrastructure
         /// <param name="employeeId"></param>
         /// <param name="petId"></param>
         /// <param name="petServiceId"></param>
-        /// <param name="eventDate"></param>
+        /// <param name="eventStart"></param>
+        /// <param name="eventEnd"></param>
         /// <returns></returns>
-        public async Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventDate)
+        public async Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart, DateTime eventEnd)
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.JobEvents.AnyAsync(j => j.Id != id && j.EventDate.Equals(eventDate) && (j.EmployeeId.Equals(employeeId) || j.PetId.Equals(petId)));
+                return await context.JobEvents.AnyAsync(j => j.Id != id && j.EventStartTime.Equals(eventStart) && j.EventEndTime.Equals(eventEnd) && (j.EmployeeId.Equals(employeeId) || j.PetId.Equals(petId)));
             }
         }
     }

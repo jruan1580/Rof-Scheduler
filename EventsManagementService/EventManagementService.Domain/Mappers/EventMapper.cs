@@ -14,7 +14,8 @@ namespace EventManagementService.Domain.Mappers
             coreEvent.EmployeeId = dbEvent.EmployeeId;
             coreEvent.PetId = dbEvent.PetId;
             coreEvent.PetServiceId = dbEvent.PetServiceId;
-            coreEvent.EventDate = dbEvent.EventDate;
+            coreEvent.EventStartTime = dbEvent.EventStartTime;
+            coreEvent.EventEndTime = dbEvent.EventEndTime;
             coreEvent.Completed = dbEvent.Completed;
             coreEvent.Canceled = dbEvent.Canceled;
 
@@ -38,7 +39,7 @@ namespace EventManagementService.Domain.Mappers
                 };
             }
 
-            if(dbEvent.PetService != null)
+            if (dbEvent.PetService != null)
             {
                 coreEvent.PetService = new Models.PetService()
                 {
@@ -60,7 +61,8 @@ namespace EventManagementService.Domain.Mappers
             entity.EmployeeId = coreEvent.EmployeeId;
             entity.PetId = coreEvent.PetId;
             entity.PetServiceId = coreEvent.PetServiceId;
-            entity.EventDate = coreEvent.EventDate;
+            entity.EventStartTime = coreEvent.EventStartTime;
+            entity.EventEndTime = coreEvent.EventEndTime;
             entity.Completed = coreEvent.Completed;
             entity.Canceled = coreEvent.Canceled;
 

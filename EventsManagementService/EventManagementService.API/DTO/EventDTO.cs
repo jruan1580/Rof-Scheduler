@@ -18,7 +18,9 @@ namespace EventManagementService.API.DTO
 
         public string PetServiceName { get; set; }
 
-        public DateTime EventDate { get; set; }
+        public string EventStartTime { get; set; }
+
+        public string EventEndTime { get; set; }
 
         public bool Completed { get; set; }
 
