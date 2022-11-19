@@ -222,12 +222,12 @@
 									"});\r",
 									"\r",
 									"var jsonData = pm.response.json();\r",
-									"console.log(jsonData);\r",
+									"var services = jsonData.petServices;\r",
 									"\r",
-									"if (jsonData.length == 0){\r",
+									"if (services.length == 0){\r",
 									"    pm.expect.fail(\"No pet services returned.\");\r",
 									"}else{\r",
-									"    const firstPetService = jsonData[0];\r",
+									"    const firstPetService = services[0];\r",
 									"    pm.expect(firstPetService.id).to.be.a(\"number\");\r",
 									"    pm.environment.set(\"petServiceId\", firstPetService.id);\r",
 									"}"
@@ -291,6 +291,16 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set('currentDate', (new Date()).toJSON());\r",
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -335,6 +345,15 @@
 									"pm.test(\"Status code is 400\", () => {\r",
 									"  pm.response.to.have.status(400);\r",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -390,7 +409,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.environment.set('currentDate', (new Date()).toJSON())"
+									""
 								],
 								"type": "text/javascript"
 							}
