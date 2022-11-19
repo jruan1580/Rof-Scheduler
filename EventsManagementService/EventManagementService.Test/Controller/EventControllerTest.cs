@@ -35,7 +35,7 @@ namespace EventManagementService.Test.Controller
                 PetName = "Dog1",
                 PetServiceId = 1,
                 PetServiceName = "Walk",
-                EventDate = DateTime.Now,
+                EventDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = false,
                 Canceled = false
             };
@@ -62,7 +62,7 @@ namespace EventManagementService.Test.Controller
                 PetName = "Dog1",
                 PetServiceId = 1,
                 PetServiceName = "Walk",
-                EventDate = DateTime.Now,
+                EventDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = false,
                 Canceled = false
             };
@@ -136,7 +136,7 @@ namespace EventManagementService.Test.Controller
             Assert.AreEqual(events[0].EmployeeId, eventDTO[0].EmployeeId);
             Assert.AreEqual(events[0].PetId, eventDTO[0].PetId);
             Assert.AreEqual(events[0].PetServiceId, eventDTO[0].PetServiceId);
-            Assert.AreEqual(events[0].EventDate, eventDTO[0].EventDate);
+            Assert.AreEqual(events[0].EventDate.ToString("yyyy-MM-ddTHH:mm:ss"), eventDTO[0].EventDate);
             Assert.AreEqual(events[0].Completed, eventDTO[0].Completed);
             Assert.AreEqual(events[0].Canceled, eventDTO[0].Canceled);
 
@@ -195,7 +195,7 @@ namespace EventManagementService.Test.Controller
             Assert.AreEqual(jobEvent.EmployeeId, eventDTO.EmployeeId);
             Assert.AreEqual(jobEvent.PetId, eventDTO.PetId);
             Assert.AreEqual(jobEvent.PetServiceId, eventDTO.PetServiceId);
-            Assert.AreEqual(jobEvent.EventDate, eventDTO.EventDate);
+            Assert.AreEqual(jobEvent.EventDate.ToString("yyyy-MM-ddTHH:mm:ss"), eventDTO.EventDate);
             Assert.AreEqual(jobEvent.Completed, eventDTO.Completed);
             Assert.AreEqual(jobEvent.Canceled, eventDTO.Canceled);
 
@@ -233,7 +233,7 @@ namespace EventManagementService.Test.Controller
                 PetName = "Dog1",
                 PetServiceId = 1,
                 PetServiceName = "Walk",
-                EventDate = DateTime.Now,
+                EventDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = true,
                 Canceled = false
             };
@@ -264,7 +264,7 @@ namespace EventManagementService.Test.Controller
                 PetName = "Dog1",
                 PetServiceId = 1,
                 PetServiceName = "Walk",
-                EventDate = DateTime.Now,
+                EventDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = true,
                 Canceled = false
             };

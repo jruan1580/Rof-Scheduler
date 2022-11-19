@@ -1,6 +1,7 @@
 ﻿using EventManagementService.API.DTO;
 using EventManagementService.Domain.Models;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System;
 
 namespace EventManagementService.API.DtoMapper
 {
@@ -19,7 +20,7 @@ namespace EventManagementService.API.DtoMapper
             dtoEvent.EmployeeId = coreEvent.EmployeeId;
             dtoEvent.PetId = coreEvent.PetId;
             dtoEvent.PetServiceId = coreEvent.PetServiceId;
-            dtoEvent.EventDate = coreEvent.EventDate;
+            dtoEvent.EventDate = coreEvent.EventDate.ToString("yyyy-MM-ddTHH:mm:ss");
             dtoEvent.Completed = coreEvent.Completed;
             dtoEvent.Canceled = coreEvent.Canceled;
 
@@ -48,13 +49,20 @@ namespace EventManagementService.API.DtoMapper
                 return null;
             }
 
+            var date = new DateTime(); 
+            
+            if(!DateTime.TryParse(eventDTO.EventDate, out date))
+            {
+                throw new ArgumentException("Event date is not a date.");
+            }
+
             var jobEvent = new JobEvent();
 
             jobEvent.Id = eventDTO.Id;
             jobEvent.EmployeeId = eventDTO.EmployeeId;
             jobEvent.PetId = eventDTO.PetId;
             jobEvent.PetServiceId = eventDTO.PetServiceId;
-            jobEvent.EventDate = eventDTO.EventDate;
+            jobEvent.EventDate = date;
             jobEvent.Completed = eventDTO.Completed;
             jobEvent.Canceled = eventDTO.Canceled;
             jobEvent.Employee = new Employee() { Id = eventDTO.EmployeeId, FullName = eventDTO.EmployeeFullName };
