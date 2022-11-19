@@ -91,7 +91,7 @@ namespace EventManagementService.Infrastructure
             {
                 var job = await context.JobEvents.FirstOrDefaultAsync(j => j.Id == id);
 
-                if (job != null)
+                if (job == null)
                 {
                     throw new ArgumentException($"No job event with id: {id} found.");
                 }
