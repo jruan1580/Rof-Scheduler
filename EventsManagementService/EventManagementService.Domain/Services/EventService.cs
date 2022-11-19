@@ -1,7 +1,7 @@
 ﻿using EventManagementService.Domain.Exceptions;
 using EventManagementService.Domain.Mappers;
 using EventManagementService.Domain.Models;
-using EventManagementService.Infrastructure;
+using EventManagementService.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +44,7 @@ namespace EventManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var eventExists = await _eventRepository.JobEventAlreadyExists(0, newEvent.EmployeeId, newEvent.PetId, newEvent.EventDate);
+            var eventExists = await _eventRepository.JobEventAlreadyExists(0, newEvent.EmployeeId, newEvent.PetId, newEvent.EventStartTime, newEvent.EventEndTime);
             if (eventExists)
             {
                 throw new ArgumentException("This Pet Service for this Pet is already scheduled under this Employee at this date and time.");
@@ -59,7 +59,7 @@ namespace EventManagementService.Domain.Services
         /// Grabs all events by month and year
         /// </summary>
         /// <returns></returns>
-        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate) 
+        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate)
         {
             var results = await _eventRepository.GetAllJobEventsByMonthAndYear(eventDate);
 
@@ -106,7 +106,7 @@ namespace EventManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var eventExists = await _eventRepository.JobEventAlreadyExists(updateEvent.Id, updateEvent.EmployeeId, updateEvent.PetId, updateEvent.EventDate);
+            var eventExists = await _eventRepository.JobEventAlreadyExists(updateEvent.Id, updateEvent.EmployeeId, updateEvent.PetId, updateEvent.EventStartTime, updateEvent.EventEndTime);
             if (eventExists)
             {
                 throw new ArgumentException("This Pet or Employee is already scheduled for another service at this date and time.");

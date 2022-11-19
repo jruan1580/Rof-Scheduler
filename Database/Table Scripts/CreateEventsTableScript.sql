@@ -8,8 +8,9 @@ CREATE TABLE dbo.JobEvent(
 	EmployeeId BIGINT NOT NULL FOREIGN KEY REFERENCES dbo.Employee(Id),
 	PetId BIGINT NOT NULL FOREIGN KEY REFERENCES dbo.Pet(Id),
 	PetServiceId SMALLINT NOT NULL FOREIGN KEY REFERENCES dbo.PetServices(Id),
-	EventDate DATETIME NOT NULL,
+	EventStartTime DATETIME NOT NULL,
+	EventEndTime DATETIME NOT NULL,
 	Completed BIT NOT NULL,
 	Canceled BIT NOT NULL,
-	CONSTRAINT UC_EVENT UNIQUE (EmployeeId, PetId, EventDate)
+	CONSTRAINT UC_EVENT UNIQUE (EmployeeId, PetId, EventStartTime, EventEndTime)
 );

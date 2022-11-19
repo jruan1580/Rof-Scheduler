@@ -1,5 +1,5 @@
 using EventManagementService.Domain.Services;
-using EventManagementService.Infrastructure;
+using EventManagementService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;

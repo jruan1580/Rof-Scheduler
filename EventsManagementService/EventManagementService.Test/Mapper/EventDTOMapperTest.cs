@@ -18,7 +18,8 @@ namespace EventManagementService.Test.Mapper
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventDate = DateTime.Today,
+                EventStartTime = DateTime.Now,
+                EventEndTime = DateTime.Now,
                 Completed = false,
                 Canceled = false,
                 Employee = new Employee()
@@ -45,7 +46,8 @@ namespace EventManagementService.Test.Mapper
             Assert.AreEqual(coreEvent.EmployeeId, dto.EmployeeId);
             Assert.AreEqual(coreEvent.PetId, dto.PetId);
             Assert.AreEqual(coreEvent.PetServiceId, dto.PetServiceId);
-            Assert.AreEqual(coreEvent.EventDate.ToString("yyyy-MM-ddTHH:mm:ss"), dto.EventDate);
+            Assert.AreEqual(coreEvent.EventStartTime.ToString("yyyy-MM-ddTHH:mm:ss"), dto.EventStartTime);
+            Assert.AreEqual(coreEvent.EventEndTime.ToString("yyyy-MM-ddTHH:mm:ss"), dto.EventEndTime);
             Assert.AreEqual(coreEvent.Completed, dto.Completed);
             Assert.AreEqual(coreEvent.Canceled, dto.Canceled);
 
@@ -68,7 +70,7 @@ namespace EventManagementService.Test.Mapper
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventDate = DateTime.Today.ToString("yyyy-MM-ddTHH:mm:ss"),
+                EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = false,
                 Canceled = false,
                 EmployeeFullName = "John Doe",
@@ -80,14 +82,14 @@ namespace EventManagementService.Test.Mapper
 
             DateTime dtoCoreDate;
 
-            DateTime.TryParse(dto.EventDate, out dtoCoreDate);
+            DateTime.TryParse(dto.EventStartTime, out dtoCoreDate);
 
             Assert.IsNotNull(coreEvent);
             Assert.AreEqual(dto.Id, coreEvent.Id);
             Assert.AreEqual(dto.EmployeeId, coreEvent.EmployeeId);
             Assert.AreEqual(dto.PetId, coreEvent.PetId);
             Assert.AreEqual(dto.PetServiceId, coreEvent.PetServiceId);
-            Assert.AreEqual(dtoCoreDate, coreEvent.EventDate);
+            Assert.AreEqual(dtoCoreDate, coreEvent.EventStartTime);
             Assert.AreEqual(dto.Completed, coreEvent.Completed);
             Assert.AreEqual(dto.Canceled, coreEvent.Canceled);
 

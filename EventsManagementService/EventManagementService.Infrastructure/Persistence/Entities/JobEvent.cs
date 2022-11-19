@@ -11,7 +11,8 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
         public long EmployeeId { get; set; }
         public long PetId { get; set; }
         public short PetServiceId { get; set; }
-        public DateTime EventDate { get; set; }
+        public DateTime EventStartTime { get; set; }
+        public DateTime EventEndTime { get; set; }
         public bool Completed { get; set; }
         public bool Canceled { get; set; }
 

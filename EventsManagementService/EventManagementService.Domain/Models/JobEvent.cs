@@ -12,8 +12,10 @@ namespace EventManagementService.Domain.Models
         public long PetId { get; set; }
         
         public short PetServiceId { get; set; }
-        
-        public DateTime EventDate { get; set; }
+
+        public DateTime EventStartTime { get; set; }
+
+        public DateTime EventEndTime { get; set; }
 
         public bool Completed { get; set; }
         
@@ -44,9 +46,9 @@ namespace EventManagementService.Domain.Models
                 invalidErr.Add($"Invalid PetServiceId: {PetServiceId}.");
             }
 
-            if(EventDate == null)
+            if(EventStartTime == null)
             {
-                invalidErr.Add("Please set date and time for event.");
+                invalidErr.Add("Please set a start date and time for event.");
             }
 
             return invalidErr;
@@ -76,9 +78,14 @@ namespace EventManagementService.Domain.Models
                 invalidErr.Add($"Invalid PetServiceId: {PetServiceId}.");
             }
 
-            if (EventDate == null)
+            if (EventStartTime == null)
             {
-                invalidErr.Add("Please set date and time for event.");
+                invalidErr.Add("Please set a start date and time for event.");
+            }
+
+            if (EventEndTime == null)
+            {
+                invalidErr.Add("Please set an end date and time for event.");
             }
 
             return invalidErr;

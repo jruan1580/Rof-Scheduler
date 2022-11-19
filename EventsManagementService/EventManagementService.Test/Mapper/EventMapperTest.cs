@@ -17,7 +17,8 @@ namespace EventManagementService.Test.Mapper
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventDate = DateTime.Today,
+                EventStartTime = DateTime.Now,
+                EventEndTime = DateTime.Now,
                 Completed = false,
                 Canceled = false,
                 Employee = new Employee()
@@ -46,7 +47,8 @@ namespace EventManagementService.Test.Mapper
             Assert.AreEqual(entity.EmployeeId, coreEvent.EmployeeId);
             Assert.AreEqual(entity.PetId, coreEvent.PetId);
             Assert.AreEqual(entity.PetServiceId, coreEvent.PetServiceId);
-            Assert.AreEqual(entity.EventDate, coreEvent.EventDate);
+            Assert.AreEqual(entity.EventStartTime, coreEvent.EventStartTime);
+            Assert.AreEqual(entity.EventEndTime, coreEvent.EventEndTime);
             Assert.AreEqual(entity.Completed, coreEvent.Completed);
             Assert.AreEqual(entity.Canceled, coreEvent.Canceled);
 
@@ -74,7 +76,8 @@ namespace EventManagementService.Test.Mapper
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventDate = DateTime.Today,
+                EventStartTime = DateTime.Now,
+                EventEndTime = DateTime.Now,
                 Completed = false,
                 Canceled = false,
                 Employee = new Domain.Models.Employee()
@@ -103,7 +106,8 @@ namespace EventManagementService.Test.Mapper
             Assert.AreEqual(coreEvent.EmployeeId, entity.EmployeeId);
             Assert.AreEqual(entity.PetId, coreEvent.PetId);
             Assert.AreEqual(entity.PetServiceId, coreEvent.PetServiceId);
-            Assert.AreEqual(entity.EventDate, coreEvent.EventDate);
+            Assert.AreEqual(entity.EventStartTime, coreEvent.EventStartTime);
+            Assert.AreEqual(entity.EventEndTime, coreEvent.EventEndTime);
             Assert.AreEqual(entity.Completed, coreEvent.Completed);
             Assert.AreEqual(entity.Canceled, coreEvent.Canceled);
         }
