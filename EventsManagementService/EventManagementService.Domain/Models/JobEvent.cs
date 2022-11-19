@@ -83,11 +83,6 @@ namespace EventManagementService.Domain.Models
                 invalidErr.Add("Please set a start date and time for event.");
             }
 
-            if (EventEndTime == null)
-            {
-                invalidErr.Add("Please set an end date and time for event.");
-            }
-
             return invalidErr;
         }
     }
