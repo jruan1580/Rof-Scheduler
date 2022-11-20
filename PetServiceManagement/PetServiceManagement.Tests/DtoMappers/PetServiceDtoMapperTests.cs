@@ -1,10 +1,8 @@
 ﻿using NUnit.Framework;
 using PetServiceManagement.API.DTO;
 using PetServiceManagement.API.DtoMapper;
+using PetServiceManagement.Domain.Constants;
 using PetServiceManagement.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PetServiceManagement.Tests.DtoMappers
 {
@@ -20,7 +18,9 @@ namespace PetServiceManagement.Tests.DtoMappers
                 Name = "Dog Walking",
                 Description = "Walking dog",
                 Price = 20m,
-                EmployeeRate = 10m
+                EmployeeRate = 10m,
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
             };
 
             var dto = PetServiceDtoMapper.ToPetServiceDTO(domain);
@@ -31,6 +31,8 @@ namespace PetServiceManagement.Tests.DtoMappers
             Assert.AreEqual(domain.Description, dto.Description);
             Assert.AreEqual(domain.Price, dto.Rate);
             Assert.AreEqual(domain.EmployeeRate, dto.EmployeeRate);
+            Assert.AreEqual(domain.Duration, dto.Duration);
+            Assert.AreEqual(domain.TimeUnit, dto.TimeUnit);
         }
 
         [Test]
@@ -42,7 +44,9 @@ namespace PetServiceManagement.Tests.DtoMappers
                 Name = "Dog Walking",
                 Description = "Walking dog",
                 Rate = 20m,
-                EmployeeRate = 10m
+                EmployeeRate = 10m,
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
             };
 
             var domain = PetServiceDtoMapper.FromPetServiceDTO(dto);
@@ -53,6 +57,8 @@ namespace PetServiceManagement.Tests.DtoMappers
             Assert.AreEqual(dto.Description, domain.Description);
             Assert.AreEqual(dto.Rate, domain.Price);
             Assert.AreEqual(dto.EmployeeRate, domain.EmployeeRate);
+            Assert.AreEqual(dto.Duration, domain.Duration);
+            Assert.AreEqual(dto.TimeUnit, domain.TimeUnit);
         }
     }
 }
