@@ -4,6 +4,7 @@ using NUnit.Framework;
 using PetServiceManagement.API.Controllers;
 using PetServiceManagement.API.DTO;
 using PetServiceManagement.Domain.BusinessLogic;
+using PetServiceManagement.Domain.Constants;
 using PetServiceManagement.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,9 @@ namespace PetServiceManagement.Tests.Controllers
                     Name = "Dog Walking",
                     Description = "Walking dog",
                     Price = 20m,
-                    EmployeeRate = 10m
+                    EmployeeRate = 10m,
+                    Duration = 30,
+                    TimeUnit = TimeUnits.MINUTES
                 }
             };
 
@@ -63,6 +66,8 @@ namespace PetServiceManagement.Tests.Controllers
             Assert.AreEqual(petServices[0].Price, petServicesDTO[0].Rate);
             Assert.AreEqual(petServices[0].Description, petServicesDTO[0].Description);
             Assert.AreEqual(petServices[0].EmployeeRate, petServicesDTO[0].EmployeeRate);
+            Assert.AreEqual(petServices[0].Duration, petServicesDTO[0].Duration);
+            Assert.AreEqual(petServices[0].TimeUnit, petServicesDTO[0].TimeUnit);
 
             Assert.AreEqual(1, petServicesWithTotalPage.TotalPages);
         }
@@ -78,7 +83,9 @@ namespace PetServiceManagement.Tests.Controllers
                 Name = "Dog Walking",
                 Description = "Walking dog",
                 Rate = 20m,
-                EmployeeRate = 10m
+                EmployeeRate = 10m,
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
             });
 
             Assert.IsNotNull(res);
@@ -96,7 +103,9 @@ namespace PetServiceManagement.Tests.Controllers
                 Name = "Dog Walking",
                 Description = "Walking dog",
                 Rate = 20m,
-                EmployeeRate = 10m
+                EmployeeRate = 10m,
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
             });
 
             Assert.IsNotNull(res);
@@ -119,7 +128,9 @@ namespace PetServiceManagement.Tests.Controllers
                 Name = "Dog Walking",
                 Description = "Walking dog",
                 Rate = 20m,
-                EmployeeRate = 10m
+                EmployeeRate = 10m,
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
             });
 
             Assert.IsNotNull(res);
@@ -138,7 +149,9 @@ namespace PetServiceManagement.Tests.Controllers
                 Name = "Dog Walking",
                 Description = "Walking dog",
                 Rate = 20m,
-                EmployeeRate = 10m
+                EmployeeRate = 10m,
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
             });
 
             Assert.IsNotNull(res);

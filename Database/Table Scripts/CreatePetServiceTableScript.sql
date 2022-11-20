@@ -8,6 +8,8 @@ CREATE TABLE dbo.PetServices(
 	ServiceName VARCHAR(255) NOT NULL,
 	Price DECIMAL(10, 2) NOT NULL,
 	EmployeeRate DECIMAL(5,2) NOT NULL, -- percentage
+	Duration INT NOT NULL, -- specified in hours, minutes, or seconds
+	TimeUnit VARCHAR(10) NOT NULL, -- hours, minutes, and seconds
 	[Description] VARCHAR(2000) NULL,
 	CONSTRAINT UC_ServiceName UNIQUE(ServiceName)
 );
