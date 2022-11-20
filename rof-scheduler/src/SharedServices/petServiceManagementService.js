@@ -23,3 +23,9 @@ export const updatePetService = async function(id, name, rate, employeeRate, des
 
     return await makeHttpRequest(baseUrl, "PUT", {"Content-Type": "application/json"}, 200, data); 
 }
+
+export const deletePetService = async function(id){
+    var url = process.env.REACT_APP_PET_SERVICE_BASE_URL + "/petservice/" + id;
+
+  return await makeHttpRequest(url, "DELETE", undefined, 200, undefined); 
+}

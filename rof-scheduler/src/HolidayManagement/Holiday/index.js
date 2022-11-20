@@ -4,7 +4,6 @@ import {
   Button,
   Row,
   Col,
-  Pagination,
   OverlayTrigger,
   Table,
   Tooltip,
@@ -16,6 +15,8 @@ import{
 } from "../../SharedServices/holidayAndHolidayRateService";
 import AddHoliday from "./AddHoliday";
 import UpdateHoliday from "./UpdateHoliday";
+
+import TablePagination from "../../SharedComponents/TablePagination";
 
 import { deleteHoliday } from "../../SharedServices/holidayAndHolidayRateService";
 
@@ -231,15 +232,8 @@ function Holidaymanagement({setLoginState}){
                     </tbody>
                 </Table>
             </Row>
-
-            <Pagination>
-                {currPage != 1 && (
-                    <Pagination.Prev onClick={() => setCurrPage(currPage - 1)} />
-                )}
-                {currPage != totalPages && totalPages !== 0 && (
-                    <Pagination.Next onClick={() => setCurrPage(currPage + 1)} />
-                )}
-            </Pagination>
+            
+            <TablePagination currPage={currPage} totalPages={totalPages} setCurrPage={setCurrPage} />            
         </>
     );
 }
