@@ -19,6 +19,8 @@ namespace PetServiceManagement.Domain.Mappers
             petService.Price = petServices.Price;
             petService.Description = petServices.Description;
             petService.EmployeeRate = petServices.EmployeeRate;
+            petService.Duration = petServices.Duration;
+            petService.TimeUnit = petServices.TimeUnit;
 
             return petService;
         }
@@ -37,6 +39,8 @@ namespace PetServiceManagement.Domain.Mappers
             petServices.Price = petService.Price;
             petServices.EmployeeRate = petService.EmployeeRate;
             petServices.Description = petService.Description;
+            petServices.Duration = petService.Duration;
+            petServices.TimeUnit = petService.TimeUnit;
 
             return petServices;
         }

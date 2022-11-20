@@ -10,6 +10,10 @@
 
         public decimal EmployeeRate { get; set; }
 
+        public int Duration { get; set; } 
+
+        public string TimeUnit { get; set; }
+
         public string Description { get; set; }
 
     }
