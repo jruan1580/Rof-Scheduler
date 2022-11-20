@@ -1,9 +1,10 @@
-import { Modal, Row, Form, Col, Button, Spinner, Alert } from "react-bootstrap";
+import { Modal, Row, Form, Col, Alert } from "react-bootstrap";
 
 import { useState } from "react";
 
 import "../../../SharedCSS/modal.css";
 import { updateHoliday } from "../../../SharedServices/holidayAndHolidayRateService";
+import UpdateEntityBtn from "../../../SharedComponents/UpdateEntityBtn";
 
 function UpdateHoliday({holiday, show, hide, setLoginState, postUpdatePetAction}){
     const [updating, setUpdating] = useState(false);
@@ -108,44 +109,7 @@ function UpdateHoliday({holiday, show, hide, setLoginState, postUpdatePetAction}
                             </Form.Group>
                         </Row><br/>
 
-                        <hr></hr>
-                        {updating && (
-                            <Button
-                                type="button"
-                                variant="danger"
-                                className="float-end ms-2"
-                                disabled
-                            >
-                                Cancel
-                            </Button>
-                        )}
-                        {!updating && (
-                            <Button
-                                type="button"
-                                variant="danger"
-                                onClick={() => closeModal()}
-                                className="float-end ms-2"
-                            >
-                                Cancel
-                            </Button>
-                        )}
-                        {updating && (
-                            <Button variant="primary" className="float-end" disabled>
-                                <Spinner
-                                as="span"
-                                animation="grow"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                />
-                                Updating...
-                            </Button>
-                        )}
-                        {!updating && (
-                            <Button type="submit" className="float-end">
-                                Update
-                            </Button>
-                        )}
+                        <UpdateEntityBtn updating={updating} closeModal={closeModal} />
                     </Form>
                 </Modal.Body>
             </Modal>

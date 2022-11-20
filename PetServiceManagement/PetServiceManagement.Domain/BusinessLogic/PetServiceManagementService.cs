@@ -1,4 +1,5 @@
-﻿using PetServiceManagement.Domain.Mappers;
+﻿using PetServiceManagement.Domain.Constants;
+using PetServiceManagement.Domain.Mappers;
 using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Repositories;
 using System;
@@ -18,10 +19,13 @@ namespace PetServiceManagement.Domain.BusinessLogic
     public class PetServiceManagementService : IPetServiceManagementService
     {
         private readonly IPetServiceRepository _petServiceRepository;
+        private readonly HashSet<string> _supportedTimeUnits;
 
         public PetServiceManagementService(IPetServiceRepository petServiceRepository)
         {
             _petServiceRepository = petServiceRepository;
+
+            _supportedTimeUnits = new HashSet<string>() { TimeUnits.SECONDS, TimeUnits.MINUTES, TimeUnits.HOURS };
         }
 
         /// <summary>
@@ -118,6 +122,16 @@ namespace PetServiceManagement.Domain.BusinessLogic
             if (petService.EmployeeRate > 100 || petService.EmployeeRate < 0)
             {
                 throw new ArgumentException("Employee rate should be between 0 and 100");
+            }
+
+            if (petService.Duration < 0)
+            {
+                throw new ArgumentException("Pet Service Duration must be greater than 0");
+            }
+
+            if (!_supportedTimeUnits.Contains(petService.TimeUnit))
+            {
+                throw new ArgumentException("Time Unit not supported.");
             }
         }
     }

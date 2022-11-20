@@ -4,18 +4,22 @@ import {
   Button,
   Row,
   Col,
-  Pagination,
   OverlayTrigger,
   Table,
   Tooltip,
   Alert,
 } from "react-bootstrap";
 
+import TablePagination from "../SharedComponents/TablePagination";
+
 import{
-    getAllPetServices
+    getAllPetServices,
+    deletePetService
 } from "../SharedServices/petServiceManagementService";
 
 import AddPetService from "./AddPetService";
+import UpdatePetService from "./UpdatePetService";
+
 
 function PetService({ setLoginState }){
     const [errMsg, setErrMsg] = useState(undefined);
@@ -24,6 +28,8 @@ function PetService({ setLoginState }){
     const [totalPages, setTotalPages] = useState(0);
     const [searchKeyword, setSearchKeyword] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [currPetServiceToUpdate, setCurrPetServiceToUpdate] = useState(undefined);
 
     useEffect(() =>{
         (async function () {
@@ -60,6 +66,61 @@ function PetService({ setLoginState }){
         setTimeout(() => window.location.reload(), 3000);
     };
 
+    const loadUpdateModal = (petServiceToUpdate) => {
+        setCurrPetServiceToUpdate(petServiceToUpdate);
+    
+        setShowUpdateModal(true);
+    };
+
+    const postUpdatePetServiceAction = function(updatedFieldsMap){
+        const id = updatedFieldsMap.get('id');
+        const indexOfPetService = petServices.findIndex((petService) => petService.id == id);
+
+        petServices[indexOfPetService].name = updatedFieldsMap.get('name');
+        petServices[indexOfPetService].rate = updatedFieldsMap.get('rate');
+        petServices[indexOfPetService].employeeRate = updatedFieldsMap.get('employeeRate');
+        petServices[indexOfPetService].description = updatedFieldsMap.get('description');
+
+        setPetServices(petServices);
+    }
+
+    const removePetService = function(id){
+        (async function(){
+            try{
+                var resp = await deletePetService(id);
+
+                if (resp.status === 401) {
+                    setLoginState(false);
+                    return;
+                }
+
+                var pageToRequery = currPage; //set default page to requery to curr page
+                //curr page has one pet service and we just deleted it and we still have a previous page
+                if (petServices.length === 1 && currPage !== 1){
+                    pageToRequery = currPage - 1; //query previous page
+                }   
+                
+                //get pet services for current page again to reload after delete
+                resp = await getAllPetServices(pageToRequery, 10, searchKeyword);
+                if (resp.status === 401) {
+                    setLoginState(false);
+                    return;
+                }
+
+                const petServicesWithTotalPages = await resp.json();
+              
+                setPetServices(petServicesWithTotalPages.petServices);
+                setTotalPages(petServicesWithTotalPages.totalPages);  
+                if (pageToRequery != currPage)  {
+                    setCurrPage(pageToRequery);
+                }
+                
+            }catch(e){
+                setErrMsg('Failed to delete with error: ' + e.message);
+            }                
+        })();
+    }
+
     return(
         <>
             <AddPetService 
@@ -67,6 +128,14 @@ function PetService({ setLoginState }){
                 handleHide={() => setShowAddModal(false)}
                 setLoginState={setLoginState}
                 reloadAfterThreeSeconds={reloadAfterThreeSeconds}
+            />
+
+            <UpdatePetService
+                 petService={currPetServiceToUpdate}
+                 show={showUpdateModal}
+                 hide={() => setShowUpdateModal(false)}
+                 setLoginState={setLoginState}
+                 postUpdatePetAction={postUpdatePetServiceAction}
             />
             
             <Row>
@@ -116,7 +185,7 @@ function PetService({ setLoginState }){
                                                 placement="top"
                                                 overlay={<Tooltip>Update</Tooltip>}
                                             >
-                                                <Button>
+                                                <Button onClick={() => loadUpdateModal(petService)}>
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         width="16"
@@ -135,7 +204,7 @@ function PetService({ setLoginState }){
                                                 placement="top"
                                                 overlay={<Tooltip>Delete</Tooltip>}
                                             >
-                                                <Button>
+                                                <Button onClick={() => removePetService(petService.id)}>
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         width="16"
@@ -164,15 +233,8 @@ function PetService({ setLoginState }){
                     </tbody>
                 </Table>
             </Row>
-
-            <Pagination>
-                {currPage != 1 && (
-                    <Pagination.Prev onClick={() => setCurrPage(currPage - 1)} />
-                )}
-                {currPage != totalPages && totalPages !== 0 && (
-                    <Pagination.Next onClick={() => setCurrPage(currPage + 1)} />
-                )}
-            </Pagination>
+            
+            <TablePagination currPage={currPage} totalPages={totalPages} setCurrPage={setCurrPage} />
         </>
     );
 }

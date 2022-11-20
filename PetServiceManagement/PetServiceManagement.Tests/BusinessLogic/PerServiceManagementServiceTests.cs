@@ -1,6 +1,7 @@
 ﻿using Moq;
 using NUnit.Framework;
 using PetServiceManagement.Domain.BusinessLogic;
+using PetServiceManagement.Domain.Constants;
 using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
 using PetServiceManagement.Infrastructure.Persistence.Repositories;
@@ -25,7 +26,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         }
 
         [Test]
-        public void PetServiceValidationTest()
+        public void PetServiceValidationNoNameTest()
         {
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(null));
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(null));
@@ -34,7 +35,96 @@ namespace PetServiceManagement.Tests.BusinessLogic
             {
                 Id = 1,
                 Price = 20m,
-                Description = "testing"
+                Description = "testing",
+                EmployeeRate = 15m,
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
+            };
+
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+        }
+
+        [Test]
+        public void PetServiceValidationInvalidPrice()
+        {
+            var petService = new PetService()
+            {
+                Id = 1,
+                Price = -1m,
+                Description = "testing",
+                EmployeeRate = 15m,
+                Name = "InvalidPrice",
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
+            };
+
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+        }
+
+        [Test]
+        public void PetServiceValidationInvalidEmployeeRate()
+        {
+            var petService = new PetService()
+            {
+                Id = 1,
+                Price = 10m,
+                Description = "testing",
+                EmployeeRate = -1m,
+                Name = "InvalidEmployeeRate",
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
+            };
+
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+
+            petService = new PetService()
+            {
+                Id = 1,
+                Price = 10m,
+                Description = "testing",
+                EmployeeRate = 101m,
+                Name = "InvalidEmployeeRate",
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
+            };
+
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+        }
+
+        [Test]
+        public void PetServiceValidationInvalidDuration()
+        {
+            var petService = new PetService()
+            {
+                Id = 1,
+                Price = 10m,
+                Description = "testing",
+                EmployeeRate = 20m,
+                Name = "InvalidDuration",
+                Duration = -1,
+                TimeUnit = TimeUnits.SECONDS
+            };
+
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+        }
+
+        [Test]
+        public void PetServiceValidationInvalidTimeUnit()
+        {
+            var petService = new PetService()
+            {
+                Id = 1,
+                Price = 10m,
+                Description = "testing",
+                EmployeeRate = 20m,
+                Name = "InvalidTimeUnit",
+                Duration = 1,
+                TimeUnit = "Sec"
             };
 
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
@@ -52,7 +142,9 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 Id = 1,
                 Price = 20m,
                 Name = "Doesn't Exists",
-                Description = "testing"
+                Description = "testing",
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
             };
 
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
@@ -68,7 +160,9 @@ namespace PetServiceManagement.Tests.BusinessLogic
                     Id = 1,
                     Price = 20m,
                     ServiceName = "Dog Walking",
-                    Description = "Walking dog"
+                    Description = "Walking dog",
+                    Duration = 30,
+                    TimeUnit = TimeUnits.MINUTES
                 }
             };
 
@@ -98,7 +192,9 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 Id = 1,
                 Price = 20m,
                 Name = "Dog Walking",
-                Description = "Walking dog"
+                Description = "Walking dog",
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
             };
 
             _petServiceRepo.Setup(p => p.AddPetService(It.IsAny<PetServices>())).ReturnsAsync((short)1);
@@ -116,7 +212,9 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 Id = 1,
                 Price = 20m,
                 Name = "Dog Walking",
-                Description = "Walking dog"
+                Description = "Walking dog",
+                Duration = 30,
+                TimeUnit = TimeUnits.MINUTES
             };
 
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))

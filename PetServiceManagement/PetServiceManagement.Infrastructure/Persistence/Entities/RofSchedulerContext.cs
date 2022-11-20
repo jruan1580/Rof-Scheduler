@@ -46,13 +46,13 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
                     .WithMany(p => p.HolidayRates)
                     .HasForeignKey(d => d.HolidayId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__HolidayRa__Holid__69FBBC1F");
+                    .HasConstraintName("FK__HolidayRa__Holid__01D345B0");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.HolidayRates)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__HolidayRa__PetSe__690797E6");
+                    .HasConstraintName("FK__HolidayRa__PetSe__00DF2177");
             });
 
             modelBuilder.Entity<Holidays>(entity =>
@@ -84,6 +84,11 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
                 entity.Property(e => e.ServiceName)
                     .IsRequired()
                     .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TimeUnit)
+                    .IsRequired()
+                    .HasMaxLength(10)
                     .IsUnicode(false);
             });
 

@@ -56,7 +56,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
                 }
 
                 var skip = (page - 1) * offset;
-                var result = await petServices.OrderByDescending(p => p.Id).Skip(skip).Take(10).ToListAsync();
+                var result = await petServices.OrderByDescending(p => p.Id).Skip(skip).Take(offset).ToListAsync();
 
                 return (result, totalPages);
             }

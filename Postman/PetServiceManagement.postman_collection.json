@@ -721,7 +721,242 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"no service name\"\r\n}",
+							"raw": "{\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"no service name\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Pet Service - Negative Rate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Rate\": -1,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"Dog walking for 30 minutes\",\r\n    \"Name\": \"Dog Walk (30 Min)\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Pet Service - Negative Employee Rate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": -15,\r\n    \"Description\": \"Dog walking for 30 minutes\",\r\n    \"Name\": \"Dog Walk (30 Min)\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Pet Service - Over 100 Employee Rate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 115,\r\n    \"Description\": \"Dog walking for 30 minutes\",\r\n    \"Name\": \"Dog Walk (30 Min)\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Pet Service - Negative Duration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"Dog walking for 30 minutes\",\r\n    \"Name\": \"Dog Walk (30 Min)\",\r\n    \"Duration\": -30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Pet Service - Bad Time Unit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"Dog walking for 30 minutes\",\r\n    \"Name\": \"Dog Walk (30 Min)\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"BadUnit\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -768,7 +1003,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Name\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"30 minutes dog walking.\"\r\n}",
+							"raw": "{\r\n    \"Name\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"30 minutes dog walking.\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -815,7 +1050,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Name\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"30 minutes dog walking.\"\r\n}",
+							"raw": "{\r\n    \"Name\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"30 minutes dog walking.\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -931,7 +1166,242 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n     \"Id\": {{petServiceId}},\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"no service name provided for update\"\r\n}",
+							"raw": "{\r\n     \"Id\": {{petServiceId}},\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"no service name provided for update\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pet Service - Negative Rate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"Id\": {{petServiceId}},\r\n    \"Rate\": -20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"Negative rate\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pet Service - Negative Employee Rate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"Id\": {{petServiceId}},\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": -15,\r\n    \"Description\": \"Negative employee rate\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pet Service - Over 100 Percent Employee Rate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"Id\": {{petServiceId}},\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 115,\r\n    \"Description\": \"Employee rate over 100%\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pet Service - Negative Duration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"Id\": {{petServiceId}},\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"Negative Duration\",\r\n    \"Duration\": -30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}:{{port}}/api/petservice",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"petservice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pet Service - Bad Time Unit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"Id\": {{petServiceId}},\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"Bad time unit\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"BadUnit\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -978,7 +1448,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Id\": 0,\r\n    \"Name\": \"Not Found Service\",\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"service was not ofund\"\r\n}",
+							"raw": "{\r\n    \"Id\": 0,\r\n    \"Name\": \"Not Found Service\",\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"service was not found\",\r\n    \"Duration\": 30,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1025,7 +1495,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Id\": {{petServiceId}},\r\n    \"Name\": \"Postman TestPetService Dog Walking (40 Minute)\",\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"Dog walk for 40 minutes.\"\r\n}",
+							"raw": "{\r\n    \"Id\": {{petServiceId}},\r\n    \"Name\": \"Postman TestPetService Dog Walking (40 Minute)\",\r\n    \"Rate\": 20.50,\r\n    \"EmployeeRate\": 15,\r\n    \"Description\": \"Dog walk for 40 minutes.\",\r\n    \"Duration\": 40,\r\n    \"TimeUnit\": \"Minutes\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

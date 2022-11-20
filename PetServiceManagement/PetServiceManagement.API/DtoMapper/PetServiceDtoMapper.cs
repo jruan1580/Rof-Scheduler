@@ -19,6 +19,8 @@ namespace PetServiceManagement.API.DtoMapper
             dto.Rate = petServiceDomain.Price;
             dto.Description = petServiceDomain.Description;
             dto.EmployeeRate = petServiceDomain.EmployeeRate;
+            dto.Duration = petServiceDomain.Duration;
+            dto.TimeUnit = petServiceDomain.TimeUnit;
 
             return dto;
         }
@@ -37,6 +39,8 @@ namespace PetServiceManagement.API.DtoMapper
             domain.Description = petServiceDTO.Description;
             domain.Price = petServiceDTO.Rate;
             domain.EmployeeRate = petServiceDTO.EmployeeRate;
+            domain.Duration = petServiceDTO.Duration;
+            domain.TimeUnit = petServiceDTO.TimeUnit;
 
             return domain;
         }
