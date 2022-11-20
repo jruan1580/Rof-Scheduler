@@ -16,6 +16,7 @@ import{
 } from "../SharedServices/petServiceManagementService";
 
 import AddPetService from "./AddPetService";
+import UpdatePetService from "./UpdatePetService";
 
 function PetService({ setLoginState }){
     const [errMsg, setErrMsg] = useState(undefined);
@@ -24,6 +25,8 @@ function PetService({ setLoginState }){
     const [totalPages, setTotalPages] = useState(0);
     const [searchKeyword, setSearchKeyword] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [currPetServiceToUpdate, setCurrPetServiceToUpdate] = useState(undefined);
 
     useEffect(() =>{
         (async function () {
@@ -60,6 +63,24 @@ function PetService({ setLoginState }){
         setTimeout(() => window.location.reload(), 3000);
     };
 
+    const loadUpdateModal = (petServiceToUpdate) => {
+        setCurrPetServiceToUpdate(petServiceToUpdate);
+    
+        setShowUpdateModal(true);
+    };
+
+    const postUpdatePetServiceAction = function(updatedFieldsMap){
+        const id = updatedFieldsMap.get('id');
+        const indexOfPetService = petServices.findIndex((petService) => petService.id == id);
+
+        petServices[indexOfPetService].name = updatedFieldsMap.get('name');
+        petServices[indexOfPetService].rate = updatedFieldsMap.get('rate');
+        petServices[indexOfPetService].employeeRate = updatedFieldsMap.get('employeeRate');
+        petServices[indexOfPetService].description = updatedFieldsMap.get('description');
+
+        setPetServices(petServices);
+    }
+
     return(
         <>
             <AddPetService 
@@ -67,6 +88,14 @@ function PetService({ setLoginState }){
                 handleHide={() => setShowAddModal(false)}
                 setLoginState={setLoginState}
                 reloadAfterThreeSeconds={reloadAfterThreeSeconds}
+            />
+
+            <UpdatePetService
+                 petService={currPetServiceToUpdate}
+                 show={showUpdateModal}
+                 hide={() => setShowUpdateModal(false)}
+                 setLoginState={setLoginState}
+                 postUpdatePetAction={postUpdatePetServiceAction}
             />
             
             <Row>
@@ -116,7 +145,7 @@ function PetService({ setLoginState }){
                                                 placement="top"
                                                 overlay={<Tooltip>Update</Tooltip>}
                                             >
-                                                <Button>
+                                                <Button onClick={() => loadUpdateModal(petService)}>
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         width="16"
