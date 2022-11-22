@@ -44,7 +44,7 @@ namespace EventManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var eventExists = await _eventRepository.JobEventAlreadyExists(0, newEvent.EmployeeId, newEvent.PetId, newEvent.EventStartTime, newEvent.EventEndTime);
+            var eventExists = await _eventRepository.JobEventAlreadyExists(0, newEvent.EmployeeId, newEvent.PetId, newEvent.EventStartTime);
             if (eventExists)
             {
                 throw new ArgumentException("This Pet Service for this Pet is already scheduled under this Employee at this date and time.");
@@ -106,13 +106,17 @@ namespace EventManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var eventExists = await _eventRepository.JobEventAlreadyExists(updateEvent.Id, updateEvent.EmployeeId, updateEvent.PetId, updateEvent.EventStartTime, updateEvent.EventEndTime);
+            var eventExists = await _eventRepository.JobEventAlreadyExists(updateEvent.Id, updateEvent.EmployeeId, updateEvent.PetId, updateEvent.EventStartTime);
             if (eventExists)
             {
                 throw new ArgumentException("This Pet or Employee is already scheduled for another service at this date and time.");
             }
 
             var origEvent = GetJobEventById(updateEvent.Id);
+            if (origEvent == null)
+            {
+                throw new EntityNotFoundException("Event was not found. Failed to udpate.");
+            }
 
             var eventEntity = EventMapper.FromCoreEvent(updateEvent);
 

@@ -36,7 +36,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}:{{port}}/api/event/?date={{currentDate}}",
+							"raw": "{{host}}:{{port}}/api/event/?date=2022-11-18T06:30:00",
 							"host": [
 								"{{host}}"
 							],
@@ -49,7 +49,7 @@
 							"query": [
 								{
 									"key": "date",
-									"value": "{{currentDate}}"
+									"value": "2022-11-18T06:30:00"
 								}
 							]
 						}
@@ -75,7 +75,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}:{{port}}/api/event/{{eventId}}",
+							"raw": "{{host}}:{{port}}/api/event/999",
 							"host": [
 								"{{host}}"
 							],
@@ -83,7 +83,7 @@
 							"path": [
 								"api",
 								"event",
-								"{{eventId}}"
+								"999"
 							]
 						}
 					},
@@ -296,7 +296,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.environment.set('currentDate', (new Date()).toJSON());\r",
 									""
 								],
 								"type": "text/javascript"
@@ -314,7 +313,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"EmployeeId\": 0,\r\n    \"PetId\": 0,\r\n    \"PetServiceId\": 0,\r\n    \"EventDate\": {{currentDate}},\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
+							"raw": "{\r\n    \"EmployeeId\": 0,\r\n    \"EmployeeFullName\": \"Jason Ruan\",\r\n    \"PetId\": 0,\r\n    \"PetName\": \"Layla\",\r\n    \"PetServiceId\": 0,\r\n    \"PetServiceName\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"EventStartTime\": \"2022-11-18T06:30:00\",\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -370,7 +369,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"EmployeeId\": {{adminUserId}},\r\n    \"PetId\": {{petId}},\r\n    \"PetServiceId\": {{petServiceId}},\r\n    \"EventDate\": null,\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
+							"raw": "{\r\n    \"EmployeeId\": {{adminUserId}},\r\n    \"EmployeeFullName\": \"Jason Ruan\",\r\n    \"PetId\": {{petId}},\r\n    \"PetName\": \"Layla\",\r\n    \"PetServiceId\": {{petServiceId}},\r\n    \"PetServiceName\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"EventStartTime\": null,\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -426,7 +425,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"EmployeeId\": {{adminUserId}},\r\n    \"PetId\": {{petId}},\r\n    \"PetServiceId\": {{petServiceId}},\r\n    \"EventDate\": {{currentDate}},\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
+							"raw": "{\r\n    \"EmployeeId\": {{adminUserId}},\r\n    \"EmployeeFullName\": \"Jason Ruan\",\r\n    \"PetId\": {{petId}},\r\n    \"PetName\": \"Layla\",\r\n    \"PetServiceId\": {{petServiceId}},\r\n    \"PetServiceName\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"EventStartTime\": \"2022-11-18T06:30:00\",\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -473,7 +472,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"EmployeeId\": {{adminUserId}},\r\n    \"PetId\": {{petId}},\r\n    \"PetServiceId\": {{petServiceId}},\r\n    \"EventDate\": {{currentDate}},\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
+							"raw": "{\r\n    \"EmployeeId\": {{adminUserId}},\r\n    \"EmployeeFullName\": \"Jason Ruan\",\r\n    \"PetId\": {{petId}},\r\n    \"PetName\": \"Layla\",\r\n    \"PetServiceId\": {{petServiceId}},\r\n    \"PetServiceName\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"EventStartTime\": \"2022-11-18T06:30:00\",\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -537,7 +536,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{host}}:{{port}}/api/event/?date={{currentDate}}",
+							"raw": "{{host}}:{{port}}/api/event/?date=2022-11-18T06:30:00",
 							"host": [
 								"{{host}}"
 							],
@@ -550,7 +549,7 @@
 							"query": [
 								{
 									"key": "date",
-									"value": "{{currentDate}}"
+									"value": "2022-11-18T06:30:00"
 								}
 							]
 						}
@@ -577,7 +576,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{adminUserId}}",
+								"value": "Bearer {{adminToken}}",
 								"type": "text"
 							}
 						],
@@ -622,7 +621,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Id\": {{eventId}},\r\n    \"EmployeeId\": 0,\r\n    \"PetId\": 0,\r\n    \"PetServiceId\": 0,\r\n    \"EventDate\": {{currentDate}},\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
+							"raw": "{\r\n    \"EmployeeId\": 0,\r\n    \"EmployeeFullName\": \"Jason Ruan\",\r\n    \"PetId\": 0,\r\n    \"PetName\": \"Layla\",\r\n    \"PetServiceId\": 0,\r\n    \"PetServiceName\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"EventStartTime\": \"2022-11-18T06:30:00\",\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -669,7 +668,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Id\": {{eventId}},\r\n    \"EmployeeId\": 0,\r\n    \"PetId\": 0,\r\n    \"PetServiceId\": 0,\r\n    \"EventDate\": null,\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
+							"raw": "{\r\n    \"EmployeeId\": {{adminUserId}},\r\n    \"EmployeeFullName\": \"Jason Ruan\",\r\n    \"PetId\": {{petId}},\r\n    \"PetName\": \"Layla\",\r\n    \"PetServiceId\": {{petServiceId}},\r\n    \"PetServiceName\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"EventStartTime\": null,\r\n    \"Completed\": false,\r\n    \"Canceled\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -716,7 +715,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Id\": {{eventId}},\r\n    \"EmployeeId\": {{adminUserId}},\r\n    \"PetId\": {{petId}},\r\n    \"PetServiceId\": {{petServiceId}},\r\n    \"EventDate\": {{currentDate}},\r\n    \"Completed\": true,\r\n    \"Canceled\": false\r\n}",
+							"raw": "{\r\n    \"Id\": {{eventId}},\r\n    \"EmployeeId\": {{adminUserId}},\r\n    \"EmployeeFullName\": \"Jason Ruan\",\r\n    \"PetId\": {{petId}},\r\n    \"PetName\": \"Layla\",\r\n    \"PetServiceId\": {{petServiceId}},\r\n    \"PetServiceName\": \"Postman Dog Walking (30 Minutes)\",\r\n    \"EventStartTime\": \"2022-11-18T06:30:00\",\r\n    \"Completed\": true,\r\n    \"Canceled\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

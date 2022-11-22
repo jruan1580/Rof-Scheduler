@@ -54,7 +54,7 @@ namespace EventManagementService.Test.SerivceTest
                 Completed = false
             };
 
-            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(true);
 
             var eventService = new EventService(_eventRepository.Object);
@@ -265,7 +265,7 @@ namespace EventManagementService.Test.SerivceTest
                 EventEndTime = DateTime.Now
             };
 
-            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(true);
 
             var eventService = new EventService(_eventRepository.Object);
