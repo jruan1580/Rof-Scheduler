@@ -119,27 +119,27 @@ function AddPetService({ show, handleHide, setLoginState, reloadAfterThreeSecond
                             </Form.Group>
                         </Row><br />
                         <Row>
-                        <Form.Group as={Col} md="3">
-                            <Form.Label>Duration</Form.Label>
-                            <Form.Control
-                                type="number"                            
-                                placeholder="Duration"
-                                name="duration"
-                                min={1}
-                                required
-                            />                              
-                        </Form.Group>
-                        <Form.Group as={Col} md="3">
-                            <Form.Label>Time Unit</Form.Label>
-                            <Form.Select
-                                name="unit"
-                                required
-                            >
-                                <option value="Seconds">Seconds</option>
-                                <option value="Minutes">Minutes</option>
-                                <option value="Hours">Hours</option>
-                            </Form.Select>                        
-                        </Form.Group>
+                            <Form.Group as={Col} md="3">
+                                <Form.Label>Duration</Form.Label>
+                                <Form.Control
+                                    type="number"                            
+                                    placeholder="Duration"
+                                    name="duration"
+                                    min={1}
+                                    required
+                                />                              
+                            </Form.Group>
+                            <Form.Group as={Col} md="3">
+                                <Form.Label>Time Unit</Form.Label>
+                                <Form.Select
+                                    name="unit"
+                                    required
+                                >
+                                    <option value="Seconds">Seconds</option>
+                                    <option value="Minutes">Minutes</option>
+                                    <option value="Hours">Hours</option>
+                                </Form.Select>                        
+                            </Form.Group>
                         </Row><br/>
                         <Row>
                             <Form.Group as={Col} md="12">

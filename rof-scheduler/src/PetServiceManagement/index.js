@@ -80,6 +80,8 @@ function PetService({ setLoginState }){
         petServices[indexOfPetService].rate = updatedFieldsMap.get('rate');
         petServices[indexOfPetService].employeeRate = updatedFieldsMap.get('employeeRate');
         petServices[indexOfPetService].description = updatedFieldsMap.get('description');
+        petServices[indexOfPetService].duration = updatedFieldsMap.get('duration');
+        petServices[indexOfPetService].timeUnit = updatedFieldsMap.get('timeUnit');
 
         setPetServices(petServices);
     }
