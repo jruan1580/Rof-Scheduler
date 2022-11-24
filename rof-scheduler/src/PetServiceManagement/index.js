@@ -165,8 +165,9 @@ function PetService({ setLoginState }){
                         <tr>
                             <th>Name</th>
                             <th>Service's Rate</th>                    
-                            <th>Employee's Pay Rate (%)</th>
-                            <th>Description</th>
+                            <th>Employee's Pay Rate (%)</th>                            
+                            <th>Duration</th>
+                            <th>Description</th>                            
                             <th colSpan={2}></th>
                         </tr>
                     </thead>    
@@ -179,6 +180,7 @@ function PetService({ setLoginState }){
                                         <td>{petService.name}</td>
                                         <td>{petService.rate}</td>
                                         <td>{petService.employeeRate}</td>
+                                        <td>{petService.duration} {petService.timeUnit}</td>
                                         <td>{petService.description}</td>
                                         <td>
                                             <OverlayTrigger
