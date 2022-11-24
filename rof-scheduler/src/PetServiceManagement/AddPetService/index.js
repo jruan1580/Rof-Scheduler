@@ -32,8 +32,10 @@ function AddPetService({ show, handleHide, setLoginState, reloadAfterThreeSecond
                 const serviceRate = parseFloat(e.target.serviceRate.value);
                 const employeeRate = parseFloat(e.target.employeeRate.value);
                 const description = e.target.description.value;
+                const duration = parseInt(e.target.duration.value);
+                const timeUnit = e.target.unit.value;
 
-                var resp = await addNewPetService(name, serviceRate, employeeRate, description);
+                var resp = await addNewPetService(name, serviceRate, employeeRate, description, duration, timeUnit);
                 if (resp !== undefined && resp.status === 401){
                     setLoginState(false);
                     return;
@@ -116,6 +118,29 @@ function AddPetService({ show, handleHide, setLoginState, reloadAfterThreeSecond
                                 />
                             </Form.Group>
                         </Row><br />
+                        <Row>
+                        <Form.Group as={Col} md="3">
+                            <Form.Label>Duration</Form.Label>
+                            <Form.Control
+                                type="number"                            
+                                placeholder="Duration"
+                                name="duration"
+                                min={1}
+                                required
+                            />                              
+                        </Form.Group>
+                        <Form.Group as={Col} md="3">
+                            <Form.Label>Time Unit</Form.Label>
+                            <Form.Select
+                                name="unit"
+                                required
+                            >
+                                <option value="Seconds">Seconds</option>
+                                <option value="Minutes">Minutes</option>
+                                <option value="Hours">Hours</option>
+                            </Form.Select>                        
+                        </Form.Group>
+                        </Row><br/>
                         <Row>
                             <Form.Group as={Col} md="12">
                                 <Form.Label>Description</Form.Label>
