@@ -124,19 +124,19 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__Employ__4DB4832C");
+                    .HasConstraintName("FK__JobEvent__Employ__70FDBF69");
 
                 entity.HasOne(d => d.Pet)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetId__4EA8A765");
+                    .HasConstraintName("FK__JobEvent__PetId__71F1E3A2");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetSer__4F9CCB9E");
+                    .HasConstraintName("FK__JobEvent__PetSer__72E607DB");
             });
 
             modelBuilder.Entity<Pet>(entity =>
@@ -180,6 +180,11 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
                 entity.Property(e => e.ServiceName)
                     .IsRequired()
                     .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TimeUnit)
+                    .IsRequired()
+                    .HasMaxLength(10)
                     .IsUnicode(false);
             });
 
