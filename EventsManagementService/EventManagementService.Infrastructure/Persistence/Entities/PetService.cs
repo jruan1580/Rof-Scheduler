@@ -16,6 +16,8 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
         public string ServiceName { get; set; }
         public decimal Price { get; set; }
         public decimal EmployeeRate { get; set; }
+        public int Duration { get; set; }
+        public string TimeUnit { get; set; }
         public string Description { get; set; }
 
         public virtual ICollection<JobEvent> JobEvents { get; set; }

@@ -30,7 +30,6 @@ namespace EventManagementService.Test.SerivceTest
                 PetId = 0,
                 PetServiceId = 0,
                 EventStartTime = DateTime.Now,
-                EventEndTime = DateTime.Now,
                 Canceled = false,
                 Completed = false
             };
@@ -49,7 +48,6 @@ namespace EventManagementService.Test.SerivceTest
                 PetId = 1,
                 PetServiceId = 1,
                 EventStartTime = DateTime.Now,
-                EventEndTime = DateTime.Now,
                 Canceled = false,
                 Completed = false
             };
@@ -71,7 +69,6 @@ namespace EventManagementService.Test.SerivceTest
                 PetId = 1,
                 PetServiceId = 1,
                 EventStartTime = DateTime.Now,
-                EventEndTime = DateTime.Now,
                 Canceled = false,
                 Completed = false
             };
@@ -243,8 +240,7 @@ namespace EventManagementService.Test.SerivceTest
                 EmployeeId = 0,
                 PetId = 0,
                 PetServiceId = 0,
-                EventStartTime = DateTime.Now,
-                EventEndTime = DateTime.Now
+                EventStartTime = DateTime.Now
             };
 
             var eventService = new EventService(_eventRepository.Object);
@@ -261,8 +257,7 @@ namespace EventManagementService.Test.SerivceTest
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventStartTime = DateTime.Now,
-                EventEndTime = DateTime.Now
+                EventStartTime = DateTime.Now
             };
 
             _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
@@ -282,8 +277,7 @@ namespace EventManagementService.Test.SerivceTest
                 EmployeeId = 1,
                 PetId = 1,
                 PetServiceId = 1,
-                EventStartTime = DateTime.Now,
-                EventEndTime = DateTime.Now
+                EventStartTime = DateTime.Now
             };
 
             _eventRepository.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))

@@ -8,7 +8,6 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EventManagementService.Test.Controller
@@ -236,7 +235,6 @@ namespace EventManagementService.Test.Controller
                 PetServiceId = 1,
                 PetServiceName = "Walk",
                 EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
-                EventEndTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = true,
                 Canceled = false
             };
@@ -268,7 +266,6 @@ namespace EventManagementService.Test.Controller
                 PetServiceId = 1,
                 PetServiceName = "Walk",
                 EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
-                EventEndTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = true,
                 Canceled = false
             };
