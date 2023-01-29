@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.31" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EventManagementService.Domain\EventManagementService.Domain.csproj" />
     <ProjectReference Include="..\EventManagementService.Infrastructure\EventManagementService.Infrastructure.csproj" />
   </ItemGroup>

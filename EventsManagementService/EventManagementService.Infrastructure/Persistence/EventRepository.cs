@@ -13,7 +13,7 @@ namespace EventManagementService.Infrastructure.Persistence
         Task DeleteJobEventById(int id);
         Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate);
         Task<JobEvent> GetJobEventById(int id);
-        Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart, DateTime eventEnd);
+        Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart);
         Task UpdateJobEvent(JobEvent jobEvent);
     }
 
@@ -115,13 +115,12 @@ namespace EventManagementService.Infrastructure.Persistence
         /// <param name="petId"></param>
         /// <param name="petServiceId"></param>
         /// <param name="eventStart"></param>
-        /// <param name="eventEnd"></param>
         /// <returns></returns>
-        public async Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart, DateTime eventEnd)
+        public async Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart)
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.JobEvents.AnyAsync(j => j.Id != id && j.EventStartTime.Equals(eventStart) && j.EventEndTime.Equals(eventEnd) && (j.EmployeeId.Equals(employeeId) || j.PetId.Equals(petId)));
+                return await context.JobEvents.AnyAsync(j => j.Id != id && j.EventStartTime.Equals(eventStart) && (j.EmployeeId.Equals(employeeId) || j.PetId.Equals(petId)));
             }
         }
 
