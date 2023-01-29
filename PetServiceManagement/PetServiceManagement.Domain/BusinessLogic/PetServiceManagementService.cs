@@ -86,6 +86,8 @@ namespace PetServiceManagement.Domain.BusinessLogic
             petServiceEntity.Price = petService.Price;
             petServiceEntity.Description = petService.Description;
             petServiceEntity.EmployeeRate = petService.EmployeeRate;
+            petServiceEntity.Duration = petService.Duration;
+            petServiceEntity.TimeUnit = petService.TimeUnit;
 
             await _petServiceRepository.UpdatePetService(petServiceEntity);
         }

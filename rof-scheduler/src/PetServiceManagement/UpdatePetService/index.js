@@ -37,8 +37,10 @@ function UpdatePetService({petService, show, hide, setLoginState, postUpdatePetA
                 const serviceRate = parseFloat(e.target.serviceRate.value);
                 const employeeRate = parseFloat(e.target.employeeRate.value);
                 const description = e.target.description.value;
-                
-                var resp = await updatePetService(petService.id, name, serviceRate, employeeRate, description);
+                const duration = parseInt(e.target.duration.value);
+                const timeUnit = e.target.unit.value;
+
+                var resp = await updatePetService(petService.id, name, serviceRate, employeeRate, description, duration, timeUnit);
 
                 if (resp !== undefined && resp.status === 401){
                     setLoginState(false);
@@ -51,6 +53,8 @@ function UpdatePetService({petService, show, hide, setLoginState, postUpdatePetA
                 map.set('rate', serviceRate);
                 map.set('employeeRate', employeeRate);
                 map.set('description', description);
+                map.set('duration', duration);
+                map.set('timeUnit', timeUnit);
 
                 postUpdatePetAction(map)
                 setSuccessMsg(true);
@@ -119,6 +123,31 @@ function UpdatePetService({petService, show, hide, setLoginState, postUpdatePetA
                                 />
                             </Form.Group>
                         </Row><br />
+                        <Row>
+                            <Form.Group as={Col} md="3">
+                                <Form.Label>Duration</Form.Label>
+                                <Form.Control
+                                    type="number"                            
+                                    placeholder="Duration"
+                                    name="duration"
+                                    min={1}
+                                    defaultValue={petService === undefined ? undefined : petService.duration}
+                                    required
+                                />                              
+                            </Form.Group>
+                            <Form.Group as={Col} md="3">
+                                <Form.Label>Time Unit</Form.Label>
+                                <Form.Select
+                                    name="unit"
+                                    required
+                                    defaultValue={petService === undefined ? "Seconds" : petService.timeUnit}
+                                >
+                                    <option value="Seconds">Seconds</option>
+                                    <option value="Minutes">Minutes</option>
+                                    <option value="Hours">Hours</option>
+                                </Form.Select>                        
+                            </Form.Group>
+                        </Row><br/>
                         <Row>
                             <Form.Group as={Col} md="12">
                                 <Form.Label>Description</Form.Label>

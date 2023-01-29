@@ -1,5 +1,4 @@
-﻿using System.Data;
-using CoreEvent = EventManagementService.Domain.Models.JobEvent;
+﻿using CoreEvent = EventManagementService.Domain.Models.JobEvent;
 using DbEvent = EventManagementService.Infrastructure.Persistence.Entities.JobEvent;
 
 namespace EventManagementService.Domain.Mappers

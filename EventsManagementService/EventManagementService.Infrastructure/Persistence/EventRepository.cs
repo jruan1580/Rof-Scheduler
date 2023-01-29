@@ -20,6 +20,7 @@ namespace EventManagementService.Infrastructure.Persistence
     public class EventRepository : IEventRepository
     {
         /// <summary>
+        /// Calculate and update the end time.
         /// Adds new job event.
         /// </summary>
         /// <param name="jobEvent"></param>
@@ -28,8 +29,7 @@ namespace EventManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                //will remove at next update with end time calc...currently for postman
-                jobEvent.EventEndTime = DateTime.Now;
+                await CalculateEndTime(jobEvent);
 
                 context.JobEvents.Add(jobEvent);
 
@@ -75,8 +75,7 @@ namespace EventManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                //will remove at next update with end time calc...currently for postman
-                jobEvent.EventEndTime = DateTime.Now;
+                await CalculateEndTime(jobEvent);
 
                 context.Update(jobEvent);
 
@@ -122,6 +121,34 @@ namespace EventManagementService.Infrastructure.Persistence
             using (var context = new RofSchedulerContext())
             {
                 return await context.JobEvents.AnyAsync(j => j.Id != id && j.EventStartTime.Equals(eventStart) && (j.EmployeeId.Equals(employeeId) || j.PetId.Equals(petId)));
+            }
+        }
+
+        /// <summary>
+        /// Grabs duration and unit of pet service & adds duration to start time to get end time
+        /// </summary>
+        /// <param name="jobEvent"></param>
+        /// <returns></returns>
+        private async Task CalculateEndTime(JobEvent jobEvent)
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                var petService = await context.PetServices.FirstOrDefaultAsync(ps => ps.Id == jobEvent.PetServiceId);
+
+                if(petService.TimeUnit.ToLower() == "hours")
+                {
+                    jobEvent.EventEndTime = jobEvent.EventStartTime.AddHours(petService.Duration);
+                }
+
+                if(petService.TimeUnit.ToLower() == "minutes")
+                {
+                    jobEvent.EventEndTime = jobEvent.EventStartTime.AddMinutes(petService.Duration);
+                }
+
+                if (petService.TimeUnit.ToLower() == "seconds")
+                {
+                    jobEvent.EventEndTime = jobEvent.EventStartTime.AddSeconds(petService.Duration);
+                }
             }
         }
     }
