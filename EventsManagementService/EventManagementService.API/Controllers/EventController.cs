@@ -45,7 +45,7 @@ namespace EventManagementService.API.Controllers
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet]
-        public async Task<IActionResult> GetAllJobEventsByMonthAndYear([FromQuery] int month, int year)
+        public async Task<IActionResult> GetAllJobEventsByMonthAndYear([FromQuery] int month, [FromQuery] int year)
         {
             try
             {
