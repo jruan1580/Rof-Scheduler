@@ -25,6 +25,7 @@ namespace EventManagementService.Domain.Mappers
                     Id = dbEvent.EmployeeId,
                     FirstName = dbEvent.Employee.FirstName,
                     LastName = dbEvent.Employee.LastName,
+                    FullName = dbEvent.Employee.FirstName + " " + dbEvent.Employee.LastName,
                     Role = dbEvent.Employee.Role
                 };
             }

@@ -11,7 +11,7 @@ namespace EventManagementService.Infrastructure.Persistence
     {
         Task AddEvent(JobEvent jobEvent);
         Task DeleteJobEventById(int id);
-        Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate);
+        Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime date);
         Task<JobEvent> GetJobEventById(int id);
         Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart);
         Task UpdateJobEvent(JobEvent jobEvent);
@@ -55,13 +55,29 @@ namespace EventManagementService.Infrastructure.Persistence
         /// Displays all job events for specific month & year
         /// </summary>
         /// <returns></returns>
-        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate)
+        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime date)
         {
             using (var context = new RofSchedulerContext())
             {
                 IQueryable<JobEvent> allEvents = context.JobEvents;
 
-                var result = await allEvents.Where(e => e.EventStartTime.Month == eventDate.Month && e.EventStartTime.Year == eventDate.Year).ToListAsync();
+                var result = await allEvents.Where(e => e.EventStartTime.Month == date.Month && e.EventStartTime.Year == date.Year).ToListAsync();
+
+                //populate employee, pet, and pet service
+                var uniqueEmployeeIds = result.Select(e => e.EmployeeId).Distinct().ToList();
+                var uniquePetIds = result.Select(e => e.PetId).Distinct().ToList();
+                var uniquePetServiceIds = result.Select(e => e.PetServiceId).Distinct().ToList();
+
+                var employees = context.Employees.Where(a => uniqueEmployeeIds.Contains(a.Id));
+                var pets = context.Pets.Where(a => uniquePetIds.Contains(a.Id));
+                var petServices = context.PetServices.Where(a => uniquePetServiceIds.Contains(a.Id));
+
+                foreach(var jobEvent in result)
+                {
+                    jobEvent.Employee = employees.FirstOrDefault(e => e.Id == jobEvent.EmployeeId);
+                    jobEvent.Pet = pets.FirstOrDefault(p => p.Id == jobEvent.PetId);
+                    jobEvent.PetService = petServices.FirstOrDefault(s => s.Id == jobEvent.PetServiceId);
+                }
 
                 return result;
             }
