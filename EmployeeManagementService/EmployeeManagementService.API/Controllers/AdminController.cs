@@ -1,10 +1,10 @@
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
-using EmployeeManagementService.API.Filters;
-using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RofShared.Exceptions;
+using RofShared.FilterAttributes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -74,7 +74,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (EmployeeNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound($"Employee not found");
             }
@@ -97,7 +97,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (EmployeeNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound($"Employee with id: {id} not found");
             }
@@ -119,7 +119,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (EmployeeNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound($"Employee with id: {id} not found");
             }
@@ -138,7 +138,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (EmployeeNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound($"Employee with id: {id} not found");
             }

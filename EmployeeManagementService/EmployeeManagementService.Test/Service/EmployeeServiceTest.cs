@@ -6,6 +6,7 @@ using EmployeeManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
+using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -94,7 +95,7 @@ namespace EmployeeManagementService.Test.Service
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
             
-            Assert.ThrowsAsync<EmployeeNotFoundException>(() => employeeService.GetEmployeeById(2));
+            Assert.ThrowsAsync<EntityNotFoundException>(() => employeeService.GetEmployeeById(2));
         }
 
         [Test]
@@ -197,7 +198,7 @@ namespace EmployeeManagementService.Test.Service
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            Assert.ThrowsAsync<EmployeeNotFoundException>(() => employeeService.ResetEmployeeFailedLoginAttempt(0));
+            Assert.ThrowsAsync<EntityNotFoundException>(() => employeeService.ResetEmployeeFailedLoginAttempt(0));
         }
 
         [Test]
@@ -243,7 +244,7 @@ namespace EmployeeManagementService.Test.Service
         
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            Assert.ThrowsAsync<EmployeeNotFoundException>(() => employeeService.UpdateEmployeeActiveStatus(0, It.IsAny<bool>()));
+            Assert.ThrowsAsync<EntityNotFoundException>(() => employeeService.UpdateEmployeeActiveStatus(0, It.IsAny<bool>()));
         }
 
         [Test]

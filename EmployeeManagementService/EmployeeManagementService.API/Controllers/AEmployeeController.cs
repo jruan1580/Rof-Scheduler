@@ -3,6 +3,7 @@ using EmployeeManagementService.API.DTOMappers;
 using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
+using RofShared.Exceptions;
 using System;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
             }
-            catch (EmployeeNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound($"Employee with id: {id} not found");
             }
@@ -67,7 +68,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok(new { Id = loginEmployee.Id, FirstName = loginEmployee.FirstName, Role = loginEmployee.Role });
             }
-            catch (EmployeeNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound("Employee not found");
             }
@@ -94,7 +95,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
-            catch(EmployeeNotFoundException)
+            catch(EntityNotFoundException)
             {
                 return NotFound("Employee not found");
             }
@@ -113,7 +114,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (EmployeeNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound($"Employee with id: {newPassword.Id} not found");
             }

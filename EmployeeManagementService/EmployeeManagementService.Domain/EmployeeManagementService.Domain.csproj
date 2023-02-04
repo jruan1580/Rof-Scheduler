@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="RofShared" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EmployeeManagementService.Infrastructure\EmployeeManagementService.Infrastructure.csproj" />
   </ItemGroup>
 

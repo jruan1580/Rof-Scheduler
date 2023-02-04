@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using EmployeeManagementService.API.DTO;
 using EmployeeManagementService.API.DTOMappers;
-using EmployeeManagementService.API.Filters;
-using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RofShared.Exceptions;
+using RofShared.FilterAttributes;
 
 namespace EmployeeManagementService.API.Controllers
 {
@@ -33,7 +33,7 @@ namespace EmployeeManagementService.API.Controllers
 
                 return Ok();
             }
-            catch (EmployeeNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound();
             }

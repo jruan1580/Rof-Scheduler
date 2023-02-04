@@ -1,6 +1,8 @@
 ﻿using EmployeeManagementService.Infrastructure.Persistence.Entities;
 using EmployeeManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.EntityFrameworkCore;
+using RofShared.Database;
+using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,16 +39,10 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                             || (e.LastName.ToLower().Contains(keyword))
                             || (e.EmailAddress.ToLower().Contains(keyword)));
                 }
-                     
+                                     
                 var countByCriteria = await employees.CountAsync();
-                var fullPages = countByCriteria / offset; //full pages with example 23 count and offset is 10. we will get 2 full pages (10 each page)
-                var remaining = countByCriteria % offset; //remaining will be 3 which will be an extra page
-                var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; //therefore total pages is sum of full pages plus one more page is any remains.
 
-                if (page > totalPages)
-                {
-                    throw new ArgumentException("No more employees.");
-                }
+                var totalPages = DatabaseUtilities.GetTotalPages(countByCriteria, offset, page);              
 
                 var resut = await employees
                     .Select(e => new Employee()
@@ -84,11 +80,15 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             {
                 if (filter.FilterType == GetEmployeeFilterEnum.Id)
                 {
-                    return await context.Employees.FirstOrDefaultAsync(e => e.Id == Convert.ToInt64(filter.Value));
+                    var val = Convert.ToInt64(filter.Value);
+
+                    return await context.Employees.FirstOrDefaultAsync(e => e.Id == val);
                 }
                 else if (filter.FilterType == GetEmployeeFilterEnum.Usermame)
                 {
-                    return await context.Employees.FirstOrDefaultAsync(e => e.Username.ToLower().Equals(Convert.ToString(filter.Value).ToLower()));
+                    var username = Convert.ToString(filter.Value).ToLower();
+
+                    return await context.Employees.FirstOrDefaultAsync(e => e.Username.ToLower().Equals(username));
                 }
                 else
                 {
@@ -133,7 +133,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 if (employee == null)
                 {
-                    throw new ArgumentException("No employee found.");
+                    throw new EntityNotFoundException("Employee");
                 }
 
                 employee.FailedLoginAttempts += 1;
@@ -152,7 +152,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
 
                 if (employee == null)
                 {
-                    throw new ArgumentException("Employee does not exist.");
+                    throw new EntityNotFoundException("Employee");
                 }
 
                 context.Remove(employee);
@@ -165,8 +165,10 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
-                return await context.Employees.AnyAsync(e => e.Id != id && (e.Ssn.Equals(ssn) 
-                    || e.Username.ToLower().Equals(username.ToLower()) || e.EmailAddress.ToLower().Equals(email.ToLower())));             
+                return await context.Employees.AnyAsync(e => e.Id != id 
+                    && (e.Ssn.Equals(ssn) 
+                        || e.Username.ToLower().Equals(username.ToLower()) 
+                        || e.EmailAddress.ToLower().Equals(email.ToLower())));             
             }
         }
     }
