@@ -4,45 +4,54 @@ using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Infrastructure.Persistence;
 using EmployeeManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.Extensions.Configuration;
+using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EmployeeDB = EmployeeManagementService.Infrastructure.Persistence.Entities.Employee;
 
 namespace EmployeeManagementService.Domain.Services
 {
-    public interface IEmployeeService
-    {
-        Task CreateEmployee(Employee newEmployee, string password);
-        Task<Employee> EmployeeLogIn(string username, string password);
-        Task EmployeeLogout(long id);
-        Task<EmployeesWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword);
-        Task<Employee> GetEmployeeById(long id);
-        Task<Employee> GetEmployeeByUsername(string username);
-        Task ResetEmployeeFailedLoginAttempt(long id);
-        Task UpdateEmployeeActiveStatus(long id, bool active);
-        Task UpdateEmployeeInformation(Employee employee);
-        Task UpdatePassword(long id, string newPassword);
-        Task DeleteEmployeeById(long id);
-    }
-
-    public class EmployeeService : IEmployeeService
+    public class EmployeeService : BaseEmployeeService, IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IPasswordService _passwordService;
-        private readonly string _roles;
 
-        public EmployeeService(IEmployeeRepository employeeRepository, IPasswordService passwordService, IConfiguration config)
+        private readonly IPasswordService _passwordService;
+
+        public EmployeeService(IEmployeeRepository employeeRepository, 
+            IPasswordService passwordService, 
+            IConfiguration config) : base(employeeRepository, config)
         {
             _employeeRepository = employeeRepository;
-            _passwordService = passwordService;
-            _roles = config.GetSection("Roles").Value;
+
+            _passwordService = passwordService;            
+        }
+
+        public async Task<Employee> GetEmployeeById(long id)
+        {
+            var employee = await GetDbEmployeeById(id);
+
+            return EmployeeMapper.ToCoreEmployee(employee);
+        }
+
+        public async Task<Employee> GetEmployeeByUsername(string username)
+        {
+            var filterModel = new GetEmployeeFilterModel<string>(GetEmployeeFilterEnum.Usermame, username);
+
+            var employee = await _employeeRepository.GetEmployeeByFilter(filterModel);
+
+            if (employee == null)
+            {
+                return null;
+            }
+
+            return EmployeeMapper.ToCoreEmployee(employee);
         }
 
         public async Task<EmployeesWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword)
         {
             var result = await _employeeRepository.GetAllEmployeesByKeyword(page, offset, keyword);
+
             var employees = result.Item1;
             var totalPages = result.Item2;
 
@@ -51,41 +60,14 @@ namespace EmployeeManagementService.Domain.Services
                 return new EmployeesWithTotalPage(new List<Employee>(), 0);
             }
 
-            return new EmployeesWithTotalPage(employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList(), totalPages);
-        }
+            var coreEmployees = employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();
 
-        public async Task<Employee> GetEmployeeById(long id)
-        {
-            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
-
-            if (employee == null)
-            {
-                throw new EmployeeNotFoundException();
-            }
-
-            return EmployeeMapper.ToCoreEmployee(employee);
-        }
-
-        public async Task<Employee> GetEmployeeByUsername(string username)
-        {
-            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<string>(GetEmployeeFilterEnum.Usermame, username));
-
-            if (employee == null)
-            {
-                return null;
-            }
-
-            return EmployeeMapper.ToCoreEmployee(employee);
-        }      
+            return new EmployeesWithTotalPage(coreEmployees, totalPages);
+        }             
 
         public async Task ResetEmployeeFailedLoginAttempt(long id)
         {
-            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
-
-            if (employee == null)
-            {
-                throw new EmployeeNotFoundException();
-            }
+            var employee = await GetDbEmployeeById(id);
 
             employee.FailedLoginAttempts = 0;
             employee.IsLocked = false;
@@ -95,50 +77,40 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task UpdateEmployeeActiveStatus(long id, bool active)
         {
-            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
-
-            if (employee == null)
-            {
-                throw new EmployeeNotFoundException();
-            }
+            var employee = await GetDbEmployeeById(id);
 
             employee.Active = active;
+
+            await _employeeRepository.UpdateEmployee(employee);
+        }
+
+        public async Task UpdatePassword(long id, string newPassword)
+        {
+            var employee = await GetDbEmployeeById(id);
+
+            if (!_passwordService.VerifyPasswordRequirements(newPassword))
+            {
+                throw new ArgumentException("New password does not meet all requirements.");
+            }
+
+            if (_passwordService.VerifyPasswordHash(newPassword, employee.Password))
+            {
+                throw new ArgumentException("New password cannot be the same as current password.");
+            }
+
+            var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
+
+            employee.Password = newEncryptedPass;
+
             await _employeeRepository.UpdateEmployee(employee);
         }
 
         public async Task UpdateEmployeeInformation(Employee employee)
         {
-            var invalidErrors = employee.IsValidEmployeeForUpdate().ToArray();
+            await ValidateEmployeeInformation(employee, true);
 
-            if (invalidErrors.Length > 0)
-            {
-                var errorMessage = string.Join("\n", invalidErrors);
-
-                throw new ArgumentException(errorMessage);
-            }          
-
-            if (await _employeeRepository.DoesEmployeeExistsBySsnOrUsernameOrEmail(employee.Ssn, employee.Username, employee.Email, employee.Id))
-            {
-                throw new ArgumentException("Employee with ssn, username, or email exists");
-            }
-
-            var originalEmployee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, employee.Id));
-            if (originalEmployee == null)
-            {
-                throw new EmployeeNotFoundException();
-            }
-
-            //role is not empty, we need to validate role passed in
-            if (!string.IsNullOrEmpty(employee.Role))
-            {
-                var roles = _roles.Split(",");
-
-                if (!roles.Contains(employee.Role))
-                {
-                    throw new ArgumentException("Invalid role assigned");
-                }
-            }
-
+            var originalEmployee = await GetDbEmployeeById(employee.Id);
+            
             originalEmployee.EmailAddress = employee.Email;
             originalEmployee.PhoneNumber = employee.PhoneNumber;
             originalEmployee.Username = employee.Username;
@@ -158,53 +130,29 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task CreateEmployee(Employee newEmployee, string password)
         {
-            var invalidErrors = newEmployee.IsValidEmployeeToCreate().ToArray();
-
-            if (invalidErrors.Length > 0)
-            {
-                var errorMessage = string.Join("\n", invalidErrors);
-
-                throw new ArgumentException(errorMessage);
-            }
-
-            if (await _employeeRepository.DoesEmployeeExistsBySsnOrUsernameOrEmail(newEmployee.Ssn, newEmployee.Username, newEmployee.Email, newEmployee.Id))
-            {
-                throw new ArgumentException("Employee with ssn, username, or email exists");
-            }
+            await ValidateEmployeeInformation(newEmployee, false);
 
             if (!_passwordService.VerifyPasswordRequirements(password))
             {
                 throw new ArgumentException("Password does not meet requirements");
-            }
-
-            var roles = _roles.Split(",");
-
-            if (!roles.Contains(newEmployee.Role))
-            {
-                throw new ArgumentException("Invalid role assigned");
-            }
+            }            
 
             var encryptedPass = _passwordService.EncryptPassword(password);
             newEmployee.Password = encryptedPass;
 
             var newEmployeeEntity = EmployeeMapper.FromCoreEmployee(newEmployee);
 
-            await _employeeRepository.CreateEmployee(newEmployeeEntity);            
+            await _employeeRepository.CreateEmployee(newEmployeeEntity);
         }
 
         public async Task<Employee> EmployeeLogIn(string username, string password)
         {
-            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<string>(GetEmployeeFilterEnum.Usermame, username));
-
-            if (employee == null)
-            {
-                throw new EmployeeNotFoundException();
-            }
+            var employee = await GetDbEmployeeByUsername(username);
 
             if (employee.IsLocked)
             {
                 throw new EmployeeIsLockedException();
-            }           
+            }
 
             if (!_passwordService.VerifyPasswordHash(password, employee.Password))
             {
@@ -219,14 +167,14 @@ namespace EmployeeManagementService.Domain.Services
             }
 
             employee.Status = true;
-            await _employeeRepository.UpdateEmployee(employee);            
+            await _employeeRepository.UpdateEmployee(employee);
 
-            return EmployeeMapper.ToCoreEmployee(employee); 
+            return EmployeeMapper.ToCoreEmployee(employee);
         }
 
         public async Task EmployeeLogout(long id)
         {
-            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
+            var employee = await GetDbEmployeeById(id);
 
             if (employee.Status == false)
             {
@@ -236,59 +184,22 @@ namespace EmployeeManagementService.Domain.Services
             employee.Status = false;
 
             await _employeeRepository.UpdateEmployee(employee);
-        }
-
-        public async Task UpdatePassword(long id, string newPassword)
-        {
-            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
-
-            if (!_passwordService.VerifyPasswordRequirements(newPassword))
-            {
-                throw new ArgumentException("New password does not meet all requirements.");
-            }
-
-            if (_passwordService.VerifyPasswordHash(newPassword, employee.Password))
-            {
-                throw new ArgumentException("New password cannot be the same as current password.");
-            }
-
-            var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
-
-            employee.Password = newEncryptedPass;
-
-            await _employeeRepository.UpdateEmployee(employee);
-        }
+        }        
 
         public async Task DeleteEmployeeById(long id)
         {
-            var employee = await _employeeRepository.GetEmployeeByFilter(new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id));
-            
-            if (employee == null)
-            {
+            try
+            {                
+                await _employeeRepository.DeleteEmployeeById(id);
+            }
+            catch (EntityNotFoundException)
+            {               
                 return;
             }
-
-            await _employeeRepository.DeleteEmployeeById(id);
-        }
-
-        private async Task IncrementEmployeeFailedLoginAttempt(EmployeeDB employee)
-        {
-            if (employee.IsLocked)
+            catch (Exception)
             {
-                return;
-            }
-
-            var attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(employee.Id);
-
-            if (attempts != 3)
-            {
-                return;
-            }
-
-            employee.IsLocked = true;
-            employee.FailedLoginAttempts = attempts;
-
-            await _employeeRepository.UpdateEmployee(employee);
-        }
+                throw;
+            }            
+        }       
     }
 }

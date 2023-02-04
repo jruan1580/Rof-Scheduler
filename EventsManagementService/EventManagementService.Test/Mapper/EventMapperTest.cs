@@ -56,6 +56,7 @@ namespace EventManagementService.Test.Mapper
             Assert.AreEqual(entity.Employee.Id, coreEvent.Employee.Id);
             Assert.AreEqual(entity.Employee.FirstName, coreEvent.Employee.FirstName);
             Assert.AreEqual(entity.Employee.LastName, coreEvent.Employee.LastName);
+            Assert.AreEqual(entity.Employee.FirstName + " " + entity.Employee.LastName, coreEvent.Employee.FullName);
             Assert.AreEqual(entity.Employee.Role, coreEvent.Employee.Role);
 
             Assert.IsNotNull(coreEvent.Pet);
