@@ -20,29 +20,11 @@ namespace EmployeeManagementService.Domain.Services
 
         public EmployeeService(IEmployeeRepository employeeRepository, 
             IPasswordService passwordService, 
-            IConfiguration config) 
-        : base(employeeRepository, config)
+            IConfiguration config) : base(employeeRepository, config)
         {
             _employeeRepository = employeeRepository;
 
             _passwordService = passwordService;            
-        }
-
-        public async Task<EmployeesWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword)
-        {
-            var result = await _employeeRepository.GetAllEmployeesByKeyword(page, offset, keyword);
-
-            var employees = result.Item1;
-            var totalPages = result.Item2;
-
-            if (employees == null || employees.Count == 0)
-            {
-                return new EmployeesWithTotalPage(new List<Employee>(), 0);
-            }
-
-            var coreEmployees = employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();
-
-            return new EmployeesWithTotalPage(coreEmployees, totalPages);
         }
 
         public async Task<Employee> GetEmployeeById(long id)
@@ -66,6 +48,23 @@ namespace EmployeeManagementService.Domain.Services
             return EmployeeMapper.ToCoreEmployee(employee);
         }
 
+        public async Task<EmployeesWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword)
+        {
+            var result = await _employeeRepository.GetAllEmployeesByKeyword(page, offset, keyword);
+
+            var employees = result.Item1;
+            var totalPages = result.Item2;
+
+            if (employees == null || employees.Count == 0)
+            {
+                return new EmployeesWithTotalPage(new List<Employee>(), 0);
+            }
+
+            var coreEmployees = employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();
+
+            return new EmployeesWithTotalPage(coreEmployees, totalPages);
+        }             
+
         public async Task ResetEmployeeFailedLoginAttempt(long id)
         {
             var employee = await GetDbEmployeeById(id);
@@ -81,6 +80,27 @@ namespace EmployeeManagementService.Domain.Services
             var employee = await GetDbEmployeeById(id);
 
             employee.Active = active;
+
+            await _employeeRepository.UpdateEmployee(employee);
+        }
+
+        public async Task UpdatePassword(long id, string newPassword)
+        {
+            var employee = await GetDbEmployeeById(id);
+
+            if (!_passwordService.VerifyPasswordRequirements(newPassword))
+            {
+                throw new ArgumentException("New password does not meet all requirements.");
+            }
+
+            if (_passwordService.VerifyPasswordHash(newPassword, employee.Password))
+            {
+                throw new ArgumentException("New password cannot be the same as current password.");
+            }
+
+            var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
+
+            employee.Password = newEncryptedPass;
 
             await _employeeRepository.UpdateEmployee(employee);
         }
@@ -164,28 +184,7 @@ namespace EmployeeManagementService.Domain.Services
             employee.Status = false;
 
             await _employeeRepository.UpdateEmployee(employee);
-        }
-
-        public async Task UpdatePassword(long id, string newPassword)
-        {
-            var employee = await GetDbEmployeeById(id);
-
-            if (!_passwordService.VerifyPasswordRequirements(newPassword))
-            {
-                throw new ArgumentException("New password does not meet all requirements.");
-            }
-
-            if (_passwordService.VerifyPasswordHash(newPassword, employee.Password))
-            {
-                throw new ArgumentException("New password cannot be the same as current password.");
-            }
-
-            var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
-
-            employee.Password = newEncryptedPass;
-
-            await _employeeRepository.UpdateEmployee(employee);
-        }
+        }        
 
         public async Task DeleteEmployeeById(long id)
         {
