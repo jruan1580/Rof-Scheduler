@@ -85,12 +85,12 @@ namespace EventManagementService.Test.SerivceTest
         [Test]
         public async Task GetAllJobEventsByMonthAndYear_NoEvents()
         {
-            _eventRepository.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<DateTime>()))
+            _eventRepository.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(new List<JobEvent>());
 
             var eventService = new EventService(_eventRepository.Object);
 
-            var results = await eventService.GetAllJobEventsByMonthAndYear(DateTime.Today);
+            var results = await eventService.GetAllJobEventsByMonthAndYear(DateTime.Today.Month, DateTime.Today.Year);
 
             Assert.IsEmpty(results);
         }
@@ -130,12 +130,12 @@ namespace EventManagementService.Test.SerivceTest
                 }
             };
 
-            _eventRepository.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<DateTime>()))
+            _eventRepository.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(events);
 
             var eventService = new EventService(_eventRepository.Object);
 
-            var results = await eventService.GetAllJobEventsByMonthAndYear(DateTime.Today);
+            var results = await eventService.GetAllJobEventsByMonthAndYear(DateTime.Today.Month, DateTime.Today.Year);
 
             Assert.IsNotEmpty(results);
             Assert.AreEqual(1, results[0].EmployeeId);

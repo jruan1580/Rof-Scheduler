@@ -62,7 +62,7 @@ namespace EventManagementService.Domain.Mappers
             entity.PetId = coreEvent.PetId;
             entity.PetServiceId = coreEvent.PetServiceId;
             entity.EventStartTime = coreEvent.EventStartTime;
-            //entity.EventEndTime = coreEvent.EventEndTime; to be uncommented in next branch that updates service to support end date calc
+            entity.EventEndTime = coreEvent.EventEndTime;
             entity.Completed = coreEvent.Completed;
             entity.Canceled = coreEvent.Canceled;
 
