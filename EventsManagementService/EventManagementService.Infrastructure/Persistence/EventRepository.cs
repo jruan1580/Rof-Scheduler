@@ -75,7 +75,18 @@ namespace EventManagementService.Infrastructure.Persistence
         {
             using (var context = new RofSchedulerContext())
             {
+                var origEvent = await context.JobEvents.FirstOrDefaultAsync(e => e.Id == jobEvent.Id);
+                
                 await CalculateEndTime(jobEvent);
+                
+                origEvent.EmployeeId = jobEvent.EmployeeId;
+                origEvent.PetId = jobEvent.PetId;
+                origEvent.PetServiceId = jobEvent.PetServiceId;
+
+                origEvent.EventStartTime = jobEvent.EventStartTime;
+                origEvent.EventEndTime = jobEvent.EventEndTime;
+                origEvent.Completed = jobEvent.Completed;
+                origEvent.Canceled = jobEvent.Canceled;
 
                 context.Update(jobEvent);
 
