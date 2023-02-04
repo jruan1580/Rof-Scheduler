@@ -113,12 +113,12 @@ namespace EventManagementService.Test.Controller
                 }
             };
 
-            _eventService.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<DateTime>()))
+            _eventService.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(events);
 
             var controller = new EventController(_eventService.Object);
 
-            var response = await controller.GetAllJobEventsByMonthAndYear(DateTime.Today);
+            var response = await controller.GetAllJobEventsByMonthAndYear(DateTime.Today.Month, DateTime.Today.Year);
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(OkObjectResult));

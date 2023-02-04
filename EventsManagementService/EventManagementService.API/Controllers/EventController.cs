@@ -45,11 +45,11 @@ namespace EventManagementService.API.Controllers
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet]
-        public async Task<IActionResult> GetAllJobEventsByMonthAndYear([FromQuery] DateTime date)
+        public async Task<IActionResult> GetAllJobEventsByMonthAndYear([FromQuery] int month, [FromQuery] int year)
         {
             try
             {
-                var jobEvents = await _eventService.GetAllJobEventsByMonthAndYear(date);
+                var jobEvents = await _eventService.GetAllJobEventsByMonthAndYear(month, year);
 
                 var eventList = new List<EventDTO>();
 

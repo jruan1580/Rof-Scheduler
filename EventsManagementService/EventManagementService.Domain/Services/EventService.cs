@@ -13,7 +13,7 @@ namespace EventManagementService.Domain.Services
     {
         Task AddEvent(JobEvent newEvent);
         Task DeleteEventById(int id);
-        Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate);
+        Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year);
         Task<JobEvent> GetJobEventById(int id);
         Task UpdateJobEvent(JobEvent updateEvent);
     }
@@ -59,9 +59,9 @@ namespace EventManagementService.Domain.Services
         /// Grabs all events by month and year
         /// </summary>
         /// <returns></returns>
-        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(DateTime eventDate)
+        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year)
         {
-            var results = await _eventRepository.GetAllJobEventsByMonthAndYear(eventDate);
+            var results = await _eventRepository.GetAllJobEventsByMonthAndYear(month, year);
 
             if (results == null || results.Count == 0)
             {
