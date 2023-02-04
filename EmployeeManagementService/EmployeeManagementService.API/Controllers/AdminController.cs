@@ -1,6 +1,6 @@
-using EmployeeManagementService.API.DTO;
-using EmployeeManagementService.API.DTOMappers;
+using EmployeeManagementService.Domain.Mappers.DTO;
 using EmployeeManagementService.Domain.Services;
+using EmployeeManagementService.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RofShared.Exceptions;

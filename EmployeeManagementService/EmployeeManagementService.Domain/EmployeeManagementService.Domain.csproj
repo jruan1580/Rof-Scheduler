@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EmployeeManagementService.DTO\EmployeeManagementService.DTO.csproj" />
     <ProjectReference Include="..\EmployeeManagementService.Infrastructure\EmployeeManagementService.Infrastructure.csproj" />
   </ItemGroup>
 

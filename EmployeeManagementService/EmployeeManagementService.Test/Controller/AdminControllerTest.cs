@@ -2,9 +2,8 @@
 using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Domain.Services;
-using Microsoft.AspNetCore.Http;
+using EmployeeManagementService.DTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -82,7 +81,7 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task CreateEmployee_Success()
         {
-            var newEmployee = new API.DTO.EmployeeDTO()
+            var newEmployee = new EmployeeDTO()
             {
                 FirstName = "John",
                 LastName = "Doe",
@@ -111,7 +110,7 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task CreateEmployee_BadRequestError()
         {
-            var newEmployee = new API.DTO.EmployeeDTO()
+            var newEmployee = new EmployeeDTO()
             {
                 FirstName = "",
                 LastName = "",
@@ -176,7 +175,7 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task UpdateEmployeeInformation_Success()
         {
-            var updateEmployee = new API.DTO.EmployeeDTO()
+            var updateEmployee = new EmployeeDTO()
             {
                 Id = 1,
                 FirstName = "John",
@@ -184,7 +183,7 @@ namespace EmployeeManagementService.Test.Controller
                 Ssn = "123-45-6789",
                 Username = "jdoe",
                 Role = "Employee",
-                Address = new API.DTO.AddressDTO { AddressLine1 = "123 Abc St", AddressLine2 = "", City = "Oakland", State = "CA", ZipCode = "12345" }
+                Address = new AddressDTO { AddressLine1 = "123 Abc St", AddressLine2 = "", City = "Oakland", State = "CA", ZipCode = "12345" }
             };
 
             _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Domain.Models.Employee>()))
@@ -205,7 +204,7 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task UpdateEmployeeInformation_BadRequestError()
         {
-            var updateEmployee = new API.DTO.EmployeeDTO()
+            var updateEmployee = new EmployeeDTO()
             {
                 Id = 0,
                 FirstName = "",
@@ -213,7 +212,7 @@ namespace EmployeeManagementService.Test.Controller
                 Ssn = "",
                 Username = "",
                 Role = "",
-                Address = new API.DTO.AddressDTO { AddressLine1 = "", AddressLine2 = "", City = "", State = "", ZipCode = "" }
+                Address = new AddressDTO { AddressLine1 = "", AddressLine2 = "", City = "", State = "", ZipCode = "" }
             };
 
             _employeeService.Setup(_e => _e.UpdateEmployeeInformation(It.IsAny<Employee>()))
@@ -343,7 +342,7 @@ namespace EmployeeManagementService.Test.Controller
 
             var controller = new AdminController(_employeeService.Object);
 
-            var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
+            var response = await controller.EmployeeLogin(new EmployeeDTO()
             {
                 Username = "jdoe",
                 Password = "teST1234!"
@@ -365,7 +364,7 @@ namespace EmployeeManagementService.Test.Controller
 
             var controller = new AdminController(_employeeService.Object);
 
-            var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
+            var response = await controller.EmployeeLogin(new EmployeeDTO()
             {
                 Username = "jdoe",
                 Password = "abcdef123345!"
@@ -387,7 +386,7 @@ namespace EmployeeManagementService.Test.Controller
 
             var controller = new AdminController(_employeeService.Object);
 
-            var response = await controller.EmployeeLogin(new API.DTO.EmployeeDTO()
+            var response = await controller.EmployeeLogin(new EmployeeDTO()
             {
                 Username = "jdoe",
                 Password = "abcdef123345!"
@@ -440,7 +439,7 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task UpdatePassword_Success()
         {
-            var password = new API.DTO.PasswordDTO()
+            var password = new PasswordDTO()
             {
                 Id = 1,
                 NewPassword = "NewTestPassword123!"
@@ -464,7 +463,7 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task UpdatePassword_InternalServerError()
         {
-            var password = new API.DTO.PasswordDTO()
+            var password = new PasswordDTO()
             {
                 Id = 1,
                 NewPassword = "NewTestPassword123!"
