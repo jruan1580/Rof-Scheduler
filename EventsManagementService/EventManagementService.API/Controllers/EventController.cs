@@ -67,6 +67,29 @@ namespace EventManagementService.API.Controllers
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllJobEvents()
+        {
+            try
+            {
+                var jobEvents = await _eventService.GetAllJobEvents();
+
+                var eventList = new List<EventDTO>();
+
+                foreach (var jobEvent in jobEvents)
+                {
+                    eventList.Add(EventDTOMapper.ToDTOEvent(jobEvent));
+                }
+
+                return Ok(eventList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{eventId}")]
         public async Task<IActionResult> GetJobEventById(int eventId)
         {

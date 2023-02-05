@@ -16,6 +16,7 @@ namespace EventManagementService.Domain.Services
         Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year);
         Task<JobEvent> GetJobEventById(int id);
         Task UpdateJobEvent(JobEvent updateEvent);
+        Task<List<JobEvent>> GetAllJobEvents();
     }
 
     public class EventService : IEventService
@@ -62,6 +63,22 @@ namespace EventManagementService.Domain.Services
         public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year)
         {
             var results = await _eventRepository.GetAllJobEventsByMonthAndYear(month, year);
+
+            if (results == null || results.Count == 0)
+            {
+                return new List<JobEvent>();
+            }
+
+            return new List<JobEvent>(results.Select(e => EventMapper.ToCoreEvent(e))).ToList();
+        }
+
+        /// <summary>
+        /// Grabs all job events
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<JobEvent>> GetAllJobEvents()
+        {
+            var results = await _eventRepository.GetAllJobEvents();
 
             if (results == null || results.Count == 0)
             {
