@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29728.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmployeeManagementService.API", "EmployeeManagementService.API\EmployeeManagementService.API.csproj", "{0B8E5E4C-390A-423D-9485-88F01F52FE42}"
 EndProject
@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmployeeManagementService.I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmployeeManagementService.Domain", "EmployeeManagementService.Domain\EmployeeManagementService.Domain.csproj", "{7D8304E1-943B-4D48-8912-79AA1C60DE7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmployeeManagementService.Test", "EmployeeManagementService.Test\EmployeeManagementService.Test.csproj", "{2F7AD1C7-ABB9-4825-AEC5-66B77D4232C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmployeeManagementService.Test", "EmployeeManagementService.Test\EmployeeManagementService.Test.csproj", "{2F7AD1C7-ABB9-4825-AEC5-66B77D4232C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmployeeManagementService.DTO", "EmployeeManagementService.DTO\EmployeeManagementService.DTO.csproj", "{932C5F45-60ED-4E52-BFC4-3BBE2CACEC99}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{2F7AD1C7-ABB9-4825-AEC5-66B77D4232C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F7AD1C7-ABB9-4825-AEC5-66B77D4232C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F7AD1C7-ABB9-4825-AEC5-66B77D4232C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{932C5F45-60ED-4E52-BFC4-3BBE2CACEC99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{932C5F45-60ED-4E52-BFC4-3BBE2CACEC99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{932C5F45-60ED-4E52-BFC4-3BBE2CACEC99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{932C5F45-60ED-4E52-BFC4-3BBE2CACEC99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

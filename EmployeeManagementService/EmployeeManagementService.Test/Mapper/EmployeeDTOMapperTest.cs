@@ -1,10 +1,8 @@
-﻿using EmployeeManagementService.API.DTOMappers;
+﻿using EmployeeManagementService.Domain.Mappers.DTO;
+using EmployeeManagementService.DTO;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using CoreEmployee = EmployeeManagementService.Domain.Models.Employee;
-using DTOEmployee = EmployeeManagementService.API.DTO.EmployeeDTO;
+using DTOEmployee = EmployeeManagementService.DTO.EmployeeDTO;
 
 namespace EmployeeManagementService.Test.Mapper
 {
@@ -82,7 +80,7 @@ namespace EmployeeManagementService.Test.Mapper
             dtoEmp.Status = false;
             dtoEmp.Active = true;
 
-            dtoEmp.Address = new API.DTO.AddressDTO();
+            dtoEmp.Address = new AddressDTO();
             dtoEmp.Address.AddressLine1 = "123 test st.";
             dtoEmp.Address.AddressLine2 = null;
             dtoEmp.Address.City = "san diego";
