@@ -4,27 +4,27 @@ import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
 import timeGridPlugin from '@fullcalendar/timegrid'
 import { useEffect, useState } from "react";
 import { GetAllJobEventsByMonthAndYear } from '../SharedServices/jobEventService';
+import { Alert } from "react-bootstrap";
 
-function Calendar() {
-    const [events, setEvents] = useState([]);
-    const [eventDate, setEventDate] = useState();
-    const [errorMessage, setErrorMessage] = useState(undefined);    
+function Calendar({setLoginState}) {
+    const [jobEvents, setJobEvents] = useState([]);
+    const [errorMessage, setErrorMessage] = useState(undefined);
+    const [eventDate, setEventDate] = useState(new Date());
 
     useEffect(() => {
     (async function () {
       try {
-        var resp = await GetAllJobEventsByMonthAndYear(eventDate);        
+        var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());        
 
         if (resp.status === 401){
-          console.log("error");
+          setLoginState(false);
           return;
         }
 
         const eventList = await resp.json();
 
-        console.log(eventList[0]);
-
-        setEvents(eventList);
+        setJobEvents(eventList);
+        setErrorMessage(undefined);
       } catch (e) {
         setErrorMessage(e.message);
       }
@@ -43,6 +43,10 @@ function Calendar() {
 
     return(
         <>
+            {errorMessage !== undefined && (
+                <Alert variant="danger">{errorMessage}</Alert>
+            )}
+
             <FullCalendar
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 headerToolbar={{
@@ -55,11 +59,14 @@ function Calendar() {
                 selectable={true}    
                 selectMirror={true}
                 select={handleDateSelect}
-                eventClick={handleEventClick}            
-                events={[
-                    { title: 'event 1', start: '2022-04-29T05:00:00', end: '2022-04-29T07:00:00'},
-                    { title: 'event 2', start: '2022-04-29T05:00:00', end: '2022-04-29T06:00:00' }
-                  ]}
+                eventClick={handleEventClick}
+                events = {jobEvents.length != 0 && 
+                    jobEvents.map((jobEvent) => {
+                        return(
+                            { title: jobEvent.petServiceName, start: jobEvent.eventStartTime, end: jobEvent.eventEndTime}
+                        );
+                    })
+                } 
             />
         </>
     )
