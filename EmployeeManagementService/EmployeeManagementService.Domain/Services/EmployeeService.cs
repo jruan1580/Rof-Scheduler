@@ -4,6 +4,7 @@ using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Infrastructure.Persistence;
 using EmployeeManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.Extensions.Configuration;
+using RofShared;
 using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;

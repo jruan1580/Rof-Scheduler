@@ -3,7 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace EmployeeManagementService.Domain.Services
+namespace RofShared
 {
     public interface IPasswordService
     {
@@ -14,14 +14,13 @@ namespace EmployeeManagementService.Domain.Services
 
     public class PasswordService : IPasswordService
     {
-        private readonly string _saltString;
         private readonly byte[] _salt;
 
         public PasswordService(IConfiguration config)
         {
-            _saltString = config.GetSection("PasswordSalt").Value;
+             var saltString = config.GetSection("PasswordSalt").Value;
 
-            _salt = Encoding.UTF8.GetBytes(_saltString);
+            _salt = Encoding.UTF8.GetBytes(saltString);
         }
 
         /// <summary>
@@ -57,10 +56,10 @@ namespace EmployeeManagementService.Domain.Services
 
             return true;
         }
-        
+
         public bool VerifyPasswordRequirements(string password)
         {
-            if(password.Length < 8 || password.Length > 32)
+            if (password.Length < 8 || password.Length > 32)
             {
                 return false;
             }
@@ -70,12 +69,12 @@ namespace EmployeeManagementService.Domain.Services
                 return false;
             }
 
-            if(!password.Any(ch => char.IsUpper(ch)) || !password.Any(ch => char.IsLower(ch)))
+            if (!password.Any(ch => char.IsUpper(ch)) || !password.Any(ch => char.IsLower(ch)))
             {
                 return false;
             }
 
-            if (!password.Any(ch =>char.IsDigit(ch)))
+            if (!password.Any(ch => char.IsDigit(ch)))
             {
                 return false;
             }
