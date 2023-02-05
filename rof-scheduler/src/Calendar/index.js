@@ -3,7 +3,7 @@ import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
 import timeGridPlugin from '@fullcalendar/timegrid'
 import { useEffect, useState } from "react";
-import { GetAllJobEventsByMonthAndYear } from '../SharedServices/jobEventService';
+import { GetAllJobEventsByMonthAndYear, GetAllJobEvents } from '../SharedServices/jobEventService';
 import { Alert } from "react-bootstrap";
 
 function Calendar({setLoginState}) {
@@ -14,7 +14,8 @@ function Calendar({setLoginState}) {
     useEffect(() => {
     (async function () {
       try {
-        var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());        
+        var resp = await GetAllJobEvents();
+        // var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth + 1, eventDate.getFullYear);
 
         if (resp.status === 401){
           setLoginState(false);
@@ -31,11 +32,13 @@ function Calendar({setLoginState}) {
     })();
   }, [eventDate]);
 
+  //clicking on actual event
     const handleEventClick = (arg) => {
         console.log(arg);
         alert(arg);
     }
 
+    //clicking on date
     const handleDateSelect = (selectInfo) => {
         alert(selectInfo);
         console.log(selectInfo);

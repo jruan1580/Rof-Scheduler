@@ -8,6 +8,14 @@ export const GetAllJobEventsByMonthAndYear = async function(month, year){
   return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
 }
 
+export const GetAllJobEvents = async function(){
+  var baseUrl = process.env.REACT_APP_EVENT_SERVICE_BASE_URL;
+  
+  var url = baseUrl + "/event/all";
+
+  return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
+}
+
 export const addEvent = async function(employeeId, petId, petServiceId, eventStartTime){
   var baseUrl = process.env.REACT_APP_EVENT_SERVICE_BASE_URL + "/event";
 
