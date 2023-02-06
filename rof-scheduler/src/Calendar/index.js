@@ -16,6 +16,9 @@ function Calendar({setLoginState}) {
     (async function () {
       try {
         // var resp = await GetAllJobEvents();
+        var newDate = calendarRef.current.getApi().getDate();
+        setEventDate(newDate);
+
         var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
 
         if (resp.status === 401){
@@ -46,89 +49,6 @@ function Calendar({setLoginState}) {
         console.log(selectInfo);
     }
 
-    //clicking prev
-    const handlePrevBtn = () => {
-      (async function () {
-        try {
-          var prevDate = eventDate;
-
-          if(eventDate.getMonth() === 0){
-            prevDate.setFullYear(eventDate.getFullYear() - 1);
-            prevDate.setMonth(11);
-          }else{
-            prevDate.setMonth(eventDate.getMonth() - 1);
-          }
-
-          var resp = await GetAllJobEventsByMonthAndYear(prevDate.getMonth() + 1, prevDate.getFullYear());
-
-          if (resp.status === 401){
-            setLoginState(false);
-            return;
-          }
-
-          const eventList = await resp.json();
-
-          setJobEvents(eventList);
-          setErrorMessage(undefined);
-        } catch (e) {
-          setErrorMessage(e.message);
-        }
-      })();
-    }
-
-    const handleNextBtn = () => {
-      (async function () {
-        try {    
-          var nextDate = eventDate;
-
-          if(eventDate.getMonth() === 11){
-            nextDate.setFullYear(eventDate.getFullYear() + 1);
-            nextDate.setMonth(0);
-          }else{
-            nextDate.setMonth(eventDate.getMonth() + 1);
-          }
-
-          var resp = await GetAllJobEventsByMonthAndYear(nextDate.getMonth() + 1, nextDate.getFullYear());
-
-          if (resp.status === 401){
-            setLoginState(false);
-            return;
-          }
-
-          const eventList = await resp.json();
-
-          setJobEvents(eventList);
-          setErrorMessage(undefined);
-        } catch (e) {
-          setErrorMessage(e.message);
-        }
-      })();
-    }
-
-    const handleTodayBtn = () => {
-      (async function () {
-        try {
-          var currDate = new Date();
-          eventDate.setMonth(currDate.getMonth());
-          eventDate.setFullYear(currDate.getFullYear());
-
-          var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
-
-          if (resp.status === 401){
-            setLoginState(false);
-            return;
-          }
-
-          const eventList = await resp.json();
-
-          setJobEvents(eventList);
-          setErrorMessage(undefined);
-        } catch (e) {
-          setErrorMessage(e.message);
-        }
-      })();
-    }
-
     return(
         <>
             {errorMessage !== undefined && (
@@ -139,32 +59,9 @@ function Calendar({setLoginState}) {
                 ref={calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 headerToolbar={{
-                  left: 'prevBtn,nextBtn todayBtn',
+                  left: 'prev,next today',
                   center: 'title',
                   right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                }}
-                customButtons={{
-                  prevBtn: {
-                    text: '<',
-                    click: () =>{
-                      handlePrevBtn();
-                      calendarRef.current.getApi().prev();
-                    }
-                  },
-                  nextBtn: {
-                    text: '>',
-                    click: () => {
-                      handleNextBtn();
-                      calendarRef.current.getApi().next();
-                    }
-                  },
-                  todayBtn: {
-                    text:'today',
-                    click: () => {
-                      handleTodayBtn();
-                      calendarRef.current.getApi().today();
-                    }
-                  }
                 }}
                 initialView="dayGridMonth"
                 editable={true}
