@@ -16,8 +16,8 @@ function Calendar({setLoginState}) {
     (async function () {
       try {
         // var resp = await GetAllJobEvents();
-        var newDate = calendarRef.current.getApi().getDate();
-        setEventDate(newDate);
+
+        setEventDate(calendarRef.current.getApi().getDate());
 
         var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
 
