@@ -6,6 +6,7 @@ using EmployeeManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
+using RofShared;
 using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
