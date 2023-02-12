@@ -10,13 +10,32 @@ function Calendar({setLoginState}) {
     const calendarRef = useRef();
     const [jobEvents, setJobEvents] = useState([]);
     const [errorMessage, setErrorMessage] = useState(undefined);
-    const [eventDate, setEventDate] = useState(new Date());
 
     useEffect(() => {
     (async function () {
       try {
-        setEventDate(calendarRef.current.getApi().getDate());
+        var eventDate = calendarRef.current.getApi().getDate();
+        
+        var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
 
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
+
+        const eventList = await resp.json();
+        setJobEvents(eventList);
+
+        setErrorMessage(undefined);
+      } catch (e) {
+        setErrorMessage(e.message);
+      }
+    })();
+  }, []);
+
+  const handleCalendarViewClick = () => {
+    (async function () {
+      try {
         var view = calendarRef.current.getApi().view; //grabs current view object for current start and end date
 
         if(view.type === "timeGridWeek"){
@@ -36,41 +55,43 @@ function Calendar({setLoginState}) {
           constructJobEvents(startEvents, jobs);
 
           //grabs events for month and year of end date
+          //only grab events using end date if month is not the same as start date
+          //prevents same event being added to the jobs[].
           var currEndDate = view.currentEnd;
-          var resp = await GetAllJobEventsByMonthAndYear(currEndDate.getMonth() + 1, currEndDate.getFullYear());
+
+          if(currEndDate.getMonth() !== currStartDate.getMonth()){
+            var resp = await GetAllJobEventsByMonthAndYear(currEndDate.getMonth() + 1, currEndDate.getFullYear());
+
+            if (resp.status === 401){
+              setLoginState(false);
+              return;
+            }
+
+            //adds events to same list
+            const endEvents = await resp.json();
+            constructJobEvents(endEvents, jobs);
+          }
+          
+          setJobEvents(jobs);
+        }else{
+          var eventDate = calendarRef.current.getApi().getDate();
+
+          var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
 
           if (resp.status === 401){
             setLoginState(false);
             return;
           }
 
-          //adds events to same list
-          const endEvents = await resp.json();
-          constructJobEvents(endEvents, jobs);
-          
-          console.log(eventDate);
-
-          setErrorMessage(undefined);
+          const eventList = await resp.json();
+          setJobEvents(eventList);
         }
-        
-        var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
-
-        if (resp.status === 401){
-          setLoginState(false);
-          return;
-        }
-
-        const eventList = await resp.json();
-        setJobEvents(eventList);
-        
-        console.log(eventDate);
-
         setErrorMessage(undefined);
-      } catch (e) {
+      }catch (e) {
         setErrorMessage(e.message);
       }
     })();
-  }, [eventDate]);
+  }
 
   //selecting an event
     const handleEventClick = (arg) => {
@@ -89,8 +110,6 @@ function Calendar({setLoginState}) {
       for(var i = 0; i < eventList.length; i++){
         jobs.push(eventList[i]);
       }
-
-      setJobEvents(jobs);
     };
 
     return(
@@ -103,9 +122,53 @@ function Calendar({setLoginState}) {
                 ref={calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 headerToolbar={{
-                  left: 'prev,next today',
+                  left: 'prevBtn,nextBtn todayBtn',
                   center: 'title',
-                  right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                  right: 'toggleMonth,toggleWeek,toggleDay'
+                }}
+                customButtons={{
+                  prevBtn:{
+                    text: "<",
+                    click: () =>{
+                      calendarRef.current.getApi().prev();
+                      handleCalendarViewClick();
+                    }
+                  },
+                  nextBtn:{
+                    text: ">",
+                    click: () => {
+                      calendarRef.current.getApi().next();
+                      handleCalendarViewClick();
+                    }
+                  },
+                  todayBtn:{
+                    text: "today",
+                    click: () => {
+                      calendarRef.current.getApi().today();
+                      handleCalendarViewClick();
+                    }
+                  },
+                  toggleMonth:{
+                    text: "month",
+                    click: () =>{
+                      calendarRef.current.getApi().changeView("dayGridMonth");
+                      handleCalendarViewClick();
+                    }
+                  },
+                  toggleWeek:{
+                    text: "week",
+                    click: () =>{
+                      calendarRef.current.getApi().changeView("timeGridWeek");
+                      handleCalendarViewClick();
+                    }
+                  },
+                  toggleDay:{
+                    text: "day",
+                    click: () =>{
+                      calendarRef.current.getApi().changeView("timeGridDay");
+                      handleCalendarViewClick();
+                    }
+                  }
                 }}
                 initialView="dayGridMonth"
                 editable={true}
