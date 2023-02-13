@@ -2,14 +2,13 @@
 using EmployeeManagementService.Domain.Mappers.Database;
 using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Infrastructure.Persistence;
-using EmployeeManagementService.Infrastructure.Persistence.Filters;
 using Microsoft.Extensions.Configuration;
-using RofShared;
 using RofShared.Exceptions;
+using RofShared.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DbEmployee = EmployeeManagementService.Infrastructure.Persistence.Entities.Employee;
 
 namespace EmployeeManagementService.Domain.Services
 {
@@ -37,15 +36,8 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task<Employee> GetEmployeeByUsername(string username)
         {
-            var filterModel = new GetEmployeeFilterModel<string>(GetEmployeeFilterEnum.Usermame, username);
-
-            var employee = await _employeeRepository.GetEmployeeByFilter(filterModel);
-
-            if (employee == null)
-            {
-                return null;
-            }
-
+            var employee = await GetDbEmployeeByUsername(username);
+        
             return EmployeeMapper.ToCoreEmployee(employee);
         }
 
@@ -55,11 +47,6 @@ namespace EmployeeManagementService.Domain.Services
 
             var employees = result.Item1;
             var totalPages = result.Item2;
-
-            if (employees == null || employees.Count == 0)
-            {
-                return new EmployeesWithTotalPage(new List<Employee>(), 0);
-            }
 
             var coreEmployees = employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();
 
@@ -89,57 +76,31 @@ namespace EmployeeManagementService.Domain.Services
         {
             var employee = await GetDbEmployeeById(id);
 
-            if (!_passwordService.VerifyPasswordRequirements(newPassword))
-            {
-                throw new ArgumentException("New password does not meet all requirements.");
-            }
+            _passwordService.ValidateNewPasswordForUpdate(newPassword, employee.Password);
 
-            if (_passwordService.VerifyPasswordHash(newPassword, employee.Password))
-            {
-                throw new ArgumentException("New password cannot be the same as current password.");
-            }
-
-            var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
-
-            employee.Password = newEncryptedPass;
+            employee.Password = _passwordService.EncryptPassword(newPassword);
 
             await _employeeRepository.UpdateEmployee(employee);
         }
 
         public async Task UpdateEmployeeInformation(Employee employee)
         {
-            await ValidateEmployeeInformation(employee, true);
+            await ValidateEmployee(employee, true);
 
             var originalEmployee = await GetDbEmployeeById(employee.Id);
-            
-            originalEmployee.EmailAddress = employee.Email;
-            originalEmployee.PhoneNumber = employee.PhoneNumber;
-            originalEmployee.Username = employee.Username;
-            originalEmployee.FirstName = employee.FirstName;
-            originalEmployee.LastName = employee.LastName;
-            originalEmployee.Role = (string.IsNullOrEmpty(employee.Role)) ? originalEmployee.Role : employee.Role;
-            originalEmployee.Ssn = employee.Ssn;
-            originalEmployee.AddressLine1 = employee.Address?.AddressLine1;
-            originalEmployee.AddressLine2 = employee.Address?.AddressLine2;
-            originalEmployee.State = employee.Address?.State;
-            originalEmployee.City = employee.Address?.City;
-            originalEmployee.ZipCode = employee.Address?.ZipCode;
-            //originalEmployee.CountryId = employee.CountryId;
+
+            MergeEmployeePropertiesForUpdate(originalEmployee, employee);
 
             await _employeeRepository.UpdateEmployee(originalEmployee);
         }
 
         public async Task CreateEmployee(Employee newEmployee, string password)
         {
-            await ValidateEmployeeInformation(newEmployee, false);
+            await ValidateEmployee(newEmployee, false);
 
-            if (!_passwordService.VerifyPasswordRequirements(password))
-            {
-                throw new ArgumentException("Password does not meet requirements");
-            }            
+            _passwordService.ValidatePasswordForCreate(password);             
 
-            var encryptedPass = _passwordService.EncryptPassword(password);
-            newEmployee.Password = encryptedPass;
+            newEmployee.Password = _passwordService.EncryptPassword(password);
 
             var newEmployeeEntity = EmployeeMapper.FromCoreEmployee(newEmployee);
 
@@ -148,29 +109,16 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task<Employee> EmployeeLogIn(string username, string password)
         {
-            var employee = await GetDbEmployeeByUsername(username);
+            var employee = await GetDbEmployeeByUsername(username);    
+            
+            await VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(password, employee);
 
             if (employee.IsLocked)
             {
                 throw new EmployeeIsLockedException();
             }
 
-            if (!_passwordService.VerifyPasswordHash(password, employee.Password))
-            {
-                await IncrementEmployeeFailedLoginAttempt(employee);
-
-                throw new ArgumentException("Incorrect password");
-            }
-
-            if (employee.Status == true)
-            {
-                return EmployeeMapper.ToCoreEmployee(employee);
-            }
-
-            employee.Status = true;
-            await _employeeRepository.UpdateEmployee(employee);
-
-            return EmployeeMapper.ToCoreEmployee(employee);
+            return await UpdateEmployeeStatusAndReturnEmployee(employee, true);
         }
 
         public async Task EmployeeLogout(long id)
@@ -201,6 +149,49 @@ namespace EmployeeManagementService.Domain.Services
             {
                 throw;
             }            
-        }       
+        }
+        
+        private async Task VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(string password, DbEmployee employee)
+        {
+            try
+            {
+                _passwordService.ValidatePasswordForLogin(password, employee.Password);
+            }
+            catch (ArgumentException)
+            {
+                //password was incorrect
+                await IncrementEmployeeFailedLoginAttempt(employee);
+
+                throw;
+            }
+        }
+
+        private async Task<Employee> UpdateEmployeeStatusAndReturnEmployee(DbEmployee employee, bool employeeStatus)
+        {
+            if (employee.Status != employeeStatus)
+            {
+                employee.Status = employeeStatus;
+
+                await _employeeRepository.UpdateEmployee(employee);
+            }
+
+            return EmployeeMapper.ToCoreEmployee(employee);
+        }
+
+        private void MergeEmployeePropertiesForUpdate(DbEmployee originalEmployee, Employee updatedEmployee)
+        {
+            originalEmployee.EmailAddress = updatedEmployee.Email;
+            originalEmployee.PhoneNumber = updatedEmployee.PhoneNumber;
+            originalEmployee.Username = updatedEmployee.Username;
+            originalEmployee.FirstName = updatedEmployee.FirstName;
+            originalEmployee.LastName = updatedEmployee.LastName;
+            originalEmployee.Role = (string.IsNullOrEmpty(updatedEmployee.Role)) ? originalEmployee.Role : updatedEmployee.Role;
+            originalEmployee.Ssn = updatedEmployee.Ssn;
+            originalEmployee.AddressLine1 = updatedEmployee.Address?.AddressLine1;
+            originalEmployee.AddressLine2 = updatedEmployee.Address?.AddressLine2;
+            originalEmployee.State = updatedEmployee.Address?.State;
+            originalEmployee.City = updatedEmployee.Address?.City;
+            originalEmployee.ZipCode = updatedEmployee.Address?.ZipCode;
+        }
     }
 }

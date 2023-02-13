@@ -51,32 +51,16 @@ namespace EmployeeManagementService.Domain.Services
             return employee;
         }
 
-        protected async Task ValidateEmployeeInformation(Employee employee, bool isUpdate)
+        protected async Task ValidateEmployee(Employee employee, bool isUpdate)
         {
-            var invalidErrors = (isUpdate) 
-                ? employee.IsValidEmployeeForUpdate().ToArray()
-                : employee.IsValidEmployeeToCreate().ToArray();
+            ValidateEmployeeProperties(employee, isUpdate);
 
-            if (invalidErrors.Length > 0)
+            await ValidateIfEmployeeIsDuplicate(employee.Id, employee.Ssn, employee.Username, employee.Email);
+
+            if (!isUpdate)
             {
-                var errorMessage = string.Join("\n", invalidErrors);
-
-                throw new ArgumentException(errorMessage);
-            }
-
-            var isDuplicate = await _employeeRepository.DoesEmployeeExistsBySsnOrUsernameOrEmail(employee.Ssn,
-                employee.Username, employee.Email, employee.Id);
-
-            if (isDuplicate)
-            {
-                throw new ArgumentException("Employee with ssn, username, or email exists");
-            }
-
-            var roles = _roles.Split(",");
-            if (string.IsNullOrEmpty(employee.Role) || !roles.Contains(employee.Role))
-            {
-                throw new ArgumentException("Invalid role assigned");
-            }          
+                ValidateEmployeeRole(employee.Role);
+            }            
         }
 
         protected async Task IncrementEmployeeFailedLoginAttempt(EmployeeDB employee)
@@ -97,6 +81,38 @@ namespace EmployeeManagementService.Domain.Services
             employee.FailedLoginAttempts = attempts;
 
             await _employeeRepository.UpdateEmployee(employee);
+        }
+
+        private void ValidateEmployeeProperties(Employee employee, bool isUpdate)
+        {
+            var validationErrors = (isUpdate) ? employee.GetValidationErrorsForUpdate() : employee.GetValidationErrorsForCreate();
+
+            if (validationErrors.Count > 0)
+            {
+                var errorMessage = string.Join("\n", validationErrors);
+
+                throw new ArgumentException(errorMessage);
+            }
+        }
+
+        private async Task ValidateIfEmployeeIsDuplicate(long id, string ssn, string username, string email)
+        {
+            var isDuplicate = await _employeeRepository.DoesEmployeeExistsBySsnOrUsernameOrEmail(ssn,
+                username, email, id);
+
+            if (isDuplicate)
+            {
+                throw new ArgumentException("Employee with ssn, username, or email exists");
+            }
+        }
+
+        private void ValidateEmployeeRole(string role)
+        {
+            var roles = _roles.Split(",");
+            if (string.IsNullOrEmpty(role) || !roles.Contains(role))
+            {
+                throw new ArgumentException($"Invalid role assigned - {role}");
+            }
         }
     }
 }

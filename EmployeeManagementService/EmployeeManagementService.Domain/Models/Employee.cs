@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace EmployeeManagementService.Domain.Models
 {
@@ -84,88 +85,59 @@ namespace EmployeeManagementService.Domain.Models
         /// Validates whether or not all fields are present for employee information update.
         /// </summary>
         /// <returns></returns>
-        public List<string> IsValidEmployeeForUpdate()
+        public List<string> GetValidationErrorsForUpdate()
         {
-            var invalidErrors = new List<string>();
+            var validationErrors = new List<string>();
 
             if (Id <= 0)
             {
-                invalidErrors.Add($"Invalid Id: {Id}");
+                validationErrors.Add($"Invalid Id: {Id}");
             }
 
-            if (string.IsNullOrEmpty(Username))
-            {
-                invalidErrors.Add("Username cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(FirstName))
-            {
-                invalidErrors.Add("First name cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(LastName))
-            {
-                invalidErrors.Add("Last name cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(Ssn))
-            {
-                invalidErrors.Add("SSN cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(PhoneNumber))
-            {
-                invalidErrors.Add("Phone number cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(Email))
-            {
-                invalidErrors.Add("Email cannot be empty");
-            }
-
-            return invalidErrors;
+            var remainingPropertyValidationErrors = GetValidationErrorsForBothCreateOrUpdate();
+            validationErrors.AddRange(remainingPropertyValidationErrors);
+            
+            return validationErrors;
         }
 
-        public List<string> IsValidEmployeeToCreate()
+        public List<string> GetValidationErrorsForCreate()
         {
-            var invalidErrors = new List<string>();
-            
-            if (string.IsNullOrEmpty(Username))
-            {
-                invalidErrors.Add("Username cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(FirstName))
-            {
-                invalidErrors.Add("First name cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(LastName))
-            {
-                invalidErrors.Add("Last name cannot be empty");
-            }
-
+            var validationErrors = new List<string>();
+                    
             if (string.IsNullOrEmpty(Role))
             {
-                invalidErrors.Add("Role cannot be empty");
+                validationErrors.Add("Role cannot be empty");
             }
 
-            if (string.IsNullOrEmpty(Ssn))
+            var remainingPropertyValidationErrors = GetValidationErrorsForBothCreateOrUpdate();
+            validationErrors.AddRange(remainingPropertyValidationErrors);
+
+            return validationErrors;
+        }
+
+        private List<string> GetValidationErrorsForBothCreateOrUpdate()
+        {
+            var validationErrors = new List<string>();
+            var failedMessageIfValidationResultIsTrue = new Dictionary<string, bool>();
+
+            failedMessageIfValidationResultIsTrue.Add("Username cannot be empty", string.IsNullOrEmpty(Username));
+            failedMessageIfValidationResultIsTrue.Add("First name cannot be empty", string.IsNullOrEmpty(FirstName));
+            failedMessageIfValidationResultIsTrue.Add("Last name cannot be empty", string.IsNullOrEmpty(LastName));
+            failedMessageIfValidationResultIsTrue.Add("SSN cannot be empty", string.IsNullOrEmpty(Ssn));
+            failedMessageIfValidationResultIsTrue.Add("Phone number cannot be empty", string.IsNullOrEmpty(PhoneNumber));
+            failedMessageIfValidationResultIsTrue.Add("Email cannot be empty", string.IsNullOrEmpty(Email));
+
+            foreach(var failedMessageToValidationResult in failedMessageIfValidationResultIsTrue)
             {
-                invalidErrors.Add("SSN cannot be empty");
+                var validationFailed = failedMessageToValidationResult.Value;
+                if (validationFailed)
+                {
+                    var msg = failedMessageToValidationResult.Key;
+                    validationErrors.Add(msg);
+                }
             }
 
-            if (string.IsNullOrEmpty(PhoneNumber))
-            {
-                invalidErrors.Add("Phone number cannot be empty");
-            }
-
-            if (string.IsNullOrEmpty(Email))
-            {
-                invalidErrors.Add("Email cannot be empty");
-            }
-
-            return invalidErrors;
+            return validationErrors;
         }
     }
 }
