@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
 using RofShared.Exceptions;
+using RofShared.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -137,16 +138,14 @@ namespace EmployeeManagementService.Test.Service
         }
 
         [Test]
-        public async Task GetEmployeeByUsername_EmployeeDoesNotExist()
+        public void GetEmployeeByUsername_EmployeeDoesNotExist()
         {
             _employeeRepository.Setup(e => e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
-                .ReturnsAsync((Employee)null);
+                .ThrowsAsync(new EntityNotFoundException("Employee"));
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            var employee = await employeeService.GetEmployeeByUsername("jdoe");
-
-            Assert.IsNull(employee);
+            Assert.ThrowsAsync<EntityNotFoundException>(() => employeeService.GetEmployeeByUsername("jdoe"));
         }
 
         [Test]
@@ -503,7 +502,8 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public void EmployeeLogin_Locked()
         {
-            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
+            var password = "t3$T1234";
+            var encryptedPass = _passwordService.EncryptPassword(password);
 
             _employeeRepository.Setup(e => e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
                 .ReturnsAsync(new Employee()
@@ -525,7 +525,7 @@ namespace EmployeeManagementService.Test.Service
 
             var employeeService = new EmployeeService(_employeeRepository.Object, _passwordService, _config.Object);
 
-            Assert.ThrowsAsync<EmployeeIsLockedException>(() => employeeService.EmployeeLogIn("jdoe", "tE$t1234"));
+            Assert.ThrowsAsync<EmployeeIsLockedException>(() => employeeService.EmployeeLogIn("jdoe", password));
         }
 
         [Test]

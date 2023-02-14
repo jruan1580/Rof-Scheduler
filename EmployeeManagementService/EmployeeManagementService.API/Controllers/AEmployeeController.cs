@@ -46,12 +46,11 @@ namespace EmployeeManagementService.API.Controllers
             {
                 var employee = await _employeeService.GetEmployeeByUsername(username);
 
-                if (employee == null)
-                {
-                    return NotFound($"Employee with username: {username} not found.");
-                }
-
                 return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
+            }
+            catch (EntityNotFoundException)
+            {
+                return NotFound($"Employee with username: {username} not found.");
             }
             catch (Exception ex)
             {

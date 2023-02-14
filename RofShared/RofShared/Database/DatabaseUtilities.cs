@@ -16,7 +16,7 @@ namespace RofShared.Database
                 throw new Exception("Page requested is more than total number of pages");
             }
 
-            return totalPages; ;
+            return totalPages;
         }
 
 

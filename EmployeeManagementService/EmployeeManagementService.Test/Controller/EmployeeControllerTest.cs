@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
+using RofShared.Exceptions;
 using System;
 using System.Threading.Tasks;
 
@@ -168,7 +169,7 @@ namespace EmployeeManagementService.Test.Controller
         public async Task GetEmployeeByUsername_InternalServerError()
         {
             _employeeService.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
-                .ReturnsAsync((Domain.Models.Employee)null);
+                .ThrowsAsync(new EntityNotFoundException("Employee"));
 
             var controller = new EmployeeController(_employeeService.Object);
 
