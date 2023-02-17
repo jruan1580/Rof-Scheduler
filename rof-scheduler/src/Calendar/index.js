@@ -2,16 +2,35 @@ import FullCalendar from '@fullcalendar/react' // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
 import timeGridPlugin from '@fullcalendar/timegrid'
+import { useRef } from "react";
 
 function Calendar() {
+  const calendarRef = useRef();
     const handleEventClick = (arg) => {
         console.log(arg);
         alert(arg);
     }
 
     const handleDateSelect = (selectInfo) => {
+      //employeeId, petId, petServiceId, eventStartTime <- needed for add
+
+      //month view time is 00:00, need to get time.
+
+      //if(view = month){
+        //alert to select time
+        //set start time
+      // }else{
+        //start time = time selected
+      // }
+
+      //grab employee, pet, pet service
+      //alert to chose
+      //set ids
+
+      //add event
+      
+      console.log(selectInfo.start);
         alert(selectInfo);
-        console.log(selectInfo);
     }
 
     return(
