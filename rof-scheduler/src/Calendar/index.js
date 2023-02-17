@@ -3,7 +3,7 @@ import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
 import timeGridPlugin from '@fullcalendar/timegrid'
 import { useEffect, useRef, useState } from "react";
-import { GetAllJobEventsByMonthAndYear, GetAllJobEvents } from '../SharedServices/jobEventService';
+import { getAllJobEventsByMonthAndYear, addEvent } from '../SharedServices/jobEventService';
 import { Alert } from "react-bootstrap";
 
 function Calendar({setLoginState}) {
@@ -16,7 +16,7 @@ function Calendar({setLoginState}) {
       try {
         var eventDate = calendarRef.current.getApi().getDate();
         
-        var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
+        var resp = await getAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
 
         if (resp.status === 401){
           setLoginState(false);
@@ -43,7 +43,7 @@ function Calendar({setLoginState}) {
 
           //grabs events for month and year of start date
           var currStartDate = view.currentStart;
-          var resp = await GetAllJobEventsByMonthAndYear(currStartDate.getMonth() + 1, currStartDate.getFullYear());
+          var resp = await getAllJobEventsByMonthAndYear(currStartDate.getMonth() + 1, currStartDate.getFullYear());
 
           if (resp.status === 401){
             setLoginState(false);

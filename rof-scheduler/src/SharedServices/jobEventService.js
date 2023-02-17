@@ -1,6 +1,6 @@
 import { makeHttpRequest } from "./httpClientWrapper";
 
-export const GetAllJobEventsByMonthAndYear = async function(month, year){
+export const getAllJobEventsByMonthAndYear = async function(month, year){
   var baseUrl = process.env.REACT_APP_EVENT_SERVICE_BASE_URL;
   
   var url = baseUrl + "/event?month=" + month + "&year=" + year;
@@ -8,7 +8,7 @@ export const GetAllJobEventsByMonthAndYear = async function(month, year){
   return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
 }
 
-export const GetAllJobEvents = async function(){
+export const getAllJobEvents = async function(){
   var baseUrl = process.env.REACT_APP_EVENT_SERVICE_BASE_URL;
   
   var url = baseUrl + "/event/all";
