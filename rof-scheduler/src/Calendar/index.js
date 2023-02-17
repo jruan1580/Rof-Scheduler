@@ -60,7 +60,7 @@ function Calendar({setLoginState}) {
           var currEndDate = view.currentEnd;
 
           if(currEndDate.getMonth() !== currStartDate.getMonth()){
-            var resp = await GetAllJobEventsByMonthAndYear(currEndDate.getMonth() + 1, currEndDate.getFullYear());
+            var resp = await getAllJobEventsByMonthAndYear(currEndDate.getMonth() + 1, currEndDate.getFullYear());
 
             if (resp.status === 401){
               setLoginState(false);
@@ -76,7 +76,7 @@ function Calendar({setLoginState}) {
         }else{
           var eventDate = calendarRef.current.getApi().getDate();
 
-          var resp = await GetAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
+          var resp = await getAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
 
           if (resp.status === 401){
             setLoginState(false);
