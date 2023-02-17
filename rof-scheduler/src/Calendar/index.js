@@ -2,35 +2,77 @@ import FullCalendar from '@fullcalendar/react' // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
 import timeGridPlugin from '@fullcalendar/timegrid'
-import { useRef } from "react";
+import { useState, useRef } from "react";
 
 function Calendar() {
   const calendarRef = useRef();
-    const handleEventClick = (arg) => {
-        console.log(arg);
-        alert(arg);
-    }
+  const [employees, setEmployees] = useState([]);
+  const [pets, setPets] = useState([]);
+  const [petServices, setPetServices] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(undefined);
 
-    const handleDateSelect = (selectInfo) => {
-      //employeeId, petId, petServiceId, eventStartTime <- needed for add
+  const handleEventClick = (arg) => {
+      console.log(arg);
+      alert(arg);
+  }
 
-      //month view time is 00:00, need to get time.
+  const handleDateSelect = (selectInfo) => {
+    //employeeId, petId, petServiceId, eventStartTime <- needed for add
 
-      //if(view = month){
-        //alert to select time
-        //set start time
-      // }else{
-        //start time = time selected
-      // }
+    //month view time is 00:00, need to get time.
 
-      //grab employee, pet, pet service
-      //alert to chose
-      //set ids
+    //if(view = month){
+      //alert to select time
+      //set start time
+    // }else{
+      //start time = time selected
+    // }
 
-      //add event
-      
-      console.log(selectInfo.start);
-        alert(selectInfo);
+    //grab employee, pet, pet service
+    //alert to chose
+    //set ids
+
+    //add event
+    
+    console.log(selectInfo.start);
+      alert(selectInfo);
+  }
+
+    // const getEmployees = () => {
+    //   (async function() {
+    //   try {
+    //     //need a get Employee drop down
+    //   } catch (e) {
+    //     setErrorMessage(e.message);
+    //   }
+    // })
+    // }
+
+    // const getPets = () => {
+    //   (async function() {
+    //   try {
+    //     //need a get Pet drop down
+    //   } catch (e) {
+    //     setErrorMessage(e.message);
+    //   }
+    // })
+    // }
+
+    const getPetServices = () => {
+      (async function() {
+        try {
+          const resp = await getPetServices();
+          if (resp.status === 401) {
+            setLoginState(false);
+            return;
+          }
+
+          const petServices = await resp.json();
+          setPetServices(petServices);
+        } catch (e) {
+          setErrorMessage(e.message);
+        }
+      })
     }
 
     return(

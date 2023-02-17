@@ -27,3 +27,10 @@ export const getVaccinesByPetType = async function(petTypeId){
   
     return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
 }
+
+export const getPetServices = async function(){
+    var baseUrl = process.env.REACT_APP_PET_SERVICE_BASE_URL;
+    var url = baseUrl + "/dropdown/petServices";
+
+    return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
+}
