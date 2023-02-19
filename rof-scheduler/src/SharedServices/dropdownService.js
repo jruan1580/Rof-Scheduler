@@ -34,3 +34,10 @@ export const getPetServices = async function(){
 
     return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
 }
+
+export const getPets = async function(){
+    var baseUrl = process.env.REACT_APP_CLIENT_MANAGEMENT_BASE_URL;
+    var url = baseUrl + "/dropdown/pets";
+  
+    return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
+}
