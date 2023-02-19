@@ -5,12 +5,6 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import { useState, useRef } from "react";
 
 function Calendar() {
-  const calendarRef = useRef();
-  const [employees, setEmployees] = useState([]);
-  const [pets, setPets] = useState([]);
-  const [petServices, setPetServices] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(undefined);
-
   const handleEventClick = (arg) => {
       console.log(arg);
       alert(arg);
