@@ -58,6 +58,16 @@ namespace ClientManagementService.Test.Controller
                         FullName = "Test User"
                     }
                 });
+
+            _dropdownService.Setup(d => d.GetPets())
+                .ReturnsAsync(new List<Domain.Models.Pet>()
+                {
+                    new Domain.Models.Pet()
+                    {
+                        Id = 1,
+                        Name = "TestPet"
+                    }
+                });
         }
 
         [Test]
@@ -66,6 +76,21 @@ namespace ClientManagementService.Test.Controller
             var controller = new DropdownController(_dropdownService.Object);
 
             var result = await controller.GetClients();
+
+            Assert.NotNull(result);
+            Assert.AreEqual(typeof(OkObjectResult), result.GetType());
+
+            var okObj = (OkObjectResult)result;
+
+            Assert.AreEqual(okObj.StatusCode, 200);
+        }
+
+        [Test]
+        public async Task GetPetTest()
+        {
+            var controller = new DropdownController(_dropdownService.Object);
+
+            var result = await controller.GetPets();
 
             Assert.NotNull(result);
             Assert.AreEqual(typeof(OkObjectResult), result.GetType());

@@ -13,6 +13,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task<long> AddPet(Pet newPet);
         Task DeletePetById(long petId);
         Task<List<PetType>> GetAllPetTypes();
+        Task<List<Pet>> GetPetsForDropdown();
         Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
         Task<(List<Pet>, int)> GetPetsByClientIdAndKeyword(long clientId, int page = 1, int offset = 10, string keyword = "");
@@ -82,6 +83,14 @@ namespace ClientManagementService.Infrastructure.Persistence
                 await PopulateBreedOwnerAndPetType(context, res);
 
                 return (res, totalPages);
+            }
+        }
+
+        public async Task<List<Pet>> GetPetsForDropdown()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Pets.Select(p => new Pet() { Id = p.Id, Name = p.Name }).ToListAsync();
             }
         }
 

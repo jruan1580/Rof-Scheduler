@@ -133,5 +133,21 @@ namespace ClientManagementService.Test.Mapper
             Assert.AreEqual(1, core.Id);
             Assert.AreEqual("Golden Retriever", core.BreedName);
         }
+
+        [Test]
+        public void ToCorePetDropdownTest()
+        {
+            var entity = new DbPet();
+
+            entity.Id = 1;
+            entity.Name = "TestPet";
+
+            var core = PetMapper.ToCorePetDropDown(entity);
+
+            Assert.IsNotNull(core);
+
+            Assert.AreEqual(1, core.Id);
+            Assert.AreEqual("TestPet", core.Name);
+        }
     }
 }

@@ -72,5 +72,15 @@ namespace ClientManagementService.Domain.Mappers.Database
 
             return coreBreed;
         }
+
+        public static CorePet ToCorePetDropDown(DbPet dbPet)
+        {
+            var corePet = new CorePet();
+
+            corePet.Id = dbPet.Id;
+            corePet.Name = dbPet.Name;
+
+            return corePet;
+        }
     }
 }

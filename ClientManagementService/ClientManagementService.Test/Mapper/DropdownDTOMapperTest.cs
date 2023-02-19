@@ -85,5 +85,24 @@ namespace ClientManagementService.Test.Mapper
             Assert.AreEqual(dto.Id, client.Id);
             Assert.AreEqual(dto.FullName, client.FullName);
         }
+
+        [Test]
+        public void TestToPetDTO()
+        {
+            var pet = new Pet()
+            {
+                Id = 1,
+                Name = "TestPet"
+            };
+
+            var dtos = DropdownDTOMapper.ToPetDTO(new List<Pet> { pet });
+
+            Assert.IsNotNull(dtos);
+            Assert.AreEqual(1, dtos.Count);
+
+            var dto = dtos[0];
+            Assert.AreEqual(dto.Id, pet.Id);
+            Assert.AreEqual(dto.Name, pet.Name);
+        }
     }
 }
