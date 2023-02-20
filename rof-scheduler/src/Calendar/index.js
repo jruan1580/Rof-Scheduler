@@ -2,19 +2,19 @@ import FullCalendar from '@fullcalendar/react' // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
 import timeGridPlugin from '@fullcalendar/timegrid'
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Modal, Form, Row, Col, Button, Alert } from "react-bootstrap";
 
 import { getPetServices, getPets } from "../SharedServices/dropdownService";
 
 function Calendar({ setLoginState }) {
-  const calendarRef = useRef();
   const [showAddModal, setShowAddModal] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [pets, setPets] = useState([]);
   const [petServices, setPetServices] = useState([]);
   const [isMonthView, setIsMonthView] = useState(true);
   const [errorMessage, setErrorMessage] = useState(undefined);
+  const [eventStartDate, setEventStartDate] = useState("");
 
   const handleEventClick = (arg) => {
       console.log(arg);
@@ -23,15 +23,25 @@ function Calendar({ setLoginState }) {
 
   const handleDateSelect = (selectInfo) => {
     console.log(selectInfo);
-    var view = calendarRef.current.getApi().view;
+    var view = selectInfo.view;
     if(view.type !== "dayGridMonth"){
       setIsMonthView(false);
     }else{
       setIsMonthView(true);
     }
+    
+    var eventStart = selectInfo.startStr;
+    setEventStartDate(eventStart);
+    
+    // constructEmployeeOptions();
     constructPetOptions();
     constructPetServiceOptions();
     setShowAddModal(true);
+  }
+
+  //get employees for dropdown
+  const constructEmployeeOptions = () => {
+
   }
 
   //get pet services for dropdown
@@ -72,7 +82,7 @@ function Calendar({ setLoginState }) {
     })();
   };
 
-  //reset everything when we close modal
+  //reset everything and close modal
   const closeModal = function () {
     setErrorMessage(undefined);
     setShowAddModal(false);
@@ -86,7 +96,23 @@ function Calendar({ setLoginState }) {
     const employeeId = parseInt(e.target.employees.value);
     const petId = parseInt(e.target.pets.value);
     const petServiceId = parseInt(e.target.petService.value);
-    const eventDate = undefined;
+    var eventDate = undefined;
+
+    if(e.target.ampm.value === "pm" && e.target.hour.value === "12"){
+      e.target.hour.value = "00";
+    } else if(e.target.ampm.value === "pm"){
+      var time = parseInt(e.target.hour.value);
+      time += 12;
+      e.target.hour.value = time.toString();
+    }
+
+    var eventTime = e.target.hour.value + ":" + e.target.minute.value;
+
+    if(eventTime !== undefined){
+      eventDate = eventStartDate + eventTime;
+    }else{
+      eventDate = eventStartDate;
+    }
 
     (async function () {
       try {
@@ -101,7 +127,6 @@ function Calendar({ setLoginState }) {
   return(
       <>
           <FullCalendar
-            ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             headerToolbar={{
               left: 'prev,next today',
@@ -201,7 +226,7 @@ function Calendar({ setLoginState }) {
                     </Form.Select>
                   </Col>
                   <Col lg={3}>
-                    <Form.Select type="select" name="hour">
+                    <Form.Select type="select" name="minute">
                       <option value="00">00</option>
                       <option value="15">15</option>
                       <option value="30">30</option>
