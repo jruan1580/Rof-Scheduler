@@ -13,6 +13,7 @@ function Calendar({ setLoginState }) {
   const [employees, setEmployees] = useState([]);
   const [pets, setPets] = useState([]);
   const [petServices, setPetServices] = useState([]);
+  const [isMonthView, setIsMonthView] = useState(true);
   const [errorMessage, setErrorMessage] = useState(undefined);
 
   const handleEventClick = (arg) => {
@@ -22,6 +23,12 @@ function Calendar({ setLoginState }) {
 
   const handleDateSelect = (selectInfo) => {
     console.log(selectInfo);
+    var view = calendarRef.current.getApi().view;
+    if(view.type !== "dayGridMonth"){
+      setIsMonthView(false);
+    }else{
+      setIsMonthView(true);
+    }
     constructPetOptions();
     constructPetServiceOptions();
     setShowAddModal(true);
@@ -76,9 +83,14 @@ function Calendar({ setLoginState }) {
 
     setErrorMessage(undefined);
 
+    const employeeId = parseInt(e.target.employees.value);
+    const petId = parseInt(e.target.pets.value);
+    const petServiceId = parseInt(e.target.petService.value);
+    const eventDate = undefined;
+
     (async function () {
       try {
-        
+        //add event
       } catch (e) {
         setErrorMessage(e.message);
         return;
@@ -89,22 +101,23 @@ function Calendar({ setLoginState }) {
   return(
       <>
           <FullCalendar
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              headerToolbar={{
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-              }}
-              initialView="dayGridMonth"
-              editable={true}
-              selectable={true}    
-              selectMirror={true}
-              select={handleDateSelect}
-              eventClick={handleEventClick}            
-              events={[
-                  { title: 'event 1', start: '2022-04-29T05:00:00', end: '2022-04-29T07:00:00'},
-                  { title: 'event 2', start: '2022-04-29T05:00:00', end: '2022-04-29T06:00:00' }
-                ]}
+            ref={calendarRef}
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            }}
+            initialView="dayGridMonth"
+            editable={true}
+            selectable={true}    
+            selectMirror={true}
+            select={handleDateSelect}
+            eventClick={handleEventClick}            
+            events={[
+                { title: 'event 1', start: '2022-04-29T05:00:00', end: '2022-04-29T07:00:00'},
+                { title: 'event 2', start: '2022-04-29T05:00:00', end: '2022-04-29T06:00:00' }
+              ]}
           />
           
           <Modal show={showAddModal} onHide={closeModal}>
@@ -121,7 +134,7 @@ function Calendar({ setLoginState }) {
                     Employee:
                   </Form.Label>
                   <Col lg={9}>
-                    <Form.Select type="select" name="employees">
+                    <Form.Select type="select" name="employee">
                       {/* {employees.map((employee) => {
                         return (
                           <option key={employee.id} value={employee.id}>
@@ -138,7 +151,7 @@ function Calendar({ setLoginState }) {
                     Pet:
                   </Form.Label>
                   <Col lg={9}>
-                    <Form.Select type="select" name="pets">
+                    <Form.Select type="select" name="pet">
                       {pets.map((pet) => {
                         return (
                           <option key={pet.id} value={pet.id}>
@@ -167,6 +180,41 @@ function Calendar({ setLoginState }) {
                   </Col>
                 </Form.Group>
                 <br />
+                {isMonthView && (<Form.Group as={Row}>
+                  <Form.Label column lg={3}>
+                    Time:
+                  </Form.Label>
+                  <Col lg={3}>
+                    <Form.Select type="select" name="hour">
+                      <option value="1">01</option>
+                      <option value="2">02</option>
+                      <option value="3">03</option>
+                      <option value="4">04</option>
+                      <option value="5">05</option>
+                      <option value="6">06</option>
+                      <option value="7">07</option>
+                      <option value="8">08</option>
+                      <option value="9">09</option>
+                      <option value="10">10</option>
+                      <option value="11">11</option>
+                      <option value="12">12</option>
+                    </Form.Select>
+                  </Col>
+                  <Col lg={3}>
+                    <Form.Select type="select" name="hour">
+                      <option value="00">00</option>
+                      <option value="15">15</option>
+                      <option value="30">30</option>
+                      <option value="45">45</option>
+                    </Form.Select>
+                  </Col>
+                  <Col lg={3}>
+                    <Form.Select type="select" name="ampm">
+                      <option value="am">AM</option>
+                      <option value="pm">PM</option>
+                    </Form.Select>
+                  </Col>
+                </Form.Group>)}
                 <hr></hr>
                 <Button type="submit" className="float-end">
                   Add
