@@ -25,6 +25,7 @@ namespace EmployeeManagementService.API
             services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
             services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IPasswordService, PasswordService>();
+            services.AddTransient<IDropdownService, DropdownService>();
 
             services.AddMvc();           
 
