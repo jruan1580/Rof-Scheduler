@@ -277,7 +277,10 @@ function Calendar({ setLoginState }) {
                   </Col>
                 </Form.Group>)}
                 <hr></hr>
-                <Button type="submit" className="float-end">
+                <Button type="button" variant="danger" onClick={() => closeModal()} className="float-end ms-2">
+                  Cancel
+                </Button>
+                <Button type="submit" className="float-end ms-2">
                   Add
                 </Button>
               </Form>
