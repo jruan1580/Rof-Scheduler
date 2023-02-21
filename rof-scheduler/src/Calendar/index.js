@@ -5,7 +5,8 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import { useState } from "react";
 import { Modal, Form, Row, Col, Button, Alert } from "react-bootstrap";
 
-import { getPetServices, getPets } from "../SharedServices/dropdownService";
+import { getPetServices, getPets, getEmployees } from "../SharedServices/dropdownService";
+import { addEvent } from "../SharedServices/jobEventService";
 
 function Calendar({ setLoginState }) {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -33,7 +34,7 @@ function Calendar({ setLoginState }) {
     var eventStart = selectInfo.startStr;
     setEventStartDate(eventStart);
     
-    // constructEmployeeOptions();
+    constructEmployeeOptions();
     constructPetOptions();
     constructPetServiceOptions();
     setShowAddModal(true);
@@ -41,7 +42,21 @@ function Calendar({ setLoginState }) {
 
   //get employees for dropdown
   const constructEmployeeOptions = () => {
+    (async function () {
+      try {
+        const resp = await getEmployees();
+        if (resp.status === 401) {
+          setLoginState(false);
+          return;
+        }
 
+        const employees = await resp.json();
+        setEmployees(employees);
+        
+      } catch (e) {
+        setErrorMessage(e.message);
+      }
+    })();
   }
 
   //get pet services for dropdown
@@ -93,35 +108,52 @@ function Calendar({ setLoginState }) {
 
     setErrorMessage(undefined);
 
-    const employeeId = parseInt(e.target.employees.value);
-    const petId = parseInt(e.target.pets.value);
+    const employeeId = parseInt(e.target.employee.value);
+    const petId = parseInt(e.target.pet.value);
     const petServiceId = parseInt(e.target.petService.value);
     var eventDate = undefined;
 
-    if(e.target.ampm.value === "pm" && e.target.hour.value === "12"){
-      e.target.hour.value = "00";
-    } else if(e.target.ampm.value === "pm"){
-      var time = parseInt(e.target.hour.value);
-      time += 12;
-      e.target.hour.value = time.toString();
+    var eventTime = undefined; 
+    
+    if(isMonthView){
+      var hour = undefined;
+
+      if(e.target.ampm.value === "pm" && e.target.hour.value === "12"){
+        hour = "00";
+      } else if(e.target.ampm.value === "pm"){
+        hour = parseInt(e.target.hour.value) + 12;
+      }
+
+      eventTime = hour + ":" + e.target.minute.value;
     }
 
-    var eventTime = e.target.hour.value + ":" + e.target.minute.value;
-
     if(eventTime !== undefined){
-      eventDate = eventStartDate + eventTime;
+      eventDate = eventStartDate + "T" + eventTime + ":00";
     }else{
       eventDate = eventStartDate;
     }
 
     (async function () {
       try {
-        //add event
+        const resp = await addEvent(employeeId, petId, petServiceId, eventDate);
+        
+        if (resp.status === 401) {
+          setLoginState(false);
+          return;
+        }
+
+        setErrorMessage(undefined);
+        reloadAfterThreeSeconds();
+
       } catch (e) {
         setErrorMessage(e.message);
         return;
       }
     })();
+  };
+
+  const reloadAfterThreeSeconds = () => {
+    setTimeout(() => window.location.reload(), 3000);
   };
 
   return(
@@ -160,13 +192,13 @@ function Calendar({ setLoginState }) {
                   </Form.Label>
                   <Col lg={9}>
                     <Form.Select type="select" name="employee">
-                      {/* {employees.map((employee) => {
+                      {employees.map((employee) => {
                         return (
                           <option key={employee.id} value={employee.id}>
-                            {employee.petTypeName}
+                            {employee.fullName}
                           </option>
                         );
-                      })} */}
+                      })}
                     </Form.Select>
                   </Col>
                 </Form.Group>
