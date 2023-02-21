@@ -120,11 +120,13 @@ function Calendar({ setLoginState }) {
 
       if(e.target.ampm.value === "pm" && e.target.hour.value === "12"){
         hour = "00";
+        eventTime = hour + ":" + e.target.minute.value;
       } else if(e.target.ampm.value === "pm"){
         hour = parseInt(e.target.hour.value) + 12;
+        eventTime = hour + ":" + e.target.minute.value;
+      }else{
+        eventTime = e.target.hour.value + ":" + e.target.minute.value;
       }
-
-      eventTime = hour + ":" + e.target.minute.value;
     }
 
     if(eventTime !== undefined){
@@ -133,10 +135,12 @@ function Calendar({ setLoginState }) {
       eventDate = eventStartDate;
     }
 
+    console.log(eventDate);
+
     (async function () {
       try {
         const resp = await addEvent(employeeId, petId, petServiceId, eventDate);
-        
+
         if (resp.status === 401) {
           setLoginState(false);
           return;
@@ -243,15 +247,15 @@ function Calendar({ setLoginState }) {
                   </Form.Label>
                   <Col lg={3}>
                     <Form.Select type="select" name="hour">
-                      <option value="1">01</option>
-                      <option value="2">02</option>
-                      <option value="3">03</option>
-                      <option value="4">04</option>
-                      <option value="5">05</option>
-                      <option value="6">06</option>
-                      <option value="7">07</option>
-                      <option value="8">08</option>
-                      <option value="9">09</option>
+                      <option value="01">01</option>
+                      <option value="02">02</option>
+                      <option value="03">03</option>
+                      <option value="04">04</option>
+                      <option value="05">05</option>
+                      <option value="06">06</option>
+                      <option value="07">07</option>
+                      <option value="08">08</option>
+                      <option value="09">09</option>
                       <option value="10">10</option>
                       <option value="11">11</option>
                       <option value="12">12</option>
