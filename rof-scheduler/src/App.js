@@ -32,7 +32,7 @@ function App() {
               />
             )} */}
             {/* {isLogin &&  <Route exact path="/" element={<Calendar/>}/>}            */}                        
-            <Route exact path="/" element={!isLogin ? <Login handleLoginState={setLogin} /> : <Calendar />}/>
+            <Route exact path="/" element={!isLogin ? <Login handleLoginState={setLogin} /> : <Calendar setLoginState={setLogin}/>}/>
             <Route exact path="/signup" element={<CreateClient />} />
             <Route exact path="/accountsettings" element={!isLogin ? <Navigate to="/"/> : <AccountSettings setLoginState={setLogin}/>} />
             {/* <Route exact path="/calendar" element={<Calendar />} /> */}
