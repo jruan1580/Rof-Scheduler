@@ -3,10 +3,11 @@ import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
 import timeGridPlugin from '@fullcalendar/timegrid'
 import { useState } from "react";
-import { Modal, Form, Row, Col, Button, Alert } from "react-bootstrap";
+import AddEventModal from "./AddModal";
+// import { Modal, Form, Row, Col, Button, Alert } from "react-bootstrap";
 
 import { getPetServices, getPets, getEmployees } from "../SharedServices/dropdownService";
-import { addEvent } from "../SharedServices/jobEventService";
+// import { addEvent } from "../SharedServices/jobEventService";
 
 function Calendar({ setLoginState }) {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -23,7 +24,6 @@ function Calendar({ setLoginState }) {
   }
 
   const handleDateSelect = (selectInfo) => {
-    console.log(selectInfo);
     var view = selectInfo.view;
     if(view.type !== "dayGridMonth"){
       setIsMonthView(false);
@@ -97,65 +97,6 @@ function Calendar({ setLoginState }) {
     })();
   };
 
-  //reset everything and close modal
-  const closeModal = function () {
-    setErrorMessage(undefined);
-    setShowAddModal(false);
-  };
-
-  const addEventSubmit = (e) => {
-    e.preventDefault();
-
-    setErrorMessage(undefined);
-
-    const employeeId = parseInt(e.target.employee.value);
-    const petId = parseInt(e.target.pet.value);
-    const petServiceId = parseInt(e.target.petService.value);
-    var eventDate = undefined;
-
-    var eventTime = undefined; 
-    
-    if(isMonthView){
-      var hour = undefined;
-
-      if(e.target.ampm.value === "pm" && e.target.hour.value === "12"){
-        hour = "00";
-        eventTime = hour + ":" + e.target.minute.value;
-      } else if(e.target.ampm.value === "pm"){
-        hour = parseInt(e.target.hour.value) + 12;
-        eventTime = hour + ":" + e.target.minute.value;
-      }else{
-        eventTime = e.target.hour.value + ":" + e.target.minute.value;
-      }
-    }
-
-    if(eventTime !== undefined){
-      eventDate = eventStartDate + "T" + eventTime + ":00";
-    }else{
-      eventDate = eventStartDate;
-    }
-
-    console.log(eventDate);
-
-    (async function () {
-      try {
-        const resp = await addEvent(employeeId, petId, petServiceId, eventDate);
-
-        if (resp.status === 401) {
-          setLoginState(false);
-          return;
-        }
-
-        setErrorMessage(undefined);
-        reloadAfterThreeSeconds();
-
-      } catch (e) {
-        setErrorMessage(e.message);
-        return;
-      }
-    })();
-  };
-
   const reloadAfterThreeSeconds = () => {
     setTimeout(() => window.location.reload(), 3000);
   };
@@ -180,8 +121,20 @@ function Calendar({ setLoginState }) {
                 { title: 'event 2', start: '2022-04-29T05:00:00', end: '2022-04-29T06:00:00' }
               ]}
           />
+
+          <AddEventModal 
+            show={showAddModal}
+            handleHide={() => setShowAddModal(false)}
+            handleAddSuccess={reloadAfterThreeSeconds}
+            setLoginState={setLoginState}
+            eventDate={eventStartDate}
+            view={isMonthView}
+            employees={employees}
+            pets={pets}
+            petServices={petServices}
+          />
           
-          <Modal show={showAddModal} onHide={closeModal}>
+          {/* <Modal show={showAddModal} onHide={closeModal}>
             <Modal.Header className="modal-header-color" closeButton>
                 <Modal.Title>Add Event</Modal.Title>
             </Modal.Header>
@@ -285,7 +238,7 @@ function Calendar({ setLoginState }) {
                 </Button>
               </Form>
             </Modal.Body>
-          </Modal>
+          </Modal> */}
       </>
   )
 }
