@@ -2,27 +2,111 @@ import FullCalendar from '@fullcalendar/react' // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
 import timeGridPlugin from '@fullcalendar/timegrid'
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getAllJobEventsByMonthAndYear, addEvent } from '../SharedServices/jobEventService';
+import { Alert } from "react-bootstrap";
 import AddEventModal from "./AddModal";
-// import { Modal, Form, Row, Col, Button, Alert } from "react-bootstrap";
 
 import { getPetServices, getPets, getEmployees } from "../SharedServices/dropdownService";
-// import { addEvent } from "../SharedServices/jobEventService";
+function Calendar({setLoginState}) {
+    const calendarRef = useRef();
+    const [jobEvents, setJobEvents] = useState([]);
+    const [errorMessage, setErrorMessage] = useState(undefined);
 
-function Calendar({ setLoginState }) {
+    useEffect(() => {
+    (async function () {
+      try {
+        var eventDate = calendarRef.current.getApi().getDate();
+        
+        var resp = await getAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
+
+        if (resp.status === 401){
+          setLoginState(false);
+          return;
+        }
+
+        const eventList = await resp.json();
+        setJobEvents(eventList);
+
+        setErrorMessage(undefined);
+      } catch (e) {
+        setErrorMessage(e.message);
+      }
+    })();
+  }, []);
+
+  const handleCalendarViewClick = () => {
+    (async function () {
+      try {
+        var view = calendarRef.current.getApi().view; //grabs current view object for current start and end date
+
+        if(view.type === "timeGridWeek"){
+          var jobs = []; //list to hold events from current start date to current end date of view
+
+          //grabs events for month and year of start date
+          var currStartDate = view.currentStart;
+          var resp = await getAllJobEventsByMonthAndYear(currStartDate.getMonth() + 1, currStartDate.getFullYear());
+
+          if (resp.status === 401){
+            setLoginState(false);
+            return;
+          }
+
+          //adds event to list
+          const startEvents = await resp.json();
+          constructJobEvents(startEvents, jobs);
+
+          //grabs events for month and year of end date
+          //only grab events using end date if month is not the same as start date
+          //prevents same event being added to the jobs[].
+          var currEndDate = view.currentEnd;
+
+          if(currEndDate.getMonth() !== currStartDate.getMonth()){
+            var resp = await getAllJobEventsByMonthAndYear(currEndDate.getMonth() + 1, currEndDate.getFullYear());
+
+            if (resp.status === 401){
+              setLoginState(false);
+              return;
+            }
+
+            //adds events to same list
+            const endEvents = await resp.json();
+            constructJobEvents(endEvents, jobs);
+          }
+          
+          setJobEvents(jobs);
+        }else{
+          var eventDate = calendarRef.current.getApi().getDate();
+
+          var resp = await getAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
+
+          if (resp.status === 401){
+            setLoginState(false);
+            return;
+          }
+
+          const eventList = await resp.json();
+          setJobEvents(eventList);
+        }
+        setErrorMessage(undefined);
+      }catch (e) {
+        setErrorMessage(e.message);
+      }
+    })();
+  }
+
+  //selecting an event
+    const handleEventClick = (arg) => {
+        console.log(arg);
+        alert(arg);
+    }
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [pets, setPets] = useState([]);
   const [petServices, setPetServices] = useState([]);
   const [isMonthView, setIsMonthView] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(undefined);
   const [eventStartDate, setEventStartDate] = useState("");
-
-  const handleEventClick = (arg) => {
-      console.log(arg);
-      alert(arg);
-  }
-
   const handleDateSelect = (selectInfo) => {
     var view = selectInfo.view;
     if(view.type !== "dayGridMonth"){
@@ -40,6 +124,12 @@ function Calendar({ setLoginState }) {
     setShowAddModal(true);
   }
 
+    const constructJobEvents = (eventList, jobs) => {
+           
+      for(var i = 0; i < eventList.length; i++){
+        jobs.push(eventList[i]);
+      }
+    };
   //get employees for dropdown
   const constructEmployeeOptions = () => {
     (async function () {
@@ -101,26 +191,78 @@ function Calendar({ setLoginState }) {
     setTimeout(() => window.location.reload(), 3000);
   };
 
-  return(
-      <>
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            }}
-            initialView="dayGridMonth"
-            editable={true}
-            selectable={true}    
-            selectMirror={true}
-            select={handleDateSelect}
-            eventClick={handleEventClick}            
-            events={[
-                { title: 'event 1', start: '2022-04-29T05:00:00', end: '2022-04-29T07:00:00'},
-                { title: 'event 2', start: '2022-04-29T05:00:00', end: '2022-04-29T06:00:00' }
-              ]}
-          />
+    return(
+        <>
+            {errorMessage !== undefined && (
+                <Alert variant="danger">{errorMessage}</Alert>
+            )}
+
+            <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                headerToolbar={{
+                  left: 'prevBtn,nextBtn todayBtn',
+                  center: 'title',
+                  right: 'toggleMonth,toggleWeek,toggleDay'
+                }}
+                customButtons={{
+                  prevBtn:{
+                    text: "<",
+                    click: () =>{
+                      calendarRef.current.getApi().prev();
+                      handleCalendarViewClick();
+                    }
+                  },
+                  nextBtn:{
+                    text: ">",
+                    click: () => {
+                      calendarRef.current.getApi().next();
+                      handleCalendarViewClick();
+                    }
+                  },
+                  todayBtn:{
+                    text: "today",
+                    click: () => {
+                      calendarRef.current.getApi().today();
+                      handleCalendarViewClick();
+                    }
+                  },
+                  toggleMonth:{
+                    text: "month",
+                    click: () =>{
+                      calendarRef.current.getApi().changeView("dayGridMonth");
+                      handleCalendarViewClick();
+                    }
+                  },
+                  toggleWeek:{
+                    text: "week",
+                    click: () =>{
+                      calendarRef.current.getApi().changeView("timeGridWeek");
+                      handleCalendarViewClick();
+                    }
+                  },
+                  toggleDay:{
+                    text: "day",
+                    click: () =>{
+                      calendarRef.current.getApi().changeView("timeGridDay");
+                      handleCalendarViewClick();
+                    }
+                  }
+                }}
+                initialView="dayGridMonth"
+                editable={true}
+                selectable={true}    
+                selectMirror={true}
+                select={handleDateSelect}
+                eventClick={handleEventClick}
+                events = {jobEvents.length != 0 && 
+                    jobEvents.map((jobEvent) => {
+                        return(
+                            { title: jobEvent.petServiceName, start: jobEvent.eventStartTime, end: jobEvent.eventEndTime}
+                        );
+                    })
+                } 
+            />
 
           <AddEventModal 
             show={showAddModal}
@@ -133,114 +275,8 @@ function Calendar({ setLoginState }) {
             pets={pets}
             petServices={petServices}
           />
-          
-          {/* <Modal show={showAddModal} onHide={closeModal}>
-            <Modal.Header className="modal-header-color" closeButton>
-                <Modal.Title>Add Event</Modal.Title>
-            </Modal.Header>
-
-            <Modal.Body>
-              <Form onSubmit={addEventSubmit}>
-                {errorMessage !== undefined && <Alert variant="danger">{errorMessage}</Alert>}
-
-                <Form.Group as={Row}>
-                  <Form.Label column lg={3}>
-                    Employee:
-                  </Form.Label>
-                  <Col lg={9}>
-                    <Form.Select type="select" name="employee">
-                      {employees.map((employee) => {
-                        return (
-                          <option key={employee.id} value={employee.id}>
-                            {employee.fullName}
-                          </option>
-                        );
-                      })}
-                    </Form.Select>
-                  </Col>
-                </Form.Group>
-                <br />
-                <Form.Group as={Row}>
-                  <Form.Label column lg={3}>
-                    Pet:
-                  </Form.Label>
-                  <Col lg={9}>
-                    <Form.Select type="select" name="pet">
-                      {pets.map((pet) => {
-                        return (
-                          <option key={pet.id} value={pet.id}>
-                            {pet.name}
-                          </option>
-                        );
-                      })}
-                    </Form.Select>
-                  </Col>
-                </Form.Group>
-                <br/>
-                <Form.Group as={Row}>
-                  <Form.Label column lg={3}>
-                    Pet Service:
-                  </Form.Label>
-                  <Col lg={9}>
-                    <Form.Select type="select" name="petService">
-                      {petServices.map((petService) => {
-                        return (
-                          <option key={petService.id} value={petService.id}>
-                            {petService.name}
-                          </option>
-                        );
-                      })}
-                    </Form.Select>
-                  </Col>
-                </Form.Group>
-                <br />
-                {isMonthView && (<Form.Group as={Row}>
-                  <Form.Label column lg={3}>
-                    Time:
-                  </Form.Label>
-                  <Col lg={3}>
-                    <Form.Select type="select" name="hour">
-                      <option value="01">01</option>
-                      <option value="02">02</option>
-                      <option value="03">03</option>
-                      <option value="04">04</option>
-                      <option value="05">05</option>
-                      <option value="06">06</option>
-                      <option value="07">07</option>
-                      <option value="08">08</option>
-                      <option value="09">09</option>
-                      <option value="10">10</option>
-                      <option value="11">11</option>
-                      <option value="12">12</option>
-                    </Form.Select>
-                  </Col>
-                  <Col lg={3}>
-                    <Form.Select type="select" name="minute">
-                      <option value="00">00</option>
-                      <option value="15">15</option>
-                      <option value="30">30</option>
-                      <option value="45">45</option>
-                    </Form.Select>
-                  </Col>
-                  <Col lg={3}>
-                    <Form.Select type="select" name="ampm">
-                      <option value="am">AM</option>
-                      <option value="pm">PM</option>
-                    </Form.Select>
-                  </Col>
-                </Form.Group>)}
-                <hr></hr>
-                <Button type="button" variant="danger" onClick={() => closeModal()} className="float-end ms-2">
-                  Cancel
-                </Button>
-                <Button type="submit" className="float-end ms-2">
-                  Add
-                </Button>
-              </Form>
-            </Modal.Body>
-          </Modal> */}
-      </>
-  )
+        </>
+    )
 }
 
 export default Calendar;
