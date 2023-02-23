@@ -23,3 +23,17 @@ export const addEvent = async function(employeeId, petId, petServiceId, eventSta
 
   return await makeHttpRequest(baseUrl, "POST", {"Content-Type": "application/json"}, 200, data); 
 }
+
+export const updateEvent = async function(employeeId, petId, petServiceId, eventStartTime, isCompleted, isCanceled){
+  var baseUrl = process.env.REACT_APP_EVENT_SERVICE_BASE_URL + "/event";
+
+  var data = { employeeId, petId, petServiceId, eventStartTime, isCompleted, isCanceled };
+
+  return await makeHttpRequest(baseUrl, "PUT", {"Content-Type": "application/json"}, 200, data);
+}
+
+export const deleteEvent = async function(eventId){
+  var url = process.env.REACT_APP_EVENT_SERVICE_BASE_URL + "/event/"+ eventId;
+
+  return await makeHttpRequest(url, "DELETE", undefined, 200, undefined); 
+}
