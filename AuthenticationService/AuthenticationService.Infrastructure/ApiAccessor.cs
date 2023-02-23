@@ -10,6 +10,28 @@ namespace AuthenticationService.Infrastructure
 {
     public class ApiAccessor
     {
+        private readonly IHttpClientFactory _httpClientFactory;
+        public ApiAccessor(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
+
+        protected HttpClient GetHttpClient => _httpClientFactory.CreateClient();
+
+        protected async Task<T> PatchRequestAndValidateResponse<T>(string url, StringContent content)
+        {
+            var response = await GetHttpClient.PatchAsync(url, content);
+
+            return await ValidateAndParseResponse<T>(response);
+        }
+
+        protected async Task PatchRequestAndValidateResponse(string url, StringContent content)
+        {
+            var response = await GetHttpClient.PatchAsync(url, content);
+
+            await ValidateResponse(response);
+        }
+
         protected void AddAuthHeader(HttpClient httpClient, string token)
         {
             if (string.IsNullOrEmpty(token))
@@ -39,7 +61,7 @@ namespace AuthenticationService.Infrastructure
             await CheckResponseStatus(response);
         }
 
-        private static async Task CheckResponseStatus(HttpResponseMessage response)
+        private async Task CheckResponseStatus(HttpResponseMessage response)
         {            
             var strContent = (response.Content == null) 
                 ? string.Empty

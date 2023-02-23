@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RofShared.Exceptions;
 using System;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,17 +19,16 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
     public class EmployeeManagementAccessor : ApiAccessor, IEmployeeManagementAccessor
     {
         private readonly string _employeeManagementBaseUrl;
-        private readonly IHttpClientFactory _httpClientFactory;
 
         public EmployeeManagementAccessor(IConfiguration configuration, IHttpClientFactory httpClientFactory)
+            : base(httpClientFactory)
         {
             _employeeManagementBaseUrl = configuration.GetSection("EmployeeManagement:URL").Value;
-            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<bool> CheckIfEmployee(string username, string token)
         {
-            using(var httpClient = _httpClientFactory.CreateClient())
+            using(var httpClient = GetHttpClient)
             {
                 var url = $"{_employeeManagementBaseUrl}/api/employee/{username}/username";
 
@@ -59,7 +57,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         /// <returns>returns response if successful</returns>
         public async Task<EmployeeLoginResponse> Login(string username, string password, string token)
         {
-            using (var httpClient = _httpClientFactory.CreateClient())
+            using (var httpClient = GetHttpClient)
             {
                 AddAuthHeader(httpClient, token);
 
@@ -69,9 +67,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
 
                 var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
 
-                var response = await httpClient.PatchAsync(url, content);
-
-                return await ValidateAndParseResponse<EmployeeLoginResponse>(response);               
+                return await PatchRequestAndValidateResponse<EmployeeLoginResponse>(url, content);                        
             }
         }
 
@@ -85,15 +81,13 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         /// <exception cref="Exception"></exception>
         public async Task Logout(long userId, string relativeUrl, string token)
         {
-            using (var httpClient = _httpClientFactory.CreateClient())
+            using (var httpClient = GetHttpClient)
             {
                 AddAuthHeader(httpClient, token);
 
                 var url = $"{_employeeManagementBaseUrl}{relativeUrl}";
 
-                var response = await httpClient.PatchAsync(url, null);
-
-                await ValidateResponse(response);
+                await PatchRequestAndValidateResponse(url, null);                
             }
         }
     }
