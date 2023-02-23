@@ -3,7 +3,7 @@ import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import interactionPlugin from "@fullcalendar/interaction" // needed for dayClick
 import timeGridPlugin from '@fullcalendar/timegrid'
 import { useEffect, useRef, useState } from "react";
-import { getAllJobEventsByMonthAndYear, addEvent } from '../SharedServices/jobEventService';
+import { getAllJobEventsByMonthAndYear } from '../SharedServices/jobEventService';
 import { Alert } from "react-bootstrap";
 
 function Calendar({setLoginState}) {
