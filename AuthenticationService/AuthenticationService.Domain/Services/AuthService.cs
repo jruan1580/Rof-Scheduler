@@ -1,7 +1,7 @@
-﻿using AuthenticationService.Domain.Exceptions;
-using AuthenticationService.Domain.Model;
+﻿using AuthenticationService.Domain.Model;
 using AuthenticationService.Infrastructure.ClientManagement;
 using AuthenticationService.Infrastructure.EmployeeManagement;
+using RofShared.Exceptions;
 using System.Threading.Tasks;
 
 namespace AuthenticationService.Domain.Services
@@ -45,25 +45,10 @@ namespace AuthenticationService.Domain.Services
             //this is potentially a client
             if (!isAnEmployee)
             {
-                var clientResponse = await _clientManagementAccessor.Login(username, password, token);
+                return await HandleClientLogin(username, password, token);
+            }          
 
-                if (clientResponse == null)
-                {
-                    throw new NotFoundException();
-                }
-
-                return new BasicUserInfo().MapFromClientLoginResponse(clientResponse);
-            }
-
-            var employeeResponse = await _employeeManagementAccessor.Login(username, password, token);
-
-            //employee was not found.
-            if (employeeResponse == null)
-            {
-                throw new NotFoundException();
-            }
-
-            return new BasicUserInfo().MapFromEmployeeLoginResponse(employeeResponse);
+            return await HandleEmployeeLogin(username, password, token);
         }
 
         public async Task Logout(long id, string role)
@@ -73,24 +58,49 @@ namespace AuthenticationService.Domain.Services
 
             if (role.ToLower().Equals("client"))
             {
-                var clientResp = await _clientManagementAccessor.Logout(id, token);
-
-                if (clientResp == null)
-                {
-                    throw new NotFoundException();
-                }
-
+                await HandleClientLogout(id, token);
                 return;
             }
 
-            var relativeUrl = (role.ToLower().Equals("employee")) ? $"/api/Employee/{id}/logout" : $"/api/Admin/{id}/logout";
+            await HandleEmployeeLogout(id, role, token);         
+        }
 
-            var resp = await _employeeManagementAccessor.Logout(id, relativeUrl, token);
+        private async Task<BasicUserInfo> HandleClientLogin(string username, string password, string token)
+        {
+            var clientResponse = await _clientManagementAccessor.Login(username, password, token);
 
-            if (resp == null)
+            if (clientResponse == null)
             {
-                throw new NotFoundException();
+                throw new EntityNotFoundException("Client");
             }
+
+            return new BasicUserInfo().MapFromClientLoginResponse(clientResponse);
+        }
+
+        private async Task<BasicUserInfo> HandleEmployeeLogin(string username, string password, string token)
+        {
+            var employeeResponse = await _employeeManagementAccessor.Login(username, password, token);
+
+            //employee was not found.
+            if (employeeResponse == null)
+            {
+                throw new EntityNotFoundException("Employee");
+            }
+
+            return new BasicUserInfo().MapFromEmployeeLoginResponse(employeeResponse);
+        }
+
+        private async Task HandleClientLogout(long id, string token)
+        {
+            await _clientManagementAccessor.Logout(id, token);
+        }
+
+        private async Task HandleEmployeeLogout(long id, string role, string token)
+        {
+            var isEmployee = role.ToLower().Equals("employee");
+            var relativeUrl = isEmployee ? $"/api/Employee/{id}/logout" : $"/api/Admin/{id}/logout";
+
+            await _employeeManagementAccessor.Logout(id, relativeUrl, token);
         }
     }
 }

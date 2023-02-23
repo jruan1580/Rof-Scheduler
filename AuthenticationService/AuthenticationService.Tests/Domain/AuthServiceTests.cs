@@ -1,12 +1,10 @@
-﻿using AuthenticationService.Domain.Exceptions;
-using AuthenticationService.Domain.Services;
+﻿using AuthenticationService.Domain.Services;
 using AuthenticationService.Infrastructure.ClientManagement;
-using AuthenticationService.Infrastructure.ClientManagement.Models;
 using AuthenticationService.Infrastructure.EmployeeManagement;
-using AuthenticationService.Infrastructure.EmployeeManagement.Models;
-using AuthenticationService.Infrastructure.Shared.Models;
+using AuthenticationService.Infrastructure.Models;
 using Moq;
 using NUnit.Framework;
+using RofShared.Exceptions;
 using System.Threading.Tasks;
 
 namespace AuthenticationService.Tests.Domain
@@ -61,7 +59,7 @@ namespace AuthenticationService.Tests.Domain
             _employeeManagementAccessor.Setup(e => e.Login(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync((EmployeeLoginResponse)null);
 
-            Assert.ThrowsAsync<NotFoundException>(() => _authService.Login("testFirstName", "password"));
+            Assert.ThrowsAsync<EntityNotFoundException>(() => _authService.Login("testFirstName", "password"));
         }
 
         [Test]
@@ -71,7 +69,7 @@ namespace AuthenticationService.Tests.Domain
                 .ReturnsAsync(false);
 
             _clientManagementAccessor.Setup(e => e.Login(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new ClientLoginResponse()
+                .ReturnsAsync(new LoginResponse()
                 {
                     FirstName = "testFirstName",
                     Id = 1
@@ -91,16 +89,17 @@ namespace AuthenticationService.Tests.Domain
                 .ReturnsAsync(false);
 
             _clientManagementAccessor.Setup(e => e.Login(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync((ClientLoginResponse)null);
+                .ReturnsAsync((LoginResponse)null);
 
-            Assert.ThrowsAsync<NotFoundException>(() => _authService.Login("testFirstName", "password"));
+            Assert.ThrowsAsync<EntityNotFoundException>(() => _authService.Login("testFirstName", "password"));
         }
 
         [Test]
         public async Task TestEmployeeLogoutSuccess()
         {
-            _employeeManagementAccessor.Setup(e => e.Logout(It.IsAny<long>(), It.Is<string>(s => s.Equals("/api/Employee/1/logout")), It.IsAny<string>()))
-                .ReturnsAsync(new LogoutResponse(1, true));
+            _employeeManagementAccessor.Setup(e =>
+                e.Logout(It.IsAny<long>(), It.Is<string>(s => s.Equals("/api/Employee/1/logout")), It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
 
             await _authService.Logout(1, "Employee");
 
@@ -110,17 +109,18 @@ namespace AuthenticationService.Tests.Domain
         [Test]
         public void TestEmployeeLogoutNotFound()
         {
-            _employeeManagementAccessor.Setup(e => e.Logout(It.IsAny<long>(), It.Is<string>(s => s.Equals("/api/Employee/1/logout")), It.IsAny<string>()))
-               .ReturnsAsync((LogoutResponse)null);
+            _employeeManagementAccessor.Setup(e => 
+                e.Logout(It.IsAny<long>(), It.Is<string>(s => s.Equals("/api/Employee/1/logout")), It.IsAny<string>()))
+              .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            Assert.ThrowsAsync<NotFoundException>(() => _authService.Logout(1, "Employee"));
+            Assert.ThrowsAsync<EntityNotFoundException>(() => _authService.Logout(1, "Employee"));
         }
 
         [Test]
         public async Task TestClientLogoutSuccess()
         {
             _clientManagementAccessor.Setup(e => e.Logout(It.IsAny<long>(), It.IsAny<string>()))
-                .ReturnsAsync(new LogoutResponse(1, true));
+                .Returns(Task.CompletedTask);
 
             await _authService.Logout(1, "Client");
 
@@ -131,9 +131,9 @@ namespace AuthenticationService.Tests.Domain
         public void TestClientLogoutNotFound()
         {
             _clientManagementAccessor.Setup(e => e.Logout(It.IsAny<long>(), It.IsAny<string>()))
-               .ReturnsAsync((LogoutResponse)null);
+               .ThrowsAsync(new EntityNotFoundException("Client"));
 
-            Assert.ThrowsAsync<NotFoundException>(() => _authService.Logout(1, "Client"));
+            Assert.ThrowsAsync<EntityNotFoundException>(() => _authService.Logout(1, "Client"));
         }
     }
 }

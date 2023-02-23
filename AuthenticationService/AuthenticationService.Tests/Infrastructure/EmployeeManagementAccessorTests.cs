@@ -1,10 +1,11 @@
 ﻿using AuthenticationService.Infrastructure.EmployeeManagement;
-using AuthenticationService.Infrastructure.EmployeeManagement.Models;
+using AuthenticationService.Infrastructure.Models;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using RofShared.Exceptions;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -148,7 +149,7 @@ namespace AuthenticationService.Tests.Infrastructure
         }
 
         [Test]
-        public async Task LoginNotFoundStatusCode()
+        public void LoginNotFoundStatusCode()
         {
             _httpMessageHandlerMock
                .Protected()
@@ -167,9 +168,7 @@ namespace AuthenticationService.Tests.Infrastructure
             _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
              .Returns(httpClient);
 
-            var loginResp = await _accessor.Login("testUsername", "testPassword", "internalToken");
-
-            Assert.IsNull(loginResp);
+            Assert.ThrowsAsync<EntityNotFoundException>(() => _accessor.Login("testUsername", "testPassword", "internalToken"));
         }
 
         [Test]
@@ -221,32 +220,7 @@ namespace AuthenticationService.Tests.Infrastructure
         }
 
         [Test]
-        public async Task LogoutSuccess()
-        {            
-            _httpMessageHandlerMock
-               .Protected()
-               .Setup<Task<HttpResponseMessage>>(
-                   "SendAsync",
-                   ItExpr.IsAny<HttpRequestMessage>(),
-                   ItExpr.IsAny<CancellationToken>()
-               )
-               .ReturnsAsync(new HttpResponseMessage()
-               {
-                   StatusCode = HttpStatusCode.OK
-               });
-
-            var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
-
-            _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
-             .Returns(httpClient);
-
-            var res = await _accessor.Logout(1, "/api/Employee/logout", "testToken");
-
-            Assert.IsNotNull(res);
-        }
-
-        [Test]
-        public async Task LogoutNotFoundStatusCode()
+        public void LogoutNotFoundStatusCode()
         {
             _httpMessageHandlerMock
                .Protected()
@@ -265,9 +239,7 @@ namespace AuthenticationService.Tests.Infrastructure
             _httpClientFactoryMock.Setup(factory => factory.CreateClient(String.Empty))
              .Returns(httpClient);
 
-            var logoutResp = await _accessor.Logout(1, "/api/Employee/logout", "testToken");
-
-            Assert.IsNull(logoutResp);
+            Assert.ThrowsAsync<EntityNotFoundException>(() => _accessor.Logout(1, "/api/Employee/logout", "testToken"));
         }
 
         [Test]
