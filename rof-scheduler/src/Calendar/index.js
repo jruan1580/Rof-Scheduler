@@ -13,6 +13,7 @@ function Calendar({setLoginState}) {
   const [errorMessage, setErrorMessage] = useState(undefined);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [updateEvent, setUpdateEvent] = useState(undefined);
+  const [scheduled, setScheduled] = useState("");
 
   //loads event for current month once land on page
   useEffect(() => {
@@ -107,6 +108,7 @@ function Calendar({setLoginState}) {
 
   //selecting an event
   const handleEventClick = (arg) => {
+    getCurrScheduledTime(arg.event);
     setUpdateEvent(arg.event);
     setShowUpdateModal(true);
   }
@@ -115,6 +117,27 @@ function Calendar({setLoginState}) {
   const handleDateSelect = (selectInfo) => {
       alert(selectInfo);
       console.log(selectInfo);
+  }
+
+  const getCurrScheduledTime = (event) =>{
+    const week = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+    const dayOfWeek = event.start.getDay();
+    const MM = event.start.getMonth() + 1;
+    const dd = event.start.getDate();
+    const HH = event.start.getHours();
+    const mm = event.start.getMinutes();
+    
+    let yyyy = event.start.getFullYear();
+
+    var weekday = week[dayOfWeek];
+    var month = (MM < 10) ? "0" + MM : MM;
+    var day = (dd < 10) ? "0" + dd : dd;
+    var hour = (HH < 10) ? "0" + HH: HH || (HH > 12) ? HH - 12 : HH;
+    var minute = (mm < 10) ? "0" + mm : mm;
+    var ampm = (HH < 12) ? "AM" : "PM";
+
+    setScheduled(weekday + ", " + month + "/" + day + "/" + yyyy + ", " + hour + ":" + minute + ampm);
   }
 
   return(
@@ -206,6 +229,7 @@ function Calendar({setLoginState}) {
           show={showUpdateModal}
           handleHide={() => setShowUpdateModal(false)}
           setLoginState={setLoginState}
+          scheduledTime={scheduled}
         />
       </>
   )
