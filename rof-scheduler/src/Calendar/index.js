@@ -5,13 +5,17 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import { useEffect, useRef, useState } from "react";
 import { getAllJobEventsByMonthAndYear } from '../SharedServices/jobEventService';
 import { Alert } from "react-bootstrap";
+import UpdateEventModal from "./UpdateModal";
 
 function Calendar({setLoginState}) {
-    const calendarRef = useRef();
-    const [jobEvents, setJobEvents] = useState([]);
-    const [errorMessage, setErrorMessage] = useState(undefined);
+  const calendarRef = useRef();
+  const [jobEvents, setJobEvents] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(undefined);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateEvent, setUpdateEvent] = useState(undefined);
 
-    useEffect(() => {
+  //loads event for current month once land on page
+  useEffect(() => {
     (async function () {
       try {
         var eventDate = calendarRef.current.getApi().getDate();
@@ -25,7 +29,7 @@ function Calendar({setLoginState}) {
 
         const eventList = await resp.json();
         setJobEvents(eventList);
-
+        
         setErrorMessage(undefined);
       } catch (e) {
         setErrorMessage(e.message);
@@ -33,6 +37,7 @@ function Calendar({setLoginState}) {
     })();
   }, []);
 
+  //clicking on custom buttons to get events for current view
   const handleCalendarViewClick = () => {
     (async function () {
       try {
@@ -60,7 +65,7 @@ function Calendar({setLoginState}) {
           var currEndDate = view.currentEnd;
 
           if(currEndDate.getMonth() !== currStartDate.getMonth()){
-            var resp = await getAllJobEventsByMonthAndYear(currEndDate.getMonth() + 1, currEndDate.getFullYear());
+            resp = await getAllJobEventsByMonthAndYear(currEndDate.getMonth() + 1, currEndDate.getFullYear());
 
             if (resp.status === 401){
               setLoginState(false);
@@ -76,7 +81,7 @@ function Calendar({setLoginState}) {
         }else{
           var eventDate = calendarRef.current.getApi().getDate();
 
-          var resp = await getAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
+          resp = await getAllJobEventsByMonthAndYear(eventDate.getMonth() + 1, eventDate.getFullYear());
 
           if (resp.status === 401){
             setLoginState(false);
@@ -92,100 +97,118 @@ function Calendar({setLoginState}) {
       }
     })();
   }
+  
+  //makes list of events set b/w current start and end dates 
+  const constructJobEvents = (eventList, jobs) => {      
+    for(var i = 0; i < eventList.length; i++){
+      jobs.push(eventList[i]);
+    }
+  };
 
   //selecting an event
-    const handleEventClick = (arg) => {
-        console.log(arg);
-        alert(arg);
-    }
+  const handleEventClick = (arg) => {
+    setUpdateEvent(arg.event);
+    setShowUpdateModal(true);
+  }
 
-    //selecting a specific date
-    const handleDateSelect = (selectInfo) => {
-        alert(selectInfo);
-        console.log(selectInfo);
-    }
+  //selecting a specific date
+  const handleDateSelect = (selectInfo) => {
+      alert(selectInfo);
+      console.log(selectInfo);
+  }
 
-    const constructJobEvents = (eventList, jobs) => {
-           
-      for(var i = 0; i < eventList.length; i++){
-        jobs.push(eventList[i]);
-      }
-    };
+  return(
+      <>
+        {errorMessage !== undefined && (
+          <Alert variant="danger">{errorMessage}</Alert>
+        )}
 
-    return(
-        <>
-            {errorMessage !== undefined && (
-                <Alert variant="danger">{errorMessage}</Alert>
-            )}
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          headerToolbar={{
+            left: 'prevBtn,nextBtn todayBtn',
+            center: 'title',
+            right: 'toggleMonth,toggleWeek,toggleDay'
+          }}
+          customButtons={{
+            prevBtn:{
+              text: "<",
+              click: () =>{
+                calendarRef.current.getApi().prev();
+                handleCalendarViewClick();
+              }
+            },
+            nextBtn:{
+              text: ">",
+              click: () => {
+                calendarRef.current.getApi().next();
+                handleCalendarViewClick();
+              }
+            },
+            todayBtn:{
+              text: "today",
+              click: () => {
+                calendarRef.current.getApi().today();
+                handleCalendarViewClick();
+              }
+            },
+            toggleMonth:{
+              text: "month",
+              click: () =>{
+                calendarRef.current.getApi().changeView("dayGridMonth");
+                handleCalendarViewClick();
+              }
+            },
+            toggleWeek:{
+              text: "week",
+              click: () =>{
+                calendarRef.current.getApi().changeView("timeGridWeek");
+                handleCalendarViewClick();
+              }
+            },
+            toggleDay:{
+              text: "day",
+              click: () =>{
+                calendarRef.current.getApi().changeView("timeGridDay");
+                handleCalendarViewClick();
+              }
+            }
+          }}
+          initialView="dayGridMonth"
+          editable={true}
+          selectable={true}    
+          selectMirror={true}
+          select={handleDateSelect}
+          eventClick={handleEventClick}
+          events = {jobEvents.length !== 0 && 
+              jobEvents.map((jobEvent) => {
+                  return(
+                      { id: jobEvent.id, 
+                        title: jobEvent.petServiceName, 
+                        start: jobEvent.eventStartTime, 
+                        end: jobEvent.eventEndTime,
+                        extendedProps: {
+                          employeeId: jobEvent.employeeId,
+                          employee: jobEvent.employeeFullName,
+                          petId: jobEvent.petId,
+                          pet: jobEvent.petName,
+                          petServiceId: jobEvent.petServiceId
+                        }
+                      }
+                  );
+              })
+          } 
+        />
 
-            <FullCalendar
-                ref={calendarRef}
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                headerToolbar={{
-                  left: 'prevBtn,nextBtn todayBtn',
-                  center: 'title',
-                  right: 'toggleMonth,toggleWeek,toggleDay'
-                }}
-                customButtons={{
-                  prevBtn:{
-                    text: "<",
-                    click: () =>{
-                      calendarRef.current.getApi().prev();
-                      handleCalendarViewClick();
-                    }
-                  },
-                  nextBtn:{
-                    text: ">",
-                    click: () => {
-                      calendarRef.current.getApi().next();
-                      handleCalendarViewClick();
-                    }
-                  },
-                  todayBtn:{
-                    text: "today",
-                    click: () => {
-                      calendarRef.current.getApi().today();
-                      handleCalendarViewClick();
-                    }
-                  },
-                  toggleMonth:{
-                    text: "month",
-                    click: () =>{
-                      calendarRef.current.getApi().changeView("dayGridMonth");
-                      handleCalendarViewClick();
-                    }
-                  },
-                  toggleWeek:{
-                    text: "week",
-                    click: () =>{
-                      calendarRef.current.getApi().changeView("timeGridWeek");
-                      handleCalendarViewClick();
-                    }
-                  },
-                  toggleDay:{
-                    text: "day",
-                    click: () =>{
-                      calendarRef.current.getApi().changeView("timeGridDay");
-                      handleCalendarViewClick();
-                    }
-                  }
-                }}
-                initialView="dayGridMonth"
-                editable={true}
-                selectable={true}    
-                selectMirror={true}
-                select={handleDateSelect}
-                eventClick={handleEventClick}
-                events = {jobEvents.length != 0 && 
-                    jobEvents.map((jobEvent) => {
-                        return(
-                            { title: jobEvent.petServiceName, start: jobEvent.eventStartTime, end: jobEvent.eventEndTime}
-                        );
-                    })
-                } 
-            />
-        </>
-    )
+        <UpdateEventModal
+          event={updateEvent}
+          show={showUpdateModal}
+          handleHide={() => setShowUpdateModal(false)}
+          setLoginState={setLoginState}
+        />
+      </>
+  )
 }
 
 export default Calendar;

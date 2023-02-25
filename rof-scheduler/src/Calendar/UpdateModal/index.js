@@ -1,9 +1,26 @@
 import { Modal, Row, Form, Col, Button, Spinner, Alert } from "react-bootstrap";
 import { useEffect, useState } from "react";
+import Select from "react-select";
 
-function UpdateEventModal(event, show, handleHide, setLoginState){
+function UpdateEventModal({event, show, handleHide, setLoginState}){
     const [errorMessage, setErrorMessage] = useState(undefined);
     const [successMessage, setSuccessMessage] = useState(undefined);
+
+    // useEffect(() => {
+    //     (async function () {
+    //         try {
+    //             if (event === undefined){
+    //                 return;
+    //             }
+
+    //             var resp = undefined;
+
+    //             setErrorMessage(undefined);
+    //         } catch (e) {
+    //             setErrorMessage(e.message);
+    //         }
+    //         })();
+    // }, [event]);
 
     const closeModal = function () {
         setErrorMessage(undefined);
@@ -32,47 +49,68 @@ function UpdateEventModal(event, show, handleHide, setLoginState){
                         <Form.Group as={Row}>
                             <Form.Label column lg={3}>Employee:</Form.Label>
                             <Col lg={9}>
-                                <Form.Select type="select" name="employee">
-                                    <option value=""></option>
-                                </Form.Select>
+                                {event !== undefined && (
+                                    <Select
+                                        name="employee"
+                                        // options={}
+                                        defaultValue={{
+                                            label: event.extendedProps.employee,
+                                            value: event.extendedProps.employeeId,
+                                        }}
+                                    />
+                                )}
                             </Col>
                         </Form.Group>
                         <br />
                         <Form.Group as={Row}>
                             <Form.Label column lg={3}>Pet:</Form.Label>
                             <Col lg={9}>
-                                <Form.Select type="select" name="pet">
-                                    <option value=""></option>
-                                </Form.Select>
+                                {event !== undefined && (
+                                    <Select
+                                        name="pet"
+                                        // options={}
+                                        defaultValue={{
+                                            label: event.extendedProps.pet,
+                                            value: event.extendedProps.petId,
+                                        }}
+                                    />
+                                )}
                             </Col>
                         </Form.Group>
                         <br />
                         <Form.Group as={Row}>
                             <Form.Label column lg={3}>Pet Service:</Form.Label>
                             <Col lg={9}>
-                                <Form.Select type="select" name="petService">
-                                    <option value=""></option>
-                                </Form.Select>
+                                {event !== undefined && (
+                                    <Select
+                                        name="petService"
+                                        // options={}
+                                        defaultValue={{
+                                            label: event.title,
+                                            value: event.extendedProps.petServiceId,
+                                        }}
+                                    />
+                                )}
                             </Col>
                         </Form.Group>
                         <br />
                         <Form.Group as={Row}>
                             <Form.Label column lg={3}>Time:</Form.Label>
                             <Col lg={3}>
-                            <Form.Select type="select" name="hour">
-                            <option value="01">01</option>
-                            <option value="02">02</option>
-                            <option value="03">03</option>
-                            <option value="04">04</option>
-                            <option value="05">05</option>
-                            <option value="06">06</option>
-                            <option value="07">07</option>
-                            <option value="08">08</option>
-                            <option value="09">09</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                            </Form.Select>
+                                <Form.Select type="select" name="hour">
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                </Form.Select>
                             </Col>
                             <Col lg={3}>
                                 <Form.Select type="select" name="minute">
@@ -90,9 +128,9 @@ function UpdateEventModal(event, show, handleHide, setLoginState){
                             </Col>
                         </Form.Group>
                         <hr />
-                        <Button type="button" variant="danger" className="float-start ms-2">Delete</Button>
-                        <Button type="button" variant="secondary" className="float-start ms-2">Complete</Button>
-                        <Button type="button" variant="danger" className="float-end ms-2">Cancel</Button>
+                        <Button type="button" variant="secondary" className="float-start me-2">Delete</Button>
+                        <Button type="button" variant="success" className="float-start me-2">Complete</Button>
+                        <Button type="button" variant="danger" onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
                         <Button type="submit" variant="primary" className="float-end ms-2">Update</Button>
                     </Form>
                 </Modal.Body>
