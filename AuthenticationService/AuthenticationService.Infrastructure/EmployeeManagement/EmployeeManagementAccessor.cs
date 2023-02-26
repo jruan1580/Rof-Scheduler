@@ -28,25 +28,18 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
 
         public async Task<bool> CheckIfEmployee(string username, string token)
         {
-            using(var httpClient = GetHttpClient)
+            var url = $"{_employeeManagementBaseUrl}/api/employee/{username}/username";
+
+            try
             {
-                var url = $"{_employeeManagementBaseUrl}/api/employee/{username}/username";
-
-                AddAuthHeader(httpClient, token);
-
-                try
-                {
-                    var response = await httpClient.GetAsync(url);
-
-                    await ValidateResponse(response);
-                }
-                catch (EntityNotFoundException)
-                {
-                    return false;
-                }
-
-                return true;
+                await ExecuteGetRequestAndValidateResponse(url, token);
             }
+            catch (EntityNotFoundException)
+            {
+                return false;
+            }
+
+            return true;            
         }
 
         /// <summary>
@@ -57,18 +50,13 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         /// <returns>returns response if successful</returns>
         public async Task<EmployeeLoginResponse> Login(string username, string password, string token)
         {
-            using (var httpClient = GetHttpClient)
-            {
-                AddAuthHeader(httpClient, token);
+            var url = $"{_employeeManagementBaseUrl}/api/employee/login";                
 
-                var url = $"{_employeeManagementBaseUrl}/api/employee/login";                
+            var body = new { Username = username, Password = password };
 
-                var body = new { Username = username, Password = password };
+            var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
 
-                var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
-
-                return await PatchRequestAndValidateResponse<EmployeeLoginResponse>(url, content);                        
-            }
+            return await ExecutePatchRequestAndValidateAndParseResponse<EmployeeLoginResponse>(url, token, content);            
         }
 
         /// <summary>
@@ -80,15 +68,10 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         /// <returns>returns true if successful</returns>
         /// <exception cref="Exception"></exception>
         public async Task Logout(long userId, string relativeUrl, string token)
-        {
-            using (var httpClient = GetHttpClient)
-            {
-                AddAuthHeader(httpClient, token);
+        { 
+            var url = $"{_employeeManagementBaseUrl}{relativeUrl}";
 
-                var url = $"{_employeeManagementBaseUrl}{relativeUrl}";
-
-                await PatchRequestAndValidateResponse(url, null);                
-            }
+            await ExecutePatchRequestAndValidateResponse(url, token, null);                
         }
     }
 }

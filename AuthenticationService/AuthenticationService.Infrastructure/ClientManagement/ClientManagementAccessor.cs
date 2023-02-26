@@ -25,30 +25,20 @@ namespace AuthenticationService.Infrastructure.ClientManagement
 
         public async Task<LoginResponse> Login(string username, string password, string token)
         {
-            using (var httpClient = GetHttpClient)
-            {
-                AddAuthHeader(httpClient, token);
+            var url = $"{_clientManagementBaseUrl}/api/client/login";
 
-                var url = $"{_clientManagementBaseUrl}/api/client/login";
+            var body = new { Username = username, Password = password };
 
-                var body = new { Username = username, Password = password };
+            var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
 
-                var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
-
-                return await PatchRequestAndValidateResponse<LoginResponse>(url, content);          
-            }
+            return await ExecutePatchRequestAndValidateAndParseResponse<LoginResponse>(url, token, content);                      
         }
 
         public async Task Logout(long userId, string token)
         {
-            using (var httpClient = GetHttpClient)
-            {
-                AddAuthHeader(httpClient, token);
+            var url = $"{_clientManagementBaseUrl}/api/client/{userId}/logout";
 
-                var url = $"{_clientManagementBaseUrl}/api/client/{userId}/logout";
-
-                await PatchRequestAndValidateResponse(url, null);
-            }
+            await ExecutePatchRequestAndValidateResponse(url, token, null);            
         }       
     }
 }

@@ -17,22 +17,41 @@ namespace AuthenticationService.Infrastructure
         }
 
         protected HttpClient GetHttpClient => _httpClientFactory.CreateClient();
-
-        protected async Task<T> PatchRequestAndValidateResponse<T>(string url, StringContent content)
+        
+        protected async Task ExecuteGetRequestAndValidateResponse(string url, string token)
         {
-            var response = await GetHttpClient.PatchAsync(url, content);
+            var httpClient = GetHttpClient;
 
-            return await ValidateAndParseResponse<T>(response);
-        }
+            AddAuthHeader(httpClient, token);
 
-        protected async Task PatchRequestAndValidateResponse(string url, StringContent content)
-        {
-            var response = await GetHttpClient.PatchAsync(url, content);
+            var response = await httpClient.GetAsync(url);
 
             await ValidateResponse(response);
         }
 
-        protected void AddAuthHeader(HttpClient httpClient, string token)
+        protected async Task<T> ExecutePatchRequestAndValidateAndParseResponse<T>(string url, string token, StringContent content)
+        {
+            var httpClient = GetHttpClient;
+
+            AddAuthHeader(httpClient, token);
+
+            var response = await httpClient.PatchAsync(url, content);
+
+            return await ValidateAndParseResponse<T>(response);
+        }
+
+        protected async Task ExecutePatchRequestAndValidateResponse(string url, string token, StringContent content)
+        {
+            var httpClient = GetHttpClient;
+
+            AddAuthHeader(httpClient, token);
+
+            var response = await httpClient.PatchAsync(url, content);
+
+            await ValidateResponse(response);
+        }
+
+        private void AddAuthHeader(HttpClient httpClient, string token)
         {
             if (string.IsNullOrEmpty(token))
             {
@@ -42,7 +61,7 @@ namespace AuthenticationService.Infrastructure
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        protected async Task<T> ValidateAndParseResponse<T>(HttpResponseMessage response)
+        private async Task<T> ValidateAndParseResponse<T>(HttpResponseMessage response)
         {
             await CheckResponseStatus(response);
 
@@ -51,7 +70,7 @@ namespace AuthenticationService.Infrastructure
             return JsonConvert.DeserializeObject<T>(strContent);
         }
 
-        protected async Task ValidateResponse(HttpResponseMessage response)
+        private async Task ValidateResponse(HttpResponseMessage response)
         {
             if (response.IsSuccessStatusCode)
             {
