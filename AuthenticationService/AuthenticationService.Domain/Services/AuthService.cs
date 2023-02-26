@@ -1,7 +1,4 @@
 ﻿using AuthenticationService.Domain.Model;
-using AuthenticationService.Infrastructure.ClientManagement;
-using AuthenticationService.Infrastructure.EmployeeManagement;
-using RofShared.Exceptions;
 using System.Threading.Tasks;
 
 namespace AuthenticationService.Domain.Services
@@ -15,17 +12,21 @@ namespace AuthenticationService.Domain.Services
 
     public class AuthService : IAuthService
     {
-        private readonly IEmployeeManagementAccessor _employeeManagementAccessor;
-        private readonly IClientManagementAccessor _clientManagementAccessor;
         private readonly ITokenHandler _tokenHandler;
+        
+        private readonly IEmployeeAuthHelper _employeeAuthHelper;
 
-        public AuthService(IEmployeeManagementAccessor employeeManagementAccessor,
-            IClientManagementAccessor clientManagementAccessor,
-            ITokenHandler tokenHandler)
+        private readonly IClientAuthHelper _clientAuthHelper;
+
+        public AuthService(ITokenHandler tokenHandler, 
+            IEmployeeAuthHelper employeeAuthHelper, 
+            IClientAuthHelper clientAuthHelper)
         {
-            _employeeManagementAccessor = employeeManagementAccessor;
-            _clientManagementAccessor = clientManagementAccessor;
             _tokenHandler = tokenHandler;
+
+            _employeeAuthHelper = employeeAuthHelper;
+
+            _clientAuthHelper = clientAuthHelper;
         }
 
         /// <summary>
@@ -40,15 +41,15 @@ namespace AuthenticationService.Domain.Services
             //use an internal token for internal service communication            
             var token = _tokenHandler.GenerateTokenForRole("Internal");
 
-            var isAnEmployee = await _employeeManagementAccessor.CheckIfEmployee(username, token);
+            var isAnEmployee = await _employeeAuthHelper.IsAnEmployee(username, token);
 
             //this is potentially a client
             if (!isAnEmployee)
             {
-                return await HandleClientLogin(username, password, token);
+                return await _clientAuthHelper.HandleClientLogin(username, password, token);
             }          
 
-            return await HandleEmployeeLogin(username, password, token);
+            return await _employeeAuthHelper.HandleEmployeeLogin(username, password, token);
         }
 
         public async Task Logout(long id, string role)
@@ -58,49 +59,12 @@ namespace AuthenticationService.Domain.Services
 
             if (role.ToLower().Equals("client"))
             {
-                await HandleClientLogout(id, token);
+                await _clientAuthHelper.HandleClientLogout(id, token);
+
                 return;
             }
 
-            await HandleEmployeeLogout(id, role, token);         
-        }
-
-        private async Task<BasicUserInfo> HandleClientLogin(string username, string password, string token)
-        {
-            var clientResponse = await _clientManagementAccessor.Login(username, password, token);
-
-            if (clientResponse == null)
-            {
-                throw new EntityNotFoundException("Client");
-            }
-
-            return new BasicUserInfo().MapFromClientLoginResponse(clientResponse);
-        }
-
-        private async Task<BasicUserInfo> HandleEmployeeLogin(string username, string password, string token)
-        {
-            var employeeResponse = await _employeeManagementAccessor.Login(username, password, token);
-
-            //employee was not found.
-            if (employeeResponse == null)
-            {
-                throw new EntityNotFoundException("Employee");
-            }
-
-            return new BasicUserInfo().MapFromEmployeeLoginResponse(employeeResponse);
-        }
-
-        private async Task HandleClientLogout(long id, string token)
-        {
-            await _clientManagementAccessor.Logout(id, token);
-        }
-
-        private async Task HandleEmployeeLogout(long id, string role, string token)
-        {
-            var isEmployee = role.ToLower().Equals("employee");
-            var relativeUrl = isEmployee ? $"/api/Employee/{id}/logout" : $"/api/Admin/{id}/logout";
-
-            await _employeeManagementAccessor.Logout(id, relativeUrl, token);
-        }
+            await _employeeAuthHelper.HandleEmployeeLogout(id, role, token);         
+        }       
     }
 }

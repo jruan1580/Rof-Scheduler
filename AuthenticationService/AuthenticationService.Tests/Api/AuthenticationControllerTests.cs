@@ -1,7 +1,7 @@
 ﻿using AuthenticationService.API.Controllers;
-using AuthenticationService.API.Models;
 using AuthenticationService.Domain.Model;
 using AuthenticationService.Domain.Services;
+using AuthenticationService.DTO.Controllers.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;

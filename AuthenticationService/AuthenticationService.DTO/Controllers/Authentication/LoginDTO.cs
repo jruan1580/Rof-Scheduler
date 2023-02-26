@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AuthenticationService.API.Models
+﻿namespace AuthenticationService.DTO.Controllers.Authentication
 {
     public class LoginDTO
     {        

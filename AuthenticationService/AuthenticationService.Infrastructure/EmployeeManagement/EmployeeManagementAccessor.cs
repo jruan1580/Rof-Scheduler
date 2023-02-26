@@ -1,4 +1,4 @@
-﻿using AuthenticationService.Infrastructure.Models;
+﻿using AuthenticationService.DTO.Accessors;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RofShared.Exceptions;

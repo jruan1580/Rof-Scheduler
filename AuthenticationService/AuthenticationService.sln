@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthenticationService.Infra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthenticationService.Tests", "AuthenticationService.Tests\AuthenticationService.Tests.csproj", "{29238165-777C-42BA-9197-2E95EDC0AB25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticationService.Domain", "AuthenticationService.Domain\AuthenticationService.Domain.csproj", "{32828C7C-2A4A-44D5-89BA-7C846E9788E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthenticationService.Domain", "AuthenticationService.Domain\AuthenticationService.Domain.csproj", "{32828C7C-2A4A-44D5-89BA-7C846E9788E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticationService.DTO", "AuthenticationService.DTO\AuthenticationService.DTO.csproj", "{B07A9286-7DE8-46F0-AB8D-B05D7953E0E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{32828C7C-2A4A-44D5-89BA-7C846E9788E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32828C7C-2A4A-44D5-89BA-7C846E9788E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32828C7C-2A4A-44D5-89BA-7C846E9788E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B07A9286-7DE8-46F0-AB8D-B05D7953E0E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B07A9286-7DE8-46F0-AB8D-B05D7953E0E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B07A9286-7DE8-46F0-AB8D-B05D7953E0E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B07A9286-7DE8-46F0-AB8D-B05D7953E0E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

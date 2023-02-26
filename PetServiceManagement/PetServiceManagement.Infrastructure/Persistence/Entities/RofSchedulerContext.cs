@@ -28,7 +28,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=LAPTOP-R3ND13SE\\SQLEXPRESS;Database=RofScheduler;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=LAPTOP-ES17IBF4;Database=RofScheduler;Trusted_Connection=True;");
             }
         }
 

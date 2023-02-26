@@ -1,5 +1,5 @@
-﻿using AuthenticationService.Infrastructure.ClientManagement;
-using AuthenticationService.Infrastructure.Models;
+﻿using AuthenticationService.DTO.Accessors;
+using AuthenticationService.Infrastructure.ClientManagement;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;

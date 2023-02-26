@@ -1,4 +1,4 @@
-﻿namespace AuthenticationService.Infrastructure.Models
+﻿namespace AuthenticationService.DTO.Accessors
 {
     public class EmployeeLoginResponse : LoginResponse
     {

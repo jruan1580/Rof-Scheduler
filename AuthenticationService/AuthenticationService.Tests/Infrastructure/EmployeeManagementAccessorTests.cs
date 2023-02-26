@@ -1,5 +1,5 @@
-﻿using AuthenticationService.Infrastructure.EmployeeManagement;
-using AuthenticationService.Infrastructure.Models;
+﻿using AuthenticationService.DTO.Accessors;
+using AuthenticationService.Infrastructure.EmployeeManagement;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
