@@ -4,7 +4,7 @@ import Select from "react-select";
 
 import { getPetServices, getPets, getEmployees } from "../../SharedServices/dropdownService";
 
-function UpdateEventModal({event, show, handleHide, setLoginState, scheduledTime}){
+function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute, ampm}){
     const [errorMessage, setErrorMessage] = useState(undefined);
     const [successMessage, setSuccessMessage] = useState(undefined);
 
@@ -103,6 +103,33 @@ function UpdateEventModal({event, show, handleHide, setLoginState, scheduledTime
         console.log("Delete");
     }
 
+    const hourOptions = [
+        {value: "01", label: "01"},
+        {value: "02", label: "02"},
+        {value: "03", label: "03"},
+        {value: "04", label: "04"},
+        {value: "05", label: "05"},
+        {value: "06", label: "06"},
+        {value: "07", label: "07"},
+        {value: "08", label: "08"},
+        {value: "09", label: "09"},
+        {value: "10", label: "10"},
+        {value: "11", label: "11"},
+        {value: "12", label: "12"}
+    ]
+
+    const minOptions = [
+        {value: "00", label: "00"},
+        {value: "15", label: "15"},
+        {value: "30", label: "30"},
+        {value: "45", label: "45"}
+    ]
+
+    const ampmOptions = [
+        {value: "am", label: "AM"},
+        {value: "pm", label: "PM"}
+    ]
+
     return(
         <>
             <Modal show={show} onHide={closeModal}>
@@ -161,58 +188,47 @@ function UpdateEventModal({event, show, handleHide, setLoginState, scheduledTime
                                     />
                                 )}
                             </Col>
-                        </Form.Group>
+                        </Form.Group>                        
                         <br />
                         <Form.Group as={Row}>
                             <Form.Label column lg={3}>Scheduled:</Form.Label>
-                            <Col lg={9}>
-                                <Form.Control placeholder="Current Time" name="currEventTime" defaultValue={event === undefined ? "" : scheduledTime} disabled/>
-                            </Col>
-                        </Form.Group>
-                        <br />
-                        {/* <Form.Group as={Row}>
-                            <Form.Label column lg={3}>Time:</Form.Label>
                             <Col lg={3}>
                                 {event !== undefined && (
                                     <Select
                                         name="hour"
-                                        // options={}
+                                        options={hourOptions}
                                         defaultValue={{
-                                            label: event.startStr,
-                                            value: event.extendedProps.petServiceId,
+                                            label: hour,
+                                            value: hour,
                                         }}
                                     />
                                 )}
-                                <Form.Select type="select" name="hour">
-                                    <option value="01">01</option>
-                                    <option value="02">02</option>
-                                    <option value="03">03</option>
-                                    <option value="04">04</option>
-                                    <option value="05">05</option>
-                                    <option value="06">06</option>
-                                    <option value="07">07</option>
-                                    <option value="08">08</option>
-                                    <option value="09">09</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                </Form.Select>
                             </Col>
                             <Col lg={3}>
-                                <Form.Select type="select" name="minute">
-                                <option value="00">00</option>
-                                <option value="15">15</option>
-                                <option value="30">30</option>
-                                <option value="45">45</option>
-                                </Form.Select>
+                                {event !== undefined && (
+                                    <Select
+                                        name="minute"
+                                        options={minOptions}
+                                        defaultValue={{
+                                            label: minute,
+                                            value: minute,
+                                        }}
+                                    />
+                                )}
                             </Col>
                             <Col lg={3}>
-                                <Form.Select type="select" name="ampm">
-                                <option value="am">AM</option>
-                                <option value="pm">PM</option>
-                                </Form.Select>
+                                {event !== undefined && (
+                                    <Select
+                                        name="ampm"
+                                        options={ampmOptions}
+                                        defaultValue={{
+                                            label: ampm,
+                                            value: ampm,
+                                        }}
+                                    />
+                                )}
                             </Col>
-                        </Form.Group> */}
+                        </Form.Group>
                         <hr />
                         <Button type="button" variant="secondary" onClick={() => deleteEvent()} className="float-start me-2">Delete</Button>
                         <Button type="button" variant="success" onClick={() => markComplete()} className="float-start me-2">Complete</Button>
