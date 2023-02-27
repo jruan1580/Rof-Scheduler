@@ -16,6 +16,7 @@ function Calendar({setLoginState}) {
   const [schedHour, setSchedHour] = useState("");
   const [schedMin, setSchedMin] = useState("");
   const [schedAMPM, setSchedAMPM] = useState("");
+  const [schedDate, setSchedDate] = useState("");
 
   //loads event for current month once land on page
   useEffect(() => {
@@ -110,6 +111,7 @@ function Calendar({setLoginState}) {
 
   //selecting an event
   const handleEventClick = (arg) => {
+    console.log(arg.event.start);
     getCurrScheduledTime(arg.event);
     setUpdateEvent(arg.event);
     setShowUpdateModal(true);
@@ -122,23 +124,35 @@ function Calendar({setLoginState}) {
   }
 
   const getCurrScheduledTime = (event) =>{
-    // const MM = event.start.getMonth() + 1;
-    // const dd = event.start.getDate();
+    const MM = event.start.getMonth() + 1;
+    const dd = event.start.getDate();
     const HH = event.start.getHours();
     const mm = event.start.getMinutes();
     
-    // let yyyy = event.start.getFullYear();
+    let yyyy = event.start.getFullYear();
 
-    // var month = (MM < 10) ? "0" + MM : MM;
-    // var day = (dd < 10) ? "0" + dd : dd;
+    var month = (MM < 10) ? "0" + MM : MM;
+    var day = (dd < 10) ? "0" + dd : dd;
 
-    var hour = (HH < 10) ? "0" + HH: HH || (HH > 12) ? HH - 12 : HH;
     var minute = (mm < 10) ? "0" + mm : mm;
     var ampm = (HH < 12) ? "AM" : "PM";
+    var date = yyyy + "-" + month + "-" + day
+    
+    var hour = undefined;
+
+    if(HH < 10){
+      hour = "0" + HH;
+    }else if(HH > 12){
+      var hr = HH - 12;
+      hour = "0" + hr;
+    }else{
+      hour = HH;
+    }
 
     setSchedHour(hour);
     setSchedMin(minute);
     setSchedAMPM(ampm);
+    setSchedDate(date);
   }
 
   return(
@@ -233,6 +247,7 @@ function Calendar({setLoginState}) {
           hour={schedHour}
           minute={schedMin}
           ampm={schedAMPM}
+          date={schedDate}
         />
       </>
   )

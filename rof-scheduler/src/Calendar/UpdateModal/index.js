@@ -3,14 +3,16 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 
 import { getPetServices, getPets, getEmployees } from "../../SharedServices/dropdownService";
+import { updateEvent } from "../../SharedServices/jobEventService";
 
-function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute, ampm}){
+function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute, ampm, date}){
     const [errorMessage, setErrorMessage] = useState(undefined);
     const [successMessage, setSuccessMessage] = useState(undefined);
 
     const [employees, setEmployees] = useState([]);
     const [pets, setPets] = useState([]);
     const [petServices, setPetServices] = useState([]);
+    const [completed, setCompleted] = useState(false);
     
     useEffect(() => {
         (async function () {
@@ -85,18 +87,61 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
     const closeModal = function () {
         setErrorMessage(undefined);
         setSuccessMessage(undefined);
-        // setLoading(false);
-        // setDisableBtns(false);
+        setCompleted(false);
         handleHide();
     };
 
     const updateEventSubmit = (e) => {
         e.preventDefault();
         console.log("Update");
+        setErrorMessage(undefined);
+        setSuccessMessage(false);
+
+        var employeeId = e.target.employee.value;
+        var petId = e.target.pet.value;
+        var petServiceId = e.target.petService.value;
+        var eventStart = undefined;
+        var isComplete = completed;
+        var isCanceled = false;
+
+        var hour = undefined;
+        var eventTime = undefined;
+        var eventDate = e.target.date.value;
+
+        if(e.target.ampm.value.toLowerCase() === "am" && e.target.hour.value === "12"){
+            hour = "00";
+            eventTime = hour + ":" + e.target.minute.value;
+        } else if(e.target.ampm.value.toLowerCase() === "pm"){
+            hour = parseInt(e.target.hour.value) + 12;
+            eventTime = hour + ":" + e.target.minute.value;
+        }else{
+            eventTime = e.target.hour.value + ":" + e.target.minute.value;
+        }
+
+        eventStart = eventDate + "T" + eventTime + ":00";
+        
+        // (async function () {
+        //     try {
+        //         const resp = await updateEvent(employeeId, petId, petServiceId, eventStart, isComplete, isCanceled);
+
+        //         if (resp.status === 401) {
+        //             setLoginState(false);
+        //             return;
+        //         }
+
+        //         setErrorMessage(undefined);
+        //         setSuccessMessage(true);
+        //     } catch (e) {
+        //         setErrorMessage(e.message);
+        //         return;
+        //     }
+        // })();
     }
 
-    const markComplete = (id) => {
+    const markComplete = () => {
         console.log("Complete");
+        setCompleted(true);
+        updateEventSubmit();
     }
 
     const deleteEvent = (id) => {
@@ -191,7 +236,24 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
                         </Form.Group>                        
                         <br />
                         <Form.Group as={Row}>
-                            <Form.Label column lg={3}>Scheduled:</Form.Label>
+                            <Form.Label column lg={3}>Date:</Form.Label>
+                            <Col lg={9}>
+                                <Form.Control
+                                    type="date"
+                                    defaultValue={event === undefined ? "" : date}
+                                    name="date"
+                                />
+                                {/* <Form.Control 
+                                    type="input"
+                                    defaultValue={date}
+                                    name="date"
+                                    disabled
+                                /> */}
+                            </Col>
+                        </Form.Group>
+                        <br />
+                        <Form.Group as={Row}>
+                            <Form.Label column lg={3}>Time:</Form.Label>
                             <Col lg={3}>
                                 {event !== undefined && (
                                     <Select
