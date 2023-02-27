@@ -31,7 +31,7 @@ function AddEventModal({show, handleHide, handleAddSuccess, setLoginState, event
         if(view){
             var hour = undefined;
 
-            if(e.target.ampm.value === "pm" && e.target.hour.value === "12"){
+            if(e.target.ampm.value === "am" && e.target.hour.value === "12"){
                 hour = "00";
                 eventTime = hour + ":" + e.target.minute.value;
             } else if(e.target.ampm.value === "pm"){
