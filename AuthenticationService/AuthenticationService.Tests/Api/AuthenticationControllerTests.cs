@@ -1,12 +1,12 @@
 ﻿using AuthenticationService.API.Controllers;
-using AuthenticationService.API.Models;
-using AuthenticationService.Domain.Exceptions;
 using AuthenticationService.Domain.Model;
 using AuthenticationService.Domain.Services;
+using AuthenticationService.DTO.Controllers.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -89,7 +89,7 @@ namespace AuthenticationService.Tests.Api
         public async Task TestLoginNotFound()
         {
             _authService.Setup(a => a.Login(It.IsAny<string>(), It.IsAny<string>()))
-                .ThrowsAsync(new NotFoundException());
+                .ThrowsAsync(new EntityNotFoundException("User"));
 
             _ctr.ControllerContext = new ControllerContext()
             {
@@ -196,7 +196,7 @@ namespace AuthenticationService.Tests.Api
             };
 
             _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
-                .Throws(new NotFoundException());
+                .Throws(new EntityNotFoundException("User"));
 
             var res = await _ctr.Logout(1);
 

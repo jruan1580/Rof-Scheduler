@@ -11,7 +11,7 @@ namespace RofShared.StartupInits
     public static class AuthenticationMiddleware
     {
         public static void AddJwtAuthentication(this IServiceCollection service, IConfiguration configuration)
-       {
+        {
             service.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -29,25 +29,13 @@ namespace RofShared.StartupInits
                     {
                         OnMessageReceived = context =>
                         {
-                            //no auth header, get it out of cookie, otw, it is in auth header
-                            if (!context.Request.Headers.ContainsKey("Authorization"))
-                            {
-                                if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
-                                {
-                                    context.Token = context.Request.Cookies["X-Access-Token-Admin"];
-                                }
-
-                                if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
-                                {
-                                    context.Token = context.Request.Cookies["X-Access-Token-Employee"];
-                                }
-                            }
+                            SetToken(context);
 
                             return Task.CompletedTask;
                         }
                     };
                 });
-       }
+        }
 
         public static void AddCorsForOriginAndAllowAnyMethodAndHeader(this IApplicationBuilder app, string origin)
         {
@@ -56,6 +44,28 @@ namespace RofShared.StartupInits
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials()); // allow credentials            
+        }
+
+        private static void SetToken(MessageReceivedContext context)
+        {
+            //no auth header, get it out of cookie, otw, it is in auth header
+            if (!context.Request.Headers.ContainsKey("Authorization"))
+            {
+                if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
+                {
+                    context.Token = context.Request.Cookies["X-Access-Token-Admin"];
+                }
+
+                if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
+                {
+                    context.Token = context.Request.Cookies["X-Access-Token-Employee"];
+                }
+
+                if (context.Request.Cookies.ContainsKey("X-Access-Token-Client"))
+                {
+                    context.Token = context.Request.Cookies["X-Access-Token-Client"];
+                }
+            }
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using AuthenticationService.API.Models;
-using AuthenticationService.Domain.Exceptions;
-using AuthenticationService.Domain.Services;
+﻿using AuthenticationService.Domain.Services;
+using AuthenticationService.DTO.Controllers.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RofShared.Exceptions;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -33,24 +33,12 @@ namespace AuthenticationService.API.Controllers
                 var basicUserInfo = await _authService.Login(employee.Username, employee.Password);
 
                 var token = _tokenHandler.GenerateTokenForRole(basicUserInfo.Role);
-                switch (basicUserInfo.Role)
-                {
-                    case "Administrator":
-                        Response.Cookies.Append("X-Access-Token-Admin", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });
-                        break;
-                    case "Employee":
-                        Response.Cookies.Append("X-Access-Token-Employee", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });
-                        break;
-                    case "Client":
-                        Response.Cookies.Append("X-Access-Token-Client", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(30) });
-                        break;
-                    default:
-                        throw new Exception($"User has unsupported role: {basicUserInfo.Role}");
-                }
-         
+                
+                SetTokenInResponseCookie(Response, basicUserInfo.Role, token, 30);
+                
                 return Ok(new { accessToken = token, Id = basicUserInfo.Id, FirstName = basicUserInfo.FirstName, Role = basicUserInfo.Role });
             }
-            catch (NotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound("Username not found");
             }
@@ -74,25 +62,12 @@ namespace AuthenticationService.API.Controllers
 
                 await _authService.Logout(id, role.Value);
 
-                switch (role.Value)
-                {
-                    case "Administrator":
-                        Response.Cookies.Append("X-Access-Token-Admin", "", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(-30) });
-                        break;
-                    case "Employee":
-                        Response.Cookies.Append("X-Access-Token-Employee", "", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(-30) });
-                        break;
-                    case "Client":
-                        Response.Cookies.Append("X-Access-Token-Client", "", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true, Path = "/", Expires = DateTimeOffset.Now.AddMinutes(-30) });
-                        break;
-                    default:
-                        throw new Exception($"User has unsupported role: {role.Value}");
-                }
+                SetTokenInResponseCookie(Response, role.Value, string.Empty, -30);               
 
                 return Ok();
 
             }
-            catch (NotFoundException)
+            catch (EntityNotFoundException)
             {
                 return NotFound("User not found");
             }
@@ -105,5 +80,40 @@ namespace AuthenticationService.API.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
+        private void SetTokenInResponseCookie(HttpResponse response, string role, string token, int expirationInMinutes)
+        {
+            var cookieOption = ConstructCookieOptions(expirationInMinutes);
+
+            switch (role)
+            {
+                case "Administrator":
+                    Response.Cookies.Append("X-Access-Token-Admin", token, cookieOption);
+                    break;
+                case "Employee":
+                    Response.Cookies.Append("X-Access-Token-Employee", token, cookieOption);
+                    break;
+                case "Client":
+                    Response.Cookies.Append("X-Access-Token-Client", token, cookieOption);
+                    break;
+                default:
+                    throw new Exception($"User has unsupported role: {role}");
+            }
+        }
+
+        private CookieOptions ConstructCookieOptions(int expirationInMinutes)
+        {
+            var cookieOption = new CookieOptions()
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                Path = "/",
+                Expires = DateTimeOffset.Now.AddMinutes(expirationInMinutes)
+            };
+
+            return cookieOption;
+        }
+
     }
 }
