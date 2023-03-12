@@ -23,7 +23,9 @@ namespace EmployeeManagementService.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
-            services.AddTransient<IEmployeeService, EmployeeService>();
+            services.AddTransient<IEmployeeAuthService, EmployeeAuthService>();
+            services.AddTransient<IEmployeeRetrievalService, EmployeeRetrievalService>();
+            services.AddTransient<IEmployeeUpsertService, EmployeeUpsertService>();
             services.AddTransient<IPasswordService, PasswordService>();
 
             services.AddMvc();           
