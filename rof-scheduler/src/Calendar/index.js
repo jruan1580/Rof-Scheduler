@@ -111,7 +111,6 @@ function Calendar({setLoginState}) {
 
   //selecting an event
   const handleEventClick = (arg) => {
-    console.log(arg.event.start);
     getCurrScheduledTime(arg.event);
     setUpdateEvent(arg.event);
     setShowUpdateModal(true);
@@ -231,7 +230,8 @@ function Calendar({setLoginState}) {
                           employee: jobEvent.employeeFullName,
                           petId: jobEvent.petId,
                           pet: jobEvent.petName,
-                          petServiceId: jobEvent.petServiceId
+                          petServiceId: jobEvent.petServiceId,
+                          isComplete: jobEvent.completed
                         }
                       }
                   );

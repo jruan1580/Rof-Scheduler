@@ -12,7 +12,6 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
     const [employees, setEmployees] = useState([]);
     const [pets, setPets] = useState([]);
     const [petServices, setPetServices] = useState([]);
-    const [completed, setCompleted] = useState(false);
     
     useEffect(() => {
         (async function () {
@@ -87,13 +86,12 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
     const closeModal = function () {
         setErrorMessage(undefined);
         setSuccessMessage(undefined);
-        setCompleted(false);
         handleHide();
     };
 
     const updateEventSubmit = (e) => {
-        e.preventDefault();
         console.log("Update");
+        e.preventDefault();
         setErrorMessage(undefined);
         setSuccessMessage(false);
 
@@ -101,8 +99,10 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
         var petId = e.target.pet.value;
         var petServiceId = e.target.petService.value;
         var eventStart = undefined;
-        var isComplete = completed;
+        var isComplete = e.target.isComplete.value;
         var isCanceled = false;
+
+        console.log(isComplete);
 
         var hour = undefined;
         var eventTime = undefined;
@@ -138,12 +138,6 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
         // })();
     }
 
-    const markComplete = () => {
-        console.log("Complete");
-        setCompleted(true);
-        updateEventSubmit();
-    }
-
     const deleteEvent = (id) => {
         console.log("Delete");
     }
@@ -173,6 +167,11 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
     const ampmOptions = [
         {value: "am", label: "AM"},
         {value: "pm", label: "PM"}
+    ]
+
+    const completeOptions = [
+        {value: true, label: "Yes"},
+        {value: false, label: "No"}
     ]
 
     return(
@@ -243,12 +242,6 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
                                     defaultValue={event === undefined ? "" : date}
                                     name="date"
                                 />
-                                {/* <Form.Control 
-                                    type="input"
-                                    defaultValue={date}
-                                    name="date"
-                                    disabled
-                                /> */}
                             </Col>
                         </Form.Group>
                         <br />
@@ -291,9 +284,24 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
                                 )}
                             </Col>
                         </Form.Group>
+                        <br />
+                        <Form.Group as={Row}>
+                            <Form.Label column lg={3}>Completed:</Form.Label>
+                            <Col lg={3}>
+                                {event !== undefined && (
+                                    <Select
+                                        name="isComplete"
+                                        options={completeOptions}
+                                        defaultValue={{
+                                            label: event.extendedProps.isComplete === true ? "Yes" : "No",
+                                            value: event.extendedProps.isComplete,
+                                        }}
+                                    />
+                                )}
+                            </Col>
+                        </Form.Group>
                         <hr />
                         <Button type="button" variant="secondary" onClick={() => deleteEvent()} className="float-start me-2">Delete</Button>
-                        <Button type="button" variant="success" onClick={() => markComplete()} className="float-start me-2">Complete</Button>
                         <Button type="button" variant="danger" onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
                         <Button type="submit" variant="primary" className="float-end ms-2">Update</Button>
                     </Form>
