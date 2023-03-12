@@ -124,19 +124,19 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__Employ__70FDBF69");
+                    .HasConstraintName("FK__JobEvent__Employ__06ED0088");
 
                 entity.HasOne(d => d.Pet)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetId__71F1E3A2");
+                    .HasConstraintName("FK__JobEvent__PetId__07E124C1");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetSer__72E607DB");
+                    .HasConstraintName("FK__JobEvent__PetSer__08D548FA");
             });
 
             modelBuilder.Entity<Pet>(entity =>

@@ -30,7 +30,6 @@ namespace EventManagementService.Test.SerivceTest
                 PetId = 0,
                 PetServiceId = 0,
                 EventStartTime = DateTime.Now,
-                Canceled = false,
                 Completed = false
             };
 
@@ -48,7 +47,6 @@ namespace EventManagementService.Test.SerivceTest
                 PetId = 1,
                 PetServiceId = 1,
                 EventStartTime = DateTime.Now,
-                Canceled = false,
                 Completed = false
             };
 
@@ -69,7 +67,6 @@ namespace EventManagementService.Test.SerivceTest
                 PetId = 1,
                 PetServiceId = 1,
                 EventStartTime = DateTime.Now,
-                Canceled = false,
                 Completed = false
             };
 
@@ -109,7 +106,6 @@ namespace EventManagementService.Test.SerivceTest
                     EventStartTime = DateTime.Today,
                     EventEndTime = DateTime.Today,
                     Completed = false,
-                    Canceled = false,
                     Employee = new Employee()
                     {
                         Id = 1,
@@ -144,7 +140,6 @@ namespace EventManagementService.Test.SerivceTest
             Assert.AreEqual(DateTime.Today, results[0].EventStartTime);
             Assert.AreEqual(DateTime.Today, results[0].EventEndTime);
             Assert.IsFalse(results[0].Completed);
-            Assert.IsFalse(results[0].Canceled);
 
             Assert.IsNotNull(results[0].Employee);
             Assert.AreEqual(1, results[0].Employee.Id);
@@ -184,7 +179,6 @@ namespace EventManagementService.Test.SerivceTest
                     EventStartTime = DateTime.Today,
                     EventEndTime = DateTime.Today,
                     Completed = false,
-                    Canceled = false,
                     Employee = new Employee()
                     {
                         Id = 1,
@@ -215,7 +209,6 @@ namespace EventManagementService.Test.SerivceTest
             Assert.AreEqual(DateTime.Today, result.EventStartTime);
             Assert.AreEqual(DateTime.Today, result.EventEndTime);
             Assert.IsFalse(result.Completed);
-            Assert.IsFalse(result.Canceled);
 
             Assert.IsNotNull(result.Employee);
             Assert.AreEqual(1, result.Employee.Id);
