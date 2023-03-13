@@ -100,9 +100,6 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
         var petServiceId = e.target.petService.value;
         var eventStart = undefined;
         var isComplete = e.target.isComplete.value;
-        var isCanceled = false;
-
-        console.log(isComplete);
 
         var hour = undefined;
         var eventTime = undefined;
@@ -122,7 +119,7 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
         
         // (async function () {
         //     try {
-        //         const resp = await updateEvent(employeeId, petId, petServiceId, eventStart, isComplete, isCanceled);
+        //         const resp = await updateEvent(employeeId, petId, petServiceId, eventStart, isComplete);
 
         //         if (resp.status === 401) {
         //             setLoginState(false);
