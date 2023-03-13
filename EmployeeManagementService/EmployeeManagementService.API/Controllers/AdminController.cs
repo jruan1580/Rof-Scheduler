@@ -16,13 +16,11 @@ namespace EmployeeManagementService.API.Controllers
     [ApiController]
     public class AdminController : AEmployeeController
     {
-        private readonly IEmployeeService _employeeService;
-
-        public AdminController(IEmployeeService employeeService) 
-            : base(employeeService)
-        {
-            _employeeService = employeeService;
-        }
+        public AdminController(IEmployeeAuthService employeeAuthService,
+            IEmployeeRetrievalService employeeRetrievalService,
+            IEmployeeUpsertService employeeUpsertService) 
+        : base(employeeAuthService, employeeRetrievalService, employeeUpsertService)
+        { }
 
         [HttpGet]
         public async Task<IActionResult> GetAllEmployees([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
@@ -31,7 +29,7 @@ namespace EmployeeManagementService.API.Controllers
             {
                 var employeeList = new List<EmployeeDTO>();
 
-                var result = await _employeeService.GetAllEmployeesByKeyword(page, offset, keyword);
+                var result = await _employeeRetrievalService.GetAllEmployeesByKeyword(page, offset, keyword);
 
                 foreach (var employee in result.Employees)
                 {
@@ -51,7 +49,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                await _employeeService.CreateEmployee(EmployeeDTOMapper.FromDTOEmployee(employee), employee.Password);
+                await _employeeUpsertService.CreateEmployee(EmployeeDTOMapper.FromDTOEmployee(employee), employee.Password);
 
                 return StatusCode(201);
             }
@@ -70,7 +68,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                await _employeeService.UpdateEmployeeInformation(EmployeeDTOMapper.FromDTOEmployee(employee));
+                await _employeeUpsertService.UpdateEmployeeInformation(EmployeeDTOMapper.FromDTOEmployee(employee));
 
                 return Ok();
             }
@@ -93,7 +91,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                await _employeeService.ResetEmployeeFailedLoginAttempt(id);
+                await _employeeUpsertService.ResetEmployeeFailedLoginAttempt(id);
 
                 return Ok();
             }
@@ -115,7 +113,7 @@ namespace EmployeeManagementService.API.Controllers
             {
                 var active = (Request.Path.Value.Contains("deactivate")) ? false : true;
 
-                await _employeeService.UpdateEmployeeActiveStatus(id, active);
+                await _employeeUpsertService.UpdateEmployeeActiveStatus(id, active);
 
                 return Ok();
             }
@@ -134,7 +132,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                await _employeeService.DeleteEmployeeById(id);
+                await _employeeUpsertService.DeleteEmployeeById(id);
 
                 return Ok();
             }

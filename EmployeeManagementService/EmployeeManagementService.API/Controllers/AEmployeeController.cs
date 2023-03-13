@@ -13,11 +13,21 @@ namespace EmployeeManagementService.API.Controllers
     [Route("api/[controller]")]
     public abstract class AEmployeeController : ControllerBase
     {
-        private readonly IEmployeeService _employeeService;
+        protected readonly IEmployeeAuthService _employeeAuthService;
 
-        public AEmployeeController(IEmployeeService employeeService)
+        protected readonly IEmployeeRetrievalService _employeeRetrievalService;
+
+        protected readonly IEmployeeUpsertService _employeeUpsertService;
+
+        public AEmployeeController(IEmployeeAuthService employeeAuthService,
+            IEmployeeRetrievalService employeeRetrievalService,
+            IEmployeeUpsertService employeeUpsertService)
         {
-            _employeeService = employeeService;
+            _employeeAuthService = employeeAuthService;
+            
+            _employeeRetrievalService = employeeRetrievalService;
+            
+            _employeeUpsertService = employeeUpsertService;
         }
         
         [HttpGet("{id}")]
@@ -25,7 +35,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                var employee = await _employeeService.GetEmployeeById(id);
+                var employee = await _employeeRetrievalService.GetEmployeeById(id);
 
                 return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
             }
@@ -44,7 +54,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                var employee = await _employeeService.GetEmployeeByUsername(username);
+                var employee = await _employeeRetrievalService.GetEmployeeByUsername(username);
 
                 return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
             }
@@ -63,7 +73,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                var loginEmployee = await _employeeService.EmployeeLogIn(employee.Username, employee.Password);
+                var loginEmployee = await _employeeAuthService.EmployeeLogIn(employee.Username, employee.Password);
 
                 return Ok(new { Id = loginEmployee.Id, FirstName = loginEmployee.FirstName, Role = loginEmployee.Role });
             }
@@ -90,7 +100,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                await _employeeService.EmployeeLogout(id);               
+                await _employeeAuthService.EmployeeLogout(id);               
 
                 return Ok();
             }
@@ -109,7 +119,7 @@ namespace EmployeeManagementService.API.Controllers
         {
             try
             {
-                await _employeeService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
+                await _employeeUpsertService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
 
                 return Ok();
             }

@@ -15,21 +15,18 @@ namespace EmployeeManagementService.API.Controllers
     [ApiController]
     public class EmployeeController : AEmployeeController
     {
-        private readonly IEmployeeService _employeeService;
-
-        public EmployeeController(IEmployeeService employeeService) 
-            : base(employeeService)
-        {
-            _employeeService = employeeService;
-        }
-            
+        public EmployeeController(IEmployeeAuthService employeeAuthService,
+            IEmployeeRetrievalService employeeRetrievalService,
+            IEmployeeUpsertService employeeUpsertService)
+        : base(employeeAuthService, employeeRetrievalService, employeeUpsertService)
+        { }            
 
         [HttpPut("info")]
         public override async Task<IActionResult> UpdateEmployeeInformation([FromBody] EmployeeDTO employee)
         {
             try
             {
-                await _employeeService.UpdateEmployeeInformation(EmployeeDTOMapper.FromDTOEmployee(employee));
+                await _employeeUpsertService.UpdateEmployeeInformation(EmployeeDTOMapper.FromDTOEmployee(employee));
 
                 return Ok();
             }

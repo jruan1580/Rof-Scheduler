@@ -5,11 +5,11 @@ using EmployeeManagementService.Domain.Services;
 using EmployeeManagementService.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
 using RofShared.Exceptions;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Test.Controller
@@ -17,32 +17,25 @@ namespace EmployeeManagementService.Test.Controller
     [TestFixture]
     public class EmployeeControllerTest
     {
-        private Mock<IEmployeeService> _employeeService;
+        private readonly Mock<IEmployeeAuthService> _employeeAuthService = new Mock<IEmployeeAuthService>();
 
-        [SetUp]
-        public void Setup()
-        {
-            _employeeService = new Mock<IEmployeeService>();
-        }
+        private readonly Mock<IEmployeeRetrievalService> _employeeRetrievalService = new Mock<IEmployeeRetrievalService>();
+
+        private readonly Mock<IEmployeeUpsertService> _employeeUpsertService = new Mock<IEmployeeUpsertService>();
+
+        private readonly string _passwordUnencrypted = "t3$T1234";
+
 
         [Test]
         public async Task UpdateEmployeeInformation_Success()
         {
-            var updateEmployee = new EmployeeDTO()
-            {
-                Id = 1,
-                FirstName = "John",
-                LastName = "Doe",
-                Ssn = "123-45-6789",
-                Username = "jdoe",
-                Role = "Employee",
-                Address = new AddressDTO { AddressLine1 = "123 Abc St", AddressLine2 = "", City = "Oakland", State = "CA", ZipCode = "12345" }
-            };
+            var updateEmployee = EmployeeCreator.GetEmployeeDTO("Employee");
+            updateEmployee.Id = 1;
 
-            _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Domain.Models.Employee>()))
+            _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);
 
@@ -65,13 +58,20 @@ namespace EmployeeManagementService.Test.Controller
                 Ssn = "",
                 Username = "",
                 Role = "",
-                Address = new AddressDTO { AddressLine1 = "", AddressLine2 = "", City = "", State = "", ZipCode = "" }
+                Address = new AddressDTO 
+                { 
+                    AddressLine1 = "", 
+                    AddressLine2 = "", 
+                    City = "",
+                    State = "",
+                    ZipCode = "" 
+                }
             };
 
-            _employeeService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
+            _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .ThrowsAsync(new ArgumentException("bad arguments"));
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.UpdateEmployeeInformation(updateEmployee);
 
@@ -86,24 +86,11 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task GetEmployeeById_Success()
         {
-            _employeeService.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
-                .ReturnsAsync(new Domain.Models.Employee()
-                {
-                    Id = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    Ssn = "123-45-6789",
-                    Username = "jdoe",
-                    Password = new byte[100],
-                    Role = "Employee",
-                    IsLocked = false,
-                    FailedLoginAttempts = 0,
-                    TempPasswordChanged = false,
-                    Status = false,
-                    Active = true
-                });
+            _employeeRetrievalService.Setup(e => 
+                e.GetEmployeeById(It.IsAny<long>()))
+            .ReturnsAsync(EmployeeCreator.GetDomainEmployee(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.GetEmployeeById(1);
 
@@ -118,10 +105,10 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task GetEmployeeById_InternalServerError()
         {
-            _employeeService.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
-                .ReturnsAsync((Domain.Models.Employee)null);
+            _employeeRetrievalService.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
+                .ReturnsAsync((Employee)null);
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.GetEmployeeById(1);
 
@@ -136,24 +123,11 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task GetEmployeeByUsername_Success()
         {
-            _employeeService.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
-                .ReturnsAsync(new Domain.Models.Employee()
-                {
-                    Id = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    Ssn = "123-45-6789",
-                    Username = "jdoe",
-                    Password = new byte[100],
-                    Role = "Employee",
-                    IsLocked = false,
-                    FailedLoginAttempts = 0,
-                    TempPasswordChanged = false,
-                    Status = false,
-                    Active = true
-                });
+            _employeeRetrievalService.Setup(e => 
+                e.GetEmployeeByUsername(It.IsAny<string>()))
+            .ReturnsAsync(EmployeeCreator.GetDomainEmployee(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.GetEmployeeByUsername("jdoe");
 
@@ -168,10 +142,10 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task GetEmployeeByUsername_InternalServerError()
         {
-            _employeeService.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
+            _employeeRetrievalService.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
                 .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.GetEmployeeByUsername("jdoe");
 
@@ -186,13 +160,11 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task EmployeeLogin_Success()
         {
-            _employeeService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new Domain.Models.Employee()
-                {
-                    Role = "Employee"
-                });
+            _employeeAuthService.Setup(e => 
+                e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(EmployeeCreator.GetDomainEmployee(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.EmployeeLogin(new EmployeeDTO()
             {
@@ -211,10 +183,10 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task EmployeeLogin_InternalServerError()
         {
-            _employeeService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
+            _employeeAuthService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.EmployeeLogin(new EmployeeDTO()
             {
@@ -233,10 +205,10 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task EmployeeLogin_Locked()
         {
-            _employeeService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
+            _employeeAuthService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
                .ThrowsAsync(new EmployeeIsLockedException());
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.EmployeeLogin(new EmployeeDTO()
             {
@@ -255,13 +227,13 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task EmployeeLogout_Success()
         {
-            _employeeService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
+            _employeeAuthService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers["User-Agent"] = "Chrome";
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.EmployeeLogout(1);
 
@@ -276,10 +248,10 @@ namespace EmployeeManagementService.Test.Controller
         [Test]
         public async Task EmployeeLogout_InternalServerError()
         {
-            _employeeService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
+            _employeeAuthService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.EmployeeLogout(1);
 
@@ -300,10 +272,10 @@ namespace EmployeeManagementService.Test.Controller
                 NewPassword = "NewTestPassword123!"
             };
 
-            _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+            _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.UpdatePassword(password);
 
@@ -324,10 +296,10 @@ namespace EmployeeManagementService.Test.Controller
                 NewPassword = "NewTestPassword123!"
             };
 
-            _employeeService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+            _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
 
-            var controller = new EmployeeController(_employeeService.Object);
+            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
 
             var response = await controller.UpdatePassword(password);
 
