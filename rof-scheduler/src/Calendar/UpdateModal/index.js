@@ -22,23 +22,23 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
 
                 var resp = undefined;
                 
-                // resp = await getEmployees();
-                // if (resp.status === 401) {
-                //     setLoginState(false);
-                //     return;
-                // }
+                resp = await getEmployees();
+                if (resp.status === 401) {
+                    setLoginState(false);
+                    return;
+                }
 
-                // const employees = await resp.json();
-                // constructEmployeeOptions(employees);
+                const employees = await resp.json();
+                constructEmployeeOptions(employees);
 
-                // resp = await getPets();
-                // if (resp.status === 401) {
-                //     setLoginState(false);
-                //     return;
-                // }
+                resp = await getPets();
+                if (resp.status === 401) {
+                    setLoginState(false);
+                    return;
+                }
 
-                // const pets = await resp.json();
-                // constructPetOptions(pets);
+                const pets = await resp.json();
+                constructPetOptions(pets);
 
                 resp = await getPetServices();
                 if (resp.status === 401) {
@@ -95,6 +95,7 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
         setErrorMessage(undefined);
         setSuccessMessage(false);
 
+        let eventId = parseInt(event.id);
         var employeeId = e.target.employee.value;
         var petId = e.target.pet.value;
         var petServiceId = e.target.petService.value;
@@ -117,22 +118,22 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
 
         eventStart = eventDate + "T" + eventTime + ":00";
         
-        // (async function () {
-        //     try {
-        //         const resp = await updateEvent(eventId, employeeId, petId, petServiceId, eventStart, isComplete);
+        (async function () {
+            try {
+                const resp = await updateEvent(eventId, employeeId, petId, petServiceId, eventStart, isComplete);
 
-        //         if (resp.status === 401) {
-        //             setLoginState(false);
-        //             return;
-        //         }
+                if (resp.status === 401) {
+                    setLoginState(false);
+                    return;
+                }
 
-        //         setErrorMessage(undefined);
-        //         setSuccessMessage(true);
-        //     } catch (e) {
-        //         setErrorMessage(e.message);
-        //         return;
-        //     }
-        // })();
+                setErrorMessage(undefined);
+                setSuccessMessage(true);
+            } catch (e) {
+                setErrorMessage(e.message);
+                return;
+            }
+        })();
     }
 
     const deleteEvent = function(id){

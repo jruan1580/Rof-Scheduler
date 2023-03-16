@@ -44,7 +44,13 @@ export const getPets = async function(){
 
 export const getEmployees = async function(){
     var baseUrl = process.env.REACT_APP_EMPLOYEE_MANAGEMENT_BASE_URL;
-    var url = baseUrl +  "/dropdown/employees";
+
+    var role = localStorage.getItem("role");
+
+    var url =
+        role.toLowerCase() === "administrator"
+        ? baseUrl + "/admin/" + "employees"
+        : baseUrl + "/employee/" + "employees";
 
     return await makeHttpRequest(url, "GET", {"Accept": "application/json"}, 200, undefined);
 }
