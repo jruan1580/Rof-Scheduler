@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using RofShared.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -81,6 +82,31 @@ namespace EmployeeManagementService.Test.Controller
             var obj = (BadRequestObjectResult)response;
 
             Assert.AreEqual(obj.StatusCode, 400);
+        }
+
+        [Test]
+        public async Task GetEmployeesForDropdown_Success()
+        {
+            _employeeRetrievalService.Setup(e => e.GetEmployeesForDropdown())
+            .ReturnsAsync(new List<Employee>()
+            {
+                new Employee()
+                {
+                    Id = 1,
+                    FullName = "Test User"
+                }
+            });
+
+            var controller = new AdminController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+
+            var response = await controller.GetEmployeesForDropdown();
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+
+            var okObj = (OkObjectResult)response;
+
+            Assert.AreEqual(okObj.StatusCode, 200);
         }
 
         [Test]

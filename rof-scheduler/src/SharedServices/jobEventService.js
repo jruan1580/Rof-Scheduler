@@ -24,10 +24,10 @@ export const addEvent = async function(employeeId, petId, petServiceId, eventSta
   return await makeHttpRequest(baseUrl, "POST", {"Content-Type": "application/json"}, 200, data); 
 }
 
-export const updateEvent = async function(employeeId, petId, petServiceId, eventStartTime, isCompleted){
+export const updateEvent = async function(eventId, employeeId, petId, petServiceId, eventStartTime, isCompleted){
   var baseUrl = process.env.REACT_APP_EVENT_SERVICE_BASE_URL + "/event";
 
-  var data = { employeeId, petId, petServiceId, eventStartTime, isCompleted };
+  var data = { eventId, employeeId, petId, petServiceId, eventStartTime, isCompleted };
 
   return await makeHttpRequest(baseUrl, "PUT", {"Content-Type": "application/json"}, 200, data);
 }

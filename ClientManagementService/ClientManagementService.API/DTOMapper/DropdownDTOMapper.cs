@@ -72,5 +72,21 @@ namespace ClientManagementService.API.DTOMapper
 
             return dtos;
         }
+
+        public static List<PetDTO> ToPetDTO(List<Pet> pets)
+        {
+            var dtos = new List<PetDTO>();
+
+            foreach (var pet in pets)
+            {
+                dtos.Add(new PetDTO()
+                {
+                    Id = pet.Id,
+                    Name = pet.Name
+                });
+            }
+
+            return dtos;
+        }
     }
 }

@@ -47,6 +47,16 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
+            _petRepository.Setup(p => p.GetPetsForDropdown())
+                .ReturnsAsync(new List<Pet>()
+                {
+                    new Pet()
+                    {
+                        Id = 1,
+                        Name = "TestPet"
+                    }
+                });
+
             _petToVaccinesRepository = new Mock<IPetToVaccinesRepository>();
 
             _petToVaccinesRepository.Setup(v => v.GetVaccinesByPetType(It.IsAny<short>()))
@@ -132,6 +142,19 @@ namespace ClientManagementService.Test.Service
             Assert.AreEqual("Test", client.FirstName);
             Assert.AreEqual("User", client.LastName);
             Assert.AreEqual("Test User", client.FullName);
+        }
+
+        [Test]
+        public async Task GetPetsSuccess()
+        {
+            var pets = await _dropdownService.GetPets();
+
+            Assert.IsNotNull(pets);
+            Assert.AreEqual(1, pets.Count);
+
+            var pet = pets[0];
+            Assert.AreEqual(1, pet.Id);
+            Assert.AreEqual("TestPet", pet.Name);
         }
     }
 }

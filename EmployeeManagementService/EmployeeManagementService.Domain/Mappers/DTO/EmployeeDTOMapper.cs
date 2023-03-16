@@ -1,5 +1,7 @@
 ﻿using CoreEmployee = EmployeeManagementService.Domain.Models.Employee;
 using EmployeeManagementService.DTO;
+using System.Collections.Generic;
+using EmployeeManagementService.Domain.Models;
 
 namespace EmployeeManagementService.Domain.Mappers.DTO
 {
@@ -63,6 +65,25 @@ namespace EmployeeManagementService.Domain.Mappers.DTO
             coreEmp.SetAddress(dtoEmp.Address?.AddressLine1, dtoEmp.Address?.AddressLine2, dtoEmp.Address?.City, dtoEmp.Address?.State, dtoEmp.Address?.ZipCode);          
 
             return coreEmp;
+        }
+
+        //mapper for just the necessary properties for drop down
+        public static List<EmployeeDTO> ToEmployeeDTOForDropdown(List<Employee> employees)
+        {
+            var dtos = new List<EmployeeDTO>();
+
+            foreach (var employee in employees)
+            {
+                dtos.Add(new EmployeeDTO()
+                {
+                    Id = employee.Id,
+                    FirstName = employee.FirstName,
+                    LastName = employee.LastName,
+                    FullName = employee.FullName
+                });
+            }
+
+            return dtos;
         }
     }
 }

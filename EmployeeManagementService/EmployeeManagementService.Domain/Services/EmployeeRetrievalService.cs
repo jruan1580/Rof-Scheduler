@@ -1,6 +1,7 @@
 ﻿using EmployeeManagementService.Domain.Mappers.Database;
 using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.Infrastructure.Persistence;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,6 +40,18 @@ namespace EmployeeManagementService.Domain.Services
             var coreEmployees = employees.Select(e => EmployeeMapper.ToCoreEmployee(e)).ToList();
 
             return new EmployeesWithTotalPage(coreEmployees, totalPages);
+        }
+
+        public async Task<List<Employee>> GetEmployeesForDropdown()
+        {
+            var employees = new List<Employee>();
+
+            foreach (var employee in await _employeeRepository.GetEmployeesForDropdown())
+            {
+                employees.Add(EmployeeMapper.ToCoreEmployee(employee));
+            }
+
+            return employees;
         }
     }
 }

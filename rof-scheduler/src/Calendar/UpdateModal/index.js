@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 
 import { getPetServices, getPets, getEmployees } from "../../SharedServices/dropdownService";
-import { updateEvent } from "../../SharedServices/jobEventService";
+import { updateEvent, deleteEvent } from "../../SharedServices/jobEventService";
 
 function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute, ampm, date}){
     const [errorMessage, setErrorMessage] = useState(undefined);
@@ -119,7 +119,7 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
         
         // (async function () {
         //     try {
-        //         const resp = await updateEvent(employeeId, petId, petServiceId, eventStart, isComplete);
+        //         const resp = await updateEvent(eventId, employeeId, petId, petServiceId, eventStart, isComplete);
 
         //         if (resp.status === 401) {
         //             setLoginState(false);
@@ -135,7 +135,7 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
         // })();
     }
 
-    const deleteEvent = (id) => {
+    const deleteEvent = function(id){
         console.log("Delete");
     }
 
@@ -298,7 +298,7 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
                             </Col>
                         </Form.Group>
                         <hr />
-                        <Button type="button" variant="secondary" onClick={() => deleteEvent()} className="float-start me-2">Delete</Button>
+                        <Button type="button" variant="secondary" onClick={() => deleteEvent(event.id)} className="float-start me-2">Delete</Button>
                         <Button type="button" variant="danger" onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
                         <Button type="submit" variant="primary" className="float-end ms-2">Update</Button>
                     </Form>

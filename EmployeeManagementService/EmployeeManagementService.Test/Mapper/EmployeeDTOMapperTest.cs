@@ -1,6 +1,7 @@
 ﻿using EmployeeManagementService.Domain.Mappers.DTO;
 using EmployeeManagementService.DTO;
 using NUnit.Framework;
+using System.Collections.Generic;
 using CoreEmployee = EmployeeManagementService.Domain.Models.Employee;
 using DTOEmployee = EmployeeManagementService.DTO.EmployeeDTO;
 
@@ -110,6 +111,25 @@ namespace EmployeeManagementService.Test.Mapper
             Assert.AreEqual("CA", coreEmp.Address?.State);
             Assert.AreEqual("san diego", coreEmp.Address?.City);
             Assert.AreEqual("12345", coreEmp.Address?.ZipCode);
+        }
+
+        [Test]
+        public void TestToEmployeeDTOForDropdown()
+        {
+            var employee = new CoreEmployee()
+            {
+                Id = 1,
+                FullName = "Test User"
+            };
+
+            var dtos = EmployeeDTOMapper.ToEmployeeDTOForDropdown(new List<CoreEmployee> { employee });
+
+            Assert.IsNotNull(dtos);
+            Assert.AreEqual(1, dtos.Count);
+
+            var dto = dtos[0];
+            Assert.AreEqual(dto.Id, employee.Id);
+            Assert.AreEqual(dto.FullName, employee.FullName);
         }
     }
 }

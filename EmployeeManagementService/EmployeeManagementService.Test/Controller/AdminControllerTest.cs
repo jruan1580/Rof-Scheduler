@@ -26,6 +26,31 @@ namespace EmployeeManagementService.Test.Controller
         private readonly string _passwordUnencrypted = "t3$T1234";
             
         [Test]
+        public async Task GetEmployeesForDropdown_Success()
+        {
+            _employeeRetrievalService.Setup(e => e.GetEmployeesForDropdown())
+            .ReturnsAsync(new List<Employee>()
+            {
+                new Employee()
+                {
+                    Id = 1,
+                    FullName = "Test User"
+                }
+            });
+
+            var controller = new AdminController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+
+            var response = await controller.GetEmployeesForDropdown();
+
+            Assert.NotNull(response);
+            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+
+            var okObj = (OkObjectResult)response;
+
+            Assert.AreEqual(okObj.StatusCode, 200);
+        }
+
+        [Test]
         public async Task GetAllEmployees_Success()
         {
             var employees = new List<Employee>()

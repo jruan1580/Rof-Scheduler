@@ -36,6 +36,21 @@ namespace ClientManagementService.API.Controllers
             }
         }
 
+        [HttpGet("pets")]
+        public async Task<IActionResult> GetPets()
+        {
+            try
+            {
+                var pets = await _dropdownService.GetPets();
+
+                return Ok(DropdownDTOMapper.ToPetDTO(pets));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         [HttpGet("petTypes")]
         public async Task<IActionResult> GetPetTypes()
         {

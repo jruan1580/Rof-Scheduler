@@ -15,6 +15,36 @@ namespace EmployeeManagementService.Test.Service
     public class EmployeeRetrievalServiceTests
     {
         [Test]
+        public async Task GetEmployeesSuccess()
+        {
+            var employeeRepository = new Mock<IEmployeeRepository>();
+
+            employeeRepository.Setup(e => e.GetEmployeesForDropdown())
+                .ReturnsAsync(new List<Employee>()
+                {
+                    new Employee()
+                    {
+                        Id = 1,
+                        FirstName = "Test",
+                        LastName = "User"
+                    }
+                });
+
+            var employeeService = new EmployeeRetrievalService(employeeRepository.Object);
+
+            var result = await employeeService.GetEmployeesForDropdown();
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Count);
+
+            var employee = result[0];
+            Assert.AreEqual(1, employee.Id);
+            Assert.AreEqual("Test", employee.FirstName);
+            Assert.AreEqual("User", employee.LastName);
+            Assert.AreEqual("Test User", employee.FullName);
+        }
+
+        [Test]
         public async Task GetAllEmployees_NoEmployees()
         {
             var employeeRepository = new Mock<IEmployeeRepository>();
