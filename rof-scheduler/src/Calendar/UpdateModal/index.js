@@ -90,17 +90,16 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
     };
 
     const updateEventSubmit = (e) => {
-        console.log("Update");
         e.preventDefault();
         setErrorMessage(undefined);
         setSuccessMessage(false);
 
-        let eventId = parseInt(event.id);
-        var employeeId = e.target.employee.value;
-        var petId = e.target.pet.value;
-        var petServiceId = e.target.petService.value;
+        var id = parseInt(event.id);
+        var employeeId = parseInt(e.target.employee.value);
+        var petId = parseInt(e.target.pet.value);
+        var petServiceId = parseInt(e.target.petService.value);
         var eventStart = undefined;
-        var isComplete = e.target.isComplete.value;
+        var completed = (e.target.isComplete.value === "true") ? true : false;
 
         var hour = undefined;
         var eventTime = undefined;
@@ -120,7 +119,7 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
         
         (async function () {
             try {
-                const resp = await updateEvent(eventId, employeeId, petId, petServiceId, eventStart, isComplete);
+                const resp = await updateEvent(id, employeeId, petId, petServiceId, eventStart, completed);
 
                 if (resp.status === 401) {
                     setLoginState(false);
