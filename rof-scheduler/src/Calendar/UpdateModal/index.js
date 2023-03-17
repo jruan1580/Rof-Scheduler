@@ -5,9 +5,10 @@ import Select from "react-select";
 import { getPetServices, getPets, getEmployees } from "../../SharedServices/dropdownService";
 import { updateEvent, deleteEvent } from "../../SharedServices/jobEventService";
 
-function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute, ampm, date}){
+function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLoginState, hour, minute, ampm, date}){
     const [errorMessage, setErrorMessage] = useState(undefined);
     const [successMessage, setSuccessMessage] = useState(undefined);
+    const [updating, setUpdating] = useState(false);
 
     const [employees, setEmployees] = useState([]);
     const [pets, setPets] = useState([]);
@@ -116,6 +117,8 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
         }
 
         eventStart = eventDate + "T" + eventTime + ":00";
+
+        setUpdating(true);
         
         (async function () {
             try {
@@ -128,9 +131,12 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
 
                 setErrorMessage(undefined);
                 setSuccessMessage(true);
+
+                handleUpdateSuccess();
             } catch (e) {
                 setErrorMessage(e.message);
-                return;
+            } finally{
+                setUpdating(false);
             }
         })();
     }
@@ -181,7 +187,7 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
                 <Modal.Body>
                     <Form onSubmit={updateEventSubmit}>
                         {errorMessage !== undefined && (<Alert variant="danger">{errorMessage}</Alert>)}
-                        {successMessage && ( <Alert variant="success">Event updated successfully.</Alert>)}
+                        {successMessage && ( <Alert variant="success">Event updated successfully. Page will reload in 3 seconds...</Alert>)}
 
                         <Form.Group as={Row}>
                             <Form.Label column lg={3}>Employee:</Form.Label>
@@ -298,9 +304,27 @@ function UpdateEventModal({event, show, handleHide, setLoginState, hour, minute,
                             </Col>
                         </Form.Group>
                         <hr />
-                        <Button type="button" variant="secondary" onClick={() => deleteEvent(event.id)} className="float-start me-2">Delete</Button>
-                        <Button type="button" variant="danger" onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
-                        <Button type="submit" variant="primary" className="float-end ms-2">Update</Button>
+                        {updating && (
+                            <Button type="button" variant="secondary" className="float-start me-2" disabled>Delete</Button>
+                        )}
+                        {!updating && (
+                            <Button type="button" variant="secondary" onClick={() => deleteEvent(event.id)} className="float-start me-2">Delete</Button>
+                        )}
+                        {updating && (
+                            <Button type="button" variant="danger" className="float-end ms-2" disabled>Cancel</Button>
+                        )}
+                        {!updating && (
+                            <Button type="button" variant="danger" onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
+                        )}
+                        {updating && (
+                            <Button variant="primary" className="float-end ms-2" disabled>
+                                <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/>
+                                Updating...
+                            </Button>
+                        )}
+                        {!updating && (
+                            <Button type="submit" variant="primary" className="float-end ms-2">Update</Button>
+                        )}
                     </Form>
                 </Modal.Body>
           </Modal>

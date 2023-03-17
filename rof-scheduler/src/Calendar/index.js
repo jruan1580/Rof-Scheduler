@@ -122,6 +122,10 @@ function Calendar({setLoginState}) {
       console.log(selectInfo);
   }
 
+  const reloadAfterThreeSeconds = () => {
+    setTimeout(() => window.location.reload(), 3000);
+  };
+
   const getCurrScheduledTime = (event) =>{
     const MM = event.start.getMonth() + 1;
     const dd = event.start.getDate();
@@ -243,6 +247,7 @@ function Calendar({setLoginState}) {
           event={updateEvent}
           show={showUpdateModal}
           handleHide={() => setShowUpdateModal(false)}
+          handleUpdateSuccess={() => reloadAfterThreeSeconds()}
           setLoginState={setLoginState}
           hour={schedHour}
           minute={schedMin}
