@@ -1,5 +1,5 @@
-﻿using AuthenticationService.API.Controllers;
-using AuthenticationService.Domain.Services;
+﻿using EmployeeManagementService.API.Controllers;
+using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -12,15 +12,19 @@ using RofShared.StartupInits;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 
-namespace AuthenticationService.Tests.Api
+namespace EmployeeManagementService.Test.Controller
 {
     public class ApiTestSetup
     {
-        protected ITokenHandler _tokenHandler;
-        protected readonly Mock<IAuthService> _authService = new Mock<IAuthService>();
         private TestServer _server;
-        protected HttpClient _httpClient;        
+        protected HttpClient _httpClient;
+        protected ITokenHandler _tokenHandler;
+
+        protected readonly Mock<IEmployeeAuthService> _employeeAuthService = new Mock<IEmployeeAuthService>();
+        protected readonly Mock<IEmployeeRetrievalService> _employeeRetrievalService = new Mock<IEmployeeRetrievalService>();
+        protected readonly Mock<IEmployeeUpsertService> _employeeUpsertService = new Mock<IEmployeeUpsertService>();
 
         [OneTimeSetUp]
         public void Setup()
@@ -29,7 +33,8 @@ namespace AuthenticationService.Tests.Api
 
             var dependentServices = RegisterServices();
 
-            var webHostBuilder = new WebHostBuilder()               
+            var webHostBuilder = new WebHostBuilder()
+                .UseEnvironment("Development")
                 .UseKestrel()
                 .ConfigureServices(dependentServices)
                 .Configure(requestPipeline)
@@ -75,13 +80,16 @@ namespace AuthenticationService.Tests.Api
             var tokenConfig = GetConfiguration();
 
             _tokenHandler = new TokenHandler(tokenConfig);
-            
-            Action<IServiceCollection> services = service =>
-            {               
-                service.AddTransient(provider => _authService.Object);
-                service.AddTransient(provider => _tokenHandler);
 
-                service.AddMvc().AddApplicationPart(typeof(AuthenticationController).Assembly);
+            Action<IServiceCollection> services = service =>
+            {
+                service.AddTransient(provider => _employeeAuthService.Object);
+                service.AddTransient(provider => _employeeRetrievalService.Object);
+                service.AddTransient(provider => _employeeUpsertService.Object);
+
+                service.AddMvc()
+                    .AddApplicationPart(typeof(AdminController).Assembly)
+                    .AddApplicationPart(typeof(EmployeeController).Assembly);                    
 
                 service.AddControllers();
 
@@ -103,6 +111,13 @@ namespace AuthenticationService.Tests.Api
                 .Build();
 
             return configuration;
+        }
+
+        protected void SetAuthHeaderOnHttpClient(string role)
+        {
+            var token = _tokenHandler.GenerateTokenForRole(role);
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
     }
 }

@@ -3,6 +3,7 @@ using AuthenticationService.Domain.Services;
 using Moq;
 using NUnit.Framework;
 using RofShared.Exceptions;
+using RofShared.Services;
 using System.Threading.Tasks;
 
 namespace AuthenticationService.Tests.Domain
