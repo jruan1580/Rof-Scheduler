@@ -12,6 +12,7 @@ namespace ClientManagementService.Domain.Services
         Task<List<PetType>> GetPetTypes();
         Task<List<Vaccine>> GetVaccinesByPetType(short petTypeId);
         Task<List<Breed>> GetBreedsByPetType(short petTypeId);
+        Task<List<Pet>> GetPets();
     }
 
     public class DropdownService : IDropdownService
@@ -100,6 +101,18 @@ namespace ClientManagementService.Domain.Services
             }
 
             return clients;
+        }
+
+        public async Task<List<Pet>> GetPets()
+        {
+            var pets = new List<Pet>();
+
+            foreach (var pet in await _petRepository.GetPetsForDropdown())
+            {
+                pets.Add(PetMapper.ToCorePetDropDown(pet));
+            }
+
+            return pets;
         }
     }
 }

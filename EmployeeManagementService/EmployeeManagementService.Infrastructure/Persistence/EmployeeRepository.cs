@@ -19,10 +19,19 @@ namespace EmployeeManagementService.Infrastructure.Persistence
         Task UpdateEmployee(Employee employeeToUpdate);
         Task DeleteEmployeeById(long id);
         Task<bool> DoesEmployeeExistsBySsnOrUsernameOrEmail(string ssn, string username, string email, long id);
+        Task<List<Employee>> GetEmployeesForDropdown();
     }
 
     public class EmployeeRepository : IEmployeeRepository
     {
+        public async Task<List<Employee>> GetEmployeesForDropdown()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Employees.Select(e => new Employee() { Id = e.Id, FirstName = e.FirstName, LastName = e.LastName }).ToListAsync();
+            }
+        }
+
         public async Task<(List<Employee>, int)> GetAllEmployeesByKeyword(int page = 1, int offset = 10, string keyword = "")
         {
             using (var context = new RofSchedulerContext())
