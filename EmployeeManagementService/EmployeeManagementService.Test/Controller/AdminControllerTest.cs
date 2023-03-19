@@ -1,9 +1,7 @@
 using EmployeeManagementService.API.Controllers;
 using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Models;
-using EmployeeManagementService.Domain.Services;
 using EmployeeManagementService.DTO;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -30,25 +28,22 @@ namespace EmployeeManagementService.Test.Controller
         public async Task GetEmployeesForDropdown_Success()
         {
             _employeeRetrievalService.Setup(e => e.GetEmployeesForDropdown())
-            .ReturnsAsync(new List<Employee>()
-            {
-                new Employee()
+                .ReturnsAsync(new List<Employee>()
                 {
-                    Id = 1,
-                    FullName = "Test User"
-                }
-            });
+                    new Employee()
+                    {
+                        Id = 1,
+                        FullName = "Test User"
+                    }
+                });
 
-            var controller = new AdminController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Administrator");
 
-            var response = await controller.GetEmployeesForDropdown();
+            var response = await _httpClient.GetAsync($"{_baseUrl}/employees");
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+            Assert.IsNotNull(response);
 
-            var okObj = (OkObjectResult)response;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]

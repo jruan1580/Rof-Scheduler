@@ -47,16 +47,9 @@ namespace EmployeeManagementService.API.Controllers
         [HttpGet("employees")]
         public async Task<IActionResult> GetEmployeesForDropdown()
         {
-            try
-            {
-                var employees = await _employeeRetrievalService.GetEmployeesForDropdown();
+            var employees = await _employeeRetrievalService.GetEmployeesForDropdown();
 
-                return Ok(EmployeeDTOMapper.ToEmployeeDTOForDropdown(employees));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(EmployeeDTOMapper.ToEmployeeDTOForDropdown(employees));
         }
 
         [HttpPatch("login")]
