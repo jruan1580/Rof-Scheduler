@@ -19,6 +19,7 @@ namespace ClientManagementService.Infrastructure.Persistence
         Task<List<Breed>> GetPetBreedByPetTypeId(short petTypeId);
         Task UpdatePet(Pet updatePet);
         Task<bool> PetAlreadyExists(long petId, long ownerId, string name);
+        Task<List<Pet>> GetPetsForDropdown();
     }
 
     public class PetRepository : IPetRepository
@@ -32,6 +33,14 @@ namespace ClientManagementService.Infrastructure.Persistence
                 await context.SaveChangesAsync();
 
                 return newPet.Id;
+            }
+        }
+
+        public async Task<List<Pet>> GetPetsForDropdown()
+        {
+            using (var context = new RofSchedulerContext())
+            {
+                return await context.Pets.Select(p => new Pet() { Id = p.Id, Name = p.Name }).ToListAsync();
             }
         }
 
