@@ -6,25 +6,26 @@ using EmployeeManagementService.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Test.Controller
 {
     [TestFixture]
-    public class EmployeeControllerTest
+    public class EmployeeControllerTest : ApiTestSetup
     {
-        private readonly Mock<IEmployeeAuthService> _employeeAuthService = new Mock<IEmployeeAuthService>();
-
-        private readonly Mock<IEmployeeRetrievalService> _employeeRetrievalService = new Mock<IEmployeeRetrievalService>();
-
-        private readonly Mock<IEmployeeUpsertService> _employeeUpsertService = new Mock<IEmployeeUpsertService>();
-
         private readonly string _passwordUnencrypted = "t3$T1234";
+
+        private readonly string _baseUrl = "/api/Employee";
+
+        private readonly string _exceptionMsg = "Test Exception Message";
 
         [Test]
         public async Task UpdateEmployeeInformation_Success()
@@ -35,16 +36,14 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.UpdateEmployeeInformation(updateEmployee);
+            var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            var response = await _httpClient.PutAsync($"{_baseUrl}/info", stringContent);
 
-            var ok = (OkResult)response;
-
-            Assert.AreEqual(ok.StatusCode, 200);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
@@ -69,18 +68,20 @@ namespace EmployeeManagementService.Test.Controller
             };
 
             _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
-                .ThrowsAsync(new ArgumentException("bad arguments"));
+                .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.UpdateEmployeeInformation(updateEmployee);
+            var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
+            var response = await _httpClient.PutAsync($"{_baseUrl}/info", stringContent);
 
-            var obj = (BadRequestObjectResult)response;
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
 
-            Assert.AreEqual(obj.StatusCode, 400);
+            var errMsg = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual(errMsg, _exceptionMsg);
         }
 
         [Test]
@@ -96,16 +97,13 @@ namespace EmployeeManagementService.Test.Controller
                 }
             });
 
-            var controller = new AdminController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.GetEmployeesForDropdown();
+            var response = await _httpClient.GetAsync($"{_baseUrl}/employees");
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+            Assert.IsNotNull(response);
 
-            var okObj = (OkObjectResult)response;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
@@ -115,16 +113,13 @@ namespace EmployeeManagementService.Test.Controller
                 e.GetEmployeeById(It.IsAny<long>()))
             .ReturnsAsync(EmployeeCreator.GetDomainEmployee(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.GetEmployeeById(1);
+            var response = await _httpClient.GetAsync($"{_baseUrl}/1");
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+            Assert.IsNotNull(response);
 
-            var okObj = (OkObjectResult)response;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
@@ -133,16 +128,13 @@ namespace EmployeeManagementService.Test.Controller
             _employeeRetrievalService.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
                 .ReturnsAsync((Employee)null);
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.GetEmployeeById(1);
+            var response = await _httpClient.GetAsync($"{_baseUrl}/1");
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.IsNotNull(response);
 
-            var obj = (ObjectResult)response;
-
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
 
         [Test]
@@ -152,16 +144,13 @@ namespace EmployeeManagementService.Test.Controller
                 e.GetEmployeeByUsername(It.IsAny<string>()))
             .ReturnsAsync(EmployeeCreator.GetDomainEmployee(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.GetEmployeeByUsername("jdoe");
+            var response = await _httpClient.GetAsync($"{_baseUrl}/jdoe/username");
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+            Assert.IsNotNull(response);
 
-            var okObj = (OkObjectResult)response;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
@@ -170,16 +159,17 @@ namespace EmployeeManagementService.Test.Controller
             _employeeRetrievalService.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
                 .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.GetEmployeeByUsername("jdoe");
+            var response = await _httpClient.GetAsync($"{_baseUrl}/jdoe/username");
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(NotFoundObjectResult));
+            Assert.IsNotNull(response);
 
-            var obj = (NotFoundObjectResult)response;
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 
-            Assert.AreEqual(obj.StatusCode, 404);
+            var errMsg = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual("Employee not found!", errMsg);
         }
 
         [Test]
@@ -189,42 +179,44 @@ namespace EmployeeManagementService.Test.Controller
                 e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(EmployeeCreator.GetDomainEmployee(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.EmployeeLogin(new EmployeeDTO()
+            var employeeDTO = new EmployeeDTO()
             {
                 Username = "jdoe",
-                Password = "teST1234!"
-            });
+                Password = "test"
+            };
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+            var response = await _httpClient.PatchAsync($"{_baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employeeDTO), Encoding.UTF8, "application/json"));
 
-            var ok = (OkObjectResult)response;
+            Assert.IsNotNull(response);
 
-            Assert.AreEqual(ok.StatusCode, 200);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
         public async Task EmployeeLogin_InternalServerError()
         {
             _employeeAuthService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.EmployeeLogin(new EmployeeDTO()
+            var employeeDTO = new EmployeeDTO()
             {
                 Username = "jdoe",
-                Password = "abcdef123345!"
-            });
+                Password = "test"
+            };
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            var response = await _httpClient.PatchAsync($"{_baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employeeDTO), Encoding.UTF8, "application/json"));
 
-            var obj = (ObjectResult)response;
+            Assert.IsNotNull(response);
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+
+            var errMsg = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual(errMsg, _exceptionMsg);
         }
 
         [Test]
@@ -233,20 +225,23 @@ namespace EmployeeManagementService.Test.Controller
             _employeeAuthService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
                .ThrowsAsync(new EmployeeIsLockedException());
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.EmployeeLogin(new EmployeeDTO()
+            var employeeDTO = new EmployeeDTO()
             {
                 Username = "jdoe",
-                Password = "abcdef123345!"
-            });
+                Password = "test"
+            };
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(BadRequestObjectResult));
+            var response = await _httpClient.PatchAsync($"{_baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employeeDTO), Encoding.UTF8, "application/json"));
 
-            var obj = (BadRequestObjectResult)response;
+            Assert.IsNotNull(response);
 
-            Assert.AreEqual(obj.StatusCode, 400);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+
+            var errorMsg = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual("Employee is locked. Contact Admin to get unlocked.", errorMsg);
         }
 
         [Test]
@@ -255,37 +250,32 @@ namespace EmployeeManagementService.Test.Controller
             _employeeAuthService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers["User-Agent"] = "Chrome";
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            var response = await _httpClient.PatchAsync($"{_baseUrl}/1/logout", null);
 
-            var response = await controller.EmployeeLogout(1);
+            Assert.IsNotNull(response);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
-
-            var ok = (OkResult)response;
-
-            Assert.AreEqual(ok.StatusCode, 200);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
         public async Task EmployeeLogout_InternalServerError()
         {
             _employeeAuthService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.EmployeeLogout(1);
+            var response = await _httpClient.PatchAsync($"{_baseUrl}/1/logout", null);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.IsNotNull(response);
 
-            var obj = (ObjectResult)response;
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            var errMsg = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual(errMsg, _exceptionMsg);
         }
 
         [Test]
@@ -300,16 +290,13 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.UpdatePassword(password);
+            var response = await _httpClient.PatchAsync($"{_baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkResult));
+            Assert.IsNotNull(response);
 
-            var ok = (OkResult)response;
-
-            Assert.AreEqual(ok.StatusCode, 200);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Test]
@@ -322,18 +309,19 @@ namespace EmployeeManagementService.Test.Controller
             };
 
             _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var controller = new EmployeeController(_employeeAuthService.Object, _employeeRetrievalService.Object, _employeeUpsertService.Object);
+            SetAuthHeaderOnHttpClient("Employee");
 
-            var response = await controller.UpdatePassword(password);
+            var response = await _httpClient.PatchAsync($"{_baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
+            Assert.IsNotNull(response);
 
-            var obj = (ObjectResult)response;
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            var errMsg = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual(errMsg, _exceptionMsg);
         }
     }
 }
