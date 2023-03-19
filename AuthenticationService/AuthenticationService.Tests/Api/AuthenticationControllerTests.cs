@@ -1,18 +1,13 @@
-﻿using AuthenticationService.API.Controllers;
-using AuthenticationService.Domain.Model;
-using AuthenticationService.Domain.Services;
+﻿using AuthenticationService.Domain.Model;
 using AuthenticationService.DTO.Controllers.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using RofShared.Exceptions;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Security.Claims;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -80,109 +75,106 @@ namespace AuthenticationService.Tests.Api
             Assert.AreEqual(HttpStatusCode.NotFound, res.StatusCode);
         }
 
-        //[Test]
-        //public async Task TestLogoutSuccess()
-        //{
-        //    var claims = new List<Claim>()
-        //    {
-        //        new Claim(ClaimTypes.Role, "Employee")
-        //    };
+        [Test]
+        public async Task TestLoginBadRequest()
+        {
+            _authService.Setup(a => a.Login(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new ArgumentException("bad dto"));
 
-        //    var identity = new ClaimsIdentity(claims, "Bearer");
-        //    var user = new ClaimsPrincipal(identity);
+            var stringContent = GetStringContentForLogin();
+            var url = $"{_baseUrl}/login";
 
-        //    _httpClient.
+            var res = await _httpClient.PatchAsync(url, stringContent);
 
-        //    _ctr.ControllerContext = new ControllerContext()
-        //    {
-        //        HttpContext = new DefaultHttpContext()
-        //        {
-        //            User = user
-        //        }
-        //    };
+            Assert.IsNotNull(res);
+            Assert.AreEqual(HttpStatusCode.BadRequest, res.StatusCode);
+        }
 
-        //    _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
-        //        .Returns(Task.CompletedTask);
+        [Test]
+        public async Task TestLogoutSuccess()
+        {
+            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
 
-        //    var res = await _ctr.Logout(1);
+            var token = _tokenHandler.GenerateTokenForRole("Employee");
 
-        //    Assert.IsNotNull(res);
-        //    Assert.AreEqual(typeof(OkResult), res.GetType());
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        //    var ok = (OkResult)res;
+            var url = $"{_baseUrl}/1/logout";
 
-        //    Assert.AreEqual(200, ok.StatusCode);
-        //}
+            var res = await _httpClient.PatchAsync(url, null);
 
-        //[Test]
-        //public async Task TestLogoutInternalError()
-        //{
-        //    var claims = new List<Claim>()
-        //    {
-        //        new Claim(ClaimTypes.Role, "Employee")
-        //    };
+            Assert.IsNotNull(res);
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+        }
 
-        //    var identity = new ClaimsIdentity(claims, "Bearer");
-        //    var user = new ClaimsPrincipal(identity);
+        [Test]
+        public async Task TestLogoutUnauthorized()
+        {
+            //set to null
+            _httpClient.DefaultRequestHeaders.Authorization = null;
 
-        //    _ctr.ControllerContext = new ControllerContext()
-        //    {
-        //        HttpContext = new DefaultHttpContext()
-        //        {
-        //            User = user
-        //        }
-        //    };
+            var url = $"{_baseUrl}/1/logout";
 
-        //    _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
-        //        .Throws(new Exception("forced exception"));
+            var res = await _httpClient.PatchAsync(url, null);
 
-        //    var res = await _ctr.Logout(1);
+            Assert.IsNotNull(res);
+            Assert.AreEqual(HttpStatusCode.Unauthorized, res.StatusCode);
+        }
 
-        //    Assert.IsNotNull(res);
-        //    Assert.AreEqual(typeof(ObjectResult), res.GetType());
+        [Test]
+        public async Task TestLogoutInternalError()
+        {
+            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
+                .Throws(new Exception("forced exception"));
 
-        //    var objRes = (ObjectResult)res;
+            var token = _tokenHandler.GenerateTokenForRole("Employee");
 
-        //    Assert.AreEqual(500, objRes.StatusCode);
-        //    Assert.NotNull(objRes.Value);
-        //    Assert.AreEqual(typeof(string), objRes.Value.GetType());
-        //    Assert.AreEqual("forced exception", objRes.Value.ToString());
-        //}
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        //[Test]
-        //public async Task TestLogoutNotFound()
-        //{
-        //    var claims = new List<Claim>()
-        //    {
-        //        new Claim(ClaimTypes.Role, "Employee")
-        //    };
+            var url = $"{_baseUrl}/1/logout";
 
-        //    var identity = new ClaimsIdentity(claims, "Bearer");
-        //    var user = new ClaimsPrincipal(identity);
+            var res = await _httpClient.PatchAsync(url, null);
 
-        //    _ctr.ControllerContext = new ControllerContext()
-        //    {
-        //        HttpContext = new DefaultHttpContext()
-        //        {
-        //            User = user
-        //        }
-        //    };
+            Assert.IsNotNull(res);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, res.StatusCode);
+        }
 
-        //    _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
-        //        .Throws(new EntityNotFoundException("User"));
+        [Test]
+        public async Task TestLogoutNotFound()
+        {
+            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
+                .Throws(new EntityNotFoundException("User"));
 
-        //    var res = await _ctr.Logout(1);
+            var token = _tokenHandler.GenerateTokenForRole("Employee");
 
-        //    Assert.IsNotNull(res);
-        //    Assert.AreEqual(typeof(NotFoundObjectResult), res.GetType());
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        //    var notFound = (NotFoundObjectResult)res;
+            var url = $"{_baseUrl}/1/logout";
 
-        //    Assert.AreEqual(404, notFound.StatusCode);
-        //    Assert.NotNull(notFound.Value);
-        //    Assert.AreEqual(typeof(string), notFound.Value.GetType());
-        //    Assert.AreEqual("User not found", notFound.Value.ToString());
-        //}
+            var res = await _httpClient.PatchAsync(url, null);
+
+            Assert.IsNotNull(res);
+            Assert.AreEqual(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        [Test]
+        public async Task TestLogoutBadRequest()
+        {
+            _authService.Setup(a => a.Logout(It.IsAny<long>(), It.IsAny<string>()))
+                .Throws(new ArgumentException("bad id"));
+
+            var token = _tokenHandler.GenerateTokenForRole("Employee");
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var url = $"{_baseUrl}/1/logout";
+
+            var res = await _httpClient.PatchAsync(url, null);
+
+            Assert.IsNotNull(res);
+            Assert.AreEqual(HttpStatusCode.BadRequest, res.StatusCode);
+        }
 
         private StringContent GetStringContentForLogin()
         {
