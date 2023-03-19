@@ -11,14 +11,23 @@ import { getPetServices, getPets, getEmployees } from "../SharedServices/dropdow
 
 function Calendar({setLoginState}) {
     const calendarRef = useRef();
+    const [errorMessage, setErrorMessage] = useState(undefined);
+
     const [jobEvents, setJobEvents] = useState([]);
-    const [showAddModal, setShowAddModal] = useState(false);
     const [employees, setEmployees] = useState([]);
     const [pets, setPets] = useState([]);
     const [petServices, setPetServices] = useState([]);
-    const [isMonthView, setIsMonthView] = useState(true);
     const [eventStartDate, setEventStartDate] = useState("");
-    const [errorMessage, setErrorMessage] = useState(undefined);
+    
+    const [updateEvent, setUpdateEvent] = useState(undefined);
+    const [schedHour, setSchedHour] = useState("");
+    const [schedMin, setSchedMin] = useState("");
+    const [schedAMPM, setSchedAMPM] = useState("");
+    const [schedDate, setSchedDate] = useState("");
+    
+    const [isMonthView, setIsMonthView] = useState(true);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
 
     useEffect(() => {
       (async function () {
@@ -104,8 +113,9 @@ function Calendar({setLoginState}) {
 
     //selecting an event
     const handleEventClick = (arg) => {
-        console.log(arg);
-        alert(arg);
+      getCurrScheduledTime(arg.event);
+      setUpdateEvent(arg.event);
+      setShowUpdateModal(true);
     }
 
     //selecting date
@@ -191,6 +201,38 @@ function Calendar({setLoginState}) {
       })();
     };
 
+    const getCurrScheduledTime = (event) =>{
+    const MM = event.start.getMonth() + 1;
+    const dd = event.start.getDate();
+    const HH = event.start.getHours();
+    const mm = event.start.getMinutes();
+    
+    let yyyy = event.start.getFullYear();
+
+    var month = (MM < 10) ? "0" + MM : MM;
+    var day = (dd < 10) ? "0" + dd : dd;
+
+    var minute = (mm < 10) ? "0" + mm : mm;
+    var ampm = (HH < 12) ? "AM" : "PM";
+    var date = yyyy + "-" + month + "-" + day
+    
+    var hour = undefined;
+
+    if(HH < 10){
+      hour = "0" + HH;
+    }else if(HH > 12){
+      var hr = HH - 12;
+      hour = "0" + hr;
+    }else{
+      hour = HH;
+    }
+
+    setSchedHour(hour);
+    setSchedMin(minute);
+    setSchedAMPM(ampm);
+    setSchedDate(date);
+  }
+
     const reloadAfterThreeSeconds = () => {
       setTimeout(() => window.location.reload(), 3000);
     };
@@ -259,13 +301,25 @@ function Calendar({setLoginState}) {
             selectMirror={true}
             select={handleDateSelect}
             eventClick={handleEventClick}
-            events = {jobEvents.length != 0 && 
+            events = {jobEvents.length !== 0 && 
               jobEvents.map((jobEvent) => {
                 return(
-                  { title: jobEvent.petServiceName, start: jobEvent.eventStartTime, end: jobEvent.eventEndTime}
+                    { id: jobEvent.id, 
+                      title: jobEvent.petServiceName, 
+                      start: jobEvent.eventStartTime, 
+                      end: jobEvent.eventEndTime,
+                      extendedProps: {
+                        employeeId: jobEvent.employeeId,
+                        employee: jobEvent.employeeFullName,
+                        petId: jobEvent.petId,
+                        pet: jobEvent.petName,
+                        petServiceId: jobEvent.petServiceId,
+                        isComplete: jobEvent.completed
+                      }
+                    }
                 );
               })
-            } 
+            }
         />
 
           <AddEventModal 
@@ -279,6 +333,18 @@ function Calendar({setLoginState}) {
             pets={pets}
             petServices={petServices}
           />
+
+          <UpdateEventModal
+          event={updateEvent}
+          show={showUpdateModal}
+          handleHide={() => setShowUpdateModal(false)}
+          handleUpdateSuccess={() => reloadAfterThreeSeconds()}
+          setLoginState={setLoginState}
+          hour={schedHour}
+          minute={schedMin}
+          ampm={schedAMPM}
+          date={schedDate}
+        />
       </>
     )
 }
