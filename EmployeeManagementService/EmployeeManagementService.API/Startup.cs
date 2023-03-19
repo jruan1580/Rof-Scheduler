@@ -42,6 +42,8 @@ namespace EmployeeManagementService.API
                 app.UseDeveloperExceptionPage();
             }
 
+            app.AddExceptionHandlerForApi();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
