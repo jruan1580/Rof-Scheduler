@@ -2,7 +2,6 @@ using EmployeeManagementService.API.Controllers;
 using EmployeeManagementService.Domain.Exceptions;
 using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.DTO;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
