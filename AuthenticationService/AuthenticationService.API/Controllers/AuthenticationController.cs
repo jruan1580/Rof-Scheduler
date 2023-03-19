@@ -3,6 +3,7 @@ using AuthenticationService.DTO.Controllers.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RofShared.Services;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -33,7 +34,7 @@ namespace AuthenticationService.API.Controllers
 
             SetTokenInResponseCookie(Response, basicUserInfo.Role, token, 30);
 
-            return Ok(new { accessToken = token, Id = basicUserInfo.Id, FirstName = basicUserInfo.FirstName, Role = basicUserInfo.Role });
+            return Ok(new { accessToken = token, Id = basicUserInfo.Id, FirstName = basicUserInfo.FirstName, Role = basicUserInfo.Role });           
         }   
 
         [Authorize(Roles = "Administrator,Employee,Client")]

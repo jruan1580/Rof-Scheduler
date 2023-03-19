@@ -1,4 +1,5 @@
 ﻿using AuthenticationService.Domain.Model;
+using RofShared.Services;
 using System.Threading.Tasks;
 
 namespace AuthenticationService.Domain.Services

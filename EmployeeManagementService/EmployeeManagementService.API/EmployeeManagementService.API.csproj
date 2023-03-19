@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
-    <PackageReference Include="RofShared" Version="1.0.3" />
+    <PackageReference Include="RofShared" Version="1.0.5" />
   </ItemGroup>
 
   <ItemGroup>

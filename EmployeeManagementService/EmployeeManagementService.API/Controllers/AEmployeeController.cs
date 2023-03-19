@@ -3,8 +3,6 @@ using EmployeeManagementService.Domain.Mappers.DTO;
 using EmployeeManagementService.Domain.Services;
 using EmployeeManagementService.DTO;
 using Microsoft.AspNetCore.Mvc;
-using RofShared.Exceptions;
-using System;
 using System.Threading.Tasks;
 
 namespace EmployeeManagementService.API.Controllers
@@ -33,39 +31,17 @@ namespace EmployeeManagementService.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEmployeeById(long id)
         {
-            try
-            {
-                var employee = await _employeeRetrievalService.GetEmployeeById(id);
+            var employee = await _employeeRetrievalService.GetEmployeeById(id);
 
-                return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
-            }
-            catch (EntityNotFoundException)
-            {
-                return NotFound($"Employee with id: {id} not found");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
         }
 
         [HttpGet("{username}/username")]
         public async Task<IActionResult> GetEmployeeByUsername(string username)
         {
-            try
-            {
-                var employee = await _employeeRetrievalService.GetEmployeeByUsername(username);
+            var employee = await _employeeRetrievalService.GetEmployeeByUsername(username);
 
-                return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));
-            }
-            catch (EntityNotFoundException)
-            {
-                return NotFound($"Employee with username: {username} not found.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(EmployeeDTOMapper.ToDTOEmployee(employee));          
         }
 
         [HttpGet("employees")]
@@ -91,65 +67,27 @@ namespace EmployeeManagementService.API.Controllers
                 var loginEmployee = await _employeeAuthService.EmployeeLogIn(employee.Username, employee.Password);
 
                 return Ok(new { Id = loginEmployee.Id, FirstName = loginEmployee.FirstName, Role = loginEmployee.Role });
-            }
-            catch (EntityNotFoundException)
-            {
-                return NotFound("Employee not found");
-            }
+            }     
             catch (EmployeeIsLockedException)
             {
                 return BadRequest("Employee is locked. Contact Admin to get unlocked.");
-            }
-            catch(ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            }            
         }
 
         [HttpPatch("{id}/logout")]
         public async Task<IActionResult> EmployeeLogout(long id)
         {
-            try
-            {
-                await _employeeAuthService.EmployeeLogout(id);               
+            await _employeeAuthService.EmployeeLogout(id);
 
-                return Ok();
-            }
-            catch(EntityNotFoundException)
-            {
-                return NotFound("Employee not found");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();            
         }
 
         [HttpPatch("password")]
         public async Task<IActionResult> UpdatePassword([FromBody] PasswordDTO newPassword)
         {
-            try
-            {
-                await _employeeUpsertService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
+            await _employeeUpsertService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
 
-                return Ok();
-            }
-            catch (EntityNotFoundException)
-            {
-                return NotFound($"Employee with id: {newPassword.Id} not found");
-            }
-            catch(ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();          
         }
 
         public abstract Task<IActionResult> UpdateEmployeeInformation([FromBody] EmployeeDTO employee);
