@@ -9,6 +9,7 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
     const [errorMessage, setErrorMessage] = useState(undefined);
     const [successMessage, setSuccessMessage] = useState(undefined);
     const [updating, setUpdating] = useState(false);
+    const [disableBtns, setDisableBtns] = useState(false);
 
     const [employees, setEmployees] = useState([]);
     const [pets, setPets] = useState([]);
@@ -87,6 +88,8 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
     const closeModal = function () {
         setErrorMessage(undefined);
         setSuccessMessage(undefined);
+        setUpdating(false);
+        setDisableBtns(false);
         handleHide();
     };
 
@@ -131,6 +134,7 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
 
                 setErrorMessage(undefined);
                 setSuccessMessage(true);
+                setDisableBtns(true);
 
                 handleUpdateSuccess();
             } catch (e) {
@@ -304,25 +308,25 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                             </Col>
                         </Form.Group>
                         <hr />
-                        {updating && (
+                        {(updating || disableBtns) && (
                             <Button type="button" variant="secondary" className="float-start me-2" disabled>Delete</Button>
                         )}
-                        {!updating && (
+                        {!updating && !disableBtns && (
                             <Button type="button" variant="secondary" onClick={() => deleteEvent(event.id)} className="float-start me-2">Delete</Button>
                         )}
-                        {updating && (
+                        {(updating || disableBtns) && (
                             <Button type="button" variant="danger" className="float-end ms-2" disabled>Cancel</Button>
                         )}
-                        {!updating && (
+                        {!updating && !disableBtns && (
                             <Button type="button" variant="danger" onClick={() => closeModal()} className="float-end ms-2">Cancel</Button>
                         )}
-                        {updating && (
+                        {(updating || disableBtns) && (
                             <Button variant="primary" className="float-end ms-2" disabled>
                                 <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/>
                                 Updating...
                             </Button>
                         )}
-                        {!updating && (
+                        {!updating && !disableBtns && (
                             <Button type="submit" variant="primary" className="float-end ms-2">Update</Button>
                         )}
                     </Form>

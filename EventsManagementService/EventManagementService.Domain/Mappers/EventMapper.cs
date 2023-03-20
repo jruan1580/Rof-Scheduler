@@ -16,7 +16,6 @@ namespace EventManagementService.Domain.Mappers
             coreEvent.EventStartTime = dbEvent.EventStartTime;
             coreEvent.EventEndTime = dbEvent.EventEndTime;
             coreEvent.Completed = dbEvent.Completed;
-            coreEvent.Canceled = dbEvent.Canceled;
 
             if(dbEvent.Employee != null)
             {
@@ -64,7 +63,6 @@ namespace EventManagementService.Domain.Mappers
             entity.EventStartTime = coreEvent.EventStartTime;
             entity.EventEndTime = coreEvent.EventEndTime;
             entity.Completed = coreEvent.Completed;
-            entity.Canceled = coreEvent.Canceled;
 
             return entity;
         }

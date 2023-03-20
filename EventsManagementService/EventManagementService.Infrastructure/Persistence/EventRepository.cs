@@ -139,7 +139,6 @@ namespace EventManagementService.Infrastructure.Persistence
                 origEvent.EventStartTime = jobEvent.EventStartTime;
                 origEvent.EventEndTime = jobEvent.EventEndTime;
                 origEvent.Completed = jobEvent.Completed;
-                origEvent.Canceled = jobEvent.Canceled;
 
                 context.Update(origEvent);
 

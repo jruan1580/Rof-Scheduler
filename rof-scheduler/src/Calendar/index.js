@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { Alert } from "react-bootstrap";
 
 import AddEventModal from "./AddModal";
+import UpdateEventModal from "./UpdateModal";
+
 import { getAllJobEventsByMonthAndYear } from '../SharedServices/jobEventService';
 import { getPetServices, getPets, getEmployees } from "../SharedServices/dropdownService";
 

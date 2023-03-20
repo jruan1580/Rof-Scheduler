@@ -11,6 +11,5 @@ CREATE TABLE dbo.JobEvent(
 	EventStartTime DATETIME NOT NULL,
 	EventEndTime DATETIME NOT NULL,
 	Completed BIT NOT NULL,
-	Canceled BIT NOT NULL,
 	CONSTRAINT UC_EVENT UNIQUE (EmployeeId, PetId, EventStartTime, EventEndTime)
 );
