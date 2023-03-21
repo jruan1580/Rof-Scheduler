@@ -19,8 +19,6 @@ namespace EventManagementService.Domain.Models
 
         public bool Completed { get; set; }
         
-        public bool Canceled { get; set; }
-
         public Employee Employee { get; set; }
 
         public Pet Pet { get; set; }

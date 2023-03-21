@@ -20,7 +20,6 @@ namespace EventManagementService.Test.Mapper
                 EventStartTime = DateTime.Now,
                 EventEndTime = DateTime.Now,
                 Completed = false,
-                Canceled = false,
                 Employee = new Employee()
                 {
                     Id = 1,
@@ -50,7 +49,6 @@ namespace EventManagementService.Test.Mapper
             Assert.AreEqual(entity.EventStartTime, coreEvent.EventStartTime);
             Assert.AreEqual(entity.EventEndTime, coreEvent.EventEndTime);
             Assert.AreEqual(entity.Completed, coreEvent.Completed);
-            Assert.AreEqual(entity.Canceled, coreEvent.Canceled);
 
             Assert.IsNotNull(coreEvent.Employee);
             Assert.AreEqual(entity.Employee.Id, coreEvent.Employee.Id);
@@ -80,7 +78,6 @@ namespace EventManagementService.Test.Mapper
                 EventStartTime = DateTime.Now,
                 EventEndTime = DateTime.Now,
                 Completed = false,
-                Canceled = false,
                 Employee = new Domain.Models.Employee()
                 {
                     Id = 1,
@@ -110,7 +107,6 @@ namespace EventManagementService.Test.Mapper
             Assert.AreEqual(entity.EventStartTime, coreEvent.EventStartTime);
             Assert.AreEqual(entity.EventEndTime, coreEvent.EventEndTime);
             Assert.AreEqual(entity.Completed, coreEvent.Completed);
-            Assert.AreEqual(entity.Canceled, coreEvent.Canceled);
         }
     }
 }

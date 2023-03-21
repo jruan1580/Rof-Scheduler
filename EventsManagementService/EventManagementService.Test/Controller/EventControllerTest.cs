@@ -36,7 +36,6 @@ namespace EventManagementService.Test.Controller
                 PetServiceName = "Walk",
                 EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = false,
-                Canceled = false
             };
 
             _eventService.Setup(e => e.AddEvent(It.IsAny<JobEvent>()))
@@ -63,7 +62,6 @@ namespace EventManagementService.Test.Controller
                 PetServiceName = "Walk",
                 EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = false,
-                Canceled = false
             };
 
             _eventService.Setup(e => e.AddEvent(It.IsAny<JobEvent>()))
@@ -94,7 +92,6 @@ namespace EventManagementService.Test.Controller
                     PetServiceId = 1,
                     EventStartTime = DateTime.Today,
                     Completed = false,
-                    Canceled = false,
                     Employee = new Employee()
                     {
                         Id = 1,
@@ -137,7 +134,6 @@ namespace EventManagementService.Test.Controller
             Assert.AreEqual(events[0].PetServiceId, eventDTO[0].PetServiceId);
             Assert.AreEqual(events[0].EventStartTime.ToString("yyyy-MM-ddTHH:mm:ss"), eventDTO[0].EventStartTime);
             Assert.AreEqual(events[0].Completed, eventDTO[0].Completed);
-            Assert.AreEqual(events[0].Canceled, eventDTO[0].Canceled);
 
             Assert.AreEqual(events[0].Employee.FullName, eventDTO[0].EmployeeFullName);
             Assert.AreEqual(events[0].Pet.Name, eventDTO[0].PetName);
@@ -156,7 +152,6 @@ namespace EventManagementService.Test.Controller
                 EventStartTime = DateTime.Now,
                 EventEndTime = DateTime.Now,
                 Completed = false,
-                Canceled = false,
                 Employee = new Employee()
                 {
                     Id = 1,
@@ -198,7 +193,6 @@ namespace EventManagementService.Test.Controller
             Assert.AreEqual(jobEvent.EventStartTime.ToString("yyyy-MM-ddTHH:mm:ss"), eventDTO.EventStartTime);
             Assert.AreEqual(jobEvent.EventEndTime.ToString("yyyy-MM-ddTHH:mm:ss"), eventDTO.EventEndTime);
             Assert.AreEqual(jobEvent.Completed, eventDTO.Completed);
-            Assert.AreEqual(jobEvent.Canceled, eventDTO.Canceled);
 
             Assert.AreEqual(jobEvent.Employee.FullName, eventDTO.EmployeeFullName);
             Assert.AreEqual(jobEvent.Pet.Name, eventDTO.PetName);
@@ -236,7 +230,6 @@ namespace EventManagementService.Test.Controller
                 PetServiceName = "Walk",
                 EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = true,
-                Canceled = false
             };
 
             _eventService.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))
@@ -267,7 +260,6 @@ namespace EventManagementService.Test.Controller
                 PetServiceName = "Walk",
                 EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = true,
-                Canceled = false
             };
 
             _eventService.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))

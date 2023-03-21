@@ -21,7 +21,6 @@ namespace EventManagementService.Test.Mapper
                 EventStartTime = DateTime.Now,
                 EventEndTime = DateTime.Now,
                 Completed = false,
-                Canceled = false,
                 Employee = new Employee()
                 {
                     Id = 1,
@@ -49,7 +48,6 @@ namespace EventManagementService.Test.Mapper
             Assert.AreEqual(coreEvent.EventStartTime.ToString("yyyy-MM-ddTHH:mm:ss"), dto.EventStartTime);
             Assert.AreEqual(coreEvent.EventEndTime.ToString("yyyy-MM-ddTHH:mm:ss"), dto.EventEndTime);
             Assert.AreEqual(coreEvent.Completed, dto.Completed);
-            Assert.AreEqual(coreEvent.Canceled, dto.Canceled);
 
             Assert.IsNotNull(coreEvent.Employee);
             Assert.AreEqual(dto.EmployeeFullName, coreEvent.Employee.FullName);
@@ -72,7 +70,6 @@ namespace EventManagementService.Test.Mapper
                 PetServiceId = 1,
                 EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = false,
-                Canceled = false,
                 EmployeeFullName = "John Doe",
                 PetName = "Dog1",
                 PetServiceName = "Walk"
@@ -91,7 +88,6 @@ namespace EventManagementService.Test.Mapper
             Assert.AreEqual(dto.PetServiceId, coreEvent.PetServiceId);
             Assert.AreEqual(dtoCoreDate, coreEvent.EventStartTime);
             Assert.AreEqual(dto.Completed, coreEvent.Completed);
-            Assert.AreEqual(dto.Canceled, coreEvent.Canceled);
 
             Assert.IsNotNull(coreEvent.Employee);
             Assert.AreEqual(coreEvent.Employee.FullName, dto.EmployeeFullName);

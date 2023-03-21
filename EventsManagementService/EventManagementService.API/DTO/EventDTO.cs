@@ -23,7 +23,5 @@ namespace EventManagementService.API.DTO
         public string EventEndTime { get; set; }
 
         public bool Completed { get; set; }
-
-        public bool Canceled { get; set; }
     }
 }
