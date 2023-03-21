@@ -94,7 +94,7 @@ namespace PetServiceManagement.Tests.Controllers
             var holidayDto = holidayDtos[0];
             Assert.AreEqual(1, holidayDto.Id);
             Assert.AreEqual("CNY", holidayDto.Name);
-            Assert.AreEqual("09/22/2022", holidayDto.Date);
+            Assert.AreEqual($"09/22/{DateTime.Now.Year}", holidayDto.Date);
         }
     }
 }
