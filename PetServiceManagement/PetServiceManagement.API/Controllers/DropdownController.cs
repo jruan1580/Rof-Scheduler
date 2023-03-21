@@ -4,12 +4,14 @@ using PetServiceManagement.API.DTO;
 using PetServiceManagement.API.DtoMapper;
 using PetServiceManagement.Domain.BusinessLogic;
 using PetServiceManagement.Domain.Models;
+using RofShared.FilterAttributes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PetServiceManagement.API.Controllers
 {
+    [CookieActionFilter]
     [Authorize(Roles = "Administrator")]
     [Route("api/[controller]")]
     [ApiController]
