@@ -129,7 +129,19 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             var holidayRatesEntity = HolidayRatesMapper.FromDomainHolidayRate(holidayRate);
 
-            await _holidayAndRatesRepository.CreateHolidayRates(holidayRatesEntity);
+            try
+            {
+                await _holidayAndRatesRepository.CreateHolidayRates(holidayRatesEntity);
+            }
+            catch(Exception ex)
+            {
+                if (ex.InnerException != null && ex.InnerException.Message.Contains(""))
+                {
+                    throw new ArgumentException("Holiday rate attached to pet service and holiday already exists");
+                }
+
+                throw;
+            }            
         }
 
         /// <summary>
