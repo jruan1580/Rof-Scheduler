@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Moq;
+﻿using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using PetServiceManagement.API.DTO;
@@ -192,7 +190,7 @@ namespace PetServiceManagement.Tests.Controllers
                 }
             };
 
-             SetAuthHeaderOnHttpClient("Administrator");
+            SetAuthHeaderOnHttpClient("Administrator");
 
             var res = await _httpClient.PutAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(holidayRateDTO), Encoding.UTF8, "application/json"));
 

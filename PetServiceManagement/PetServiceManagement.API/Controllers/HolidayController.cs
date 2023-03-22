@@ -4,7 +4,6 @@ using PetServiceManagement.API.DTO;
 using PetServiceManagement.API.DtoMapper;
 using PetServiceManagement.Domain.BusinessLogic;
 using RofShared.FilterAttributes;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,82 +25,41 @@ namespace PetServiceManagement.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetByPageAndHolidayName([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
-            try
-            {
-                var holidays = await _holidayAndRateService.GetHolidaysByPageAndKeyword(page, offset, keyword);
+            var holidays = await _holidayAndRateService.GetHolidaysByPageAndKeyword(page, offset, keyword);
 
-                var holidayDtos = new List<HolidayDTO>();
+            var holidayDtos = new List<HolidayDTO>();
 
-                holidays.Item1.ForEach(h => holidayDtos.Add(HolidayDtoMapper.ToHolidayDTO(h)));
+            holidays.Item1.ForEach(h => holidayDtos.Add(HolidayDtoMapper.ToHolidayDTO(h)));
 
-                return Ok(new HolidayWithTotalPagesDto(holidayDtos, holidays.Item2));
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
+            return Ok(new HolidayWithTotalPagesDto(holidayDtos, holidays.Item2));
         }
 
         [HttpPost]
         public async Task<IActionResult> AddHoliday([FromBody] HolidayDTO holidayDto)
         {
-            try
-            {
-                var holiday = HolidayDtoMapper.FromHolidayDTO(holidayDto);
+            var holiday = HolidayDtoMapper.FromHolidayDTO(holidayDto);
 
-                await _holidayAndRateService.AddHoliday(holiday);
+            await _holidayAndRateService.AddHoliday(holiday);
 
-                return Ok();
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException != null && e.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"))
-                {
-                    return BadRequest("Holiday with same name already exists");
-                }
-
-                return StatusCode(500, e.Message);
-            }
+            return Ok();           
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateHoliday([FromBody] HolidayDTO holidayDto)
         {
-            try
-            {
-                var holiday = HolidayDtoMapper.FromHolidayDTO(holidayDto);
+            var holiday = HolidayDtoMapper.FromHolidayDTO(holidayDto);
 
-                await _holidayAndRateService.UpdateHoliday(holiday);
+            await _holidayAndRateService.UpdateHoliday(holiday);
 
-                return Ok();
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
+            return Ok();           
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHoliday(short id)
         {
-            try
-            {
-                await _holidayAndRateService.DeleteHolidayById(id);
+            await _holidayAndRateService.DeleteHolidayById(id);
 
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
+            return Ok();           
         }
     }
 }
