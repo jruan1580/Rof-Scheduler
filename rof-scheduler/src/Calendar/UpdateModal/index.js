@@ -9,6 +9,7 @@ import { ensureUpdateEventInformationProvided } from "../../SharedServices/input
 function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLoginState, hour, minute, ampm, date}){
     const [errorMessage, setErrorMessage] = useState(undefined);
     const [successMessage, setSuccessMessage] = useState(undefined);
+    const [deleteSuccessMessage, setDeleteSuccessMessage] = useState(undefined);
     const [updating, setUpdating] = useState(false);
     const [disableBtns, setDisableBtns] = useState(false);
     const [validationMap, setValidationMap] = useState(new Map());
@@ -96,6 +97,7 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
         setValidationMap(new Map());
         setErrorMessage(undefined);
         setSuccessMessage(undefined);
+        setDeleteSuccessMessage(undefined);
         setUpdating(false);
         setDisableBtns(false);
     };
@@ -160,8 +162,27 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
         })();
     }
 
-    const deleteEvent = function(id){
-        console.log("Delete");
+    const removeEvent = function(){
+        var id = parseInt(event.id);
+        
+        (async function(){
+            try{
+                var resp = await deleteEvent(id);
+
+                if (resp.status === 401) {
+                    setLoginState(false);
+                    return;
+                }
+
+                setErrorMessage(undefined);
+                setDeleteSuccessMessage(true);
+                setDisableBtns(true);
+
+                handleUpdateSuccess();
+            }catch(e){
+                setErrorMessage('Failed to delete with error: ' + e.message);
+            }              
+        })();
     }
 
     const hourOptions = [
@@ -207,6 +228,7 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                     <Form onSubmit={updateEventSubmit}>
                         {errorMessage !== undefined && (<Alert variant="danger">{errorMessage}</Alert>)}
                         {successMessage && ( <Alert variant="success">Event updated successfully. Page will reload in 3 seconds...</Alert>)}
+                        {deleteSuccessMessage && (<Alert variant="success">Event removed. Page will reload in 3 seconds...</Alert>)}
 
                         <Form.Group as={Row}>
                             <Form.Label column lg={3}>Employee:</Form.Label>
@@ -366,9 +388,9 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                             <Button type="button" variant="secondary" className="float-start me-2" disabled>Delete</Button>
                         )}
                         {!updating && !disableBtns && (
-                            <Button type="button" variant="secondary" onClick={() => deleteEvent(event.id)} className="float-start me-2">Delete</Button>
+                            <Button type="button" variant="secondary" onClick={() => removeEvent()} className="float-start me-2">Delete</Button>
                         )}
-                        {(updating || disableBtns) && (
+                        {(updating ||disableBtns) && (
                             <Button type="button" variant="danger" className="float-end ms-2" disabled>Cancel</Button>
                         )}
                         {!updating && !disableBtns && (
@@ -377,7 +399,7 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                         {(updating || disableBtns) && (
                             <Button variant="primary" className="float-end ms-2" disabled>
                                 <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/>
-                                Updating...
+                                Loading...
                             </Button>
                         )}
                         {!updating && !disableBtns && (
