@@ -1,29 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Moq;
+﻿using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
-using PetServiceManagement.API.Controllers;
 using PetServiceManagement.API.DTO;
-using PetServiceManagement.Domain.BusinessLogic;
 using PetServiceManagement.Domain.Models;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PetServiceManagement.Tests.Controllers
 {
     [TestFixture]
-    public class HolidayRateControllerTests
+    public class HolidayRateControllerTests : ApiTestSetup
     {
-        private Mock<IHolidayAndRateService> _holidayAndRateService;
-
-        private HolidayRateController _holidayRateController;
-
-        [SetUp]
-        public void Setup()
-        {
-            _holidayAndRateService = new Mock<IHolidayAndRateService>();
-            _holidayRateController = new HolidayRateController(_holidayAndRateService.Object);
-        }
+        private readonly string _baseUrl = "/api/HolidayRate";
 
         [Test]
         public async Task GetByPageAndKeywordTest()
@@ -55,36 +47,46 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayAndRateService.Setup(h => h.GetHolidayRatesByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((holidayRates, 1));
 
-            var res = await _holidayRateController.GetByPageAndKeyword(1, 1, "cny");
+            var url = $"{_baseUrl}?page=1&offset=1&keyword=cny";
+            
+            SetAuthHeaderOnHttpClient("Administrator");
+
+            var res = await _httpClient.GetAsync(url);
+
             Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(OkObjectResult), res.GetType());
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
 
-            var okObj = (OkObjectResult)res;
-            Assert.IsNotNull(okObj);
-            Assert.AreEqual(200, okObj.StatusCode);
+            Assert.IsNotNull(res.Content);
+            var content = await res.Content.ReadAsStringAsync();
 
-            Assert.AreEqual(typeof(List<HolidayRateDTO>), okObj.Value.GetType());
-            var holidayRateDtos = (List<HolidayRateDTO>)okObj.Value;
+            try
+            {
+                var holidayRateDtos = JsonConvert.DeserializeObject<List<HolidayRateDTO>>(content);
 
-            Assert.AreEqual(1, holidayRateDtos.Count);
-            var holidayRateDto = holidayRateDtos[0];
-            var holidayRate = holidayRates[0];
+                Assert.AreEqual(1, holidayRateDtos.Count);
+                var holidayRateDto = holidayRateDtos[0];
+                var holidayRate = holidayRates[0];
 
-            Assert.IsNotNull(holidayRateDto);
-            Assert.AreEqual(holidayRate.Id, holidayRateDto.Id);
-            Assert.AreEqual(holidayRate.Rate, holidayRateDto.Rate);
+                Assert.IsNotNull(holidayRateDto);
+                Assert.AreEqual(holidayRate.Id, holidayRateDto.Id);
+                Assert.AreEqual(holidayRate.Rate, holidayRateDto.Rate);
 
-            Assert.IsNotNull(holidayRateDto.PetService);
-            Assert.AreEqual(holidayRate.PetService.Id, holidayRateDto.PetService.Id);
-            Assert.AreEqual(holidayRate.PetService.Name, holidayRateDto.PetService.Name);
-            Assert.AreEqual(holidayRate.PetService.Price, holidayRateDto.PetService.Rate);
-            Assert.AreEqual(holidayRate.PetService.EmployeeRate, holidayRateDto.PetService.EmployeeRate);
-            Assert.AreEqual(holidayRate.PetService.Description, holidayRateDto.PetService.Description);
+                Assert.IsNotNull(holidayRateDto.PetService);
+                Assert.AreEqual(holidayRate.PetService.Id, holidayRateDto.PetService.Id);
+                Assert.AreEqual(holidayRate.PetService.Name, holidayRateDto.PetService.Name);
+                Assert.AreEqual(holidayRate.PetService.Price, holidayRateDto.PetService.Rate);
+                Assert.AreEqual(holidayRate.PetService.EmployeeRate, holidayRateDto.PetService.EmployeeRate);
+                Assert.AreEqual(holidayRate.PetService.Description, holidayRateDto.PetService.Description);
 
-            Assert.IsNotNull(holidayRateDto.Holiday);
-            Assert.AreEqual(holidayRate.Holiday.Id, holidayRateDto.Holiday.Id);
-            Assert.AreEqual(holidayRate.Holiday.Name, holidayRateDto.Holiday.Name);
-            Assert.AreEqual($"01/28/{DateTime.Now.Year}", holidayRateDto.Holiday.Date);
+                Assert.IsNotNull(holidayRateDto.Holiday);
+                Assert.AreEqual(holidayRate.Holiday.Id, holidayRateDto.Holiday.Id);
+                Assert.AreEqual(holidayRate.Holiday.Name, holidayRateDto.Holiday.Name);
+                Assert.AreEqual($"01/28/{DateTime.Now.Year}", holidayRateDto.Holiday.Date);
+            }
+            catch(Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }            
         }
 
         [Test]
@@ -93,7 +95,7 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayAndRateService.Setup(h => h.AddHolidayRate(It.IsAny<HolidayRate>()))
                 .Returns(Task.CompletedTask);
 
-            var res = await _holidayRateController.AddHolidayRate(new HolidayRateDTO()
+            var holidayRateDto = new HolidayRateDTO()
             {
                 Rate = 20m,
                 PetService = new PetServiceDTO()
@@ -111,19 +113,23 @@ namespace PetServiceManagement.Tests.Controllers
                     Month = 1,
                     Day = 28
                 }
-            });
+            };
+
+            SetAuthHeaderOnHttpClient("Administrator");
+
+            var res = await _httpClient.PostAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(holidayRateDto), Encoding.UTF8, "application/json"));
 
             Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(OkResult), res.GetType());
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
         }
 
         [Test]
-        public async Task CreatePetServiceBadRequestTest()
+        public async Task CreateCreateHolidayBadRequestTest()
         {
             _holidayAndRateService.Setup(h => h.AddHolidayRate(It.IsAny<HolidayRate>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var res = await _holidayRateController.AddHolidayRate(new HolidayRateDTO()
+            var holidayRateDto = new HolidayRateDTO()
             {
                 Rate = 20m,
                 PetService = new PetServiceDTO()
@@ -141,23 +147,29 @@ namespace PetServiceManagement.Tests.Controllers
                     Month = 1,
                     Day = 28
                 }
-            });
+            };
+
+            SetAuthHeaderOnHttpClient("Administrator");
+
+            var res = await _httpClient.PostAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(holidayRateDto), Encoding.UTF8, "application/json"));
 
             Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(BadRequestObjectResult), res.GetType());
+            Assert.AreEqual(HttpStatusCode.BadRequest, res.StatusCode);
 
-            var badRequestObj = (BadRequestObjectResult)res;
-            Assert.AreEqual(typeof(string), badRequestObj.Value.GetType());
-            Assert.AreEqual("test", badRequestObj.Value.ToString());
+            Assert.IsNotNull(res.Content);
+
+            var content = await res.Content.ReadAsStringAsync();
+
+            Assert.AreEqual("test", content);
         }
 
         [Test]
-        public async Task UpdatePetServiceTest()
+        public async Task UpdateHolidayRateTest()
         {
             _holidayAndRateService.Setup(h => h.UpdateHolidayRate(It.IsAny<HolidayRate>()))
                 .Returns(Task.CompletedTask);
 
-            var res = await _holidayRateController.UpdateHolidayRate(new HolidayRateDTO()
+            var holidayRateDTO = new HolidayRateDTO()
             {
                 Id = 1,
                 Rate = 20m,
@@ -176,10 +188,14 @@ namespace PetServiceManagement.Tests.Controllers
                     Month = 1,
                     Day = 28
                 }
-            });
+            };
+
+            SetAuthHeaderOnHttpClient("Administrator");
+
+            var res = await _httpClient.PutAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(holidayRateDTO), Encoding.UTF8, "application/json"));
 
             Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(OkResult), res.GetType());
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);          
         }
 
         [Test]
@@ -188,8 +204,9 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayAndRateService.Setup(h => h.UpdateHolidayRate(It.IsAny<HolidayRate>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var res = await _holidayRateController.UpdateHolidayRate(new HolidayRateDTO()
+            var holidayRateDTO = new HolidayRateDTO()
             {
+                Id = 1,
                 Rate = 20m,
                 PetService = new PetServiceDTO()
                 {
@@ -206,14 +223,20 @@ namespace PetServiceManagement.Tests.Controllers
                     Month = 1,
                     Day = 28
                 }
-            });
+            };
+
+            SetAuthHeaderOnHttpClient("Administrator");
+
+            var res = await _httpClient.PutAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(holidayRateDTO), Encoding.UTF8, "application/json"));
 
             Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(BadRequestObjectResult), res.GetType());
+            Assert.AreEqual(HttpStatusCode.BadRequest, res.StatusCode);
 
-            var badRequestObj = (BadRequestObjectResult)res;
-            Assert.AreEqual(typeof(string), badRequestObj.Value.GetType());
-            Assert.AreEqual("test", badRequestObj.Value.ToString());
+            Assert.IsNotNull(res.Content);
+
+            var content = await res.Content.ReadAsStringAsync();
+
+            Assert.AreEqual("test", content);
         }
 
         [Test]
@@ -222,10 +245,14 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayAndRateService.Setup(h => h.DeleteHolidayRateById(It.IsAny<int>()))
                 .Returns(Task.CompletedTask);
 
-            var res = await _holidayRateController.DeleteHolidayRate(1);
+            var url = $"{_baseUrl}/1";
+
+            SetAuthHeaderOnHttpClient("Administrator");
+
+            var res = await _httpClient.DeleteAsync(url);
 
             Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(OkResult), res.GetType());
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
         }
     }
 }

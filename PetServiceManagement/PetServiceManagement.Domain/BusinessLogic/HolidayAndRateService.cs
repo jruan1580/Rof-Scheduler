@@ -64,7 +64,19 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             var holidayEntity = HolidayMapper.FromHolidayDomain(holiday);
 
-            await _holidayAndRatesRepository.AddHoliday(holidayEntity);
+            try
+            {
+                await _holidayAndRatesRepository.AddHoliday(holidayEntity);
+            }
+            catch(Exception e)
+            {
+                if (e.InnerException != null && e.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"))
+                {
+                    throw new ArgumentException("Holiday with same name already exists");
+                }
+
+                throw;
+            }            
         }
 
         /// <summary>
@@ -129,7 +141,19 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             var holidayRatesEntity = HolidayRatesMapper.FromDomainHolidayRate(holidayRate);
 
-            await _holidayAndRatesRepository.CreateHolidayRates(holidayRatesEntity);
+            try
+            {
+                await _holidayAndRatesRepository.CreateHolidayRates(holidayRatesEntity);
+            }
+            catch(Exception ex)
+            {
+                if (ex.InnerException != null && ex.InnerException.Message.Contains(""))
+                {
+                    throw new ArgumentException("Holiday rate attached to pet service and holiday already exists");
+                }
+
+                throw;
+            }            
         }
 
         /// <summary>
