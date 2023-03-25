@@ -1,6 +1,6 @@
-﻿using PetServiceManagement.Domain.Constants;
-using PetServiceManagement.Domain.Mappers;
+﻿using PetServiceManagement.Domain.Mappers;
 using PetServiceManagement.Domain.Models;
+using PetServiceManagement.Infrastructure.Persistence.Entities;
 using PetServiceManagement.Infrastructure.Persistence.Repositories;
 using System;
 using System.Collections.Generic;
@@ -8,24 +8,13 @@ using System.Threading.Tasks;
 
 namespace PetServiceManagement.Domain.BusinessLogic
 {
-    public interface IPetServiceManagementService
-    {
-        Task AddNewPetService(PetService petService);
-        Task DeletePetServiceById(short id);
-        Task<(List<PetService>, int)> GetPetServicesByPageAndKeyword(int page, int pageSize, string keyword = null);
-        Task UpdatePetService(PetService petService);
-    }
-
     public class PetServiceManagementService : IPetServiceManagementService
     {
         private readonly IPetServiceRepository _petServiceRepository;
-        private readonly HashSet<string> _supportedTimeUnits;
 
         public PetServiceManagementService(IPetServiceRepository petServiceRepository)
         {
             _petServiceRepository = petServiceRepository;
-
-            _supportedTimeUnits = new HashSet<string>() { TimeUnits.SECONDS, TimeUnits.MINUTES, TimeUnits.HOURS };
         }
 
         /// <summary>
@@ -45,8 +34,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
                 return (new List<PetService>(), res.Item2);
             }
 
-            var petServices = new List<PetService>();
-            res.Item1.ForEach(pet => petServices.Add(PetServiceMapper.ToDomainPetService(pet)));
+            var petServices = PetServiceMapper.ToDomainPetServices(res.Item1);            
 
             return (petServices, res.Item2);
         }
@@ -58,7 +46,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
         /// <returns></returns>
         public async Task AddNewPetService(PetService petService)
         {
-            RunValidation(petService);
+            ThrowArgumentExceptionIfValidationFails(petService);
 
             var petServiceEntity = PetServiceMapper.FromDomainPetService(petService);
 
@@ -85,7 +73,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
         /// <exception cref="ArgumentException"></exception>
         public async Task UpdatePetService(PetService petService)
         {
-            RunValidation(petService);
+            ThrowArgumentExceptionIfValidationFails(petService);
 
             var petServiceEntity = await _petServiceRepository.GetPetServiceById(petService.Id);
 
@@ -94,13 +82,8 @@ namespace PetServiceManagement.Domain.BusinessLogic
                 throw new ArgumentException($"Unable to locate existing service with id: {petService.Id}");
             }
 
-            petServiceEntity.ServiceName = petService.Name;
-            petServiceEntity.Price = petService.Price;
-            petServiceEntity.Description = petService.Description;
-            petServiceEntity.EmployeeRate = petService.EmployeeRate;
-            petServiceEntity.Duration = petService.Duration;
-            petServiceEntity.TimeUnit = petService.TimeUnit;
-
+            MergeUpdatedPetServiceToOriginalPetService(petServiceEntity, petService);
+           
             await _petServiceRepository.UpdatePetService(petServiceEntity);
         }
 
@@ -115,38 +98,31 @@ namespace PetServiceManagement.Domain.BusinessLogic
             await _petServiceRepository.DeletePetService(id);
         }
 
-        private void RunValidation(PetService petService)
+        private void MergeUpdatedPetServiceToOriginalPetService(PetServices original, PetService updated)
+        {
+            original.ServiceName = updated.Name;
+            original.Price = updated.Price;
+            original.Description = updated.Description;
+            original.EmployeeRate = updated.EmployeeRate;
+            original.Duration = updated.Duration;
+            original.TimeUnit = updated.TimeUnit;
+        }
+
+        private void ThrowArgumentExceptionIfValidationFails(PetService petService)
         {
             if (petService == null)
             {
                 throw new ArgumentException("New service not provided");
             }
 
-            //only name is important
-            if (string.IsNullOrEmpty(petService.Name))
+            var validationFailures = petService.GetValidationFailures();
+
+            if (string.IsNullOrEmpty(validationFailures))
             {
-                throw new ArgumentException("Pet service's name is not provided");
+                return;
             }
 
-            if (petService.Price < 0)
-            {
-                throw new ArgumentException("Pet service rate must be greater than 0");
-            }
-
-            if (petService.EmployeeRate > 100 || petService.EmployeeRate < 0)
-            {
-                throw new ArgumentException("Employee rate should be between 0 and 100");
-            }
-
-            if (petService.Duration < 0)
-            {
-                throw new ArgumentException("Pet Service Duration must be greater than 0");
-            }
-
-            if (!_supportedTimeUnits.Contains(petService.TimeUnit))
-            {
-                throw new ArgumentException("Time Unit not supported.");
-            }
+            throw new ArgumentException(validationFailures);
         }
     }
 }
