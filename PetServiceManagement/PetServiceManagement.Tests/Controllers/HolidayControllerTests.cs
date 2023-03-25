@@ -6,8 +6,6 @@ using PetServiceManagement.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PetServiceManagement.Tests.Controllers
