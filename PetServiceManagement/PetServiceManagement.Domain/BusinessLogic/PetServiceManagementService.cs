@@ -62,7 +62,19 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             var petServiceEntity = PetServiceMapper.FromDomainPetService(petService);
 
-            await _petServiceRepository.AddPetService(petServiceEntity);
+            try
+            {
+                await _petServiceRepository.AddPetService(petServiceEntity);
+            }
+            catch(Exception e)
+            {
+                if (e.InnerException != null && e.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"))
+                {
+                    throw new ArgumentException("Pet Service with same name already exists");
+                }
+
+                throw;
+            }            
         }
 
         /// <summary>
