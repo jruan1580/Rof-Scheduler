@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PetServiceManagement.Domain.BusinessLogic;
+using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Repositories;
 using RofShared.StartupInits;
 
@@ -24,7 +25,8 @@ namespace PetServiceManagement.API
             services.AddSingleton<IPetServiceRepository, PetServiceRepository>();
             services.AddSingleton<IHolidayAndRatesRepository, HolidayAndRatesRepository>();
 
-            services.AddTransient<IDropDownService, DropDownService>();
+            services.AddTransient<IDropdownService<PetService>, PetServiceDropdownService>();
+            services.AddTransient<IDropdownService<Holiday>, HolidayDropdownService>();
             services.AddTransient<IPetServiceManagementService, PetServiceManagementService>();
             services.AddTransient<IHolidayAndRateService, HolidayAndRateService>();
 

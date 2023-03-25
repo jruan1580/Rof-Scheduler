@@ -48,7 +48,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
                 return (holidays, res.Item2);
             }
 
-            res.Item1.ForEach(h => holidays.Add(HolidayMapper.ToHolidayDomain(h)));
+            holidays = HolidayMapper.ToHolidayDomains(res.Item1);
 
             return (holidays, res.Item2);
         }

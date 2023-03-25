@@ -1,5 +1,6 @@
 ﻿using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
+using System.Collections.Generic;
 
 namespace PetServiceManagement.Domain.Mappers
 {
@@ -20,6 +21,30 @@ namespace PetServiceManagement.Domain.Mappers
             holiday.HolidayDay = holidays.HolidayDay;
 
             return holiday;
+        }
+
+        public static List<Holiday> ToHolidayDomains(List<Holidays> holidays)
+        {
+            if (holidays == null || holidays.Count == 0)
+            {
+                return new List<Holiday>();
+            }
+
+            var holidayDomains = new List<Holiday>();
+
+            holidays.ForEach(holidayDb =>
+            {
+                var holiday = new Holiday();
+
+                holiday.Id = holidayDb.Id;
+                holiday.Name = holidayDb.HolidayName;
+                holiday.HolidayMonth = holidayDb.HolidayMonth;
+                holiday.HolidayDay = holidayDb.HolidayDay;
+
+                holidayDomains.Add(holiday);
+            });
+
+            return holidayDomains;
         }
 
         public static Holidays FromHolidayDomain(Holiday holiday)
