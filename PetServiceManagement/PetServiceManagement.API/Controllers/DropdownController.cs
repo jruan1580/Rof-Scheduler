@@ -5,7 +5,6 @@ using PetServiceManagement.API.DtoMapper;
 using PetServiceManagement.Domain.BusinessLogic;
 using PetServiceManagement.Domain.Models;
 using RofShared.FilterAttributes;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,17 +16,21 @@ namespace PetServiceManagement.API.Controllers
     [ApiController]
     public class DropdownController : ControllerBase
     {
-        private readonly IDropDownService _dropDownService;
+        private readonly IDropdownService<PetService> _petServiceDropdown;
+        private readonly IDropdownService<Holiday> _holidayDropdown;
 
-        public DropdownController(IDropDownService dropdownService)
+        public DropdownController(IDropdownService<PetService> petDropdownService,
+            IDropdownService<Holiday> holidayDropdownService)
         {
-            _dropDownService = dropdownService;
+            _holidayDropdown = holidayDropdownService;
+
+            _petServiceDropdown = petDropdownService;
         }
 
         [HttpGet("petServices")]
         public async Task<IActionResult> GetPetServices()
         {
-            var petServices = await _dropDownService.GetDropdownForType<PetService>();
+            var petServices = await _petServiceDropdown.GetDropdown();
 
             var petServiceDtos = new List<PetServiceDTO>();
 
@@ -39,7 +42,7 @@ namespace PetServiceManagement.API.Controllers
         [HttpGet("holidays")]
         public async Task<IActionResult> GetHolidays()
         {
-            var holidays = await _dropDownService.GetDropdownForType<Holiday>();
+            var holidays = await _holidayDropdown.GetDropdown();
 
             var holidayDtos = new List<HolidayDTO>();
 

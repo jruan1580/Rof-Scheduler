@@ -4,7 +4,6 @@ using PetServiceManagement.Domain.BusinessLogic;
 using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
 using PetServiceManagement.Infrastructure.Persistence.Repositories;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,7 +14,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
     {
         private Mock<IHolidayAndRatesRepository> _holidayAndRateRepo;
         private Mock<IPetServiceRepository> _petServiceRepo;
-        private DropDownService _dropDownService;
+        private HolidayDropdownService _holidayDropdownService;
+        private PetServiceDropdownService _petServiceDropdownService;
 
         [SetUp]
         public void Setup()
@@ -48,13 +48,14 @@ namespace PetServiceManagement.Tests.BusinessLogic
                     }
                 });
 
-            _dropDownService = new DropDownService(_petServiceRepo.Object, _holidayAndRateRepo.Object);
+            _holidayDropdownService = new HolidayDropdownService(_holidayAndRateRepo.Object);
+            _petServiceDropdownService = new PetServiceDropdownService(_petServiceRepo.Object);
         }
 
         [Test]
         public async Task GetPetServiceDropDownTest()
         {
-            var petServicesDDL = await _dropDownService.GetDropdownForType<PetService>();
+            var petServicesDDL = await _petServiceDropdownService.GetDropdown();
             Assert.IsNotNull(petServicesDDL);
             Assert.AreEqual(1, petServicesDDL.Count);
 
@@ -69,7 +70,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public async Task GetHolidaysDropdownTest()
         {
-            var holidayDDL = await _dropDownService.GetDropdownForType<Holiday>();
+            var holidayDDL = await _holidayDropdownService.GetDropdown();
 
             Assert.IsNotNull(holidayDDL);
             Assert.AreEqual(1, holidayDDL.Count);
