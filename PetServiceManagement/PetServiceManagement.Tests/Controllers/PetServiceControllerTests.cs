@@ -1,31 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Moq;
+﻿using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
-using PetServiceManagement.API.Controllers;
 using PetServiceManagement.API.DTO;
-using PetServiceManagement.Domain.BusinessLogic;
 using PetServiceManagement.Domain.Constants;
 using PetServiceManagement.Domain.Models;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PetServiceManagement.Tests.Controllers
 {
     [TestFixture]
-    public class PetServiceControllerTests
+    public class PetServiceControllerTests : ApiTestSetup
     {
-        private Mock<IPetServiceManagementService> _petService;
-
-        private PetServiceController _petServiceController;
-
-        [SetUp]
-        public void Setup()
-        {
-            _petService = new Mock<IPetServiceManagementService>();
-
-            _petServiceController = new PetServiceController(_petService.Object);
-        }
+        private readonly string _baseUrl = "/api/PetService";
 
         [Test]
         public async Task GetByPageAndKeywordTest()
@@ -44,134 +33,115 @@ namespace PetServiceManagement.Tests.Controllers
                 }
             };
 
-            _petService.Setup(p => p.GetPetServicesByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _petServiceManagementService.Setup(p => p.GetPetServicesByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((petServices, 1));
 
-            var res = await _petServiceController.GetByPageAndServiceName(1, 1, "walking");
+            var url = $"{_baseUrl}?page=1&offset=1&keyword=cny";
+
+            SetAuthHeaderOnHttpClient("Administrator");
+
+            var res = await _httpClient.GetAsync(url);
+
             Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(OkObjectResult), res.GetType());
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
 
-            var okObj = (OkObjectResult)res;
-            Assert.IsNotNull(okObj);
-            Assert.AreEqual(200, okObj.StatusCode);
+            Assert.IsNotNull(res.Content);
+            var content = await res.Content.ReadAsStringAsync();
 
-            Assert.AreEqual(typeof(PetServicesWithTotalPageDTO), okObj.Value.GetType());
-            var petServicesWithTotalPage = (PetServicesWithTotalPageDTO)okObj.Value;
+            try
+            {
+                var petServicesWithTotalPage = JsonConvert.DeserializeObject<PetServicesWithTotalPageDTO>(content);
 
-            var petServicesDTO = petServicesWithTotalPage.PetServices;
+                Assert.IsNotNull(petServicesWithTotalPage);
 
-            Assert.AreEqual(1, petServicesDTO.Count);
-            Assert.AreEqual(petServices[0].Id, petServicesDTO[0].Id);
-            Assert.AreEqual(petServices[0].Name, petServicesDTO[0].Name);
-            Assert.AreEqual(petServices[0].Price, petServicesDTO[0].Rate);
-            Assert.AreEqual(petServices[0].Description, petServicesDTO[0].Description);
-            Assert.AreEqual(petServices[0].EmployeeRate, petServicesDTO[0].EmployeeRate);
-            Assert.AreEqual(petServices[0].Duration, petServicesDTO[0].Duration);
-            Assert.AreEqual(petServices[0].TimeUnit, petServicesDTO[0].TimeUnit);
+                var petServicesDTO = petServicesWithTotalPage.PetServices;
 
-            Assert.AreEqual(1, petServicesWithTotalPage.TotalPages);
+                Assert.AreEqual(1, petServicesDTO.Count);
+                Assert.AreEqual(petServices[0].Id, petServicesDTO[0].Id);
+                Assert.AreEqual(petServices[0].Name, petServicesDTO[0].Name);
+                Assert.AreEqual(petServices[0].Price, petServicesDTO[0].Rate);
+                Assert.AreEqual(petServices[0].Description, petServicesDTO[0].Description);
+                Assert.AreEqual(petServices[0].EmployeeRate, petServicesDTO[0].EmployeeRate);
+                Assert.AreEqual(petServices[0].Duration, petServicesDTO[0].Duration);
+                Assert.AreEqual(petServices[0].TimeUnit, petServicesDTO[0].TimeUnit);
+
+                Assert.AreEqual(1, petServicesWithTotalPage.TotalPages);
+
+            }
+            catch(Exception e)
+            {
+                Assert.Fail(e.Message);
+            }
         }
 
         [Test]
         public async Task CreatePetServiceTest()
         {
-            _petService.Setup(p => p.AddNewPetService(It.IsAny<PetService>()))
+            _petServiceManagementService.Setup(p => p.AddNewPetService(It.IsAny<PetService>()))
                 .Returns(Task.CompletedTask);
 
-            var res = await _petServiceController.AddPetService(new PetServiceDTO()
-            {
-                Name = "Dog Walking",
-                Description = "Walking dog",
-                Rate = 20m,
-                EmployeeRate = 10m,
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            });
+            var dto = GetPetServiceDTO();
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(OkResult), res.GetType());
+            await SendNonGetAndDeleteRequestAndVerifySuccess(_baseUrl, "POST", dto);
         }
 
         [Test]
         public async Task CreatePetServiceBadRequestTest()
         {
-            _petService.Setup(p => p.AddNewPetService(It.IsAny<PetService>()))
+            _petServiceManagementService.Setup(p => p.AddNewPetService(It.IsAny<PetService>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var res = await _petServiceController.AddPetService(new PetServiceDTO()
-            {
-                Name = "Dog Walking",
-                Description = "Walking dog",
-                Rate = 20m,
-                EmployeeRate = 10m,
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            });
+            var dto = GetPetServiceDTO();
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(BadRequestObjectResult), res.GetType());
-
-            var badRequestObj = (BadRequestObjectResult)res;
-            Assert.AreEqual(typeof(string), badRequestObj.Value.GetType());
-            Assert.AreEqual("test", badRequestObj.Value.ToString());
+            await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "POST", dto, "test");
         }
 
         [Test]
         public async Task UpdatePetServiceTest()
         {
-            _petService.Setup(p => p.UpdatePetService(It.IsAny<PetService>()))
+            _petServiceManagementService.Setup(p => p.UpdatePetService(It.IsAny<PetService>()))
                 .Returns(Task.CompletedTask);
 
-            var res = await _petServiceController.UpdatePetService(new PetServiceDTO()
-            {
-                Id = 1,
-                Name = "Dog Walking",
-                Description = "Walking dog",
-                Rate = 20m,
-                EmployeeRate = 10m,
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            });
+            var dto = GetPetServiceDTO();
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(OkResult), res.GetType());
+            SetAuthHeaderOnHttpClient("Administrator");
+
+            await SendNonGetAndDeleteRequestAndVerifySuccess(_baseUrl, "PUT", dto);
         }
 
         [Test]
         public async Task UpdatePetServiceBadRequestTest()
         {
-            _petService.Setup(p => p.UpdatePetService(It.IsAny<PetService>()))
+            _petServiceManagementService.Setup(p => p.UpdatePetService(It.IsAny<PetService>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var res = await _petServiceController.UpdatePetService(new PetServiceDTO()
+            var dto = GetPetServiceDTO();
+
+            await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "PUT", dto, "test");
+        }
+
+        [Test]
+        public async Task DeletePetServiceByIdTest()
+        {
+            _petServiceManagementService.Setup(p => p.DeletePetServiceById(It.IsAny<short>()))
+                .Returns(Task.CompletedTask);
+
+            var url = $"{_baseUrl}/1";
+
+            await SendDeleteRequestAndVerifySuccess(url);
+        }
+
+        private PetServiceDTO GetPetServiceDTO()
+        {
+            return new PetServiceDTO()
             {
-                Id = 1,
                 Name = "Dog Walking",
                 Description = "Walking dog",
                 Rate = 20m,
                 EmployeeRate = 10m,
                 Duration = 30,
                 TimeUnit = TimeUnits.MINUTES
-            });
-
-            Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(BadRequestObjectResult), res.GetType());
-
-            var badRequestObj = (BadRequestObjectResult)res;
-            Assert.AreEqual(typeof(string), badRequestObj.Value.GetType());
-            Assert.AreEqual("test", badRequestObj.Value.ToString());
-        }
-
-        [Test]
-        public async Task DeletePetServiceByIdTest()
-        {
-            _petService.Setup(p => p.DeletePetServiceById(It.IsAny<short>()))
-                .Returns(Task.CompletedTask);
-
-            var res = await _petServiceController.DeletePetService(1);
-
-            Assert.IsNotNull(res);
-            Assert.AreEqual(typeof(OkResult), res.GetType());
+            };
         }
     }
 }
