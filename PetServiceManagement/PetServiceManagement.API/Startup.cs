@@ -29,7 +29,7 @@ namespace PetServiceManagement.API
             services.AddTransient<IDropdownService<Holiday>, HolidayDropdownService>();
             services.AddTransient<IPetServiceManagementService, PetServiceManagementService>();
             services.AddTransient<IHolidayService, HolidayService>();
-            services.AddTransient<IHolidayAndRateService, HolidayAndRateService>();
+            services.AddTransient<IHolidayRateService, HolidayRateService>();            
 
             services.AddControllers();
             services.AddJwtAuthentication(Configuration);           

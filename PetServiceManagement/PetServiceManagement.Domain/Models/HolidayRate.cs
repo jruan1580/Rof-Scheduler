@@ -1,4 +1,6 @@
-﻿namespace PetServiceManagement.Domain.Models
+﻿using System.Collections.Generic;
+
+namespace PetServiceManagement.Domain.Models
 {
     public class HolidayRate
     {
@@ -7,6 +9,6 @@
 
         public PetService PetService { get; set; }
 
-        public decimal Rate { get; set; }
+        public decimal Rate { get; set; }        
     }
 }
