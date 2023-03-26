@@ -28,6 +28,7 @@ namespace PetServiceManagement.API
             services.AddTransient<IDropdownService<PetService>, PetServiceDropdownService>();
             services.AddTransient<IDropdownService<Holiday>, HolidayDropdownService>();
             services.AddTransient<IPetServiceManagementService, PetServiceManagementService>();
+            services.AddTransient<IHolidayService, HolidayService>();
             services.AddTransient<IHolidayAndRateService, HolidayAndRateService>();
 
             services.AddControllers();

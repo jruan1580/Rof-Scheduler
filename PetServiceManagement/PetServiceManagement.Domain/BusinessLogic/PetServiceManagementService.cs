@@ -18,14 +18,6 @@ namespace PetServiceManagement.Domain.BusinessLogic
             _petServiceRepository = petServiceRepository;
         }
 
-        /// <summary>
-        /// Enables searching by keyword
-        /// Return results of the particular page of size "pageSize"
-        /// </summary>
-        /// <param name="page"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="keyword"></param>
-        /// <returns></returns>
         public async Task<(List<PetService>, int)> GetPetServicesByPageAndKeyword(int page, int pageSize, string keyword = null)
         {
             var res = await _petServiceRepository.GetAllPetServicesByPageAndKeyword(page, pageSize, keyword);
@@ -40,11 +32,6 @@ namespace PetServiceManagement.Domain.BusinessLogic
             return (petServices, res.Item2);
         }
 
-        /// <summary>
-        /// Adds a new pet service if provided and name is filled in.
-        /// </summary>
-        /// <param name="petService"></param>
-        /// <returns></returns>
         public async Task AddNewPetService(PetService petService)
         {
             ThrowArgumentExceptionIfValidationFails(petService);
@@ -61,12 +48,6 @@ namespace PetServiceManagement.Domain.BusinessLogic
             }            
         }
 
-        /// <summary>
-        /// Updates a pet service's fields.
-        /// </summary>
-        /// <param name="petService"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         public async Task UpdatePetService(PetService petService)
         {
             ThrowArgumentExceptionIfValidationFails(petService);
@@ -83,12 +64,6 @@ namespace PetServiceManagement.Domain.BusinessLogic
             await _petServiceRepository.UpdatePetService(petServiceEntity);
         }
 
-        /// <summary>
-        /// Removes all holiday rates tied to pet service first.
-        /// Removes a pet service by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public async Task DeletePetServiceById(short id)
         {
             await _petServiceRepository.DeletePetService(id);

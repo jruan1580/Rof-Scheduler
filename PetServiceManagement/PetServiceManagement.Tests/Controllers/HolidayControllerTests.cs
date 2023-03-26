@@ -29,7 +29,7 @@ namespace PetServiceManagement.Tests.Controllers
                 }
             };
 
-            _holidayAndRateService.Setup(h => h.GetHolidaysByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _holidayService.Setup(h => h.GetHolidaysByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((holidays, 1));
 
             var url = $"{_baseUrl}?page=1&offset=1&keyword=cny";
@@ -68,7 +68,7 @@ namespace PetServiceManagement.Tests.Controllers
         [Test]
         public async Task CreateHolidayTest()
         {
-            _holidayAndRateService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
+            _holidayService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
                 .Returns(Task.CompletedTask);
 
             var dto = GetHolidayDTO();
@@ -77,9 +77,9 @@ namespace PetServiceManagement.Tests.Controllers
         }
 
         [Test]
-        public async Task CreatePetServiceBadRequestTest()
+        public async Task CreateHolidayBadRequestTest()
         {
-            _holidayAndRateService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
+            _holidayService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
                .ThrowsAsync(new ArgumentException("test"));
 
             var dto = GetHolidayDTO();
@@ -88,9 +88,9 @@ namespace PetServiceManagement.Tests.Controllers
         }
 
         [Test]
-        public async Task UpdatePetServiceTest()
+        public async Task UpdateHolidayTest()
         {
-            _holidayAndRateService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
+            _holidayService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
                 .Returns(Task.CompletedTask);
 
             var dto = GetHolidayDTO();
@@ -101,9 +101,9 @@ namespace PetServiceManagement.Tests.Controllers
         }
 
         [Test]
-        public async Task UpdatePetServiceBadRequestTest()
+        public async Task UpdateHolidayBadRequestTest()
         {
-            _holidayAndRateService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
+            _holidayService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
                .ThrowsAsync(new ArgumentException("test"));
 
             var dto = GetHolidayDTO();
@@ -114,7 +114,7 @@ namespace PetServiceManagement.Tests.Controllers
         [Test]
         public async Task DeletePetServiceByIdTest()
         {
-            _holidayAndRateService.Setup(h => h.DeleteHolidayById(It.IsAny<short>()))
+            _holidayService.Setup(h => h.DeleteHolidayById(It.IsAny<short>()))
                 .Returns(Task.CompletedTask);
 
             var url = $"{_baseUrl}/1";

@@ -99,7 +99,7 @@ namespace PetServiceManagement.Tests.Controllers
         }
 
         [Test]
-        public async Task CreateCreateHolidayBadRequestTest()
+        public async Task CreateHolidayBadRequestTest()
         {
             _holidayAndRateService.Setup(h => h.AddHolidayRate(It.IsAny<HolidayRate>()))
                .ThrowsAsync(new ArgumentException("test"));
@@ -121,7 +121,7 @@ namespace PetServiceManagement.Tests.Controllers
         }
 
         [Test]
-        public async Task UpdatePetServiceBadRequestTest()
+        public async Task UpdateHolidayRateBadRequestTest()
         {
             _holidayAndRateService.Setup(h => h.UpdateHolidayRate(It.IsAny<HolidayRate>()))
                .ThrowsAsync(new ArgumentException("test"));
@@ -132,7 +132,7 @@ namespace PetServiceManagement.Tests.Controllers
         }
 
         [Test]
-        public async Task DeletePetServiceByIdTest()
+        public async Task DeleteHolidayRateByIdTest()
         {
             _holidayAndRateService.Setup(h => h.DeleteHolidayRateById(It.IsAny<int>()))
                 .Returns(Task.CompletedTask);

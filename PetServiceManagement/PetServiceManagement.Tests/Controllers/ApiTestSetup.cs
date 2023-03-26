@@ -26,6 +26,7 @@ namespace PetServiceManagement.Tests.Controllers
         protected HttpClient _httpClient;
         protected ITokenHandler _tokenHandler;
 
+        protected Mock<IHolidayService> _holidayService = new Mock<IHolidayService>();
         protected Mock<IHolidayAndRateService> _holidayAndRateService = new Mock<IHolidayAndRateService>();
         protected Mock<IPetServiceManagementService> _petServiceManagementService = new Mock<IPetServiceManagementService>();
 
@@ -86,10 +87,14 @@ namespace PetServiceManagement.Tests.Controllers
             Action<IServiceCollection> services = service =>
             {
                 service.AddTransient(provider => _tokenHandler);
+                service.AddTransient(provider => _holidayService.Object);
                 service.AddTransient(provider => _holidayAndRateService.Object);
                 service.AddTransient(provider => _petServiceManagementService.Object);
 
-                service.AddMvc().AddApplicationPart(typeof(HolidayRateController).Assembly);
+                service.AddMvc()
+                    .AddApplicationPart(typeof(HolidayRateController).Assembly)
+                    .AddApplicationPart(typeof(HolidayController).Assembly)
+                    .AddApplicationPart(typeof(PetServiceController).Assembly);
 
                 service.AddControllers();
 
