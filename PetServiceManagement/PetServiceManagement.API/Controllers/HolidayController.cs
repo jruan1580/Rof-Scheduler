@@ -15,17 +15,17 @@ namespace PetServiceManagement.API.Controllers
     [ApiController]
     public class HolidayController : ControllerBase
     {
-        private readonly IHolidayAndRateService _holidayAndRateService;
+        private readonly IHolidayService _holidayService;
 
-        public HolidayController(IHolidayAndRateService holidayAndRateService)
+        public HolidayController(IHolidayService holidayService)
         {
-            _holidayAndRateService = holidayAndRateService;
+            _holidayService = holidayService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetByPageAndHolidayName([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
-            var holidays = await _holidayAndRateService.GetHolidaysByPageAndKeyword(page, offset, keyword);
+            var holidays = await _holidayService.GetHolidaysByPageAndKeyword(page, offset, keyword);
 
             var holidayDtos = new List<HolidayDTO>();
 
@@ -39,7 +39,7 @@ namespace PetServiceManagement.API.Controllers
         {
             var holiday = HolidayDtoMapper.FromHolidayDTO(holidayDto);
 
-            await _holidayAndRateService.AddHoliday(holiday);
+            await _holidayService.AddHoliday(holiday);
 
             return Ok();           
         }
@@ -49,7 +49,7 @@ namespace PetServiceManagement.API.Controllers
         {
             var holiday = HolidayDtoMapper.FromHolidayDTO(holidayDto);
 
-            await _holidayAndRateService.UpdateHoliday(holiday);
+            await _holidayService.UpdateHoliday(holiday);
 
             return Ok();           
         }
@@ -57,7 +57,7 @@ namespace PetServiceManagement.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHoliday(short id)
         {
-            await _holidayAndRateService.DeleteHolidayById(id);
+            await _holidayService.DeleteHolidayById(id);
 
             return Ok();           
         }

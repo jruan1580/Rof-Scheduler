@@ -1,8 +1,5 @@
 ﻿using NUnit.Framework;
-using PetServiceManagement.API.DTO;
 using PetServiceManagement.API.DtoMapper;
-using PetServiceManagement.Domain.Constants;
-using PetServiceManagement.Domain.Models;
 
 namespace PetServiceManagement.Tests.DtoMappers
 {
@@ -12,16 +9,7 @@ namespace PetServiceManagement.Tests.DtoMappers
         [Test]
         public void ToPetServiceDtoTest()
         {
-            var domain = new PetService()
-            {
-                Id = 1,
-                Name = "Dog Walking",
-                Description = "Walking dog",
-                Price = 20m,
-                EmployeeRate = 10m,
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var domain = PetServiceFactory.GetPetServiceDomain();
 
             var dto = PetServiceDtoMapper.ToPetServiceDTO(domain);
 
@@ -38,16 +26,7 @@ namespace PetServiceManagement.Tests.DtoMappers
         [Test]
         public void FromPetServiceDtoTest()
         {
-            var dto = new PetServiceDTO()
-            {
-                Id = 1,
-                Name = "Dog Walking",
-                Description = "Walking dog",
-                Rate = 20m,
-                EmployeeRate = 10m,
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var dto = PetServiceFactory.GetPetServiceDTO();
 
             var domain = PetServiceDtoMapper.FromPetServiceDTO(dto);
 

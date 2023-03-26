@@ -4,7 +4,6 @@ using PetServiceManagement.API.DTO;
 using PetServiceManagement.API.DtoMapper;
 using PetServiceManagement.Domain.BusinessLogic;
 using RofShared.FilterAttributes;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,82 +25,41 @@ namespace PetServiceManagement.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetByPageAndServiceName([FromQuery]int page, [FromQuery]int offset, [FromQuery]string keyword)
         {
-            try
-            {
-                var petServices = await _petService.GetPetServicesByPageAndKeyword(page, offset, keyword);
+            var petServices = await _petService.GetPetServicesByPageAndKeyword(page, offset, keyword);
 
-                var petServicesDto = new List<PetServiceDTO>();
+            var petServicesDto = new List<PetServiceDTO>();
 
-                petServices.Item1.ForEach(service => petServicesDto.Add(PetServiceDtoMapper.ToPetServiceDTO(service)));
+            petServices.Item1.ForEach(service => petServicesDto.Add(PetServiceDtoMapper.ToPetServiceDTO(service)));
 
-                return Ok(new PetServicesWithTotalPageDTO(petServicesDto, petServices.Item2));
-            }
-            catch(Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
+            return Ok(new PetServicesWithTotalPageDTO(petServicesDto, petServices.Item2));
         }
 
         [HttpPost]
         public async Task<IActionResult> AddPetService([FromBody]PetServiceDTO petServiceDTO)
         {
-            try
-            {
-                var petService = PetServiceDtoMapper.FromPetServiceDTO(petServiceDTO);
+            var petService = PetServiceDtoMapper.FromPetServiceDTO(petServiceDTO);
 
-                await _petService.AddNewPetService(petService);
+            await _petService.AddNewPetService(petService);
 
-                return Ok();
-            }
-            catch(ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch(Exception e)
-            {
-                if (e.InnerException != null && e.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"))
-                {
-                    return BadRequest("Pet Service with same name already exists");
-                }
-
-                return StatusCode(500, e.Message);
-            }
+            return Ok();            
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdatePetService([FromBody]PetServiceDTO petServiceDTO)
         {
-            try
-            {
-                var petService = PetServiceDtoMapper.FromPetServiceDTO(petServiceDTO);
+            var petService = PetServiceDtoMapper.FromPetServiceDTO(petServiceDTO);
 
-                await _petService.UpdatePetService(petService);
+            await _petService.UpdatePetService(petService);
 
-                return Ok();
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
+            return Ok();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePetService(short id)
         {
-            try
-            {
-                await _petService.DeletePetServiceById(id);
+            await _petService.DeletePetServiceById(id);
 
-                return Ok();
-            }          
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
+            return Ok();            
         }
     }
 }

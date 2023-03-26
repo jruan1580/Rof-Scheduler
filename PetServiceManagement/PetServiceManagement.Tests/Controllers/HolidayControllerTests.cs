@@ -6,8 +6,6 @@ using PetServiceManagement.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PetServiceManagement.Tests.Controllers
@@ -31,7 +29,7 @@ namespace PetServiceManagement.Tests.Controllers
                 }
             };
 
-            _holidayAndRateService.Setup(h => h.GetHolidaysByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _holidayService.Setup(h => h.GetHolidaysByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((holidays, 1));
 
             var url = $"{_baseUrl}?page=1&offset=1&keyword=cny";
@@ -70,115 +68,69 @@ namespace PetServiceManagement.Tests.Controllers
         [Test]
         public async Task CreateHolidayTest()
         {
-            _holidayAndRateService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
+            _holidayService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
                 .Returns(Task.CompletedTask);
 
-            var dto = new HolidayDTO()
-            {
-                Name = "CNY",
-                Month = 1,
-                Day = 28
-            };
+            var dto = GetHolidayDTO();
 
-            SetAuthHeaderOnHttpClient("Administrator");
-
-            var res = await _httpClient.PostAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json"));
-
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            await SendNonGetAndDeleteRequestAndVerifySuccess(_baseUrl, "POST", dto);
         }
 
         [Test]
-        public async Task CreatePetServiceBadRequestTest()
+        public async Task CreateHolidayBadRequestTest()
         {
-            _holidayAndRateService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
+            _holidayService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var dto = new HolidayDTO()
-            {
-                Name = "CNY",
-                Month = 1,
-                Day = 28
-            };
+            var dto = GetHolidayDTO();
 
-            SetAuthHeaderOnHttpClient("Administrator");
-
-            var res = await _httpClient.PostAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json"));
-
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.BadRequest, res.StatusCode);
-
-            Assert.IsNotNull(res.Content);
-
-            var content = await res.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("test", content);
+            await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "POST", dto, "test");
         }
 
         [Test]
-        public async Task UpdatePetServiceTest()
+        public async Task UpdateHolidayTest()
         {
-            _holidayAndRateService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
+            _holidayService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
                 .Returns(Task.CompletedTask);
 
-            var dto = new HolidayDTO()
-            {
-                Id = 1,
-                Name = "CNY",
-                Month = 1,
-                Day = 28
-            };
+            var dto = GetHolidayDTO();
 
             SetAuthHeaderOnHttpClient("Administrator");
 
-            var res = await _httpClient.PutAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json"));
-
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            await SendNonGetAndDeleteRequestAndVerifySuccess(_baseUrl, "PUT", dto);
         }
 
         [Test]
-        public async Task UpdatePetServiceBadRequestTest()
+        public async Task UpdateHolidayBadRequestTest()
         {
-            _holidayAndRateService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
+            _holidayService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var dto = new HolidayDTO()
-            {
-                Id = 1,
-                Name = "CNY",
-                Month = 1,
-                Day = 28
-            };
+            var dto = GetHolidayDTO();
 
-            SetAuthHeaderOnHttpClient("Administrator");
-
-            var res = await _httpClient.PutAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json"));
-
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.BadRequest, res.StatusCode);
-
-            Assert.IsNotNull(res.Content);
-
-            var content = await res.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("test", content);
+            await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "PUT", dto, "test");
         }
 
         [Test]
         public async Task DeletePetServiceByIdTest()
         {
-            _holidayAndRateService.Setup(h => h.DeleteHolidayById(It.IsAny<short>()))
+            _holidayService.Setup(h => h.DeleteHolidayById(It.IsAny<short>()))
                 .Returns(Task.CompletedTask);
 
             var url = $"{_baseUrl}/1";
 
-            SetAuthHeaderOnHttpClient("Administrator");
+            await SendDeleteRequestAndVerifySuccess(url);
+        }
 
-            var res = await _httpClient.DeleteAsync(url);
-
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+        private HolidayDTO GetHolidayDTO()
+        {
+            return new HolidayDTO()
+            {
+                Id = 1,
+                Name = "CNY",
+                Month = 1,
+                Day = 28
+            };
         }
     }
 }

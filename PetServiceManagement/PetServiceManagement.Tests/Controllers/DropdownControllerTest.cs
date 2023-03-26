@@ -14,21 +14,24 @@ namespace PetServiceManagement.Tests.Controllers
     [TestFixture]
     public class DropdownControllerTest
     {
-        private Mock<IDropDownService> _dropdownService;
+        private Mock<IDropdownService<PetService>> _petServiceDropdown;
+        private Mock<IDropdownService<Holiday>> _holidayDropdown;
         private DropdownController _dropdownController;
 
         [SetUp]
         public void Setup()
         {
-            _dropdownService = new Mock<IDropDownService>();
+            _petServiceDropdown = new Mock<IDropdownService<PetService>>();
 
-            _dropdownController = new DropdownController(_dropdownService.Object);
+            _holidayDropdown = new Mock<IDropdownService<Holiday>>();
+
+            _dropdownController = new DropdownController(_petServiceDropdown.Object, _holidayDropdown.Object);
         }
 
         [Test]
         public async Task GetPetServicesTest()
         {
-            _dropdownService.Setup(d => d.GetDropdownForType<PetService>())
+            _petServiceDropdown.Setup(d => d.GetDropdown())
                 .ReturnsAsync(new List<PetService>() 
                 { 
                     new PetService()
@@ -65,7 +68,7 @@ namespace PetServiceManagement.Tests.Controllers
         [Test]
         public async Task GetHolidaysTest()
         {
-            _dropdownService.Setup(d => d.GetDropdownForType<Holiday>())
+            _holidayDropdown.Setup(d => d.GetDropdown())
                 .ReturnsAsync(new List<Holiday>()
                 {
                     new Holiday()

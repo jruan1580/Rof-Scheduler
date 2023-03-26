@@ -15,17 +15,17 @@ namespace PetServiceManagement.API.Controllers
     [ApiController]
     public class HolidayRateController : ControllerBase
     {
-        private readonly IHolidayAndRateService _holidayAndRateService;
+        private readonly IHolidayRateService _holidayRateService;
 
-        public HolidayRateController(IHolidayAndRateService holidayAndRateService)
+        public HolidayRateController(IHolidayRateService holidayRateService)
         {
-            _holidayAndRateService = holidayAndRateService;
+            _holidayRateService = holidayRateService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetByPageAndKeyword([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
-            var holidayRates = await _holidayAndRateService.GetHolidayRatesByPageAndKeyword(page, offset, keyword);
+            var holidayRates = await _holidayRateService.GetHolidayRatesByPageAndKeyword(page, offset, keyword);
 
             var holidayRateDtos = new List<HolidayRateDTO>();
 
@@ -39,7 +39,7 @@ namespace PetServiceManagement.API.Controllers
         {                     
             var holidayRate = HolidayRateDtoMapper.FromHolidayRateDto(dto);
 
-            await _holidayAndRateService.AddHolidayRate(holidayRate);
+            await _holidayRateService.AddHolidayRate(holidayRate);
 
             return Ok();                     
         }
@@ -49,7 +49,7 @@ namespace PetServiceManagement.API.Controllers
         {
             var holidayRate = HolidayRateDtoMapper.FromHolidayRateDto(dto);
 
-            await _holidayAndRateService.UpdateHolidayRate(holidayRate);
+            await _holidayRateService.UpdateHolidayRate(holidayRate);
 
             return Ok();
         }
@@ -57,7 +57,7 @@ namespace PetServiceManagement.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHolidayRate(int id)
         {
-            await _holidayAndRateService.DeleteHolidayRateById(id);
+            await _holidayRateService.DeleteHolidayRateById(id);
 
             return Ok();           
         }

@@ -1,5 +1,6 @@
 ﻿using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
+using System.Collections.Generic;
 
 namespace PetServiceManagement.Domain.Mappers
 {
@@ -23,6 +24,34 @@ namespace PetServiceManagement.Domain.Mappers
             petService.TimeUnit = petServices.TimeUnit;
 
             return petService;
+        }
+
+        public static List<PetService> ToDomainPetServices(List<PetServices> petServices)
+        {
+            var domainPetServices = new List<PetService>();
+            
+            if (petServices == null || petServices.Count == 0)
+            {
+                return domainPetServices;
+            }
+
+            petServices.ForEach(petServiceDb =>
+            {
+                var petService = new PetService();
+
+                petService.Id = petServiceDb.Id;
+                petService.Name = petServiceDb.ServiceName;
+                petService.Price = petServiceDb.Price;
+                petService.Description = petServiceDb.Description;
+                petService.EmployeeRate = petServiceDb.EmployeeRate;
+                petService.Duration = petServiceDb.Duration;
+                petService.TimeUnit = petServiceDb.TimeUnit;
+
+                domainPetServices.Add(petService);
+
+            });
+           
+            return domainPetServices;
         }
 
         public static PetServices FromDomainPetService(PetService petService)

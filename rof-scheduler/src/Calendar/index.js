@@ -16,9 +16,6 @@ function Calendar({setLoginState}) {
     const [errorMessage, setErrorMessage] = useState(undefined);
 
     const [jobEvents, setJobEvents] = useState([]);
-    const [employees, setEmployees] = useState([]);
-    const [pets, setPets] = useState([]);
-    const [petServices, setPetServices] = useState([]);
     const [eventStartDate, setEventStartDate] = useState("");
     
     const [updateEvent, setUpdateEvent] = useState(undefined);
@@ -131,10 +128,6 @@ function Calendar({setLoginState}) {
       
       var eventStart = selectInfo.startStr;
       setEventStartDate(eventStart);
-      
-      constructEmployeeOptions();
-      constructPetOptions();
-      constructPetServiceOptions();
       setShowAddModal(true);
     }
 
@@ -146,94 +139,37 @@ function Calendar({setLoginState}) {
       }
     };
 
-    //get employees for dropdown
-    const constructEmployeeOptions = () => {
-      (async function () {
-        try {
-          const resp = await getEmployees();
-          if (resp.status === 401) {
-            setLoginState(false);
-            return;
-          }
-
-          const employees = await resp.json();
-          setEmployees(employees);
-          
-        } catch (e) {
-          setErrorMessage(e.message);
-        }
-      })();
-    }
-
-    //get pet services for dropdown
-    const constructPetServiceOptions = () => {
-      (async function () {
-        try {
-          const resp = await getPetServices();
-          if (resp.status === 401) {
-            setLoginState(false);
-            return;
-          }
-
-          const petServices = await resp.json();
-          setPetServices(petServices);
-          
-        } catch (e) {
-          setErrorMessage(e.message);
-        }
-      })();
-    }
-
-    //get pets for dropdown
-    const constructPetOptions = () => {
-      (async function () {
-        try {
-          const resp = await getPets();
-          if (resp.status === 401) {
-            setLoginState(false);
-            return;
-          }
-
-          const pets = await resp.json();
-          setPets(pets);
-          
-        } catch (e) {
-          setErrorMessage(e.message);
-        }
-      })();
-    };
-
     const getCurrScheduledTime = (event) =>{
-    const MM = event.start.getMonth() + 1;
-    const dd = event.start.getDate();
-    const HH = event.start.getHours();
-    const mm = event.start.getMinutes();
-    
-    let yyyy = event.start.getFullYear();
+      const MM = event.start.getMonth() + 1;
+      const dd = event.start.getDate();
+      const HH = event.start.getHours();
+      const mm = event.start.getMinutes();
+      
+      let yyyy = event.start.getFullYear();
 
-    var month = (MM < 10) ? "0" + MM : MM;
-    var day = (dd < 10) ? "0" + dd : dd;
+      var month = (MM < 10) ? "0" + MM : MM;
+      var day = (dd < 10) ? "0" + dd : dd;
 
-    var minute = (mm < 10) ? "0" + mm : mm;
-    var ampm = (HH < 12) ? "AM" : "PM";
-    var date = yyyy + "-" + month + "-" + day
-    
-    var hour = undefined;
+      var minute = (mm < 10) ? "0" + mm : mm;
+      var ampm = (HH < 12) ? "AM" : "PM";
+      var date = yyyy + "-" + month + "-" + day
+      
+      var hour = undefined;
 
-    if(HH < 10){
-      hour = "0" + HH;
-    }else if(HH > 12){
-      var hr = HH - 12;
-      hour = "0" + hr;
-    }else{
-      hour = HH;
+      if(HH < 10){
+        hour = "0" + HH;
+      }else if(HH > 12){
+        var hr = HH - 12;
+        hour = "0" + hr;
+      }else{
+        hour = HH;
+      }
+
+      setSchedHour(hour);
+      setSchedMin(minute);
+      setSchedAMPM(ampm);
+      setSchedDate(date);
     }
-
-    setSchedHour(hour);
-    setSchedMin(minute);
-    setSchedAMPM(ampm);
-    setSchedDate(date);
-  }
 
     const reloadAfterThreeSeconds = () => {
       setTimeout(() => window.location.reload(), 3000);
@@ -331,9 +267,6 @@ function Calendar({setLoginState}) {
             setLoginState={setLoginState}
             eventDate={eventStartDate}
             view={isMonthView}
-            employees={employees}
-            pets={pets}
-            petServices={petServices}
           />
 
           <UpdateEventModal
