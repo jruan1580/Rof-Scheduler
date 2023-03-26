@@ -1,4 +1,5 @@
-﻿using PetServiceManagement.Domain.Mappers;
+﻿using Microsoft.EntityFrameworkCore;
+using PetServiceManagement.Domain.Mappers;
 using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
 using PetServiceManagement.Infrastructure.Persistence.Repositories;
@@ -54,14 +55,9 @@ namespace PetServiceManagement.Domain.BusinessLogic
             {
                 await _petServiceRepository.AddPetService(petServiceEntity);
             }
-            catch(Exception e)
+            catch (DbUpdateException dbEx)
             {
-                if (e.InnerException != null && e.InnerException.Message.Contains("Violation of UNIQUE KEY constraint"))
-                {
-                    throw new ArgumentException("Pet Service with same name already exists");
-                }
-
-                throw;
+                DbExceptionHandler.HandleDbUpdateException(dbEx, "Pet Service");
             }            
         }
 
