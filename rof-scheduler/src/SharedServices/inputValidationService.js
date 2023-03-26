@@ -1,7 +1,7 @@
 export const validateLoginPassword = function (password) {
   var errMsg = "";
 
-  if (password === undefined || password.length == 0) {
+  if (password === undefined || password.length === 0) {
     errMsg = "Please enter a password.";
     return errMsg;
   }
@@ -340,6 +340,74 @@ export const ensurePetUpdateInformationProvided = function (
 
   if (ownerId === undefined || ownerId <= 0) {
     validationErrors.set("owner", "Please select pet's owner");
+  }
+
+  return validationErrors;
+};
+
+export const ensureAddEventInformationProvided = function (employeeId, petId, petServiceId, hour, min, ampm) {
+  var validationErrors = new Map();
+
+  if (employeeId === undefined || employeeId <= 0) {
+    validationErrors.set("employeeId", "Please select an employee.");
+  }
+
+  if (petId === undefined || petId <= 0) {
+    validationErrors.set("petId", "Please select a pet.");
+  }
+
+  if (petServiceId === undefined || petServiceId <= 0) {
+    validationErrors.set("petServiceId", "Please select a pet service.");
+  }
+
+  if (hour === undefined || hour === "") {
+    validationErrors.set("hour", "Please set hour for pet service.");
+  } 
+
+  if (min === undefined || min === "") {
+    validationErrors.set("minute", "Please set minute for pet service.");
+  }
+  
+  if(ampm === undefined || ampm === "") {
+    validationErrors.set("ampm", "Please select am or pm for pet service.");
+  }
+
+  return validationErrors;
+};
+
+export const ensureUpdateEventInformationProvided = function (employeeId, petId, petServiceId, date, hour, min, ampm, completed) {
+  var validationErrors = new Map();
+
+  if (employeeId === undefined || employeeId <= 0) {
+    validationErrors.set("employeeId", "Please select an employee.");
+  }
+
+  if (petId === undefined || petId <= 0) {
+    validationErrors.set("petId", "Please select a pet.");
+  }
+
+  if (petServiceId === undefined || petServiceId <= 0) {
+    validationErrors.set("petServiceId", "Please select a pet service.");
+  }
+
+  if (date === undefined || date === "") {
+    validationErrors.set("date", "Please choose a date");
+  }
+
+  if (hour === undefined || hour === "") {
+    validationErrors.set("hour", "Please set hour for pet service.");
+  } 
+
+  if (min === undefined || min === "") {
+    validationErrors.set("minute", "Please set minute for pet service.");
+  }
+  
+  if(ampm === undefined || ampm === "") {
+    validationErrors.set("ampm", "Please select am or pm for pet service.");
+  }
+
+  if (completed === undefined || completed === null) {
+    validationErrors.set("completed", "Please ensure that completed is marked yes or no.");
   }
 
   return validationErrors;

@@ -4,12 +4,15 @@ import Select from "react-select";
 
 import { getPetServices, getPets, getEmployees } from "../../SharedServices/dropdownService";
 import { updateEvent, deleteEvent } from "../../SharedServices/jobEventService";
+import { ensureUpdateEventInformationProvided } from "../../SharedServices/inputValidationService";
 
 function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLoginState, hour, minute, ampm, date}){
     const [errorMessage, setErrorMessage] = useState(undefined);
     const [successMessage, setSuccessMessage] = useState(undefined);
+    const [deleteSuccessMessage, setDeleteSuccessMessage] = useState(undefined);
     const [updating, setUpdating] = useState(false);
     const [disableBtns, setDisableBtns] = useState(false);
+    const [validationMap, setValidationMap] = useState(new Map());
 
     const [employees, setEmployees] = useState([]);
     const [pets, setPets] = useState([]);
@@ -86,11 +89,17 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
     }
 
     const closeModal = function () {
+        resetStates();
+        handleHide();
+    };
+
+    const resetStates = function () {
+        setValidationMap(new Map());
         setErrorMessage(undefined);
         setSuccessMessage(undefined);
+        setDeleteSuccessMessage(undefined);
         setUpdating(false);
         setDisableBtns(false);
-        handleHide();
     };
 
     const updateEventSubmit = (e) => {
@@ -121,6 +130,14 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
 
         eventStart = eventDate + "T" + eventTime + ":00";
 
+        var inputValidations = ensureUpdateEventInformationProvided (employeeId, petId, petServiceId, eventDate, e.target.hour.value, e.target.minute.value, e.target.ampm.value, completed);
+        if (inputValidations.size > 0) {
+            setValidationMap(inputValidations);
+            return;
+        }
+
+        setValidationMap(new Map());
+
         setUpdating(true);
         
         (async function () {
@@ -145,8 +162,27 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
         })();
     }
 
-    const deleteEvent = function(id){
-        console.log("Delete");
+    const removeEvent = function(){
+        var id = parseInt(event.id);
+        
+        (async function(){
+            try{
+                var resp = await deleteEvent(id);
+
+                if (resp.status === 401) {
+                    setLoginState(false);
+                    return;
+                }
+
+                setErrorMessage(undefined);
+                setDeleteSuccessMessage(true);
+                setDisableBtns(true);
+
+                handleUpdateSuccess();
+            }catch(e){
+                setErrorMessage('Failed to delete with error: ' + e.message);
+            }              
+        })();
     }
 
     const hourOptions = [
@@ -192,6 +228,7 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                     <Form onSubmit={updateEventSubmit}>
                         {errorMessage !== undefined && (<Alert variant="danger">{errorMessage}</Alert>)}
                         {successMessage && ( <Alert variant="success">Event updated successfully. Page will reload in 3 seconds...</Alert>)}
+                        {deleteSuccessMessage && (<Alert variant="success">Event removed. Page will reload in 3 seconds...</Alert>)}
 
                         <Form.Group as={Row}>
                             <Form.Label column lg={3}>Employee:</Form.Label>
@@ -204,8 +241,13 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                                             label: event.extendedProps.employee,
                                             value: event.extendedProps.employeeId,
                                         }}
+                                        isInvalid={validationMap.has("employeeId")}
                                     />
                                 )}
+                                <div className="dropdown-invalid">
+                                    {" "}
+                                    {validationMap.get("employeeId")}
+                                </div>
                             </Col>
                         </Form.Group>
                         <br />
@@ -220,8 +262,13 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                                             label: event.extendedProps.pet,
                                             value: event.extendedProps.petId,
                                         }}
+                                        isInvalid={validationMap.has("petId")}
                                     />
                                 )}
+                                <div className="dropdown-invalid">
+                                    {" "}
+                                    {validationMap.get("petId")}
+                                </div>
                             </Col>
                         </Form.Group>
                         <br />
@@ -236,8 +283,13 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                                             label: event.title,
                                             value: event.extendedProps.petServiceId,
                                         }}
+                                        isInvalid={validationMap.has("petServiceId")}
                                     />
                                 )}
+                                <div className="dropdown-invalid">
+                                    {" "}
+                                    {validationMap.get("petServiceId")}
+                                </div>
                             </Col>
                         </Form.Group>                        
                         <br />
@@ -248,7 +300,11 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                                     type="date"
                                     defaultValue={event === undefined ? "" : date}
                                     name="date"
+                                    isInvalid={validationMap.has("date")}
                                 />
+                                <Form.Control.Feedback type="invalid">
+                                    {validationMap.get("date")}
+                                </Form.Control.Feedback>
                             </Col>
                         </Form.Group>
                         <br />
@@ -263,8 +319,13 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                                             label: hour,
                                             value: hour,
                                         }}
+                                        isInvalid={validationMap.has("hour")}
                                     />
                                 )}
+                                <div className="dropdown-invalid">
+                                    {" "}
+                                    {validationMap.get("hour")}
+                                </div>
                             </Col>
                             <Col lg={3}>
                                 {event !== undefined && (
@@ -275,8 +336,13 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                                             label: minute,
                                             value: minute,
                                         }}
+                                        isInvalid={validationMap.has("minute")}
                                     />
                                 )}
+                                <div className="dropdown-invalid">
+                                    {" "}
+                                    {validationMap.get("minute")}
+                                </div>
                             </Col>
                             <Col lg={3}>
                                 {event !== undefined && (
@@ -287,8 +353,13 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                                             label: ampm,
                                             value: ampm,
                                         }}
+                                        isInvalid={validationMap.has("ampm")}
                                     />
                                 )}
+                                <div className="dropdown-invalid">
+                                    {" "}
+                                    {validationMap.get("ampm")}
+                                </div>
                             </Col>
                         </Form.Group>
                         <br />
@@ -303,8 +374,13 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                                             label: event.extendedProps.isComplete === true ? "Yes" : "No",
                                             value: event.extendedProps.isComplete,
                                         }}
+                                        isInvalid={validationMap.has("completed")}
                                     />
                                 )}
+                                <div className="dropdown-invalid">
+                                    {" "}
+                                    {validationMap.get("completed")}
+                                </div>
                             </Col>
                         </Form.Group>
                         <hr />
@@ -312,9 +388,9 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                             <Button type="button" variant="secondary" className="float-start me-2" disabled>Delete</Button>
                         )}
                         {!updating && !disableBtns && (
-                            <Button type="button" variant="secondary" onClick={() => deleteEvent(event.id)} className="float-start me-2">Delete</Button>
+                            <Button type="button" variant="secondary" onClick={() => removeEvent()} className="float-start me-2">Delete</Button>
                         )}
-                        {(updating || disableBtns) && (
+                        {(updating ||disableBtns) && (
                             <Button type="button" variant="danger" className="float-end ms-2" disabled>Cancel</Button>
                         )}
                         {!updating && !disableBtns && (
@@ -323,7 +399,7 @@ function UpdateEventModal({event, show, handleHide, handleUpdateSuccess, setLogi
                         {(updating || disableBtns) && (
                             <Button variant="primary" className="float-end ms-2" disabled>
                                 <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/>
-                                Updating...
+                                Loading...
                             </Button>
                         )}
                         {!updating && !disableBtns && (
