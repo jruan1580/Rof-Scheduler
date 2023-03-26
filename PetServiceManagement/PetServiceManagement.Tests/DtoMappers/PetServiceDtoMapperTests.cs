@@ -1,8 +1,5 @@
 ﻿using NUnit.Framework;
-using PetServiceManagement.API.DTO;
 using PetServiceManagement.API.DtoMapper;
-using PetServiceManagement.Domain.Constants;
-using PetServiceManagement.Domain.Models;
 
 namespace PetServiceManagement.Tests.DtoMappers
 {

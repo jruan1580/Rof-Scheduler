@@ -1,7 +1,5 @@
 ﻿using NUnit.Framework;
-using PetServiceManagement.Domain.Constants;
 using PetServiceManagement.Domain.Mappers;
-using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
 using System.Collections.Generic;
 

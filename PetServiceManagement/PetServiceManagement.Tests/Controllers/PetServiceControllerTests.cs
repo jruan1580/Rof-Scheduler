@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using NUnit.Framework;
 using PetServiceManagement.API.DTO;
-using PetServiceManagement.Domain.Constants;
 using PetServiceManagement.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -21,16 +20,7 @@ namespace PetServiceManagement.Tests.Controllers
         {
             var petServices = new List<PetService>()
             {
-                new PetService()
-                {
-                    Id = 1,
-                    Name = "Dog Walking",
-                    Description = "Walking dog",
-                    Price = 20m,
-                    EmployeeRate = 10m,
-                    Duration = 30,
-                    TimeUnit = TimeUnits.MINUTES
-                }
+               PetServiceFactory.GetPetServiceDomain()
             };
 
             _petServiceManagementService.Setup(p => p.GetPetServicesByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))

@@ -1,8 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
 using PetServiceManagement.Domain.BusinessLogic;
-using PetServiceManagement.Domain.Constants;
-using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
 using PetServiceManagement.Infrastructure.Persistence.Repositories;
 using System;
