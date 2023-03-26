@@ -80,7 +80,7 @@ namespace PetServiceManagement.Tests.Controllers
             _petServiceManagementService.Setup(p => p.AddNewPetService(It.IsAny<PetService>()))
                 .Returns(Task.CompletedTask);
 
-            var dto = GetPetServiceDTO();
+            var dto = PetServiceFactory.GetPetServiceDTO();
 
             await SendNonGetAndDeleteRequestAndVerifySuccess(_baseUrl, "POST", dto);
         }
@@ -91,7 +91,7 @@ namespace PetServiceManagement.Tests.Controllers
             _petServiceManagementService.Setup(p => p.AddNewPetService(It.IsAny<PetService>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var dto = GetPetServiceDTO();
+            var dto = PetServiceFactory.GetPetServiceDTO();
 
             await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "POST", dto, "test");
         }
@@ -102,7 +102,7 @@ namespace PetServiceManagement.Tests.Controllers
             _petServiceManagementService.Setup(p => p.UpdatePetService(It.IsAny<PetService>()))
                 .Returns(Task.CompletedTask);
 
-            var dto = GetPetServiceDTO();
+            var dto = PetServiceFactory.GetPetServiceDTO();
 
             SetAuthHeaderOnHttpClient("Administrator");
 
@@ -115,7 +115,7 @@ namespace PetServiceManagement.Tests.Controllers
             _petServiceManagementService.Setup(p => p.UpdatePetService(It.IsAny<PetService>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var dto = GetPetServiceDTO();
+            var dto = PetServiceFactory.GetPetServiceDTO();
 
             await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "PUT", dto, "test");
         }
@@ -129,19 +129,6 @@ namespace PetServiceManagement.Tests.Controllers
             var url = $"{_baseUrl}/1";
 
             await SendDeleteRequestAndVerifySuccess(url);
-        }
-
-        private PetServiceDTO GetPetServiceDTO()
-        {
-            return new PetServiceDTO()
-            {
-                Name = "Dog Walking",
-                Description = "Walking dog",
-                Rate = 20m,
-                EmployeeRate = 10m,
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
         }
     }
 }

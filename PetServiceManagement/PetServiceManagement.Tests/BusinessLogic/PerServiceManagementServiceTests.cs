@@ -31,15 +31,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(null));
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(null));
 
-            var petService = new PetService()
-            {
-                Id = 1,
-                Price = 20m,
-                Description = "testing",
-                EmployeeRate = 15m,
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var petService = PetServiceFactory.GetPetServiceDomain();
+            petService.Name = string.Empty;
 
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
@@ -48,16 +41,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public void PetServiceValidationInvalidPrice()
         {
-            var petService = new PetService()
-            {
-                Id = 1,
-                Price = -1m,
-                Description = "testing",
-                EmployeeRate = 15m,
-                Name = "InvalidPrice",
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var petService = PetServiceFactory.GetPetServiceDomain();
+            petService.Price = -1m;
 
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
@@ -66,30 +51,13 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public void PetServiceValidationInvalidEmployeeRate()
         {
-            var petService = new PetService()
-            {
-                Id = 1,
-                Price = 10m,
-                Description = "testing",
-                EmployeeRate = -1m,
-                Name = "InvalidEmployeeRate",
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var petService = PetServiceFactory.GetPetServiceDomain();
+            petService.EmployeeRate = -1m;
 
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
 
-            petService = new PetService()
-            {
-                Id = 1,
-                Price = 10m,
-                Description = "testing",
-                EmployeeRate = 101m,
-                Name = "InvalidEmployeeRate",
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            petService.EmployeeRate = 101m;
 
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
@@ -98,16 +66,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public void PetServiceValidationInvalidDuration()
         {
-            var petService = new PetService()
-            {
-                Id = 1,
-                Price = 10m,
-                Description = "testing",
-                EmployeeRate = 20m,
-                Name = "InvalidDuration",
-                Duration = -1,
-                TimeUnit = TimeUnits.SECONDS
-            };
+            var petService = PetServiceFactory.GetPetServiceDomain();
+            petService.Duration = -1;
 
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
@@ -116,16 +76,8 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public void PetServiceValidationInvalidTimeUnit()
         {
-            var petService = new PetService()
-            {
-                Id = 1,
-                Price = 10m,
-                Description = "testing",
-                EmployeeRate = 20m,
-                Name = "InvalidTimeUnit",
-                Duration = 1,
-                TimeUnit = "Sec"
-            };
+            var petService = PetServiceFactory.GetPetServiceDomain();
+            petService.TimeUnit = "Sec";
 
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
@@ -137,15 +89,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
                 .ReturnsAsync((PetServices)null);
 
-            var petService = new PetService()
-            {
-                Id = 1,
-                Price = 20m,
-                Name = "Doesn't Exists",
-                Description = "testing",
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var petService = PetServiceFactory.GetPetServiceDomain();
 
             Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
         }
@@ -155,15 +99,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         {
             var petServices = new List<PetServices>()
             {
-                new PetServices()
-                {
-                    Id = 1,
-                    Price = 20m,
-                    ServiceName = "Dog Walking",
-                    Description = "Walking dog",
-                    Duration = 30,
-                    TimeUnit = TimeUnits.MINUTES
-                }
+                PetServiceFactory.GetPetServicesDbEntity(),
             };
 
             _petServiceRepo.Setup(p => p.GetAllPetServicesByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
@@ -187,15 +123,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public async Task AddNewPetServiceTest()
         {
-            var petService = new PetService()
-            {
-                Id = 1,
-                Price = 20m,
-                Name = "Dog Walking",
-                Description = "Walking dog",
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var petService = PetServiceFactory.GetPetServiceDomain();
 
             _petServiceRepo.Setup(p => p.AddPetService(It.IsAny<PetServices>())).ReturnsAsync((short)1);
 
@@ -207,22 +135,10 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public async Task UpdatePetServiceTest()
         {
-            var petService = new PetService()
-            {
-                Id = 1,
-                Price = 20m,
-                Name = "Dog Walking",
-                Description = "Walking dog",
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var petService = PetServiceFactory.GetPetServiceDomain();
 
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
-                .ReturnsAsync(new PetServices()
-                {
-                    Id = 1,
-                    ServiceName = "Service to be updated"
-                });
+                .ReturnsAsync(PetServiceFactory.GetPetServicesDbEntity());
 
             _petServiceRepo.Setup(p => p.UpdatePetService(It.IsAny<PetServices>())).Returns(Task.CompletedTask);
 

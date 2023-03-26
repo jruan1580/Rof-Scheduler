@@ -13,16 +13,7 @@ namespace PetServiceManagement.Tests.DomainMappers
         [Test]
         public void MapToDomainPetServiceTest()
         {
-            var petServiceEntity = new PetServices()
-            {
-                Id = 1,
-                ServiceName = "Dog Walking (30 Minutes)",
-                EmployeeRate = 20m,
-                Price = 20.99m,
-                Description = "Waling dog for 30 minutes",
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var petServiceEntity = PetServiceFactory.GetPetServicesDbEntity();
 
             var domainPetService = PetServiceMapper.ToDomainPetService(petServiceEntity);
 
@@ -41,16 +32,7 @@ namespace PetServiceManagement.Tests.DomainMappers
         {
             var petServiceEntity = new List<PetServices>()
             {
-                new PetServices()
-                {
-                     Id = 1,
-                    ServiceName = "Dog Walking (30 Minutes)",
-                    EmployeeRate = 20m,
-                    Price = 20.99m,
-                    Description = "Waling dog for 30 minutes",
-                    Duration = 30,
-                    TimeUnit = TimeUnits.MINUTES
-                }
+                PetServiceFactory.GetPetServicesDbEntity()
             };
 
             var domainPetServices = PetServiceMapper.ToDomainPetServices(petServiceEntity);
@@ -73,16 +55,7 @@ namespace PetServiceManagement.Tests.DomainMappers
         [Test]
         public void MapFromDomainPetServiceTest()
         {
-            var petServiceDomain = new PetService()
-            {
-                Id = 1,
-                Name = "Dog Walking (30 Minutes)",
-                EmployeeRate = 20m,
-                Price = 20.99m,
-                Description = "Waling dog for 30 minutes",
-                Duration = 30,
-                TimeUnit = TimeUnits.MINUTES
-            };
+            var petServiceDomain = PetServiceFactory.GetPetServiceDomain();
 
             var entityPetService = PetServiceMapper.FromDomainPetService(petServiceDomain);
 
