@@ -27,216 +27,102 @@ namespace ClientManagementService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateClient([FromBody] ClientDTO client)
         {
-            try
-            {
-                await _clientService.CreateClient(ClientDTOMapper.FromDTOClient(client), client.Password);
+            await _clientService.CreateClient(ClientDTOMapper.FromDTOClient(client), client.Password);
 
-                return StatusCode(201);
-            }
-            catch(ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return StatusCode(201);
         }
 
         [Authorize(Roles = "Administrator,Employee")]
         [HttpGet]
         public async Task<IActionResult> GetAllClients([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
-            try
+            var clientList = new List<ClientDTO>();
+
+            var result = await _clientService.GetAllClientsByKeyword(page, offset, keyword);
+
+            foreach (var client in result.Clients)
             {
-                var clientList = new List<ClientDTO>();
-
-                var result = await _clientService.GetAllClientsByKeyword(page, offset, keyword);
-
-                foreach (var client in result.Clients)
-                {
-                    clientList.Add(ClientDTOMapper.ToDTOClient(client));
-                }
-
-                return Ok(new { clients = clientList, totalPages = result.TotalPages });
+                clientList.Add(ClientDTOMapper.ToDTOClient(client));
             }
-            catch(Exception ex)
-            {
-                return StatusCode(500, ex);
-            }
+
+            return Ok(new { clients = clientList, totalPages = result.TotalPages });
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetClientById(long id)
         {
-            try
-            {
-                var client = await _clientService.GetClientById(id);
+            var client = await _clientService.GetClientById(id);
 
-                return Ok(ClientDTOMapper.ToDTOClient(client));
-            }
-            catch (EntityNotFoundException notFound)
-            {
-                return NotFound(notFound.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(ClientDTOMapper.ToDTOClient(client));
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{email}/email")]
         public async Task<IActionResult> GetClientByEmail(string email)
         {
-            try
-            {
-                var client = await _clientService.GetClientByEmail(email);
+            var client = await _clientService.GetClientByEmail(email);
 
-                if (client == null)
-                {
-                    return NotFound($"Client with email, {email}, was not found");
-                }
-
-                return Ok(ClientDTOMapper.ToDTOClient(client));
-            }
-            catch (Exception ex)
+            if (client == null)
             {
-                return StatusCode(500, ex.Message);
+                return NotFound($"Client with email, {email}, was not found");
             }
+
+            return Ok(ClientDTOMapper.ToDTOClient(client));
         }
 
         [Authorize(Roles = "Internal")]
         [HttpPatch("login")]
         public async Task<IActionResult> ClientLogin([FromBody] ClientDTO client)
         {
-            try
-            {
-                var clientLogIn = await _clientService.ClientLogin(client.Username, client.Password);
+            var clientLogIn = await _clientService.ClientLogin(client.Username, client.Password);
 
-                return Ok(new { Id = clientLogIn.Id, FirstName = clientLogIn.FirstName, LastName = clientLogIn.LastName});
-            }
-            catch (EntityNotFoundException notFound)
-            {
-                return NotFound(notFound.Message);
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(new { Id = clientLogIn.Id, FirstName = clientLogIn.FirstName, LastName = clientLogIn.LastName });
         }
 
         [Authorize(Roles = "Client,Internal")]
         [HttpPatch("{id}/logout")]
         public async Task<IActionResult> ClientLogout(long id)
         {
-            try
-            {
-                await _clientService.ClientLogout(id);
+            await _clientService.ClientLogout(id);
 
-                return Ok();
-            }
-            catch (EntityNotFoundException notFound)
-            {
-                return NotFound(notFound.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
 
         [Authorize(Roles = "Administrator,Employee")]
         [HttpPatch("{id}/locked")]
         public async Task<IActionResult> ResetClientLockedStatus(long id)
         {
-            try
-            {
-                await _clientService.ResetClientFailedLoginAttempts(id);
+            await _clientService.ResetClientFailedLoginAttempts(id);
 
-                return Ok();
-            }
-            catch(ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpPatch("password")]
         public async Task<IActionResult> UpdatePassword([FromBody] PasswordDTO newPassword)
         {
-            try
-            {
-                await _clientService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
+            await _clientService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
 
-                return Ok();
-            }
-            catch (EntityNotFoundException notFound)
-            {
-                return NotFound(notFound.Message);
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpPut("info")]
         public async Task<IActionResult> UpdateClientInfo([FromBody] ClientDTO client)
         {
-            try
-            {
-                await _clientService.UpdateClientInfo(ClientDTOMapper.FromDTOClient(client));
+            await _clientService.UpdateClientInfo(ClientDTOMapper.FromDTOClient(client));
 
-                return Ok();
-            }
-            catch (EntityNotFoundException notFound)
-            {
-                return NotFound(notFound.Message);
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
 
         [Authorize(Roles = "Administrator,Employee")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClientById(long id)
         {
-            try
-            {
-                await _clientService.DeleteClientById(id);
+            await _clientService.DeleteClientById(id);
 
-                return Ok();
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
     }
 }
