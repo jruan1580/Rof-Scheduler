@@ -1,7 +1,5 @@
 ﻿using NUnit.Framework;
-using PetServiceManagement.API.DTO;
 using PetServiceManagement.API.DtoMapper;
-using PetServiceManagement.Domain.Models;
 using System;
 
 namespace PetServiceManagement.Tests.DtoMappers
@@ -12,26 +10,7 @@ namespace PetServiceManagement.Tests.DtoMappers
         [Test]
         public void ToHolidayRateDtoTest()
         {
-            var holidayRate = new HolidayRate()
-            {
-                Id = 1,
-                Rate = 20m,
-                PetService = new PetService()
-                {
-                    Id = 1,
-                    Name = "Dog Walking",
-                    Description = "Dog Walking",
-                    Price = 20m,
-                    EmployeeRate = 10m
-                },
-                Holiday = new Holiday()
-                {
-                    Id = 1,
-                    Name = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                }
-            };
+            var holidayRate = HolidayRateFactory.GetHolidayRateDomainObj();
 
             var holidayRateDto = HolidayRateDtoMapper.ToHolidayRateDto(holidayRate);
 
@@ -55,26 +34,7 @@ namespace PetServiceManagement.Tests.DtoMappers
         [Test]
         public void FromHolidayRateDtoTest()
         {
-            var holidayRateDto = new HolidayRateDTO()
-            {
-                Id = 1,
-                Rate = 20m,
-                PetService = new PetServiceDTO()
-                {
-                    Id = 1,
-                    Name = "Dog Walking",
-                    Description = "Walking dog",
-                    Rate = 20m,
-                    EmployeeRate = 10m
-                },
-                Holiday = new HolidayDTO()
-                {
-                    Id = 1,
-                    Name = "CNY",
-                    Month = 1,
-                    Day = 28
-                }
-            };
+            var holidayRateDto = HolidayRateFactory.GetHolidayRateDTO();
 
             var holidayRate = HolidayRateDtoMapper.FromHolidayRateDto(holidayRateDto);
 
