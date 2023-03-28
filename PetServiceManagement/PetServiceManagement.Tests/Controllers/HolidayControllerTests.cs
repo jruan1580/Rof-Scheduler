@@ -20,13 +20,7 @@ namespace PetServiceManagement.Tests.Controllers
         {
             var holidays = new List<Holiday>()
             {
-                new Holiday()
-                {
-                    Id = 1,
-                    Name = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                }
+                HolidayFactory.GetHolidayDomainObj()
             };
 
             _holidayService.Setup(h => h.GetHolidaysByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
@@ -71,7 +65,7 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
                 .Returns(Task.CompletedTask);
 
-            var dto = GetHolidayDTO();
+            var dto = HolidayFactory.GetHolidayDTO();
 
             await SendNonGetAndDeleteRequestAndVerifySuccess(_baseUrl, "POST", dto);
         }
@@ -82,7 +76,7 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayService.Setup(h => h.AddHoliday(It.IsAny<Holiday>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var dto = GetHolidayDTO();
+            var dto = HolidayFactory.GetHolidayDTO();
 
             await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "POST", dto, "test");
         }
@@ -93,7 +87,7 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
                 .Returns(Task.CompletedTask);
 
-            var dto = GetHolidayDTO();
+            var dto = HolidayFactory.GetHolidayDTO();
 
             SetAuthHeaderOnHttpClient("Administrator");
 
@@ -106,7 +100,7 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayService.Setup(h => h.UpdateHoliday(It.IsAny<Holiday>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var dto = GetHolidayDTO();
+            var dto = HolidayFactory.GetHolidayDTO();
 
             await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "PUT", dto, "test");
         }
@@ -120,17 +114,6 @@ namespace PetServiceManagement.Tests.Controllers
             var url = $"{_baseUrl}/1";
 
             await SendDeleteRequestAndVerifySuccess(url);
-        }
-
-        private HolidayDTO GetHolidayDTO()
-        {
-            return new HolidayDTO()
-            {
-                Id = 1,
-                Name = "CNY",
-                Month = 1,
-                Day = 28
-            };
-        }
+        }      
     }
 }

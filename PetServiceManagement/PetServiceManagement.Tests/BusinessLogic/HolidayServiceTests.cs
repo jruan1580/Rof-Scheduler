@@ -1,7 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
 using PetServiceManagement.Domain.BusinessLogic;
-using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
 using PetServiceManagement.Infrastructure.Persistence.Repositories;
 using System;
@@ -28,35 +27,23 @@ namespace PetServiceManagement.Tests.BusinessLogic
             Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(null));
             Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(null));
 
-            var holiday = new Holiday()
-            {
-                Id = 1,
-                HolidayMonth = 1,
-                HolidayDay = 28
-            };
+            var holidayWithNoName = HolidayFactory.GetHolidayDomainObj();
+            holidayWithNoName.Name = string.Empty;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(holiday));
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(holiday));
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(holidayWithNoName));
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(holidayWithNoName));
 
-            var invalidHolidayDate = new Holiday()
-            {
-                Id = 1,
-                HolidayDay = 13,
-                HolidayMonth = 13
-            };
+            var invalidHolidayDate = HolidayFactory.GetHolidayDomainObj();
+            invalidHolidayDate.HolidayMonth = 13;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(holiday));
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(holiday));
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(invalidHolidayDate));
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(invalidHolidayDate));
 
-            invalidHolidayDate = new Holiday()
-            {
-                Id = 1,
-                HolidayDay = 33,
-                HolidayMonth = 12
-            };
+            invalidHolidayDate.HolidayMonth = 12;
+            invalidHolidayDate.HolidayDay = 33;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(holiday));
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(holiday));
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(invalidHolidayDate));
+            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(invalidHolidayDate));
         }
 
         [Test]
@@ -65,13 +52,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
             _holidayAndRateRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
                 .ReturnsAsync((Holidays)null);
 
-            var holiday = new Holiday()
-            {
-                Id = 1,
-                Name = "CNY",
-                HolidayMonth = 1,
-                HolidayDay = 28
-            };
+            var holiday = HolidayFactory.GetHolidayDomainObj();
 
             Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(holiday));
         }
@@ -81,13 +62,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         {
             var holidays = new List<Holidays>()
             {
-                new Holidays()
-                {
-                    Id = 1,
-                    HolidayName = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                }
+                HolidayFactory.GetHolidayDbEntityObj()
             };
 
             _holidayAndRateRepo.Setup(h => h.GetHolidaysByPagesAndSearch(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
@@ -110,13 +85,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public async Task AddHolidayTest()
         {
-            var holiday = new Holiday()
-            {
-                Id = 1,
-                Name = "CNY",
-                HolidayMonth = 1,
-                HolidayDay = 28
-            };
+            var holiday = HolidayFactory.GetHolidayDomainObj();
 
             _holidayAndRateRepo.Setup(h => h.AddHoliday(It.IsAny<Holidays>())).ReturnsAsync((short)1);
 
@@ -128,22 +97,10 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public async Task UpdateHolidayTest()
         {
-            var holiday = new Holiday()
-            {
-                Id = 1,
-                Name = "CNY",
-                HolidayMonth = 1,
-                HolidayDay = 28
-            };
+            var holiday = HolidayFactory.GetHolidayDomainObj();
 
             _holidayAndRateRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
-                   .ReturnsAsync(new Holidays()
-                   {
-                       Id = 1,
-                       HolidayName = "Name to be updated",
-                       HolidayMonth = 1,
-                       HolidayDay = 28
-                   });
+                   .ReturnsAsync(HolidayFactory.GetHolidayDbEntityObj());
 
             _holidayAndRateRepo.Setup(h => h.UpdateHoliday(It.IsAny<Holidays>())).Returns(Task.CompletedTask);
 

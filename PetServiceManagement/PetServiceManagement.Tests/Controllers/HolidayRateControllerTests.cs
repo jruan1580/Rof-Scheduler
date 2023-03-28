@@ -20,26 +20,7 @@ namespace PetServiceManagement.Tests.Controllers
         {
             var holidayRates = new List<HolidayRate>()
             {
-                new HolidayRate()
-                {
-                    Id = 1,
-                    Rate = 20m,
-                    PetService = new PetService()
-                    {
-                        Id = 1,
-                        Name = "Dog Walking",
-                        Description = "Dog Walking",
-                        Price = 20m,
-                        EmployeeRate = 10m
-                    },
-                    Holiday = new Holiday()
-                    {
-                        Id = 1,
-                        Name = "CNY",
-                        HolidayMonth = 1,
-                        HolidayDay = 28
-                    }
-                }
+                HolidayRateFactory.GetHolidayRateDomainObj()
             };
 
             _holidayRateService.Setup(h => h.GetHolidayRatesByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
@@ -93,7 +74,7 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayRateService.Setup(h => h.AddHolidayRate(It.IsAny<HolidayRate>()))
                 .Returns(Task.CompletedTask);
 
-            var holidayRateDTO = GetHolidayRateDTO();
+            var holidayRateDTO = HolidayRateFactory.GetHolidayRateDTO();
 
             await SendNonGetAndDeleteRequestAndVerifySuccess(_baseUrl, "POST", holidayRateDTO);
         }
@@ -104,7 +85,7 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayRateService.Setup(h => h.AddHolidayRate(It.IsAny<HolidayRate>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var holidayRateDTO = GetHolidayRateDTO();
+            var holidayRateDTO = HolidayRateFactory.GetHolidayRateDTO();
 
             await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "POST", holidayRateDTO, "test");
         }
@@ -115,7 +96,7 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayRateService.Setup(h => h.UpdateHolidayRate(It.IsAny<HolidayRate>()))
                 .Returns(Task.CompletedTask);
 
-            var holidayRateDTO = GetHolidayRateDTO();
+            var holidayRateDTO = HolidayRateFactory.GetHolidayRateDTO();
 
             await SendNonGetAndDeleteRequestAndVerifySuccess(_baseUrl, "PUT", holidayRateDTO);
         }
@@ -126,7 +107,7 @@ namespace PetServiceManagement.Tests.Controllers
             _holidayRateService.Setup(h => h.UpdateHolidayRate(It.IsAny<HolidayRate>()))
                .ThrowsAsync(new ArgumentException("test"));
 
-            var holidayRateDTO = GetHolidayRateDTO();
+            var holidayRateDTO = HolidayRateFactory.GetHolidayRateDTO();
 
             await SendNonGetAndDeleteRequestAndVerifyBadRequest(_baseUrl, "PUT", holidayRateDTO, "test");
         }
@@ -140,30 +121,6 @@ namespace PetServiceManagement.Tests.Controllers
             var url = $"{_baseUrl}/1";
 
             await SendDeleteRequestAndVerifySuccess(url);
-        }
-
-        private HolidayRateDTO GetHolidayRateDTO()
-        {
-            return new HolidayRateDTO()
-            {
-                Id = 1,
-                Rate = 20m,
-                PetService = new PetServiceDTO()
-                {
-                    Id = 1,
-                    Name = "Dog Walking",
-                    Description = "Walking dog",
-                    Rate = 20m,
-                    EmployeeRate = 10m
-                },
-                Holiday = new HolidayDTO()
-                {
-                    Id = 1,
-                    Name = "CNY",
-                    Month = 1,
-                    Day = 28
-                }
-            };
-        }
+        }        
     }
 }

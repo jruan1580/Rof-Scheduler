@@ -1,7 +1,5 @@
 ﻿using NUnit.Framework;
-using PetServiceManagement.API.DTO;
 using PetServiceManagement.API.DtoMapper;
-using PetServiceManagement.Domain.Models;
 using System;
 
 namespace PetServiceManagement.Tests.DtoMappers
@@ -12,13 +10,7 @@ namespace PetServiceManagement.Tests.DtoMappers
         [Test]
         public void ToHolidayDtoTest()
         {
-            var domain = new Holiday()
-            {
-                Id = 1,
-                Name = "CNY",
-                HolidayDay = 28,
-                HolidayMonth = 1
-            };
+            var domain = HolidayFactory.GetHolidayDomainObj();
 
             var dto = HolidayDtoMapper.ToHolidayDTO(domain);
 
@@ -31,13 +23,7 @@ namespace PetServiceManagement.Tests.DtoMappers
         [Test]
         public void FromHolidayDtoTest()
         {
-            var dto = new HolidayDTO()
-            {
-                Id = 1,
-                Name = "CNY",
-                Month = 1,
-                Day = 28
-            };
+            var dto = HolidayFactory.GetHolidayDTO();
 
             var domain = HolidayDtoMapper.FromHolidayDTO(dto);
             Assert.IsNotNull(domain);

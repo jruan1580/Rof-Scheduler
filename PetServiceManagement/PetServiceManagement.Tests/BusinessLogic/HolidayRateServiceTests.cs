@@ -39,38 +39,20 @@ namespace PetServiceManagement.Tests.BusinessLogic
             Assert.ThrowsAsync<ArgumentException>(() => _holidayRateService.AddHolidayRate(null));
 
             //define pet service but not holiday
-            holidayRate.PetService = new PetService()
-            {
-                Id = 1,
-                Price = 20m,
-                Name = "Dog Walking",
-                Description = "Walking dog"
-            };
+            holidayRate.PetService = PetServiceFactory.GetPetServiceDomain();
 
             Assert.ThrowsAsync<ArgumentException>(() => _holidayRateService.AddHolidayRate(null));
             Assert.ThrowsAsync<ArgumentException>(() => _holidayRateService.AddHolidayRate(null));
 
             //define holiday but not pet service
             holidayRate.PetService = null;
-            holidayRate.Holiday = new Holiday()
-            {
-                Id = 1,
-                Name = "CNY",
-                HolidayMonth = 1,
-                HolidayDay = 28
-            };
+            holidayRate.Holiday = HolidayFactory.GetHolidayDomainObj();
 
             Assert.ThrowsAsync<ArgumentException>(() => _holidayRateService.AddHolidayRate(null));
             Assert.ThrowsAsync<ArgumentException>(() => _holidayRateService.AddHolidayRate(null));
 
             //redefine pet service
-            holidayRate.PetService = new PetService()
-            {
-                Id = 1,
-                Price = 20m,
-                Name = "Dog Walking",
-                Description = "Walking dog"
-            };
+            holidayRate.PetService = PetServiceFactory.GetPetServiceDomain();
 
             //unable to find pet service
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
@@ -84,13 +66,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 .ReturnsAsync((Holidays)null);
 
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
-                .ReturnsAsync(new PetServices()
-                {
-                    Id = 1,
-                    Price = 20m,
-                    ServiceName = "Dog Walking",
-                    Description = "Walking dog"
-                });
+                .ReturnsAsync(PetServiceFactory.GetPetServicesDbEntity());
 
             Assert.ThrowsAsync<ArgumentException>(() => _holidayRateService.AddHolidayRate(null));
             Assert.ThrowsAsync<ArgumentException>(() => _holidayRateService.AddHolidayRate(null));
@@ -100,45 +76,15 @@ namespace PetServiceManagement.Tests.BusinessLogic
         public void UnableToFindHolidayRatesForUpdateTest()
         {
             _holidayAndRateRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
-                .ReturnsAsync(new Holidays()
-                {
-                    Id = 1,
-                    HolidayName = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                });
+                .ReturnsAsync(HolidayFactory.GetHolidayDbEntityObj());
 
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
-              .ReturnsAsync(new PetServices()
-              {
-                  Id = 1,
-                  Price = 20m,
-                  ServiceName = "Dog Walking",
-                  Description = "Walking dog"
-              });
+              .ReturnsAsync(PetServiceFactory.GetPetServicesDbEntity());
 
             _holidayAndRateRepo.Setup(h => h.GetHolidayRatesById(It.IsAny<int>()))
                 .ReturnsAsync((HolidayRates)null);
 
-            var holidayRate = new HolidayRate()
-            {
-                Id = 1,
-                PetService = new PetService()
-                {
-                    Id = 1,
-                    Price = 20m,
-                    Name = "Dog Walking",
-                    Description = "Walking dog"
-                },
-                Holiday = new Holiday()
-                {
-                    Id = 1,
-                    Name = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                },
-                Rate = 20m
-            };
+            var holidayRate = HolidayRateFactory.GetHolidayRateDomainObj();
 
             Assert.ThrowsAsync<ArgumentException>(() => _holidayRateService.UpdateHolidayRate(holidayRate));
         }
@@ -148,27 +94,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         {
             var holidayRates = new List<HolidayRates>
             {
-                new HolidayRates()
-                {
-                    Id = 1,
-                    PetServiceId = 1,
-                    HolidayId = 1,
-                    PetService = new PetServices()
-                    {
-                        Id = 1,
-                        Price = 20m,
-                        ServiceName = "Dog Walking",
-                        Description = "Walking dog"
-                    },
-                    Holiday = new Holidays()
-                    {
-                        Id = 1,
-                        HolidayName = "CNY",
-                        HolidayMonth = 1,
-                        HolidayDay = 28
-                    },
-                    HolidayRate = 20m
-                }
+                HolidayRateFactory.GetHoldayRateDbEntity()
             };
 
             _holidayAndRateRepo.Setup(h => h.GetHolidayRatesByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
@@ -203,42 +129,12 @@ namespace PetServiceManagement.Tests.BusinessLogic
         public async Task AddHolidayRateTest()
         {
             _holidayAndRateRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
-                .ReturnsAsync(new Holidays()
-                {
-                    Id = 1,
-                    HolidayName = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                });
+                .ReturnsAsync(HolidayFactory.GetHolidayDbEntityObj());
 
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
-              .ReturnsAsync(new PetServices()
-              {
-                  Id = 1,
-                  Price = 20m,
-                  ServiceName = "Dog Walking",
-                  Description = "Walking dog"
-              });
+              .ReturnsAsync(PetServiceFactory.GetPetServicesDbEntity());
 
-            var holidayRate = new HolidayRate()
-            {
-                Id = 1,
-                PetService = new PetService()
-                {
-                    Id = 1,
-                    Price = 20m,
-                    Name = "Dog Walking",
-                    Description = "Walking dog"
-                },
-                Holiday = new Holiday()
-                {
-                    Id = 1,
-                    Name = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                },
-                Rate = 30m
-            };
+            var holidayRate = HolidayRateFactory.GetHolidayRateDomainObj();
 
             _holidayAndRateRepo.Setup(h => h.CreateHolidayRates(It.IsAny<HolidayRates>())).ReturnsAsync(1);
 
@@ -251,42 +147,12 @@ namespace PetServiceManagement.Tests.BusinessLogic
         public async Task UpdateHolidayRateTest()
         {
             _holidayAndRateRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
-                .ReturnsAsync(new Holidays()
-                {
-                    Id = 1,
-                    HolidayName = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                });
+                .ReturnsAsync(HolidayFactory.GetHolidayDbEntityObj());
 
             _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
-              .ReturnsAsync(new PetServices()
-              {
-                  Id = 1,
-                  Price = 20m,
-                  ServiceName = "Dog Walking",
-                  Description = "Walking dog"
-              });
+              .ReturnsAsync(PetServiceFactory.GetPetServicesDbEntity());
 
-            var holidayRate = new HolidayRate()
-            {
-                Id = 1,
-                PetService = new PetService()
-                {
-                    Id = 1,
-                    Price = 20m,
-                    Name = "Dog Walking",
-                    Description = "Walking dog"
-                },
-                Holiday = new Holiday()
-                {
-                    Id = 1,
-                    Name = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                },
-                Rate = 30m
-            };
+            var holidayRate = HolidayRateFactory.GetHolidayRateDomainObj();
 
             _holidayAndRateRepo.Setup(h => h.GetHolidayRatesById(It.IsAny<int>()))
                    .ReturnsAsync(new HolidayRates()

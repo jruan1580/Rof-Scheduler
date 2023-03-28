@@ -28,7 +28,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             if (res.Item1.Count == 0)
             {
-                return (new List<HolidayRate>(), res.Item2);
+                return (holidayRates, res.Item2);
             }
 
             res.Item1.ForEach(h => holidayRates.Add(HolidayRatesMapper.ToDomainHolidayRate(h)));
@@ -36,11 +36,6 @@ namespace PetServiceManagement.Domain.BusinessLogic
             return (holidayRates, res.Item2);
         }
 
-        /// <summary>
-        /// Add holiday rate
-        /// </summary>
-        /// <param name="holidayRate"></param>
-        /// <returns></returns>
         public async Task AddHolidayRate(HolidayRate holidayRate)
         {
             await ValidateHolidayRate(holidayRate);
@@ -57,12 +52,6 @@ namespace PetServiceManagement.Domain.BusinessLogic
             }
         }
 
-        /// <summary>
-        /// Update holiday rates
-        /// </summary>
-        /// <param name="holidayRate"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         public async Task UpdateHolidayRate(HolidayRate holidayRate)
         {
             await ValidateHolidayRate(holidayRate);
@@ -79,11 +68,6 @@ namespace PetServiceManagement.Domain.BusinessLogic
             await _holidayAndRatesRepository.UpdateHolidayRates(holidayRateToUpdate);
         }
 
-        /// <summary>
-        /// Delete holiday rate by id.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public async Task DeleteHolidayRateById(int id)
         {
             await _holidayAndRatesRepository.DeleteHolidayRates(id);

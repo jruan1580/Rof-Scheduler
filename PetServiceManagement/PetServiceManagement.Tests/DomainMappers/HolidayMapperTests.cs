@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using PetServiceManagement.Domain.Mappers;
-using PetServiceManagement.Domain.Models;
 using PetServiceManagement.Infrastructure.Persistence.Entities;
 using System.Collections.Generic;
 
@@ -12,13 +11,7 @@ namespace PetServiceManagement.Tests.DomainMappers
         [Test]
         public void MapToDomainHolidayTest()
         {
-            var holidayEntity = new Holidays()
-            {
-                Id = 1,
-                HolidayName = "CNY",
-                HolidayMonth = 1,
-                HolidayDay = 28
-            };
+            var holidayEntity = HolidayFactory.GetHolidayDbEntityObj();
 
             var domainHoliday = HolidayMapper.ToHolidayDomain(holidayEntity);
 
@@ -34,13 +27,7 @@ namespace PetServiceManagement.Tests.DomainMappers
         {
             var holidayEntities = new List<Holidays>()
             {
-                new Holidays()
-                {
-                    Id = 1,
-                    HolidayName = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                }
+                HolidayFactory.GetHolidayDbEntityObj()
             };
 
             var domainHolidays = HolidayMapper.ToHolidayDomains(holidayEntities);
@@ -61,13 +48,7 @@ namespace PetServiceManagement.Tests.DomainMappers
         [Test]
         public void MapFromDomainHolidayTest()
         {
-            var domainHoliday = new Holiday()
-            {
-                Id = 1,
-                HolidayMonth = 1,
-                HolidayDay = 28,
-                Name = "CNY"
-            };
+            var domainHoliday = HolidayFactory.GetHolidayDomainObj();
 
             var entityHoliday = HolidayMapper.FromHolidayDomain(domainHoliday);
 

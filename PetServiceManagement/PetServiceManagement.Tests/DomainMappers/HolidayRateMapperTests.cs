@@ -1,8 +1,5 @@
 ﻿using NUnit.Framework;
 using PetServiceManagement.Domain.Mappers;
-using PetServiceManagement.Domain.Models;
-using PetServiceManagement.Infrastructure.Persistence.Entities;
-using System;
 
 namespace PetServiceManagement.Tests.DomainMappers
 {
@@ -12,28 +9,7 @@ namespace PetServiceManagement.Tests.DomainMappers
         [Test]
         public void MapToDomainHolidayRateTest()
         {
-            var holidayRateEntity = new HolidayRates()
-            {
-                Id = 1,
-                HolidayRate = 20m,
-                PetServiceId = 1,
-                PetService = new PetServices()
-                {
-                    Id = 1,
-                    ServiceName = "Dog Walking (30 Minutes)",
-                    EmployeeRate = 20m,
-                    Price = 20.99m,
-                    Description = "Waling dog for 30 minutes"
-                },
-                HolidayId = 1,
-                Holiday = new Holidays()
-                {
-                    Id = 1,
-                    HolidayName = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                }
-            };
+            var holidayRateEntity = HolidayRateFactory.GetHoldayRateDbEntity();
 
             var holidayRateDomain = HolidayRatesMapper.ToDomainHolidayRate(holidayRateEntity);
 
@@ -57,26 +33,7 @@ namespace PetServiceManagement.Tests.DomainMappers
         [Test]
         public void MapFromDomainHolidayRateTest()
         {
-            var holidayRateDomain = new HolidayRate()
-            {
-                Id = 1,
-                Rate = 20m,
-                PetService = new PetService()
-                {
-                    Id = 1,
-                    Name = "Dog Walking (30 Minutes)",
-                    EmployeeRate = 20m,
-                    Price = 20.99m,
-                    Description = "Waling dog for 30 minutes"
-                },
-                Holiday = new Holiday()
-                {
-                    Id = 1,
-                    Name = "CNY",
-                    HolidayMonth = 1,
-                    HolidayDay = 28
-                }
-            };
+            var holidayRateDomain = HolidayRateFactory.GetHolidayRateDomainObj();
 
             var holidayRateEntity = HolidayRatesMapper.FromDomainHolidayRate(holidayRateDomain);
 
