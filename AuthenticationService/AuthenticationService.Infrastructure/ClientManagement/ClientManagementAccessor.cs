@@ -1,6 +1,7 @@
 ﻿using AuthenticationService.DTO.Accessors;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using RofShared.Services;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,14 +32,14 @@ namespace AuthenticationService.Infrastructure.ClientManagement
 
             var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
 
-            return await ExecutePatchRequestAndValidateAndParseResponse<LoginResponse>(url, token, content);                      
+            return await ExecuteRequestWithBody<LoginResponse>(url, HttpMethod.Patch, content, token);                      
         }
 
         public async Task Logout(long userId, string token)
         {
             var url = $"{_clientManagementBaseUrl}/api/client/{userId}/logout";
 
-            await ExecutePatchRequestAndValidateResponse(url, token, null);            
+            await ExecuteRequestWithNoBody(url, HttpMethod.Patch, token);            
         }       
     }
 }

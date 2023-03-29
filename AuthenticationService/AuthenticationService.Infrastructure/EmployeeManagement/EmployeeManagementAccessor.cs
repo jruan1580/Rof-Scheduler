@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RofShared.Exceptions;
+using RofShared.Services;
 using System;
 using System.Net.Http;
 using System.Text;
@@ -32,7 +33,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
 
             try
             {
-                await ExecuteGetRequestAndValidateResponse(url, token);
+                await ExecuteRequestWithNoBody(url, HttpMethod.Get, token);                
             }
             catch (EntityNotFoundException)
             {
@@ -56,7 +57,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
 
             var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
 
-            return await ExecutePatchRequestAndValidateAndParseResponse<EmployeeLoginResponse>(url, token, content);            
+            return await ExecuteRequestWithBody<EmployeeLoginResponse>(url, HttpMethod.Patch, content, token);            
         }
 
         /// <summary>
@@ -71,7 +72,7 @@ namespace AuthenticationService.Infrastructure.EmployeeManagement
         { 
             var url = $"{_employeeManagementBaseUrl}{relativeUrl}";
 
-            await ExecutePatchRequestAndValidateResponse(url, token, null);                
+            await ExecuteRequestWithNoBody(url, HttpMethod.Patch, token);
         }
     }
 }

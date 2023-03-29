@@ -106,7 +106,9 @@ namespace RofShared.Services
 
         private async Task<string> GetResponseContentAsString(HttpResponseMessage response)
         {
-            return await response.Content?.ReadAsStringAsync() ?? string.Empty;
+            return (response.Content == null)
+                ? string.Empty
+                : await response.Content.ReadAsStringAsync();
         }
 
         private async Task ThrowProperExceptionForUnsuccessfulResponse(HttpResponseMessage response)
