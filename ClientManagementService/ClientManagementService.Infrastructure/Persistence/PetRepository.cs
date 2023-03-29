@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using RofShared.Exceptions;
 
 namespace ClientManagementService.Infrastructure.Persistence
 {
@@ -207,7 +208,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 
                 if (pet == null)
                 {
-                    throw new ArgumentException($"No pet with Id: {petId} found.");
+                    throw new EntityNotFoundException($"No pet with Id: {petId} found.");
                 }
 
                 context.RemoveRange(petToVax);

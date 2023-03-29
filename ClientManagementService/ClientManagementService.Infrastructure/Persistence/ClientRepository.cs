@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using RofShared.Exceptions;
 
 namespace ClientManagementService.Infrastructure.Persistence
 {
@@ -48,7 +49,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 
                 if(client == null)
                 {
-                    throw new ArgumentException($"No client with Id: {id} found.");
+                    throw new EntityNotFoundException($"No client with Id: {id} found.");
                 }
 
                 context.Remove(client);
@@ -135,7 +136,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 
                 if (client == null)
                 {
-                    throw new ArgumentException("Client not found.");
+                    throw new EntityNotFoundException("Client not found.");
                 }
 
                 client.FailedLoginAttempts += 1;

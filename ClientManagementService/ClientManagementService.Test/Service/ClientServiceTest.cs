@@ -1,5 +1,4 @@
-﻿using ClientManagementService.Domain.Exceptions;
-using ClientManagementService.Domain.Services;
+﻿using ClientManagementService.Domain.Services;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Entities;
 using ClientManagementService.Infrastructure.Persistence.Filters.Client;
@@ -9,6 +8,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using RofShared.Exceptions;
 
 namespace ClientManagementService.Test.Service
 {

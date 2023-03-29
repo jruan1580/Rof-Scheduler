@@ -1,5 +1,4 @@
-﻿using ClientManagementService.Domain.Exceptions;
-using ClientManagementService.Domain.Mappers.Database;
+﻿using ClientManagementService.Domain.Mappers.Database;
 using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Filters.Client;
@@ -8,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ClientDB = ClientManagementService.Infrastructure.Persistence.Entities.Client;
+using RofShared.Exceptions;
 
 namespace ClientManagementService.Domain.Services
 {
