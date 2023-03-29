@@ -1,5 +1,4 @@
-﻿using ClientManagementService.Domain.Exceptions;
-using ClientManagementService.Domain.Services;
+﻿using ClientManagementService.Domain.Services;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Entities;
 using ClientManagementService.Infrastructure.Persistence.Filters.Pet;
@@ -9,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VaccineStatus = ClientManagementService.Domain.Models.VaccineStatus;
-
+using RofShared.Exceptions;
 
 namespace ClientManagementService.Test.Service
 {
