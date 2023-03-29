@@ -1,16 +1,13 @@
 ﻿using AuthenticationService.API.Controllers;
 using AuthenticationService.Domain.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using RofShared.Services;
 using RofShared.StartupInits;
 using System;
-using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 
 namespace AuthenticationService.Tests.Api
@@ -25,15 +22,9 @@ namespace AuthenticationService.Tests.Api
         [OneTimeSetUp]
         public void Setup()
         {
-            var requestPipeline = GetRequestPipeline();
-
             var dependentServices = RegisterServices();
 
-            var webHostBuilder = new WebHostBuilder()               
-                .UseKestrel()
-                .ConfigureServices(dependentServices)
-                .Configure(requestPipeline)
-                .UseUrls("http://localhost");
+            var webHostBuilder = UnitTestSetupHelper.GetWebHostBuilder(dependentServices);
 
             _server = new TestServer(webHostBuilder);
             _httpClient = _server.CreateClient();
@@ -47,32 +38,9 @@ namespace AuthenticationService.Tests.Api
             _httpClient.Dispose();
         }
 
-        private Action<IApplicationBuilder> GetRequestPipeline()
-        {
-            Action<IApplicationBuilder> requestPipeline = app =>
-            {
-                app.AddExceptionHandlerForApi();
-
-                app.UseHttpsRedirection();
-
-                app.UseRouting();
-
-                app.UseAuthentication();
-
-                app.UseAuthorization();
-
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                });
-            };
-
-            return requestPipeline;
-        }
-
         private Action<IServiceCollection> RegisterServices()
         {
-            var tokenConfig = GetConfiguration();
+            var tokenConfig = UnitTestSetupHelper.GetConfiguration();
 
             _tokenHandler = new TokenHandler(tokenConfig);
             
@@ -91,18 +59,10 @@ namespace AuthenticationService.Tests.Api
             return services;
         }
 
-        private IConfiguration GetConfiguration()
+        protected void AssertStatusCodeEqualsExpected(HttpResponseMessage res, HttpStatusCode expected)
         {
-            var tokenConfig = new Dictionary<string, string>();
-            tokenConfig.Add("Jwt:Key", "thisisjustsomerandomlocalkey");
-            tokenConfig.Add("Jwt:Issuer", "localhost.com");
-            tokenConfig.Add("Jwt:Audience", "rof_services");
-
-            var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(tokenConfig)
-                .Build();
-
-            return configuration;
+            Assert.IsNotNull(res);
+            Assert.AreEqual(expected, res.StatusCode);
         }
     }
 }

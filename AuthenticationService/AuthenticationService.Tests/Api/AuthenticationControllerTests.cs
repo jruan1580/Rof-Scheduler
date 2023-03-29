@@ -34,8 +34,7 @@ namespace AuthenticationService.Tests.Api
 
             var res = await _httpClient.PatchAsync(url, stringContent);
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            AssertStatusCodeEqualsExpected(res, HttpStatusCode.OK);
 
             var content = res.Content;
             Assert.IsNotNull(content);
@@ -56,8 +55,7 @@ namespace AuthenticationService.Tests.Api
 
             var res = await _httpClient.PatchAsync(url, stringContent);
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, res.StatusCode);
+            AssertStatusCodeEqualsExpected(res, HttpStatusCode.InternalServerError);
         }
 
         [Test]
@@ -71,8 +69,7 @@ namespace AuthenticationService.Tests.Api
 
             var res = await _httpClient.PatchAsync(url, stringContent);
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.NotFound, res.StatusCode);
+            AssertStatusCodeEqualsExpected(res, HttpStatusCode.NotFound);           
         }
 
         [Test]
@@ -86,8 +83,7 @@ namespace AuthenticationService.Tests.Api
 
             var res = await _httpClient.PatchAsync(url, stringContent);
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.BadRequest, res.StatusCode);
+            AssertStatusCodeEqualsExpected(res, HttpStatusCode.BadRequest);
         }
 
         [Test]
@@ -104,8 +100,7 @@ namespace AuthenticationService.Tests.Api
 
             var res = await _httpClient.PatchAsync(url, null);
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            AssertStatusCodeEqualsExpected(res, HttpStatusCode.OK);
         }
 
         [Test]
@@ -118,8 +113,7 @@ namespace AuthenticationService.Tests.Api
 
             var res = await _httpClient.PatchAsync(url, null);
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.Unauthorized, res.StatusCode);
+            AssertStatusCodeEqualsExpected(res, HttpStatusCode.Unauthorized);
         }
 
         [Test]
@@ -136,8 +130,7 @@ namespace AuthenticationService.Tests.Api
 
             var res = await _httpClient.PatchAsync(url, null);
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, res.StatusCode);
+            AssertStatusCodeEqualsExpected(res, HttpStatusCode.InternalServerError);
         }
 
         [Test]
@@ -154,8 +147,7 @@ namespace AuthenticationService.Tests.Api
 
             var res = await _httpClient.PatchAsync(url, null);
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.NotFound, res.StatusCode);
+            AssertStatusCodeEqualsExpected(res, HttpStatusCode.NotFound);
         }
 
         [Test]
@@ -172,8 +164,7 @@ namespace AuthenticationService.Tests.Api
 
             var res = await _httpClient.PatchAsync(url, null);
 
-            Assert.IsNotNull(res);
-            Assert.AreEqual(HttpStatusCode.BadRequest, res.StatusCode);
+            AssertStatusCodeEqualsExpected(res, HttpStatusCode.BadRequest);
         }
 
         private StringContent GetStringContentForLogin()

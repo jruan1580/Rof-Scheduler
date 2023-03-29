@@ -8,7 +8,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="RofShared" Version="1.0.7" />
+    <PackageReference Include="RofShared" Version="1.0.9" />
   </ItemGroup>
 
   <ItemGroup>

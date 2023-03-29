@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace RofShared.Services
 {
-    public static class UnitTestHelper
+    public static class UnitTestSetupHelper
     {
         public static IWebHostBuilder GetWebHostBuilder(Action<IServiceCollection> registeredServices)
         {
