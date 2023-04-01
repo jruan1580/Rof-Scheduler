@@ -10,15 +10,13 @@ using System.Threading.Tasks;
 namespace ClientManagementService.Test.Controller
 {
     [TestFixture]
-    public class ClientControllerTest
+    public class ClientControllerTest : ApiTestSetup
     {
-        private Mock<IClientService> _clientService;
+        private readonly string _passwordUnencrypted = "t3$T1234";
 
-        [SetUp]
-        public void Setup()
-        {
-            _clientService = new Mock<IClientService>();
-        }
+        private readonly string _baseUrl = "/api/Client";
+
+        private readonly string _exceptionMsg = "Test Exception Message";
 
         [Test]
         public async Task CreateClient_Success()
