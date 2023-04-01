@@ -1,18 +1,18 @@
 ﻿using EmployeeManagementService.API.Controllers;
 using EmployeeManagementService.Domain.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using RofShared.Services;
 using RofShared.StartupInits;
 using System;
-using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Test.Controller
 {
@@ -26,19 +26,14 @@ namespace EmployeeManagementService.Test.Controller
         protected readonly Mock<IEmployeeRetrievalService> _employeeRetrievalService = new Mock<IEmployeeRetrievalService>();
         protected readonly Mock<IEmployeeUpsertService> _employeeUpsertService = new Mock<IEmployeeUpsertService>();
 
+        protected readonly string _employeeNotFoundMessage = "Employee not found!";
+
         [OneTimeSetUp]
         public void Setup()
         {
-            var requestPipeline = GetRequestPipeline();
-
             var dependentServices = RegisterServices();
 
-            var webHostBuilder = new WebHostBuilder()
-                .UseEnvironment("Development")
-                .UseKestrel()
-                .ConfigureServices(dependentServices)
-                .Configure(requestPipeline)
-                .UseUrls("http://localhost");
+            var webHostBuilder = UnitTestSetupHelper.GetWebHostBuilder(dependentServices);
 
             _server = new TestServer(webHostBuilder);
             _httpClient = _server.CreateClient();
@@ -51,33 +46,10 @@ namespace EmployeeManagementService.Test.Controller
 
             _httpClient.Dispose();
         }
-
-        private Action<IApplicationBuilder> GetRequestPipeline()
-        {
-            Action<IApplicationBuilder> requestPipeline = app =>
-            {
-                app.AddExceptionHandlerForApi();
-
-                app.UseHttpsRedirection();
-
-                app.UseRouting();
-
-                app.UseAuthentication();
-
-                app.UseAuthorization();
-
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                });
-            };
-
-            return requestPipeline;
-        }
-
+     
         private Action<IServiceCollection> RegisterServices()
         {
-            var tokenConfig = GetConfiguration();
+            var tokenConfig = UnitTestSetupHelper.GetConfiguration();
 
             _tokenHandler = new TokenHandler(tokenConfig);
 
@@ -99,21 +71,44 @@ namespace EmployeeManagementService.Test.Controller
             return services;
         }
 
-        private IConfiguration GetConfiguration()
+        protected async Task<HttpResponseMessage> SendRequest(string role, HttpMethod method, string url, StringContent content = null)
         {
-            var tokenConfig = new Dictionary<string, string>();
-            tokenConfig.Add("Jwt:Key", "thisisjustsomerandomlocalkey");
-            tokenConfig.Add("Jwt:Issuer", "localhost.com");
-            tokenConfig.Add("Jwt:Audience", "rof_services");
+            SetAuthHeaderOnHttpClient(role);
 
-            var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(tokenConfig)
-                .Build();
+            var httpRequestMessage = new HttpRequestMessage(method, url);
 
-            return configuration;
+            if (content != null)
+            {
+                httpRequestMessage.Content = content;
+            }
+
+            return await _httpClient.SendAsync(httpRequestMessage);
         }
 
-        protected void SetAuthHeaderOnHttpClient(string role)
+        protected void AssertExpectedStatusCode(HttpResponseMessage res, HttpStatusCode expected)
+        {
+            Assert.IsNotNull(res);
+
+            Assert.AreEqual(expected, res.StatusCode);
+        }
+
+        protected void AssertContentIsAsExpected(HttpResponseMessage res, string expectedContentAsString)
+        {
+            Assert.IsNotNull(res);
+
+            Assert.IsNotNull(res.Content);
+
+            var content = Task.Run(() => res.Content.ReadAsStringAsync()).Result;
+
+            Assert.AreEqual(expectedContentAsString, content);
+        }
+
+        protected StringContent ConvertObjectToStringContent<T>(T obj)
+        {
+            return new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json");
+        }
+
+        private void SetAuthHeaderOnHttpClient(string role)
         {
             var token = _tokenHandler.GenerateTokenForRole(role);
 
