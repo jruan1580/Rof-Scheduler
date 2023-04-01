@@ -1,13 +1,11 @@
 ﻿using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.DTO;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using RofShared.Exceptions;
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Test.Controller
@@ -28,9 +26,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .Returns(Task.CompletedTask);
 
-            var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
-
-            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", stringContent);           
+            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateEmployee));           
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -44,9 +40,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
-
-            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
+            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateEmployee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
@@ -81,9 +75,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
-
-            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
+            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateEmployee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
           
@@ -101,9 +93,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
-
-            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
+            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateEmployee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 

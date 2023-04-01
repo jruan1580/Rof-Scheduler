@@ -2,7 +2,6 @@
 using EmployeeManagementService.Domain.Models;
 using EmployeeManagementService.DTO;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using RofShared.Exceptions;
 using System;
@@ -129,7 +128,7 @@ namespace EmployeeManagementService.Test.Controller
                 e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(employee);
 
-            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", ConvertObjectToStringContent(employee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -145,7 +144,7 @@ namespace EmployeeManagementService.Test.Controller
                 e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", ConvertObjectToStringContent(employee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
@@ -163,7 +162,7 @@ namespace EmployeeManagementService.Test.Controller
                 e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new EmployeeIsLockedException());
 
-            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", ConvertObjectToStringContent(employee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
@@ -180,7 +179,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeAuthService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", ConvertObjectToStringContent(employee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
@@ -241,7 +240,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/password", ConvertObjectToStringContent(password));
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -259,7 +258,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/password", ConvertObjectToStringContent(password));
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
@@ -279,7 +278,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/password", ConvertObjectToStringContent(password));
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 

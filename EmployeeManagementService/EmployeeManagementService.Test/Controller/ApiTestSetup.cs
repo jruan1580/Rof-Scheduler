@@ -3,6 +3,7 @@ using EmployeeManagementService.Domain.Services;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using RofShared.Services;
 using RofShared.StartupInits;
@@ -10,6 +11,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Test.Controller
@@ -99,6 +101,11 @@ namespace EmployeeManagementService.Test.Controller
             var content = Task.Run(() => res.Content.ReadAsStringAsync()).Result;
 
             Assert.AreEqual(expectedContentAsString, content);
+        }
+
+        protected StringContent ConvertObjectToStringContent<T>(T obj)
+        {
+            return new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json");
         }
 
         private void SetAuthHeaderOnHttpClient(string role)

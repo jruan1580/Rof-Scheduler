@@ -67,11 +67,9 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => 
                 e.CreateEmployee(It.IsAny<Employee>(), 
                     It.IsAny<string>()))
-            .Returns(Task.CompletedTask);
+            .Returns(Task.CompletedTask);                      
 
-            var stringContent = new StringContent(JsonConvert.SerializeObject(newEmployee), Encoding.UTF8, "application/json");            
-
-            var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, stringContent);            
+            var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newEmployee));            
 
             AssertExpectedStatusCode(response, HttpStatusCode.Created);
         }
@@ -95,9 +93,7 @@ namespace EmployeeManagementService.Test.Controller
                     It.IsAny<string>()))
             .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var stringContent = new StringContent(JsonConvert.SerializeObject(newEmployee), Encoding.UTF8, "application/json");
-
-            var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, stringContent);
+            var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newEmployee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
@@ -156,7 +152,7 @@ namespace EmployeeManagementService.Test.Controller
 
             var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
 
-            var response = await SendRequest("Administrator", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
+            var response = await SendRequest("Administrator", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateEmployee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -172,7 +168,7 @@ namespace EmployeeManagementService.Test.Controller
 
             var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
 
-            var response = await SendRequest("Administrator", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
+            var response = await SendRequest("Administrator", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateEmployee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
@@ -198,7 +194,7 @@ namespace EmployeeManagementService.Test.Controller
 
             var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
 
-            var response = await SendRequest("Administrator", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
+            var response = await SendRequest("Administrator", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateEmployee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
@@ -216,7 +212,7 @@ namespace EmployeeManagementService.Test.Controller
 
             var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
 
-            var response = await SendRequest("Administrator", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
+            var response = await SendRequest("Administrator", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateEmployee));
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
