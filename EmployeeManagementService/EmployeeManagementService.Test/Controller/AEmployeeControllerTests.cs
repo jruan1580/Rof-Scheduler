@@ -45,11 +45,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
-            Assert.IsNotNull(response.Content);
-
-            var errMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("Employee not found!", errMsg);
+            AssertContentIsAsExpected(response, _employeeNotFoundMessage);
         }
 
         [TestCase("/api/Admin", "Administrator")]
@@ -88,11 +84,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
-            Assert.IsNotNull(response.Content);
-
-            var errMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("Employee not found!", errMsg);
+            AssertContentIsAsExpected(response, _employeeNotFoundMessage);
         }
 
         [TestCase("/api/Admin", "Administrator")]
@@ -157,11 +149,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
-            Assert.IsNotNull(response.Content);
-
-            var errMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("Employee not found!", errMsg);
+            AssertContentIsAsExpected(response, _employeeNotFoundMessage);
         }
 
         [TestCase("/api/Admin", "Administrator")]
@@ -179,11 +167,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            Assert.IsNotNull(response.Content);
-
-            var errMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("Employee is locked. Contact Admin to get unlocked.", errMsg);
+            AssertContentIsAsExpected(response, "Employee is locked. Contact Admin to get unlocked.");
         }
 
         [TestCase("/api/Admin", "Administrator")]
@@ -200,9 +184,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            var errorMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual(_exceptionMsg, errorMsg);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [TestCase("/api/Admin", "Administrator")]
@@ -228,11 +210,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
-            Assert.IsNotNull(response.Content);
-
-            var errMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("Employee not found!", errMsg);
+            AssertContentIsAsExpected(response, _employeeNotFoundMessage);
         }
 
         [TestCase("/api/Admin", "Administrator")]
@@ -246,9 +224,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            var errMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual(errMsg, _exceptionMsg);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
 
@@ -287,11 +263,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
-            Assert.IsNotNull(response.Content);
-
-            var errMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("Employee not found!", errMsg);
+            AssertContentIsAsExpected(response, _employeeNotFoundMessage);
         }
 
         [TestCase("/api/Admin", "Administrator")]
@@ -311,9 +283,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            var content = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual(_exceptionMsg, content);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
     }
 }

@@ -56,9 +56,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            var errorMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual(_exceptionMsg, errorMsg);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
@@ -103,9 +101,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            var errorMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual(_exceptionMsg, errorMsg);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
@@ -131,9 +127,7 @@ namespace EmployeeManagementService.Test.Controller
 
             Assert.IsNotNull(response.Content);
 
-            var errorMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("Employee not found!", errorMsg);
+            AssertContentIsAsExpected(response, _employeeNotFoundMessage);
         }
 
         [Test]
@@ -148,9 +142,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            var errorMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual(_exceptionMsg, errorMsg);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
@@ -184,11 +176,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
-            Assert.IsNotNull(response.Content);
-
-            var errorMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual("Employee not found!", errorMsg);
+            AssertContentIsAsExpected(response, _employeeNotFoundMessage);
         }
 
         [Test]
@@ -214,9 +202,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            var errorMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual(_exceptionMsg, errorMsg);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
@@ -234,11 +220,7 @@ namespace EmployeeManagementService.Test.Controller
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            Assert.IsNotNull(response.Content);
-
-            var errorMsg = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual(_exceptionMsg, errorMsg);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
     }
 }

@@ -24,6 +24,8 @@ namespace EmployeeManagementService.Test.Controller
         protected readonly Mock<IEmployeeRetrievalService> _employeeRetrievalService = new Mock<IEmployeeRetrievalService>();
         protected readonly Mock<IEmployeeUpsertService> _employeeUpsertService = new Mock<IEmployeeUpsertService>();
 
+        protected readonly string _employeeNotFoundMessage = "Employee not found!";
+
         [OneTimeSetUp]
         public void Setup()
         {
@@ -86,6 +88,17 @@ namespace EmployeeManagementService.Test.Controller
             Assert.IsNotNull(res);
 
             Assert.AreEqual(expected, res.StatusCode);
+        }
+
+        protected void AssertContentIsAsExpected(HttpResponseMessage res, string expectedContentAsString)
+        {
+            Assert.IsNotNull(res);
+
+            Assert.IsNotNull(res.Content);
+
+            var content = Task.Run(() => res.Content.ReadAsStringAsync()).Result;
+
+            Assert.AreEqual(expectedContentAsString, content);
         }
 
         private void SetAuthHeaderOnHttpClient(string role)
