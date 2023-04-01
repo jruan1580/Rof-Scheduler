@@ -10,6 +10,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace EmployeeManagementService.Test.Controller
 {
@@ -65,11 +66,19 @@ namespace EmployeeManagementService.Test.Controller
 
             return services;
         }
-        protected void SetAuthHeaderOnHttpClient(string role)
-        {
-            var token = _tokenHandler.GenerateTokenForRole(role);
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        protected async Task<HttpResponseMessage> SendRequest(string role, HttpMethod method, string url, StringContent content = null)
+        {
+            SetAuthHeaderOnHttpClient(role);
+
+            var httpRequestMessage = new HttpRequestMessage(method, url);
+
+            if (content != null)
+            {
+                httpRequestMessage.Content = content;
+            }
+
+            return await _httpClient.SendAsync(httpRequestMessage);
         }
 
         protected void AssertExpectedStatusCode(HttpResponseMessage res, HttpStatusCode expected)
@@ -77,6 +86,13 @@ namespace EmployeeManagementService.Test.Controller
             Assert.IsNotNull(res);
 
             Assert.AreEqual(expected, res.StatusCode);
+        }
+
+        private void SetAuthHeaderOnHttpClient(string role)
+        {
+            var token = _tokenHandler.GenerateTokenForRole(role);
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
     }
 }

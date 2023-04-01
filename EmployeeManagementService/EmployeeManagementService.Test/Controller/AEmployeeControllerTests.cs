@@ -27,11 +27,9 @@ namespace EmployeeManagementService.Test.Controller
         {
             _employeeRetrievalService.Setup(e =>
                 e.GetEmployeeById(It.IsAny<long>()))
-            .ReturnsAsync(EmployeeCreator.GetDomainEmployee(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
+            .ReturnsAsync(EmployeeCreator.GetDomainEmployee(Encoding.UTF8.GetBytes(_passwordUnencrypted)));            
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.GetAsync($"{baseUrl}/1");
+            var response = await SendRequest(role, HttpMethod.Get, $"{baseUrl}/1");
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -43,9 +41,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeRetrievalService.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
                 .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.GetAsync($"{baseUrl}/1");
+            var response = await SendRequest(role, HttpMethod.Get, $"{baseUrl}/1");
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
@@ -63,9 +59,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeRetrievalService.Setup(e => e.GetEmployeeById(It.IsAny<long>()))
                 .ReturnsAsync((Employee)null);
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.GetAsync($"{baseUrl}/1");
+            var response = await SendRequest(role, HttpMethod.Get, $"{baseUrl}/1");
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
         }
@@ -78,9 +72,7 @@ namespace EmployeeManagementService.Test.Controller
                 e.GetEmployeeByUsername(It.IsAny<string>()))
             .ReturnsAsync(EmployeeCreator.GetDomainEmployee(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.GetAsync($"{baseUrl}/jdoe/username");
+            var response = await SendRequest(role, HttpMethod.Get, $"{baseUrl}/jdoe/username");
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -92,9 +84,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeRetrievalService.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
                 .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.GetAsync($"{baseUrl}/jdoe/username");
+            var response = await SendRequest(role, HttpMethod.Get, $"{baseUrl}/jdoe/username");
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
@@ -112,9 +102,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeRetrievalService.Setup(e => e.GetEmployeeByUsername(It.IsAny<string>()))
                 .ReturnsAsync((Employee)null);
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.GetAsync($"{baseUrl}/jdoe/username");
+            var response = await SendRequest(role, HttpMethod.Get, $"{baseUrl}/jdoe/username");
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
         }
@@ -133,9 +121,7 @@ namespace EmployeeManagementService.Test.Controller
                     }
                 });
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.GetAsync($"{baseUrl}/employees");
+            var response = await SendRequest(role, HttpMethod.Get, $"{baseUrl}/employees");
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -151,9 +137,7 @@ namespace EmployeeManagementService.Test.Controller
                 e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(employee);
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -169,9 +153,7 @@ namespace EmployeeManagementService.Test.Controller
                 e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
@@ -193,9 +175,7 @@ namespace EmployeeManagementService.Test.Controller
                 e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new EmployeeIsLockedException());
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
 
             AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
@@ -216,9 +196,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeAuthService.Setup(e => e.EmployeeLogIn(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/login", new StringContent(JsonConvert.SerializeObject(employee), Encoding.UTF8, "application/json"));
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
@@ -234,9 +212,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeAuthService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/1/logout", null);
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/1/logout");
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -248,9 +224,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeAuthService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/1/logout", null);
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/1/logout");
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
@@ -268,9 +242,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeAuthService.Setup(e => e.EmployeeLogout(It.IsAny<long>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/1/logout", null);
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/1/logout");
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
@@ -293,9 +265,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
 
             AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
@@ -313,9 +283,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
 
             AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
@@ -339,9 +307,7 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
-            SetAuthHeaderOnHttpClient(role);
-
-            var response = await _httpClient.PatchAsync($"{baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
+            var response = await SendRequest(role, HttpMethod.Patch, $"{baseUrl}/password", new StringContent(JsonConvert.SerializeObject(password), Encoding.UTF8, "application/json"));
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 

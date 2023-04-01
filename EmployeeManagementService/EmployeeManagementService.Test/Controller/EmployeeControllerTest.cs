@@ -3,6 +3,7 @@ using EmployeeManagementService.DTO;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using RofShared.Exceptions;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -27,14 +28,33 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .Returns(Task.CompletedTask);
 
-            SetAuthHeaderOnHttpClient("Employee");
+            var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
+
+            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", stringContent);           
+
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
+
+        [Test]
+        public async Task UpdateEmployeeInformation_NotFound()
+        {
+            var updateEmployee = EmployeeCreator.GetEmployeeDTO("Employee");
+            updateEmployee.Id = 1;
+
+            _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
+                .ThrowsAsync(new EntityNotFoundException("Employee"));
 
             var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsync($"{_baseUrl}/info", stringContent);
+            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            Assert.IsNotNull(response.Content);
+
+            var errMsg = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual("Employee not found!", errMsg);
         }
 
         [Test]
@@ -61,14 +81,31 @@ namespace EmployeeManagementService.Test.Controller
             _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
                 .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            SetAuthHeaderOnHttpClient("Employee");
+            var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
+
+            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
+
+            AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
+          
+            var errMsg = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual(errMsg, _exceptionMsg);
+        }
+
+        [Test]
+        public async Task UpdateEmployeeInformation_InternalServerError()
+        {
+            var updateEmployee = EmployeeCreator.GetEmployeeDTO("Employee");
+            updateEmployee.Id = 1;
+
+            _employeeUpsertService.Setup(e => e.UpdateEmployeeInformation(It.IsAny<Employee>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
             var stringContent = new StringContent(JsonConvert.SerializeObject(updateEmployee), Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsync($"{_baseUrl}/info", stringContent);
+            var response = await SendRequest("Employee", HttpMethod.Put, $"{_baseUrl}/info", stringContent);
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
             var errMsg = await response.Content.ReadAsStringAsync();
 
