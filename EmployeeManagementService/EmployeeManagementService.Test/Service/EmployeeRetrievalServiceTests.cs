@@ -17,16 +17,16 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public async Task GetAllEmployees_NoEmployees()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
 
-            employeeRepository.Setup(e => 
+            employeeRetrievalRepo.Setup(e => 
                 e.GetAllEmployeesByKeyword(
                     It.IsAny<int>(), 
                     It.IsAny<int>(), 
                     It.IsAny<string>()))
             .ReturnsAsync((new List<Employee>(), 0));
 
-            var employeeService = new EmployeeRetrievalService(employeeRepository.Object);
+            var employeeService = new EmployeeRetrievalService(employeeRetrievalRepo.Object);
 
             var result = await employeeService.GetAllEmployeesByKeyword(1, 10, "");
 
@@ -37,20 +37,20 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public async Task GetAllEmployees_Success()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
 
             var employees = new List<Employee>()
             {
                 EmployeeCreator.GetDbEmployee(Encoding.UTF8.GetBytes("password"))
             };
 
-            employeeRepository.Setup(e => e.GetAllEmployeesByKeyword(
+            employeeRetrievalRepo.Setup(e => e.GetAllEmployeesByKeyword(
                 It.IsAny<int>(), 
                 It.IsAny<int>(), 
                 It.IsAny<string>()))
             .ReturnsAsync((employees, 1));
 
-            var employeeService = new EmployeeRetrievalService(employeeRepository.Object);
+            var employeeService = new EmployeeRetrievalService(employeeRetrievalRepo.Object);
 
             var result = await employeeService.GetAllEmployeesByKeyword(1, 10, "");
 
@@ -65,13 +65,13 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public void GetEmployeeById_EmployeeDoesNotExist()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
 
-            employeeRepository.Setup(e => 
+            employeeRetrievalRepo.Setup(e => 
                 e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<long>>()))
             .ReturnsAsync((Employee)null);
 
-            var employeeService = new EmployeeRetrievalService(employeeRepository.Object);
+            var employeeService = new EmployeeRetrievalService(employeeRetrievalRepo.Object);
 
             Assert.ThrowsAsync<EntityNotFoundException>(() => employeeService.GetEmployeeById(2));
         }
@@ -79,12 +79,12 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public async Task GetEmployeeById_Success()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
 
-            employeeRepository.Setup(e => e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<long>>()))
+            employeeRetrievalRepo.Setup(e => e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<long>>()))
                 .ReturnsAsync(EmployeeCreator.GetDbEmployee(Encoding.UTF8.GetBytes("password")));
 
-            var employeeService = new EmployeeRetrievalService(employeeRepository.Object);
+            var employeeService = new EmployeeRetrievalService(employeeRetrievalRepo.Object);
 
             var employee = await employeeService.GetEmployeeById(1);
 
@@ -99,13 +99,13 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public void GetEmployeeByUsername_EmployeeDoesNotExist()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
 
-            employeeRepository.Setup(e => 
+            employeeRetrievalRepo.Setup(e => 
                 e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
             .ThrowsAsync(new EntityNotFoundException("Employee"));
 
-            var employeeService = new EmployeeRetrievalService(employeeRepository.Object);
+            var employeeService = new EmployeeRetrievalService(employeeRetrievalRepo.Object);
 
             Assert.ThrowsAsync<EntityNotFoundException>(() => employeeService.GetEmployeeByUsername("jdoe"));
         }
@@ -113,12 +113,12 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public async Task GetEmployeeByUsername_Success()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
 
-            employeeRepository.Setup(e => e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
+            employeeRetrievalRepo.Setup(e => e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
                 .ReturnsAsync(EmployeeCreator.GetDbEmployee(Encoding.UTF8.GetBytes("password")));
 
-            var employeeService = new EmployeeRetrievalService(employeeRepository.Object);
+            var employeeService = new EmployeeRetrievalService(employeeRetrievalRepo.Object);
 
             var employee = await employeeService.GetEmployeeByUsername("jdoe");
 
@@ -134,9 +134,9 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public async Task GetEmployeesForDropdown_Success()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
 
-            employeeRepository.Setup(e => e.GetEmployeesForDropdown())
+            employeeRetrievalRepo.Setup(e => e.GetEmployeesForDropdown())
                 .ReturnsAsync(new List<Employee>()
                 {
                     new Employee()
@@ -147,7 +147,7 @@ namespace EmployeeManagementService.Test.Service
                     }
                 });
 
-            var employeeService = new EmployeeRetrievalService(employeeRepository.Object);
+            var employeeService = new EmployeeRetrievalService(employeeRetrievalRepo.Object);
 
             var result = await employeeService.GetEmployeesForDropdown();
 

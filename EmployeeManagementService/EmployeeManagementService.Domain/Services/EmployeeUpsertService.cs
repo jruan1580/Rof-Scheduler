@@ -13,17 +13,18 @@ namespace EmployeeManagementService.Domain.Services
 {
     public class EmployeeUpsertService : EmployeeService, IEmployeeUpsertService
     {
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeUpsertRepository _employeeUpsertRepository;
 
         private readonly IPasswordService _passwordService;
 
         private readonly string _roles;
 
-        public EmployeeUpsertService(IEmployeeRepository employeeRepository,
+        public EmployeeUpsertService(IEmployeeRetrievalRepository employeeRetrievalRepository,
+            IEmployeeUpsertRepository employeeUpsertRepository,
             IPasswordService passwordService,
-            IConfiguration configuration) : base(employeeRepository)
+            IConfiguration configuration) : base(employeeRetrievalRepository)
         {
-            _employeeRepository = employeeRepository;
+            _employeeUpsertRepository = employeeUpsertRepository;
 
             _passwordService = passwordService;
 
@@ -37,7 +38,7 @@ namespace EmployeeManagementService.Domain.Services
             employee.FailedLoginAttempts = 0;
             employee.IsLocked = false;
 
-            await _employeeRepository.UpdateEmployee(employee);
+            await _employeeUpsertRepository.UpdateEmployee(employee);
         }
 
         public async Task UpdateEmployeeActiveStatus(long id, bool active)
@@ -46,7 +47,7 @@ namespace EmployeeManagementService.Domain.Services
 
             employee.Active = active;
 
-            await _employeeRepository.UpdateEmployee(employee);
+            await _employeeUpsertRepository.UpdateEmployee(employee);
         }
 
         public async Task UpdatePassword(long id, string newPassword)
@@ -57,7 +58,7 @@ namespace EmployeeManagementService.Domain.Services
 
             employee.Password = _passwordService.EncryptPassword(newPassword);
 
-            await _employeeRepository.UpdateEmployee(employee);
+            await _employeeUpsertRepository.UpdateEmployee(employee);
         }
 
         public async Task UpdateEmployeeInformation(Employee employee)
@@ -68,7 +69,7 @@ namespace EmployeeManagementService.Domain.Services
 
             MergeEmployeePropertiesForUpdate(originalEmployee, employee);
 
-            await _employeeRepository.UpdateEmployee(originalEmployee);
+            await _employeeUpsertRepository.UpdateEmployee(originalEmployee);
         }
 
         public async Task CreateEmployee(Employee newEmployee, string password)
@@ -81,14 +82,14 @@ namespace EmployeeManagementService.Domain.Services
 
             var newEmployeeEntity = EmployeeMapper.FromCoreEmployee(newEmployee);
 
-            await _employeeRepository.CreateEmployee(newEmployeeEntity);
+            await _employeeUpsertRepository.CreateEmployee(newEmployeeEntity);
         }
 
         public async Task DeleteEmployeeById(long id)
         {
             try
             {
-                await _employeeRepository.DeleteEmployeeById(id);
+                await _employeeUpsertRepository.DeleteEmployeeById(id);
             }
             catch (EntityNotFoundException)
             {
@@ -142,7 +143,7 @@ namespace EmployeeManagementService.Domain.Services
 
         private async Task ValidateIfEmployeeIsDuplicate(long id, string ssn, string username, string email)
         {
-            var isDuplicate = await _employeeRepository.DoesEmployeeExistsBySsnOrUsernameOrEmail(ssn,
+            var isDuplicate = await _employeeRetrievalRepository.DoesEmployeeExistsBySsnOrUsernameOrEmail(ssn,
                 username, email, id);
 
             if (isDuplicate)

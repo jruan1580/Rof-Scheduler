@@ -9,12 +9,8 @@ namespace EmployeeManagementService.Domain.Services
 {
     public class EmployeeRetrievalService : EmployeeService, IEmployeeRetrievalService
     {
-        private readonly IEmployeeRepository _employeeRepository;
-
-        public EmployeeRetrievalService(IEmployeeRepository employeeRepository) : base(employeeRepository)
-        {
-            _employeeRepository = employeeRepository;
-        }
+        public EmployeeRetrievalService(IEmployeeRetrievalRepository employeeRetrievalRepository) 
+            : base(employeeRetrievalRepository) { }
 
         public async Task<Employee> GetEmployeeById(long id)
         {
@@ -32,7 +28,7 @@ namespace EmployeeManagementService.Domain.Services
 
         public async Task<EmployeesWithTotalPage> GetAllEmployeesByKeyword(int page, int offset, string keyword)
         {
-            var result = await _employeeRepository.GetAllEmployeesByKeyword(page, offset, keyword);
+            var result = await _employeeRetrievalRepository.GetAllEmployeesByKeyword(page, offset, keyword);
 
             var employees = result.Item1;
             var totalPages = result.Item2;
@@ -46,7 +42,7 @@ namespace EmployeeManagementService.Domain.Services
         {
             var employees = new List<Employee>();
 
-            foreach (var employee in await _employeeRepository.GetEmployeesForDropdown())
+            foreach (var employee in await _employeeRetrievalRepository.GetEmployeesForDropdown())
             {
                 employees.Add(EmployeeMapper.ToCoreEmployee(employee));
             }

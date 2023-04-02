@@ -36,16 +36,17 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public async Task EmployeeLogIn_AlreadyLoggedIn()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
+            var employeeUpsertRepo = new Mock<IEmployeeUpsertRepository>();
 
             var dbEmployee = EmployeeCreator.GetDbEmployee(_passwordService.EncryptPassword(_passwordUnencrypted));
             dbEmployee.Status = true;
 
-            employeeRepository.Setup(e => 
+            employeeRetrievalRepo.Setup(e => 
                 e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
             .ReturnsAsync(dbEmployee);
 
-            var employeeService = new EmployeeAuthService(employeeRepository.Object, _passwordService);
+            var employeeService = new EmployeeAuthService(employeeRetrievalRepo.Object, employeeUpsertRepo.Object, _passwordService);
 
             var employee = await employeeService.EmployeeLogIn("jdoe", _passwordUnencrypted);
 
@@ -55,20 +56,21 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public void EmployeeLogIn_PasswordDoesNotMatch()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
+            var employeeUpsertRepo = new Mock<IEmployeeUpsertRepository>();
 
             var dbEmployee = EmployeeCreator.GetDbEmployee(_passwordService.EncryptPassword(_passwordUnencrypted));
             dbEmployee.Status = false;
 
-            employeeRepository.Setup(e => 
+            employeeRetrievalRepo.Setup(e => 
                 e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
             .ReturnsAsync(dbEmployee);
 
             short failedAttempts = 2;
-            employeeRepository.Setup(e => e.IncrementEmployeeFailedLoginAttempt(It.IsAny<long>()))
+            employeeUpsertRepo.Setup(e => e.IncrementEmployeeFailedLoginAttempt(It.IsAny<long>()))
                 .ReturnsAsync(failedAttempts);
 
-            var employeeService = new EmployeeAuthService(employeeRepository.Object, _passwordService);
+            var employeeService = new EmployeeAuthService(employeeRetrievalRepo.Object, employeeUpsertRepo.Object, _passwordService);
 
             Assert.ThrowsAsync<ArgumentException>(() => employeeService.EmployeeLogIn("jdoe", "tE$t1234"));
         }
@@ -76,17 +78,18 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public void EmployeeLogin_Locked()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
+            var employeeUpsertRepo = new Mock<IEmployeeUpsertRepository>();
 
             var dbEmployee = EmployeeCreator.GetDbEmployee(_passwordService.EncryptPassword(_passwordUnencrypted));
             dbEmployee.Status = false;
             dbEmployee.IsLocked = true;
 
-            employeeRepository.Setup(e => 
+            employeeRetrievalRepo.Setup(e => 
                 e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
             .ReturnsAsync(dbEmployee);
 
-            var employeeService = new EmployeeAuthService(employeeRepository.Object, _passwordService);
+            var employeeService = new EmployeeAuthService(employeeRetrievalRepo.Object, employeeUpsertRepo.Object, _passwordService);
 
             Assert.ThrowsAsync<EmployeeIsLockedException>(() => employeeService.EmployeeLogIn("jdoe", _passwordUnencrypted));
         }
@@ -94,20 +97,21 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public async Task EmployeeLogIn_Success()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
+            var employeeUpsertRepo = new Mock<IEmployeeUpsertRepository>();
 
             var dbEmployee = EmployeeCreator.GetDbEmployee(_passwordService.EncryptPassword(_passwordUnencrypted));
             dbEmployee.Status = false;
 
-            employeeRepository.Setup(e => 
+            employeeRetrievalRepo.Setup(e => 
                 e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<string>>()))
             .ReturnsAsync(dbEmployee);
 
-            var employeeService = new EmployeeAuthService(employeeRepository.Object, _passwordService);
+            var employeeService = new EmployeeAuthService(employeeRetrievalRepo.Object, employeeUpsertRepo.Object, _passwordService);
 
             await employeeService.EmployeeLogIn("jdoe", _passwordUnencrypted);
 
-            employeeRepository.Verify(e => 
+            employeeUpsertRepo.Verify(e => 
                 e.UpdateEmployee(It.Is<Employee>(e => e.Status == true)), 
             Times.Once);
         }
@@ -115,20 +119,21 @@ namespace EmployeeManagementService.Test.Service
         [Test]
         public async Task EmployeeLogOut_Success()
         {
-            var employeeRepository = new Mock<IEmployeeRepository>();
+            var employeeRetrievalRepo = new Mock<IEmployeeRetrievalRepository>();
+            var employeeUpsertRepo = new Mock<IEmployeeUpsertRepository>();
 
             var dbEmployee = EmployeeCreator.GetDbEmployee(_passwordService.EncryptPassword(_passwordUnencrypted));
             dbEmployee.Status = true;
 
-            employeeRepository.Setup(e => 
+            employeeRetrievalRepo.Setup(e => 
                 e.GetEmployeeByFilter(It.IsAny<GetEmployeeFilterModel<long>>()))
             .ReturnsAsync(dbEmployee);
 
-            var employeeService = new EmployeeAuthService(employeeRepository.Object, _passwordService);
+            var employeeService = new EmployeeAuthService(employeeRetrievalRepo.Object, employeeUpsertRepo.Object, _passwordService);
 
             await employeeService.EmployeeLogout(1);
 
-            employeeRepository.Verify(e => e.UpdateEmployee(It.Is<Employee>(e => !e.Status)), Times.Once);
+            employeeUpsertRepo.Verify(e => e.UpdateEmployee(It.Is<Employee>(e => !e.Status)), Times.Once);
         }       
     }
 }

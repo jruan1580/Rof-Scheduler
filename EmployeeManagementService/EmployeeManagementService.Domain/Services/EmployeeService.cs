@@ -8,18 +8,18 @@ namespace EmployeeManagementService.Domain.Services
 {
     public class EmployeeService
     {
-        private readonly IEmployeeRepository _employeeRepository;
+        protected readonly IEmployeeRetrievalRepository _employeeRetrievalRepository;
 
-        public EmployeeService(IEmployeeRepository employeeRepository)
+        public EmployeeService(IEmployeeRetrievalRepository employeeRetrievalRepository)
         {
-            _employeeRepository = employeeRepository;
+            _employeeRetrievalRepository = employeeRetrievalRepository;
         }
 
         protected async Task<EmployeeDB> GetDbEmployeeById(long id)
         {
             var filterModel = new GetEmployeeFilterModel<long>(GetEmployeeFilterEnum.Id, id);
 
-            var employee = await _employeeRepository.GetEmployeeByFilter(filterModel);
+            var employee = await _employeeRetrievalRepository.GetEmployeeByFilter(filterModel);
 
             if (employee == null)
             {
@@ -33,7 +33,7 @@ namespace EmployeeManagementService.Domain.Services
         {
             var filterModel = new GetEmployeeFilterModel<string>(GetEmployeeFilterEnum.Usermame, username);
 
-            var employee = await _employeeRepository.GetEmployeeByFilter(filterModel);
+            var employee = await _employeeRetrievalRepository.GetEmployeeByFilter(filterModel);
 
             if (employee == null)
             {
