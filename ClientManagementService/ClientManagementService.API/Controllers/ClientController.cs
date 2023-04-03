@@ -69,7 +69,7 @@ namespace ClientManagementService.API.Controllers
             return Ok(ClientDTOMapper.ToDTOClient(client));
         }
 
-        [Authorize(Roles = "Internal")]
+        [Authorize(Roles = "Client,Internal")]
         [HttpPatch("login")]
         public async Task<IActionResult> ClientLogin([FromBody] ClientDTO client)
         {

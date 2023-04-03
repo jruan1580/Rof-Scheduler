@@ -13,7 +13,23 @@ namespace ClientManagementService.Test
 
         public static DomainClient GetDomainClient(byte[] encryptedPassword)
         {
-            return new DomainClient();
+            return new DomainClient()
+            {
+                CountryId = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
+                PrimaryPhoneNum = "123-456-7890",
+                Password = encryptedPassword,
+                Address = new Domain.Models.Address()
+                {
+                    AddressLine1 = "123 Test St",
+                    City = "San Diego",
+                    State = "CA",
+                    ZipCode = "12345"
+                }
+            };
         }
 
         public static ClientDTO GetClientDTO(string role)
