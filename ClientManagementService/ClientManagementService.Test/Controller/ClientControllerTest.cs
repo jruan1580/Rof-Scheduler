@@ -230,144 +230,142 @@ namespace ClientManagementService.Test.Controller
             _clientService.Setup(c => c.ClientLogout(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/1/logout");
 
-            var response = await controller.ClientLogout(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
+        [Test]
+        public async Task ClientLogout_NotFound()
+        {
+            _clientService.Setup(c => c.ClientLogout(It.IsAny<long>()))
+                .ThrowsAsync(new EntityNotFoundException("Client"));
 
-            var ok = (OkResult)response;
+            var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/1/logout");
 
-            Assert.AreEqual(ok.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            AssertContentIsAsExpected(response, _clientNotFoundMessage);
         }
 
         [Test]
         public async Task ClientLogout_InternalServerError()
         {
             _clientService.Setup(c => c.ClientLogout(It.IsAny<long>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/1/logout");
 
-            var response = await controller.ClientLogout(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(ObjectResult), response.GetType());
-
-            var obj = (ObjectResult)response;
-
-            Assert.AreEqual(obj.StatusCode, 500);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
-        public async Task ResetClientLockedStatus_Success()
+        public async Task ResetLockedStatus_Success()
         {
             _clientService.Setup(c => c.ResetClientFailedLoginAttempts(1))
                 .Returns(Task.CompletedTask);
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Patch, $"{_baseUrl}/1/locked");
 
-            var response = await controller.ResetClientLockedStatus(1);
-
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
-
-            var ok = (OkResult)response;
-
-            Assert.AreEqual(ok.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
-        public async Task ResetClientLockedStatus_BadRequestError()
+        public async Task ResetLockedStatus_NotFound()
         {
             _clientService.Setup(c => c.ResetClientFailedLoginAttempts(1))
-                .ThrowsAsync(new ArgumentException());
+                .ThrowsAsync(new EntityNotFoundException("Client"));
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Patch, $"{_baseUrl}/1/locked");
 
-            var response = await controller.ResetClientLockedStatus(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
+            Assert.IsNotNull(response.Content);
 
-            var obj = (BadRequestObjectResult)response;
+            AssertContentIsAsExpected(response, _clientNotFoundMessage);
+        }
 
-            Assert.AreEqual(obj.StatusCode, 400);
+        [Test]
+        public async Task ResetLockedStatus_InternalServerError()
+        {
+            _clientService.Setup(c => c.ResetClientFailedLoginAttempts(1))
+                .ThrowsAsync(new Exception(_exceptionMsg));
+
+            var response = await SendRequest("Administrator", HttpMethod.Patch, $"{_baseUrl}/1/locked");
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
         public async Task UpdateClientInfo_Success()
         {
-            var client = new API.DTO.ClientDTO()
-            {
-                Id = 1,
-                FirstName = "John",
-                LastName = "Doe",
-                EmailAddress = "jdoe@gmail.com",
-                PrimaryPhoneNum = "123-456-7890",
-                Address = new API.DTO.AddressDTO()
-                {
-                    AddressLine1 = "123 Test St",
-                    City = "San Diego",
-                    State = "CA",
-                    ZipCode = "12345"
-                }
-            };
+            var updateClient = ClientCreator.GetClientDTO("Client");
+            updateClient.Id = 1;
 
-            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Domain.Models.Client>()))
+            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Client>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateClient));
 
-            var response = await controller.UpdateClientInfo(client);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
+        [Test]
+        public async Task UpdateClientInfo_NotFound()
+        {
+            var updateClient = ClientCreator.GetClientDTO("Client");
+            updateClient.Id = 1;
 
-            var ok = (OkResult)response;
+            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Client>()))
+                .ThrowsAsync(new EntityNotFoundException("Client"));
 
-            Assert.AreEqual(ok.StatusCode, 200);
+            var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateClient));
+
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            AssertContentIsAsExpected(response, _clientNotFoundMessage);
         }
 
         [Test]
         public async Task UpdateClientInfo_BadRequestError()
         {
-            var client = new API.DTO.ClientDTO()
-            {
-                Id = 0,
-                FirstName = "John",
-                LastName = "Doe",
-                EmailAddress = "jdoe@gmail.com",
-                PrimaryPhoneNum = "123-456-7890",
-                Address = new API.DTO.AddressDTO()
-                {
-                    AddressLine1 = "123 Test St",
-                    City = "San Diego",
-                    State = "CA",
-                    ZipCode = "12345"
-                }
-            };
+            var updateClient = ClientCreator.GetClientDTO("Client");
+            updateClient.Id = 1;
 
-            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Domain.Models.Client>()))
-                .ThrowsAsync(new ArgumentException());
+            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Client>()))
+                .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateClient));
 
-            var response = await controller.UpdateClientInfo(client);
+            AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
+            AssertContentIsAsExpected(response, _exceptionMsg);
+        }
 
-            var obj = (BadRequestObjectResult)response;
+        [Test]
+        public async Task UpdateClientInfo_InternalServerError()
+        {
+            var updateClient = ClientCreator.GetClientDTO("Client");
+            updateClient.Id = 1;
 
-            Assert.AreEqual(obj.StatusCode, 400);
+            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Client>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
+
+            var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateClient));
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
         public async Task UpdatePassword_Success()
         {
-            var password = new API.DTO.PasswordDTO()
+            var password = new PasswordDTO()
             {
                 Id = 1,
                 NewPassword = "NewTestPassword123!"
@@ -376,40 +374,47 @@ namespace ClientManagementService.Test.Controller
             _clientService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/password", ConvertObjectToStringContent(password));
 
-            var response = await controller.UpdatePassword(password);
-
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
-
-            var ok = (OkResult)response;
-
-            Assert.AreEqual(ok.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
-        public async Task UpdatePassword_InternalServerError()
+        public async Task UpdatePassword_NotFound()
         {
-            var password = new API.DTO.PasswordDTO()
+            var password = new PasswordDTO()
             {
                 Id = 1,
                 NewPassword = "NewTestPassword123!"
             };
 
             _clientService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new EntityNotFoundException("Client"));
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Client", HttpMethod.Patch, $"{ _baseUrl}/password", ConvertObjectToStringContent(password));
 
-            var response = await controller.UpdatePassword(password);
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(ObjectResult), response.GetType());
+            AssertContentIsAsExpected(response, _clientNotFoundMessage);
+        }
 
-            var obj = (ObjectResult)response;
+        [Test]
+        public async Task UpdatePassword_InternalServerError()
+        {
+            var password = new PasswordDTO()
+            {
+                Id = 1,
+                NewPassword = "NewTestPassword123!"
+            };
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            _clientService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
+
+            var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/password", ConvertObjectToStringContent(password));
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
@@ -418,34 +423,48 @@ namespace ClientManagementService.Test.Controller
             _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
 
-            var response = await controller.DeleteClientById(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
+        [Test]
+        public async Task DeleteClientById_NotFound()
+        {
+            _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
+                .ThrowsAsync(new EntityNotFoundException("Client"));
 
-            var ok = (OkResult)response;
+            var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
 
-            Assert.AreEqual(ok.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            AssertContentIsAsExpected(response, _clientNotFoundMessage);
         }
 
         [Test]
         public async Task DeleteClientById_BadRequestError()
         {
             _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
-                .ThrowsAsync(new ArgumentException());
+                .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var controller = new ClientController(_clientService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
 
-            var response = await controller.DeleteClientById(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
+            AssertContentIsAsExpected(response, _exceptionMsg);
+        }
 
-            var obj = (BadRequestObjectResult)response;
+        [Test]
+        public async Task DeleteClientById_InternalServerError()
+        {
+            _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
-            Assert.AreEqual(obj.StatusCode, 400);
+            var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
     }
 }
