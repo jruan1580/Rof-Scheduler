@@ -11,14 +11,15 @@ namespace EmployeeManagementService.Domain.Services
 {
     public class EmployeeAuthService : EmployeeService, IEmployeeAuthService
     {
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeUpsertRepository _employeeUpsertRepository;
 
         private readonly IPasswordService _passwordService;
 
-        public EmployeeAuthService(IEmployeeRepository employeeRepository,
-            IPasswordService passwordService) : base(employeeRepository)
+        public EmployeeAuthService(IEmployeeRetrievalRepository employeeRetrievalRepository,
+            IEmployeeUpsertRepository employeeUpsertRepository,
+            IPasswordService passwordService) : base(employeeRetrievalRepository)
         {
-            _employeeRepository = employeeRepository;
+            _employeeUpsertRepository = employeeUpsertRepository;
 
             _passwordService = passwordService;
         }
@@ -48,7 +49,7 @@ namespace EmployeeManagementService.Domain.Services
 
             employee.Status = false;
 
-            await _employeeRepository.UpdateEmployee(employee);
+            await _employeeUpsertRepository.UpdateEmployee(employee);
         }
 
         private async Task VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(string password, DbEmployee employee)
@@ -72,7 +73,7 @@ namespace EmployeeManagementService.Domain.Services
             {
                 employee.Status = employeeStatus;
 
-                await _employeeRepository.UpdateEmployee(employee);
+                await _employeeUpsertRepository.UpdateEmployee(employee);
             }
 
             return EmployeeMapper.ToCoreEmployee(employee);
@@ -85,7 +86,7 @@ namespace EmployeeManagementService.Domain.Services
                 return;
             }
 
-            var attempts = await _employeeRepository.IncrementEmployeeFailedLoginAttempt(employee.Id);
+            var attempts = await _employeeUpsertRepository.IncrementEmployeeFailedLoginAttempt(employee.Id);
 
             if (attempts != 3)
             {
@@ -95,7 +96,7 @@ namespace EmployeeManagementService.Domain.Services
             employee.IsLocked = true;
             employee.FailedLoginAttempts = attempts;
 
-            await _employeeRepository.UpdateEmployee(employee);
+            await _employeeUpsertRepository.UpdateEmployee(employee);
         }
     }
 }
