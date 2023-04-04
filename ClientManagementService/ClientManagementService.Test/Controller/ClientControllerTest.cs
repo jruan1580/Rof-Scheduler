@@ -1,13 +1,10 @@
-﻿using ClientManagementService.API.Controllers;
-using ClientManagementService.API.DTO;
+﻿using ClientManagementService.API.DTO;
 using ClientManagementService.Domain.Models;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Net;
 using System.Net.Http;
 using System.Text;
