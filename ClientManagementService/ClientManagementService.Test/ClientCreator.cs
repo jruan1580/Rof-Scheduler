@@ -8,8 +8,23 @@ namespace ClientManagementService.Test
     {
         public static DbClient GetDbClient(byte[] encryptedPassword)
         {
-            return new DbClient();
-        }
+            return new DbClient()
+            {
+                Id = 1,
+                CountryId = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                Username = "jdoe",
+                EmailAddress = "test@email.com",
+                Password = encryptedPassword,
+                TempPasswordChanged = false,
+                AddressLine1 = "123 Abc St",
+                AddressLine2 = "",
+                City = "Oakland",
+                State = "CA",
+                ZipCode = "12345"
+            };
+    }
 
         public static DomainClient GetDomainClient(byte[] encryptedPassword)
         {
