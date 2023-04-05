@@ -12,49 +12,46 @@ namespace PetServiceManagement.Tests.BusinessLogic
     [TestFixture]
     public class HolidayServiceTests
     {
-        private Mock<IHolidayAndRatesRepository> _holidayAndRateRepo = new Mock<IHolidayAndRatesRepository>();
-        private IHolidayService _holidayService;
-
-        [OneTimeSetUp]
-        public void Setup()
-        {
-            _holidayService = new HolidayService(_holidayAndRateRepo.Object);
-        }
-
         [Test]
         public void TestHolidayValidation()
         {
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(null));
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(null));
+            var holidayService = new HolidayService(null, null);
+
+            Assert.ThrowsAsync<ArgumentException>(() => holidayService.AddHoliday(null));
+            Assert.ThrowsAsync<ArgumentException>(() => holidayService.UpdateHoliday(null));
 
             var holidayWithNoName = HolidayFactory.GetHolidayDomainObj();
             holidayWithNoName.Name = string.Empty;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(holidayWithNoName));
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(holidayWithNoName));
+            Assert.ThrowsAsync<ArgumentException>(() => holidayService.AddHoliday(holidayWithNoName));
+            Assert.ThrowsAsync<ArgumentException>(() => holidayService.UpdateHoliday(holidayWithNoName));
 
             var invalidHolidayDate = HolidayFactory.GetHolidayDomainObj();
             invalidHolidayDate.HolidayMonth = 13;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(invalidHolidayDate));
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(invalidHolidayDate));
+            Assert.ThrowsAsync<ArgumentException>(() => holidayService.AddHoliday(invalidHolidayDate));
+            Assert.ThrowsAsync<ArgumentException>(() => holidayService.UpdateHoliday(invalidHolidayDate));
 
             invalidHolidayDate.HolidayMonth = 12;
             invalidHolidayDate.HolidayDay = 33;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.AddHoliday(invalidHolidayDate));
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(invalidHolidayDate));
+            Assert.ThrowsAsync<ArgumentException>(() => holidayService.AddHoliday(invalidHolidayDate));
+            Assert.ThrowsAsync<ArgumentException>(() => holidayService.UpdateHoliday(invalidHolidayDate));
         }
 
         [Test]
         public void UnableToFindHolidayForUpdateTest()
         {
-            _holidayAndRateRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
+            var holidayRetrievalRepo = new Mock<IHolidayRetrievalRepository>();
+
+            holidayRetrievalRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
                 .ReturnsAsync((Holidays)null);
+
+            var holidayService = new HolidayService(null, holidayRetrievalRepo.Object);
 
             var holiday = HolidayFactory.GetHolidayDomainObj();
 
-            Assert.ThrowsAsync<ArgumentException>(() => _holidayService.UpdateHoliday(holiday));
+            Assert.ThrowsAsync<ArgumentException>(() => holidayService.UpdateHoliday(holiday));
         }
 
         [Test]
@@ -65,10 +62,15 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 HolidayFactory.GetHolidayDbEntityObj()
             };
 
-            _holidayAndRateRepo.Setup(h => h.GetHolidaysByPagesAndSearch(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            var holidayRetrievalRepo = new Mock<IHolidayRetrievalRepository>();
+
+            holidayRetrievalRepo.Setup(h => h.GetHolidaysByPagesAndSearch(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((holidays, 1));
 
-            var result = await _holidayService.GetHolidaysByPageAndKeyword(1, 1, "CNY");
+            var holidayService = new HolidayService(null, holidayRetrievalRepo.Object);
+
+            var result = await holidayService.GetHolidaysByPageAndKeyword(1, 1, "CNY");
+
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Item2);
 
@@ -87,26 +89,36 @@ namespace PetServiceManagement.Tests.BusinessLogic
         {
             var holiday = HolidayFactory.GetHolidayDomainObj();
 
-            _holidayAndRateRepo.Setup(h => h.AddHoliday(It.IsAny<Holidays>())).ReturnsAsync((short)1);
+            var holidayUpsertRepo = new Mock<IHolidayAndRatesRepository>();
 
-            await _holidayService.AddHoliday(holiday);
+            holidayUpsertRepo.Setup(h => h.AddHoliday(It.IsAny<Holidays>()))
+                .ReturnsAsync((short)1);
 
-            _holidayAndRateRepo.Verify(h => h.AddHoliday(It.IsAny<Holidays>()), Times.Once);
+            var holidayService = new HolidayService(holidayUpsertRepo.Object, null);
+
+            await holidayService.AddHoliday(holiday);
+
+            holidayUpsertRepo.Verify(h => h.AddHoliday(It.IsAny<Holidays>()), Times.Once);
         }
 
         [Test]
         public async Task UpdateHolidayTest()
         {
             var holiday = HolidayFactory.GetHolidayDomainObj();
+            var holidayRetrievalRepo = new Mock<IHolidayRetrievalRepository>();
+            var holidayUpsertRepo = new Mock<IHolidayAndRatesRepository>();
 
-            _holidayAndRateRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
+            holidayRetrievalRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
                    .ReturnsAsync(HolidayFactory.GetHolidayDbEntityObj());
 
-            _holidayAndRateRepo.Setup(h => h.UpdateHoliday(It.IsAny<Holidays>())).Returns(Task.CompletedTask);
+            holidayUpsertRepo.Setup(h => h.UpdateHoliday(It.IsAny<Holidays>()))
+                .Returns(Task.CompletedTask);
 
-            await _holidayService.UpdateHoliday(holiday);
+            var holidayService = new HolidayService(holidayUpsertRepo.Object, holidayRetrievalRepo.Object);
 
-            _holidayAndRateRepo.Verify(p => p.UpdateHoliday(It.IsAny<Holidays>()), Times.Once);
+            await holidayService.UpdateHoliday(holiday);
+
+            holidayUpsertRepo.Verify(p => p.UpdateHoliday(It.IsAny<Holidays>()), Times.Once);
         }
     }
 }

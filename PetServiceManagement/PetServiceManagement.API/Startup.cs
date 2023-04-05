@@ -23,6 +23,7 @@ namespace PetServiceManagement.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IPetServiceRepository, PetServiceRepository>();
+            services.AddSingleton<IHolidayRetrievalRepository, HolidayRetrievalRepository>();
             services.AddSingleton<IHolidayAndRatesRepository, HolidayAndRatesRepository>();
 
             services.AddTransient<IDropdownService<PetService>, PetServiceDropdownService>();

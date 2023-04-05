@@ -8,16 +8,16 @@ namespace PetServiceManagement.Domain.BusinessLogic
 {
     public class HolidayDropdownService : IDropdownService<Holiday>
     {
-        private readonly IHolidayAndRatesRepository _holidayAndRatesRepository;
+        private readonly IHolidayRetrievalRepository _holidayRetrievalRepository;
 
-        public HolidayDropdownService(IHolidayAndRatesRepository holidayAndRatesRepository)
+        public HolidayDropdownService(IHolidayRetrievalRepository holidayRetrievalRepository)
         {
-            _holidayAndRatesRepository = holidayAndRatesRepository;
+            _holidayRetrievalRepository = holidayRetrievalRepository;
         }
 
         public async Task<List<Holiday>> GetDropdown()
         {
-            var holidays = await _holidayAndRatesRepository.GetAllHolidaysForDropdowns();
+            var holidays = await _holidayRetrievalRepository.GetAllHolidaysForDropdowns();
 
             return HolidayMapper.ToHolidayDomains(holidays);
         }

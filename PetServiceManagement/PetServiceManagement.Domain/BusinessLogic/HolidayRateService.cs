@@ -10,12 +10,15 @@ namespace PetServiceManagement.Domain.BusinessLogic
 {
     public class HolidayRateService : IHolidayRateService
     {
+        private readonly IHolidayRetrievalRepository _holidayRetrievalRepository;
         private readonly IHolidayAndRatesRepository _holidayAndRatesRepository;
         private readonly IPetServiceRepository _petServiceRepository;
 
         public HolidayRateService(IPetServiceRepository petServiceRepository,
+            IHolidayRetrievalRepository holidayRetrievalRepository,
             IHolidayAndRatesRepository holidayAndRatesRepository)
         {
+            _holidayRetrievalRepository = holidayRetrievalRepository;
             _holidayAndRatesRepository = holidayAndRatesRepository;
             _petServiceRepository = petServiceRepository;
         }
@@ -106,7 +109,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
         private async Task ThrowArgumentExceptionIfHoldayNotFound(short id)
         {
-            var holidayEntity = await _holidayAndRatesRepository.GetHolidayById(id);
+            var holidayEntity = await _holidayRetrievalRepository.GetHolidayById(id);
 
             if (holidayEntity != null)
             {

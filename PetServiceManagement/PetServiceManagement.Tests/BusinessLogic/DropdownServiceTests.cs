@@ -12,7 +12,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
     [TestFixture]
     public class DropdownServiceTests
     {
-        private Mock<IHolidayAndRatesRepository> _holidayAndRateRepo;
+        private Mock<IHolidayRetrievalRepository> _holidayRetrievalRepo;
         private Mock<IPetServiceRepository> _petServiceRepo;
         private HolidayDropdownService _holidayDropdownService;
         private PetServiceDropdownService _petServiceDropdownService;
@@ -20,10 +20,10 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [SetUp]
         public void Setup()
         {
-            _holidayAndRateRepo = new Mock<IHolidayAndRatesRepository>();
+            _holidayRetrievalRepo = new Mock<IHolidayRetrievalRepository>();
             _petServiceRepo = new Mock<IPetServiceRepository>();
 
-            _holidayAndRateRepo.Setup(h => h.GetAllHolidaysForDropdowns())
+            _holidayRetrievalRepo.Setup(h => h.GetAllHolidaysForDropdowns())
                 .ReturnsAsync(new List<Holidays>()
                 {
                     new Holidays()
@@ -48,7 +48,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
                     }
                 });
 
-            _holidayDropdownService = new HolidayDropdownService(_holidayAndRateRepo.Object);
+            _holidayDropdownService = new HolidayDropdownService(_holidayRetrievalRepo.Object);
             _petServiceDropdownService = new PetServiceDropdownService(_petServiceRepo.Object);
         }
 

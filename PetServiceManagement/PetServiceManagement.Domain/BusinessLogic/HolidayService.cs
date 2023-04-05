@@ -12,14 +12,19 @@ namespace PetServiceManagement.Domain.BusinessLogic
     {
         private IHolidayAndRatesRepository _holidayAndRatesRepository;
 
-        public HolidayService(IHolidayAndRatesRepository holidayAndRatesRepository)
+        private IHolidayRetrievalRepository _holidayRetrievalRepository;
+
+        public HolidayService(IHolidayAndRatesRepository holidayAndRatesRepository, 
+            IHolidayRetrievalRepository holidayRetrievalRepository)
         {
             _holidayAndRatesRepository = holidayAndRatesRepository;
+
+            _holidayRetrievalRepository = holidayRetrievalRepository;
         }
 
         public async Task<(List<Holiday>, int)> GetHolidaysByPageAndKeyword(int page, int pageSize, string keyword = null)
         {
-            var res = await _holidayAndRatesRepository.GetHolidaysByPagesAndSearch(page, pageSize, keyword);
+            var res = await _holidayRetrievalRepository.GetHolidaysByPagesAndSearch(page, pageSize, keyword);
 
             if (res.Item1.Count == 0)
             {
@@ -51,7 +56,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
         {
             ThrowArgumentExceptionIfValidationFails(holiday);
 
-            var holidayEntity = await _holidayAndRatesRepository.GetHolidayById(holiday.Id);
+            var holidayEntity = await _holidayRetrievalRepository.GetHolidayById(holiday.Id);
 
             if (holidayEntity == null)
             {

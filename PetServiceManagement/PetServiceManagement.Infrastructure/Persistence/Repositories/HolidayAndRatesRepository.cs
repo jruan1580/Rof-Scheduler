@@ -12,11 +12,8 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         Task<short> AddHoliday(Holidays holiday);
         Task<int> CreateHolidayRates(HolidayRates holidayRates);
         Task DeleteHolidayRates(int id);
-        Task<List<Holidays>> GetAllHolidaysForDropdowns();
-        Task<Holidays> GetHolidayById(short id);
         Task<HolidayRates> GetHolidayRatesById(int id);
         Task<(List<HolidayRates>, int)> GetHolidayRatesByPageAndKeyword(int page, int pageSize, string keyword = null);
-        Task<(List<Holidays>, int)> GetHolidaysByPagesAndSearch(int page, int pageSize, string keyword = null);
         Task RemoveHoliday(short id);
         Task UpdateHoliday(Holidays holiday);
         Task UpdateHolidayRates(HolidayRates holidayRates);
@@ -24,71 +21,6 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
 
     public class HolidayAndRatesRepository : BaseRepository, IHolidayAndRatesRepository
     {
-        /// <summary>
-        /// gets holidays by search keyword and returns the proper page size.
-        /// skip by number of pages already parsed.
-        /// </summary>
-        /// <param name="page"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="keyword"></param>
-        /// <returns></returns>
-        public async Task<(List<Holidays>, int)> GetHolidaysByPagesAndSearch(int page, int pageSize, string keyword = null)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                IQueryable<Holidays> holidays = null;
-
-                if (string.IsNullOrEmpty(keyword))
-                {
-                    holidays = context.Holidays.AsQueryable();
-                }
-                else
-                {
-                    keyword = keyword.ToLower();
-                    holidays = context.Holidays.Where(h => h.HolidayName.ToLower().Contains(keyword));
-                }
-
-                var totalPages = base.GetTotalPages(holidays.Count(), pageSize);
-
-                //not more pets
-                if (page > totalPages)
-                {
-                    return (new List<Holidays>(), totalPages);
-                }
-
-                var skip = (page - 1) * pageSize;
-                var result = await holidays.OrderByDescending(p => p.Id).Skip(skip).Take(pageSize).ToListAsync();
-
-                return (result, totalPages);
-            }
-        }
-
-        /// <summary>
-        /// Retrieves a single holiday for updating funcitonality.
-        /// Update requires querying for the original record and performing merge.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<Holidays> GetHolidayById(short id)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                return await base.GetEntityById<Holidays>(id);
-            }
-        }
-
-        /// <summary>
-        /// Gets a list of all holidays for drop down purposes
-        /// </summary>
-        /// <returns></returns>
-        public async Task<List<Holidays>> GetAllHolidaysForDropdowns()
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                return await context.Holidays.ToListAsync();
-            }
-        }
-
         /// <summary>
         /// Adds a new holiday date to DB
         /// </summary>
