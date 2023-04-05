@@ -25,7 +25,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
             if (!string.IsNullOrEmpty(keyword))
             {
                 keyword = keyword.ToLower();
-                holidays = context.Holidays.Where(h =>
+                holidays = holidays.Where(h =>
                     h.HolidayName.ToLower().Contains(keyword));
             }
 

@@ -9,70 +9,15 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
 {
     public interface IHolidayAndRatesRepository
     {
-        Task<short> AddHoliday(Holidays holiday);
         Task<int> CreateHolidayRates(HolidayRates holidayRates);
         Task DeleteHolidayRates(int id);
         Task<HolidayRates> GetHolidayRatesById(int id);
         Task<(List<HolidayRates>, int)> GetHolidayRatesByPageAndKeyword(int page, int pageSize, string keyword = null);
-        Task RemoveHoliday(short id);
-        Task UpdateHoliday(Holidays holiday);
         Task UpdateHolidayRates(HolidayRates holidayRates);
     }
 
     public class HolidayAndRatesRepository : BaseRepository, IHolidayAndRatesRepository
-    {
-        /// <summary>
-        /// Adds a new holiday date to DB
-        /// </summary>
-        /// <param name="holiday"></param>
-        /// <returns></returns>
-        public async Task<short> AddHoliday(Holidays holiday)
-        {
-            return (await base.CreateEntity(holiday)).Id;
-        }
-
-        /// <summary>
-        /// Updates a holiday information in DB
-        /// </summary>
-        /// <param name="holiday"></param>
-        /// <returns></returns>
-        public async Task UpdateHoliday(Holidays holiday)
-        {
-            await base.UpdateEntity(holiday);
-        }
-
-        /// <summary>
-        /// Removes a holiday date from DB.
-        /// 
-        /// Due to foreign key dependencies, need to delete holiday rate tied to holiday first.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task RemoveHoliday(short id)
-        {
-            using(var context = new RofSchedulerContext())
-            {
-                var holidayRates = await context.HolidayRates.Where(r => r.HolidayId == id).ToListAsync();
-
-                if (holidayRates.Count > 0)
-                {
-                    //delete holiday rates tied to holiday
-                    context.HolidayRates.RemoveRange(holidayRates);
-                }
-
-                var holiday = await context.Holidays.FirstOrDefaultAsync(h => h.Id == id);
-
-                if (holiday == null)
-                {
-                    return;
-                }
-
-                context.Holidays.Remove(holiday);
-
-                await context.SaveChangesAsync();
-            }            
-        }
-
+    {       
         /// <summary>
         /// Gets holiday rates base on page number and keyword.
         /// Keyword can either be the holiday name or service name.

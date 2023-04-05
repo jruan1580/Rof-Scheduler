@@ -89,7 +89,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         {
             var holiday = HolidayFactory.GetHolidayDomainObj();
 
-            var holidayUpsertRepo = new Mock<IHolidayAndRatesRepository>();
+            var holidayUpsertRepo = new Mock<IHolidayUpsertRepository>();
 
             holidayUpsertRepo.Setup(h => h.AddHoliday(It.IsAny<Holidays>()))
                 .ReturnsAsync((short)1);
@@ -106,7 +106,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         {
             var holiday = HolidayFactory.GetHolidayDomainObj();
             var holidayRetrievalRepo = new Mock<IHolidayRetrievalRepository>();
-            var holidayUpsertRepo = new Mock<IHolidayAndRatesRepository>();
+            var holidayUpsertRepo = new Mock<IHolidayUpsertRepository>();
 
             holidayRetrievalRepo.Setup(h => h.GetHolidayById(It.IsAny<short>()))
                    .ReturnsAsync(HolidayFactory.GetHolidayDbEntityObj());
