@@ -26,8 +26,10 @@ namespace ClientManagementService.Test.Controller
         protected ITokenHandler _tokenHandler;
 
         protected readonly Mock<IClientService> _clientService = new Mock<IClientService>();
+        protected readonly Mock<IPetService> _petService = new Mock<IPetService>();
 
         protected readonly string _clientNotFoundMessage = "Client not found!";
+        protected readonly string _petNotFoundMessage = "Pet not found!";
 
         [OneTimeSetUp]
         public void Setup()
@@ -57,9 +59,11 @@ namespace ClientManagementService.Test.Controller
             Action<IServiceCollection> services = service =>
             {
                 service.AddTransient(provider => _clientService.Object);
+                service.AddTransient(provider => _petService.Object);
 
                 service.AddMvc()
-                    .AddApplicationPart(typeof(ClientController).Assembly);
+                    .AddApplicationPart(typeof(ClientController).Assembly)
+                    .AddApplicationPart(typeof(PetController).Assembly);
 
                 service.AddControllers();
 

@@ -11,15 +11,11 @@ using System.Threading.Tasks;
 namespace ClientManagementService.Test.Controller
 {
     [TestFixture]
-    public class PetControllerTest
+    public class PetControllerTest : ApiTestSetup
     {
-        private Mock<IPetService> _petService;
+        private readonly string _baseUrl = "/api/Pet";
 
-        [SetUp]
-        public void Setup()
-        {
-            _petService = new Mock<IPetService>();
-        }
+        private readonly string _exceptionMsg = "Test Exception Message";
 
         [Test]
         public async Task AddPet_Success()
