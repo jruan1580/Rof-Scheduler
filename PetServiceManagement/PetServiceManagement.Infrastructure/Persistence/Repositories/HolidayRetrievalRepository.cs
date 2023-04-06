@@ -20,14 +20,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         {
             using var context = new RofSchedulerContext();
 
-            IQueryable<Holidays> holidays = context.Holidays;
-
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                keyword = keyword.ToLower();
-                holidays = holidays.Where(h =>
-                    h.HolidayName.ToLower().Contains(keyword));
-            }
+            var holidays = FilterByKeyword(context, keyword.ToLower());            
 
             var totalPages = DatabaseUtilities.GetTotalPages(holidays.Count(), pageSize, page);
 
@@ -58,6 +51,18 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
             using var context = new RofSchedulerContext();
 
             return await context.Holidays.ToListAsync();
+        }
+
+        private IQueryable<Holidays> FilterByKeyword(RofSchedulerContext context, string keyword)
+        {
+            var holidays = context.Holidays.AsQueryable();
+
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return holidays;
+            }
+
+            return holidays.Where(h => h.HolidayName.ToLower().Contains(keyword));
         }
     }
 }

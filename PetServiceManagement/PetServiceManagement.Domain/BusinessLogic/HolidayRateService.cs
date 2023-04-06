@@ -11,21 +11,24 @@ namespace PetServiceManagement.Domain.BusinessLogic
     public class HolidayRateService : IHolidayRateService
     {
         private readonly IHolidayRetrievalRepository _holidayRetrievalRepository;
-        private readonly IHolidayAndRatesRepository _holidayAndRatesRepository;
+        private readonly IHolidayRateUpsertRepository _holidayRateUpsertRepository;
+        private readonly IHolidayRateRetrievalRepository _holidayRateRetrievalRepository;
         private readonly IPetServiceRepository _petServiceRepository;
 
         public HolidayRateService(IPetServiceRepository petServiceRepository,
             IHolidayRetrievalRepository holidayRetrievalRepository,
-            IHolidayAndRatesRepository holidayAndRatesRepository)
+            IHolidayRateUpsertRepository holidayRateUpsertRepository,
+            IHolidayRateRetrievalRepository holidayRateRetrievalRepository)
         {
             _holidayRetrievalRepository = holidayRetrievalRepository;
-            _holidayAndRatesRepository = holidayAndRatesRepository;
+            _holidayRateUpsertRepository = holidayRateUpsertRepository;
+            _holidayRateRetrievalRepository = holidayRateRetrievalRepository;
             _petServiceRepository = petServiceRepository;
         }
 
         public async Task<(List<HolidayRate>, int)> GetHolidayRatesByPageAndKeyword(int page, int pageSize, string keyword = null)
         {
-            var res = await _holidayAndRatesRepository.GetHolidayRatesByPageAndKeyword(page, pageSize, keyword);
+            var res = await _holidayRateRetrievalRepository.GetHolidayRatesByPageAndKeyword(page, pageSize, keyword);
 
             var holidayRates = new List<HolidayRate>();
 
@@ -47,7 +50,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             try
             {
-                await _holidayAndRatesRepository.CreateHolidayRates(holidayRatesEntity);
+                await _holidayRateUpsertRepository.CreateHolidayRates(holidayRatesEntity);
             }
             catch (DbUpdateException ex)
             {
@@ -59,7 +62,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
         {
             await ValidateHolidayRate(holidayRate);
 
-            var holidayRateEntity = await _holidayAndRatesRepository.GetHolidayRatesById(holidayRate.Id);
+            var holidayRateEntity = await _holidayRateRetrievalRepository.GetHolidayRatesById(holidayRate.Id);
 
             if (holidayRateEntity == null)
             {
@@ -68,12 +71,12 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             var holidayRateToUpdate = HolidayRatesMapper.FromDomainHolidayRate(holidayRate);
 
-            await _holidayAndRatesRepository.UpdateHolidayRates(holidayRateToUpdate);
+            await _holidayRateUpsertRepository.UpdateHolidayRates(holidayRateToUpdate);
         }
 
         public async Task DeleteHolidayRateById(int id)
         {
-            await _holidayAndRatesRepository.DeleteHolidayRates(id);
+            await _holidayRateUpsertRepository.DeleteHolidayRates(id);
         }
 
         private async Task ValidateHolidayRate(HolidayRate holidayRate)

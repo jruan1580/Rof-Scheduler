@@ -25,7 +25,8 @@ namespace PetServiceManagement.API
             services.AddSingleton<IPetServiceRepository, PetServiceRepository>();
             services.AddSingleton<IHolidayRetrievalRepository, HolidayRetrievalRepository>();
             services.AddSingleton<IHolidayUpsertRepository, HolidayUpsertRepository>();
-            services.AddSingleton<IHolidayAndRatesRepository, HolidayAndRatesRepository>();
+            services.AddSingleton<IHolidayRateRetrievalRepository, HolidayRateRetrievalRepository>();
+            services.AddSingleton<IHolidayRateUpsertRepository, HolidayRateUpsertRepository>();
 
             services.AddTransient<IDropdownService<PetService>, PetServiceDropdownService>();
             services.AddTransient<IDropdownService<Holiday>, HolidayDropdownService>();

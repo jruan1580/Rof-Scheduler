@@ -29,10 +29,9 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         protected virtual async Task<T> GetEntityById<T>(object id)
         {
-            using(var context = new RofSchedulerContext())
-            {
-                return (T)(await context.FindAsync(typeof(T), id));
-            }
+            using var context = new RofSchedulerContext();
+            
+            return (T)(await context.FindAsync(typeof(T), id));            
         }
 
         /// <summary>
@@ -43,14 +42,13 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         protected virtual async Task<T> CreateEntity<T>(T entity)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                await context.AddAsync(entity);
+            using var context = new RofSchedulerContext();
+            
+            await context.AddAsync(entity);
 
-                await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
-                return entity;
-            }
+            return entity;            
         }
 
         /// <summary>
@@ -61,12 +59,11 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         protected virtual async Task UpdateEntity<T>(T entity)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                context.Update(entity);
+            using var context = new RofSchedulerContext();
+            
+            context.Update(entity);
 
-                await context.SaveChangesAsync();
-            }
+            await context.SaveChangesAsync();            
         }
 
         /// <summary>
@@ -78,20 +75,19 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         protected virtual async Task DeleteEntity<T>(object id)
         {
-            using (var context = new RofSchedulerContext())
+            using var context = new RofSchedulerContext();
+                
+            var entityToDelete = await context.FindAsync(typeof(T), id);
+
+            //does not exist, consider it deleted.
+            if (entityToDelete == null)
             {
-                var entityToDelete = await context.FindAsync(typeof(T), id);
-
-                //does not exist, consider it deleted.
-                if (entityToDelete == null)
-                {
-                    return;
-                }
-
-                context.Remove(entityToDelete);
-
-                await context.SaveChangesAsync();
+                return;
             }
+
+            context.Remove(entityToDelete);
+
+            await context.SaveChangesAsync();            
         }       
     }
 }
