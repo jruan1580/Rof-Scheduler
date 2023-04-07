@@ -27,177 +27,93 @@ namespace ClientManagementService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPet([FromBody] PetDTO pet)
         {
-            try
-            {
-                var petId = await _petService.AddPet(PetDTOMapper.FromDTOPet(pet));
+            var petId = await _petService.AddPet(PetDTOMapper.FromDTOPet(pet));
 
-                return Ok(new { Id = petId });
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(new { Id = petId });
         }
 
         [Authorize(Roles = "Administrator,Employee")]
         [HttpGet]
         public async Task<IActionResult> GetAllPets([FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
-            try
+            var petList = new List<PetDTO>();
+
+            var result = await _petService.GetAllPetsByKeyword(page, offset, keyword);
+
+            foreach (var pet in result.Pets)
             {
-                var petList = new List<PetDTO>();
-
-                var result = await _petService.GetAllPetsByKeyword(page, offset, keyword);
-
-                foreach (var pet in result.Pets)
-                {
-                    petList.Add(PetDTOMapper.ToDTOPet(pet));
-                }
-
-                return Ok(new { pets = petList, totalPages = result.TotalPages });
+                petList.Add(PetDTOMapper.ToDTOPet(pet));
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex);
-            }
+
+            return Ok(new { pets = petList, totalPages = result.TotalPages });
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPetById(long id)
         {
-            try
-            {
-                var pet = await _petService.GetPetById(id);
+            var pet = await _petService.GetPetById(id);
 
-                return Ok(PetDTOMapper.ToDTOPet(pet));
-            }
-            catch (EntityNotFoundException notFound)
-            {
-                return NotFound(notFound.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(PetDTOMapper.ToDTOPet(pet));
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{name}/name")]
         public async Task<IActionResult> GetPetByName(string name)
         {
-            try
-            {
-                var pet = await _petService.GetPetByName(name);
+            var pet = await _petService.GetPetByName(name);
 
-                return Ok(PetDTOMapper.ToDTOPet(pet));
-            }
-            catch (EntityNotFoundException notFound)
-            {
-                return NotFound(notFound.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(PetDTOMapper.ToDTOPet(pet));
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("clientId")]
         public async Task<IActionResult> GetPetsByClientId([FromQuery] long clientId, [FromQuery] int page, [FromQuery] int offset, [FromQuery] string keyword)
         {
-            try
+            var petList = new List<PetDTO>();
+
+            var result = await _petService.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
+
+            foreach (var pet in result.Pets)
             {
-                var petList = new List<PetDTO>();
-
-                var result = await _petService.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
-
-                foreach (var pet in result.Pets)
-                {
-                    petList.Add(PetDTOMapper.ToDTOPet(pet));
-                }
-
-                return Ok(new { pets = petList, totalPages = result.TotalPages });
+                petList.Add(PetDTOMapper.ToDTOPet(pet));
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+
+            return Ok(new { pets = petList, totalPages = result.TotalPages });
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpPut("updatePet")]
         public async Task<IActionResult> UpdatePetInfo([FromBody] PetDTO pet)
         {
-            try
-            {
-                await _petService.UpdatePet(PetDTOMapper.FromDTOPet(pet));
+            await _petService.UpdatePet(PetDTOMapper.FromDTOPet(pet));
 
-                return Ok();
-            }
-            catch (EntityNotFoundException notFound)
-            {
-                return NotFound(notFound.Message);
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePetById(long id)
         {
-            try
-            {
-                await _petService.DeletePetById(id);
+            await _petService.DeletePetById(id);
 
-                return Ok();
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{petId}/vax")]
         public async Task<IActionResult> GetVaccinesByPetId(long petId)
         {
-            try
-            {
-                var vaxStats = new List<PetsVaccineDTO>();
+            var vaxStats = new List<PetsVaccineDTO>();
 
-                var result = await _petService.GetVaccinesByPetId(petId);
+            var result = await _petService.GetVaccinesByPetId(petId);
 
-                foreach (var petVax in result)
-                {
-                    vaxStats.Add(PetDTOMapper.ToDTOPetsVaccine(petVax));
-                }
+            foreach (var petVax in result)
+            {
+                vaxStats.Add(PetDTOMapper.ToDTOPetsVaccine(petVax));
+            }
 
-                return Ok(vaxStats);
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(vaxStats);
         }
     }
 }

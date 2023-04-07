@@ -24,7 +24,7 @@ namespace ClientManagementService.Test
                 State = "CA",
                 ZipCode = "12345"
             };
-    }
+        }
 
         public static DomainClient GetDomainClient(byte[] encryptedPassword)
         {
