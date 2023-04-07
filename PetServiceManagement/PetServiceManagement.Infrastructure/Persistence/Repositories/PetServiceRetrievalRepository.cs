@@ -20,7 +20,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         {
             using var context = new RofSchedulerContext();
 
-            var petServices = FilterByKeyword(context, keyword.Trim().ToLower());
+            var petServices = FilterByKeyword(context, keyword?.Trim()?.ToLower());
 
             var totalPages = DatabaseUtilities.GetTotalPages(petServices.Count(), offset, page);
 

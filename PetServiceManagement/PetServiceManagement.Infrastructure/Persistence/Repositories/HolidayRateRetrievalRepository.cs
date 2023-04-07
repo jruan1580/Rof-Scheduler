@@ -19,7 +19,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         {
             using var context = new RofSchedulerContext();
 
-            var holidayRates = await FilterByKeyword(context, keyword.ToLower());
+            var holidayRates = await FilterByKeyword(context, keyword?.Trim()?.ToLower());
 
             var totalPages = DatabaseUtilities.GetTotalPages(holidayRates.Count(), pageSize, page);
 
@@ -30,15 +30,11 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
             }
 
             var skip = (page - 1) * pageSize;
-            var result = await holidayRates.OrderByDescending(p => p.Id)
-                .Skip(skip)
-                .Take(10)
-                .ToListAsync();
+            var result = await SkipNAndTakeTopM(holidayRates, skip, 10);
 
             GetHolidayAndPetServiceForHolidayRates(context, result);
 
             return (result, totalPages);
-
         }
 
         public async Task<HolidayRates> GetHolidayRatesById(int id)
@@ -52,7 +48,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
 
             if (string.IsNullOrEmpty(keyword))
             {
-                return holidayRates;
+                return holidayRates.OrderByDescending(hr => hr.Id);
             }
 
             //search for all holidays with name that contains keyword
@@ -61,7 +57,8 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
 
             return holidayRates = holidayRates
                 .Where(r => holidayIds.Contains(r.HolidayId) ||
-                    petServiceIds.Contains(r.PetServiceId));
+                    petServiceIds.Contains(r.PetServiceId))
+                .OrderByDescending(hr => hr.Id);
         }
 
         private async Task<List<short>> GetHolidaysByKeyword(RofSchedulerContext context, string keyword)

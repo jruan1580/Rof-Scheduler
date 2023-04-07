@@ -20,7 +20,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         {
             using var context = new RofSchedulerContext();
 
-            var holidays = FilterByKeyword(context, keyword.ToLower());            
+            var holidays = FilterByKeyword(context, keyword?.Trim()?.ToLower());            
 
             var totalPages = DatabaseUtilities.GetTotalPages(holidays.Count(), pageSize, page);
 
@@ -31,10 +31,7 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
             }
 
             var skip = (page - 1) * pageSize;
-            var result = await holidays.OrderByDescending(p => p.Id)
-                .Skip(skip)
-                .Take(pageSize)
-                .ToListAsync();
+            var result = await SkipNAndTakeTopM(holidays, skip, 10);
 
             return (result, totalPages);
         }
@@ -59,10 +56,11 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
 
             if (string.IsNullOrEmpty(keyword))
             {
-                return holidays;
+                return holidays.OrderByDescending(h => h.Id);
             }
 
-            return holidays.Where(h => h.HolidayName.ToLower().Contains(keyword));
+            return holidays.Where(h => h.HolidayName.ToLower().Contains(keyword))
+                .OrderByDescending(h => h.Id);
         }
     }
 }
