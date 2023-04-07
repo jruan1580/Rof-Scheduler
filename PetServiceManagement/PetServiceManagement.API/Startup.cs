@@ -22,8 +22,12 @@ namespace PetServiceManagement.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IPetServiceRepository, PetServiceRepository>();
-            services.AddSingleton<IHolidayAndRatesRepository, HolidayAndRatesRepository>();
+            services.AddSingleton<IPetServiceRetrievalRepository, PetServiceRetrievalRepository>();
+            services.AddSingleton<IPetServiceUpsertRepository, PetServiceUpsertRepository>();
+            services.AddSingleton<IHolidayRetrievalRepository, HolidayRetrievalRepository>();
+            services.AddSingleton<IHolidayUpsertRepository, HolidayUpsertRepository>();
+            services.AddSingleton<IHolidayRateRetrievalRepository, HolidayRateRetrievalRepository>();
+            services.AddSingleton<IHolidayRateUpsertRepository, HolidayRateUpsertRepository>();
 
             services.AddTransient<IDropdownService<PetService>, PetServiceDropdownService>();
             services.AddTransient<IDropdownService<Holiday>, HolidayDropdownService>();

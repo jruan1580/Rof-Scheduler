@@ -31,17 +31,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence
             using var context = new RofSchedulerContext();
 
             var skip = (page - 1) * offset;
-            IQueryable<Employee> employees = context.Employees;
-
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                keyword = keyword.ToLower();
-
-                employees = context.Employees
-                    .Where(e => (e.FirstName.ToLower().Contains(keyword))
-                        || (e.LastName.ToLower().Contains(keyword))
-                        || (e.EmailAddress.ToLower().Contains(keyword)));
-            }
+            var employees = FilterByKeyword(context, keyword?.Trim()?.ToLower());
 
             var countByCriteria = await employees.CountAsync();
 
@@ -86,6 +76,20 @@ namespace EmployeeManagementService.Infrastructure.Persistence
                 && (e.Ssn.Equals(ssn)
                     || e.Username.ToLower().Equals(username.ToLower())
                     || e.EmailAddress.ToLower().Equals(email.ToLower())));
+        }
+
+        private IQueryable<Employee> FilterByKeyword(RofSchedulerContext context, string keyword)
+        {
+            var employees = context.Employees.AsQueryable();
+
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return employees;
+            }
+
+            return employees.Where(e => (e.FirstName.ToLower().Contains(keyword)) || 
+                (e.LastName.ToLower().Contains(keyword)) || 
+                (e.EmailAddress.ToLower().Contains(keyword)));
         }
     }
 }

@@ -10,16 +10,21 @@ namespace PetServiceManagement.Domain.BusinessLogic
 {
     public class HolidayService : IHolidayService
     {
-        private IHolidayAndRatesRepository _holidayAndRatesRepository;
+        private IHolidayUpsertRepository _holidayUpsertRepository;
 
-        public HolidayService(IHolidayAndRatesRepository holidayAndRatesRepository)
+        private IHolidayRetrievalRepository _holidayRetrievalRepository;
+
+        public HolidayService(IHolidayUpsertRepository holidayUpsertRepository, 
+            IHolidayRetrievalRepository holidayRetrievalRepository)
         {
-            _holidayAndRatesRepository = holidayAndRatesRepository;
+            _holidayUpsertRepository = holidayUpsertRepository;
+
+            _holidayRetrievalRepository = holidayRetrievalRepository;
         }
 
         public async Task<(List<Holiday>, int)> GetHolidaysByPageAndKeyword(int page, int pageSize, string keyword = null)
         {
-            var res = await _holidayAndRatesRepository.GetHolidaysByPagesAndSearch(page, pageSize, keyword);
+            var res = await _holidayRetrievalRepository.GetHolidaysByPagesAndSearch(page, pageSize, keyword);
 
             if (res.Item1.Count == 0)
             {
@@ -39,7 +44,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             try
             {
-                await _holidayAndRatesRepository.AddHoliday(holidayEntity);
+                await _holidayUpsertRepository.AddHoliday(holidayEntity);
             }
             catch (DbUpdateException e)
             {
@@ -51,7 +56,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
         {
             ThrowArgumentExceptionIfValidationFails(holiday);
 
-            var holidayEntity = await _holidayAndRatesRepository.GetHolidayById(holiday.Id);
+            var holidayEntity = await _holidayRetrievalRepository.GetHolidayById(holiday.Id);
 
             if (holidayEntity == null)
             {
@@ -62,12 +67,12 @@ namespace PetServiceManagement.Domain.BusinessLogic
             holidayEntity.HolidayMonth = holiday.HolidayMonth;
             holidayEntity.HolidayDay = holiday.HolidayDay;
 
-            await _holidayAndRatesRepository.UpdateHoliday(holidayEntity);
+            await _holidayUpsertRepository.UpdateHoliday(holidayEntity);
         }
 
         public async Task DeleteHolidayById(short id)
         {
-            await _holidayAndRatesRepository.RemoveHoliday(id);
+            await _holidayUpsertRepository.RemoveHoliday(id);
         }
 
         private void ThrowArgumentExceptionIfValidationFails(Holiday holiday)

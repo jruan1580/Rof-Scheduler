@@ -12,84 +12,87 @@ namespace PetServiceManagement.Tests.BusinessLogic
     [TestFixture]
     public class PerServiceManagementServiceTests
     {
-        private Mock<IPetServiceRepository> _petServiceRepo;
-        private PetServiceManagementService _petServiceManagementService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _petServiceRepo = new Mock<IPetServiceRepository>();
-
-            _petServiceManagementService = new PetServiceManagementService(_petServiceRepo.Object);
-        }
-
         [Test]
         public void PetServiceValidationNoNameTest()
         {
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(null));
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(null));
+            var petServiceManagementService = new PetServiceManagementService(null, null);
+
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.AddNewPetService(null));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.UpdatePetService(null));
 
             var petService = PetServiceFactory.GetPetServiceDomain();
             petService.Name = string.Empty;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.UpdatePetService(petService));
         }
 
         [Test]
         public void PetServiceValidationInvalidPrice()
         {
+            var petServiceManagementService = new PetServiceManagementService(null, null);
+
             var petService = PetServiceFactory.GetPetServiceDomain();
             petService.Price = -1m;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.UpdatePetService(petService));
         }
 
         [Test]
         public void PetServiceValidationInvalidEmployeeRate()
         {
+            var petServiceManagementService = new PetServiceManagementService(null, null);
+
             var petService = PetServiceFactory.GetPetServiceDomain();
             petService.EmployeeRate = -1m;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.UpdatePetService(petService));
 
             petService.EmployeeRate = 101m;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.UpdatePetService(petService));
         }
 
         [Test]
         public void PetServiceValidationInvalidDuration()
         {
+            var petServiceManagementService = new PetServiceManagementService(null, null);
+
             var petService = PetServiceFactory.GetPetServiceDomain();
             petService.Duration = -1;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.UpdatePetService(petService));
         }
 
         [Test]
         public void PetServiceValidationInvalidTimeUnit()
         {
+            var petServiceManagementService = new PetServiceManagementService(null, null);
+
             var petService = PetServiceFactory.GetPetServiceDomain();
             petService.TimeUnit = "Sec";
 
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.AddNewPetService(petService));
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.AddNewPetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.UpdatePetService(petService));
         }
 
         [Test]
         public void UnableToFindForUpdateTest()
         {
-            _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
+            var petServiceRepo = new Mock<IPetServiceRetrievalRepository>();
+
+            petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
                 .ReturnsAsync((PetServices)null);
+
+            var petServiceManagementService = new PetServiceManagementService(petServiceRepo.Object, null);
 
             var petService = PetServiceFactory.GetPetServiceDomain();
 
-            Assert.ThrowsAsync<ArgumentException>(() => _petServiceManagementService.UpdatePetService(petService));
+            Assert.ThrowsAsync<ArgumentException>(() => petServiceManagementService.UpdatePetService(petService));
         }
 
         [Test]
@@ -100,10 +103,14 @@ namespace PetServiceManagement.Tests.BusinessLogic
                 PetServiceFactory.GetPetServicesDbEntity(),
             };
 
-            _petServiceRepo.Setup(p => p.GetAllPetServicesByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            var petServiceRepo = new Mock<IPetServiceRetrievalRepository>();
+
+            petServiceRepo.Setup(p => p.GetAllPetServicesByPageAndKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((petServices, 1));
 
-            var result = await _petServiceManagementService.GetPetServicesByPageAndKeyword(1, 1, "Walking");
+            var petServiceManagementService = new PetServiceManagementService(petServiceRepo.Object, null);
+
+            var result = await petServiceManagementService.GetPetServicesByPageAndKeyword(1, 1, "Walking");
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Item2);
 
@@ -123,11 +130,15 @@ namespace PetServiceManagement.Tests.BusinessLogic
         {
             var petService = PetServiceFactory.GetPetServiceDomain();
 
-            _petServiceRepo.Setup(p => p.AddPetService(It.IsAny<PetServices>())).ReturnsAsync((short)1);
+            var petServiceRepo = new Mock<IPetServiceUpsertRepository>();
 
-            await _petServiceManagementService.AddNewPetService(petService);
+            petServiceRepo.Setup(p => p.AddPetService(It.IsAny<PetServices>())).ReturnsAsync((short)1);
 
-            _petServiceRepo.Verify(p => p.AddPetService(It.IsAny<PetServices>()), Times.Once);
+            var petServiceManagementService = new PetServiceManagementService(null, petServiceRepo.Object);
+
+            await petServiceManagementService.AddNewPetService(petService);
+
+            petServiceRepo.Verify(p => p.AddPetService(It.IsAny<PetServices>()), Times.Once);
         }
 
         [Test]
@@ -135,14 +146,19 @@ namespace PetServiceManagement.Tests.BusinessLogic
         {
             var petService = PetServiceFactory.GetPetServiceDomain();
 
-            _petServiceRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
+            var petServiceRetrievalRepo = new Mock<IPetServiceRetrievalRepository>();
+            var petServiceUpsertRepo = new Mock<IPetServiceUpsertRepository>();
+
+            petServiceRetrievalRepo.Setup(p => p.GetPetServiceById(It.IsAny<short>()))
                 .ReturnsAsync(PetServiceFactory.GetPetServicesDbEntity());
 
-            _petServiceRepo.Setup(p => p.UpdatePetService(It.IsAny<PetServices>())).Returns(Task.CompletedTask);
+            petServiceUpsertRepo.Setup(p => p.UpdatePetService(It.IsAny<PetServices>())).Returns(Task.CompletedTask);
 
-            await _petServiceManagementService.UpdatePetService(petService);
+            var petServiceManagementService = new PetServiceManagementService(petServiceRetrievalRepo.Object, petServiceUpsertRepo.Object);
 
-            _petServiceRepo.Verify(p => p.UpdatePetService(It.IsAny<PetServices>()), Times.Once);
+            await petServiceManagementService.UpdatePetService(petService);
+
+            petServiceUpsertRepo.Verify(p => p.UpdatePetService(It.IsAny<PetServices>()), Times.Once);
         }
     }
 }

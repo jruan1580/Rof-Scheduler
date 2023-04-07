@@ -10,19 +10,25 @@ namespace PetServiceManagement.Domain.BusinessLogic
 {
     public class HolidayRateService : IHolidayRateService
     {
-        private readonly IHolidayAndRatesRepository _holidayAndRatesRepository;
-        private readonly IPetServiceRepository _petServiceRepository;
+        private readonly IHolidayRetrievalRepository _holidayRetrievalRepository;
+        private readonly IHolidayRateUpsertRepository _holidayRateUpsertRepository;
+        private readonly IHolidayRateRetrievalRepository _holidayRateRetrievalRepository;
+        private readonly IPetServiceRetrievalRepository _petServiceRetrievalRepository;
 
-        public HolidayRateService(IPetServiceRepository petServiceRepository,
-            IHolidayAndRatesRepository holidayAndRatesRepository)
+        public HolidayRateService(IPetServiceRetrievalRepository petServiceRetrievalRepository,
+            IHolidayRetrievalRepository holidayRetrievalRepository,
+            IHolidayRateUpsertRepository holidayRateUpsertRepository,
+            IHolidayRateRetrievalRepository holidayRateRetrievalRepository)
         {
-            _holidayAndRatesRepository = holidayAndRatesRepository;
-            _petServiceRepository = petServiceRepository;
+            _holidayRetrievalRepository = holidayRetrievalRepository;
+            _holidayRateUpsertRepository = holidayRateUpsertRepository;
+            _holidayRateRetrievalRepository = holidayRateRetrievalRepository;
+            _petServiceRetrievalRepository = petServiceRetrievalRepository;
         }
 
         public async Task<(List<HolidayRate>, int)> GetHolidayRatesByPageAndKeyword(int page, int pageSize, string keyword = null)
         {
-            var res = await _holidayAndRatesRepository.GetHolidayRatesByPageAndKeyword(page, pageSize, keyword);
+            var res = await _holidayRateRetrievalRepository.GetHolidayRatesByPageAndKeyword(page, pageSize, keyword);
 
             var holidayRates = new List<HolidayRate>();
 
@@ -44,7 +50,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             try
             {
-                await _holidayAndRatesRepository.CreateHolidayRates(holidayRatesEntity);
+                await _holidayRateUpsertRepository.CreateHolidayRates(holidayRatesEntity);
             }
             catch (DbUpdateException ex)
             {
@@ -56,7 +62,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
         {
             await ValidateHolidayRate(holidayRate);
 
-            var holidayRateEntity = await _holidayAndRatesRepository.GetHolidayRatesById(holidayRate.Id);
+            var holidayRateEntity = await _holidayRateRetrievalRepository.GetHolidayRatesById(holidayRate.Id);
 
             if (holidayRateEntity == null)
             {
@@ -65,12 +71,12 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             var holidayRateToUpdate = HolidayRatesMapper.FromDomainHolidayRate(holidayRate);
 
-            await _holidayAndRatesRepository.UpdateHolidayRates(holidayRateToUpdate);
+            await _holidayRateUpsertRepository.UpdateHolidayRates(holidayRateToUpdate);
         }
 
         public async Task DeleteHolidayRateById(int id)
         {
-            await _holidayAndRatesRepository.DeleteHolidayRates(id);
+            await _holidayRateUpsertRepository.DeleteHolidayRates(id);
         }
 
         private async Task ValidateHolidayRate(HolidayRate holidayRate)
@@ -94,7 +100,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
         private async Task ThrowArgumentExceptionIfPetServiceNotFound(short id)
         {
-            var petServiceEntity = await _petServiceRepository.GetPetServiceById(id);
+            var petServiceEntity = await _petServiceRetrievalRepository.GetPetServiceById(id);
 
             if (petServiceEntity != null)
             {
@@ -106,7 +112,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
         private async Task ThrowArgumentExceptionIfHoldayNotFound(short id)
         {
-            var holidayEntity = await _holidayAndRatesRepository.GetHolidayById(id);
+            var holidayEntity = await _holidayRetrievalRepository.GetHolidayById(id);
 
             if (holidayEntity != null)
             {

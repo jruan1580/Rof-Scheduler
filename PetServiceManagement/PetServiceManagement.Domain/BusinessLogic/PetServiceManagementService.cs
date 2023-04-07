@@ -11,16 +11,20 @@ namespace PetServiceManagement.Domain.BusinessLogic
 {
     public class PetServiceManagementService : IPetServiceManagementService
     {
-        private readonly IPetServiceRepository _petServiceRepository;
+        private readonly IPetServiceRetrievalRepository _petServiceRetrievalRepository;
+        private readonly IPetServiceUpsertRepository _petServiceUpsertRepository;
 
-        public PetServiceManagementService(IPetServiceRepository petServiceRepository)
+        public PetServiceManagementService(IPetServiceRetrievalRepository petServiceRetrievalRepository,
+            IPetServiceUpsertRepository petServiceUpsertRepository)
         {
-            _petServiceRepository = petServiceRepository;
+            _petServiceRetrievalRepository = petServiceRetrievalRepository;
+
+            _petServiceUpsertRepository = petServiceUpsertRepository;
         }
 
         public async Task<(List<PetService>, int)> GetPetServicesByPageAndKeyword(int page, int pageSize, string keyword = null)
         {
-            var res = await _petServiceRepository.GetAllPetServicesByPageAndKeyword(page, pageSize, keyword);
+            var res = await _petServiceRetrievalRepository.GetAllPetServicesByPageAndKeyword(page, pageSize, keyword);
 
             if (res.Item1.Count == 0)
             {
@@ -40,7 +44,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             try
             {
-                await _petServiceRepository.AddPetService(petServiceEntity);
+                await _petServiceUpsertRepository.AddPetService(petServiceEntity);
             }
             catch (DbUpdateException dbEx)
             {
@@ -52,7 +56,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
         {
             ThrowArgumentExceptionIfValidationFails(petService);
 
-            var petServiceEntity = await _petServiceRepository.GetPetServiceById(petService.Id);
+            var petServiceEntity = await _petServiceRetrievalRepository.GetPetServiceById(petService.Id);
 
             if (petServiceEntity == null)
             {
@@ -61,12 +65,12 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
             MergeUpdatedPetServiceToOriginalPetService(petServiceEntity, petService);
            
-            await _petServiceRepository.UpdatePetService(petServiceEntity);
+            await _petServiceUpsertRepository.UpdatePetService(petServiceEntity);
         }
 
         public async Task DeletePetServiceById(short id)
         {
-            await _petServiceRepository.DeletePetService(id);
+            await _petServiceUpsertRepository.DeletePetService(id);
         }
 
         private void MergeUpdatedPetServiceToOriginalPetService(PetServices original, PetService updated)

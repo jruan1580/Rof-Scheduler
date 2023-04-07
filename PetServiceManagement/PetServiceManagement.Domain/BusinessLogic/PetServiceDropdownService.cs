@@ -8,9 +8,9 @@ namespace PetServiceManagement.Domain.BusinessLogic
 {
     public class PetServiceDropdownService : IDropdownService<PetService>
     {
-        private readonly IPetServiceRepository _petServiceRepository;
+        private readonly IPetServiceRetrievalRepository _petServiceRepository;
 
-        public PetServiceDropdownService(IPetServiceRepository petServiceRepository)
+        public PetServiceDropdownService(IPetServiceRetrievalRepository petServiceRepository)
         {
             _petServiceRepository = petServiceRepository;
         }

@@ -1,23 +1,18 @@
-﻿using PetServiceManagement.Infrastructure.Persistence.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using PetServiceManagement.Infrastructure.Persistence.Entities;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PetServiceManagement.Infrastructure.Persistence.Repositories
 {
     public class BaseRepository
     {
-        /// <summary>
-        /// base on number of records (count) and page size, return total number of pages
-        /// </summary>
-        /// <param name="count"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        protected int GetTotalPages(int count, int pageSize)
+        protected async Task<List<T>> SkipNAndTakeTopM<T>(IQueryable<T> elements, int skipN, int topM)
         {
-            var fullPages = count / pageSize; //full pages with example 23 count and offset is 10. we will get 2 full pages (10 each page)
-            var remaining = count % pageSize; //remaining will be 3 which will be an extra page
-            var totalPages = (remaining > 0) ? fullPages + 1 : fullPages; //therefore total pages is sum of full pages plus one more page is any remains.
-
-            return totalPages;
+            return await elements.Skip(skipN)
+                .Take(topM)
+                .ToListAsync();
         }
 
         /// <summary>
@@ -29,10 +24,9 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         protected virtual async Task<T> GetEntityById<T>(object id)
         {
-            using(var context = new RofSchedulerContext())
-            {
-                return (T)(await context.FindAsync(typeof(T), id));
-            }
+            using var context = new RofSchedulerContext();
+            
+            return (T)(await context.FindAsync(typeof(T), id));            
         }
 
         /// <summary>
@@ -43,14 +37,13 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         protected virtual async Task<T> CreateEntity<T>(T entity)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                await context.AddAsync(entity);
+            using var context = new RofSchedulerContext();
+            
+            await context.AddAsync(entity);
 
-                await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
-                return entity;
-            }
+            return entity;            
         }
 
         /// <summary>
@@ -61,12 +54,11 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         protected virtual async Task UpdateEntity<T>(T entity)
         {
-            using (var context = new RofSchedulerContext())
-            {
-                context.Update(entity);
+            using var context = new RofSchedulerContext();
+            
+            context.Update(entity);
 
-                await context.SaveChangesAsync();
-            }
+            await context.SaveChangesAsync();            
         }
 
         /// <summary>
@@ -78,20 +70,19 @@ namespace PetServiceManagement.Infrastructure.Persistence.Repositories
         /// <returns></returns>
         protected virtual async Task DeleteEntity<T>(object id)
         {
-            using (var context = new RofSchedulerContext())
+            using var context = new RofSchedulerContext();
+                
+            var entityToDelete = await context.FindAsync(typeof(T), id);
+
+            //does not exist, consider it deleted.
+            if (entityToDelete == null)
             {
-                var entityToDelete = await context.FindAsync(typeof(T), id);
-
-                //does not exist, consider it deleted.
-                if (entityToDelete == null)
-                {
-                    return;
-                }
-
-                context.Remove(entityToDelete);
-
-                await context.SaveChangesAsync();
+                return;
             }
+
+            context.Remove(entityToDelete);
+
+            await context.SaveChangesAsync();            
         }       
     }
 }
