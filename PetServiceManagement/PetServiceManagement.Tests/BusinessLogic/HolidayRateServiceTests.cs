@@ -16,7 +16,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public void TestHolidayRatesValidation()
         {
-            var petServiceRepo = new Mock<IPetServiceRepository>();
+            var petServiceRepo = new Mock<IPetServiceRetrievalRepository>();
             var holidayRetrievalRepo = new Mock<IHolidayRetrievalRepository>();          
             var holidayRateService = new HolidayRateService(petServiceRepo.Object, 
                 holidayRetrievalRepo.Object, 
@@ -68,7 +68,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public void UnableToFindHolidayRatesForUpdateTest()
         {
-            var petServiceRepo = new Mock<IPetServiceRepository>();
+            var petServiceRepo = new Mock<IPetServiceRetrievalRepository>();
             var holidayRetrievalRepo = new Mock<IHolidayRetrievalRepository>();
             var holidayRateRetrievalRepo = new Mock<IHolidayRateRetrievalRepository>();
             var holidayRateService = new HolidayRateService(petServiceRepo.Object, 
@@ -130,7 +130,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public async Task AddHolidayRateTest()
         {
-            var petServiceRepo = new Mock<IPetServiceRepository>();
+            var petServiceRepo = new Mock<IPetServiceRetrievalRepository>();
             var holidayRetrievalRepo = new Mock<IHolidayRetrievalRepository>();
             var holidayUpsertRepo = new Mock<IHolidayRateUpsertRepository>();
             var holidayRateService = new HolidayRateService(petServiceRepo.Object, holidayRetrievalRepo.Object, holidayUpsertRepo.Object, null);
@@ -153,7 +153,7 @@ namespace PetServiceManagement.Tests.BusinessLogic
         [Test]
         public async Task UpdateHolidayRateTest()
         {
-            var petServiceRepo = new Mock<IPetServiceRepository>();
+            var petServiceRepo = new Mock<IPetServiceRetrievalRepository>();
             var holidayRetrievalRepo = new Mock<IHolidayRetrievalRepository>();
             var holidayRateRetrievalRepo = new Mock<IHolidayRateRetrievalRepository>();
             var holidayUpsertRepo = new Mock<IHolidayRateUpsertRepository>();

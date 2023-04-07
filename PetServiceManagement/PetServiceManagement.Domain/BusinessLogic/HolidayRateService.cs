@@ -13,9 +13,9 @@ namespace PetServiceManagement.Domain.BusinessLogic
         private readonly IHolidayRetrievalRepository _holidayRetrievalRepository;
         private readonly IHolidayRateUpsertRepository _holidayRateUpsertRepository;
         private readonly IHolidayRateRetrievalRepository _holidayRateRetrievalRepository;
-        private readonly IPetServiceRepository _petServiceRepository;
+        private readonly IPetServiceRetrievalRepository _petServiceRetrievalRepository;
 
-        public HolidayRateService(IPetServiceRepository petServiceRepository,
+        public HolidayRateService(IPetServiceRetrievalRepository petServiceRetrievalRepository,
             IHolidayRetrievalRepository holidayRetrievalRepository,
             IHolidayRateUpsertRepository holidayRateUpsertRepository,
             IHolidayRateRetrievalRepository holidayRateRetrievalRepository)
@@ -23,7 +23,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
             _holidayRetrievalRepository = holidayRetrievalRepository;
             _holidayRateUpsertRepository = holidayRateUpsertRepository;
             _holidayRateRetrievalRepository = holidayRateRetrievalRepository;
-            _petServiceRepository = petServiceRepository;
+            _petServiceRetrievalRepository = petServiceRetrievalRepository;
         }
 
         public async Task<(List<HolidayRate>, int)> GetHolidayRatesByPageAndKeyword(int page, int pageSize, string keyword = null)
@@ -100,7 +100,7 @@ namespace PetServiceManagement.Domain.BusinessLogic
 
         private async Task ThrowArgumentExceptionIfPetServiceNotFound(short id)
         {
-            var petServiceEntity = await _petServiceRepository.GetPetServiceById(id);
+            var petServiceEntity = await _petServiceRetrievalRepository.GetPetServiceById(id);
 
             if (petServiceEntity != null)
             {
