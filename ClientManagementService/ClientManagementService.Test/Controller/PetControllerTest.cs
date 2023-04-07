@@ -1,11 +1,12 @@
-﻿using ClientManagementService.API.Controllers;
-using ClientManagementService.Domain.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using ClientManagementService.API.DTO;
+using ClientManagementService.Domain.Models;
 using Moq;
 using NUnit.Framework;
+using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Test.Controller
@@ -20,48 +21,20 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task AddPet_Success()
         {
-            var newPet = new API.DTO.PetDTO()
-            {
-                OwnerId = 1,
-                BreedId = 1,
-                PetTypeId = 1,
-                Name = "Pet1",
-                Weight = 30,
-                Dob = "1/1/2022",
-                OwnerFirstName = "John",
-                OwnerLastName = "Doe",
-                BreedName = "Corgi",
-                Vaccines = new List<API.DTO.PetsVaccineDTO>()
-                {
-                    new API.DTO.PetsVaccineDTO()
-                    {
-                        Id = 1,
-                        PetsVaccineId = 1,
-                        VaccineName = "Bordetella",
-                        Inoculated = true
-                    }
-                }
-            };
+            var newPet = PetCreator.GetPetDTO();
 
             _petService.Setup(p => p.AddPet(It.IsAny<Domain.Models.Pet>()))
                 .ReturnsAsync(1);
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newPet));
 
-            var response = await controller.AddPet(newPet);
-
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkObjectResult), response.GetType());
-
-            var okObj = (OkObjectResult)response;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
-        public async Task AddPet_InternalServerError()
+        public async Task AddPet_BadRequestError()
         {
-            var newPet = new API.DTO.PetDTO()
+            var newPet = new PetDTO()
             {
                 OwnerId = 0,
                 BreedId = 0,
@@ -73,366 +46,225 @@ namespace ClientManagementService.Test.Controller
                 BreedName = ""
             };
 
-            _petService.Setup(p => p.AddPet(It.IsAny<Domain.Models.Pet>()))
-                .ThrowsAsync(new Exception());
+            _petService.Setup(p => p.AddPet(It.IsAny<Pet>()))
+                .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newPet));
 
-            var response = await controller.AddPet(newPet);
+            AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(ObjectResult), response.GetType());
+            AssertContentIsAsExpected(response, _exceptionMsg);
+        }
 
-            var obj = (ObjectResult)response;
+        [Test]
+        public async Task AddPet_InternalServerError()
+        {
+            var newPet = new PetDTO()
+            {
+                OwnerId = 0,
+                BreedId = 0,
+                Name = "",
+                Weight = 0,
+                Dob = "",
+                OwnerFirstName = "",
+                OwnerLastName = "",
+                BreedName = ""
+            };
 
-            Assert.AreEqual(obj.StatusCode, 500);
+            _petService.Setup(p => p.AddPet(It.IsAny<Pet>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
+
+            var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newPet));
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
         public async Task GetAllPets_Success()
         {
-            var pets = new List<Domain.Models.Pet>()
+            var newPets = new List<Pet>()
             {
-                new Domain.Models.Pet()
-                {
-                    Id = 1,
-                    OwnerId = 1,
-                    BreedId = 1,
-                    PetTypeId = 1,
-                    Name = "Pet1",
-                    Weight = 30,
-                    Dob = "1/1/2022",
-                    Owner = new Domain.Models.Client()
-                    {
-                        Id = 1,
-                        FirstName = "John",
-                        LastName = "Doe"
-                    },
-                    BreedInfo = new Domain.Models.Breed()
-                    {
-                        Id = 1,
-                        BreedName = "Corgi"
-                    },
-                    PetType = new Domain.Models.PetType()
-                    {
-                        Id = 1,
-                        PetTypeName = "Dog"
-                    }
-                }
+                PetCreator.GetDomainPet()
             };
 
             _petService.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-                .ReturnsAsync(new Domain.Models.PetsWithTotalPage(pets, 1));
+                .ReturnsAsync(new PetsWithTotalPage(newPets, 1));
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}?page=1&offset=10&keyword=test");
 
-            var response = await controller.GetAllPets(1, 10, "");
-
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
-
-            var okObj = (OkObjectResult)response;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
         public async Task GetAllPets_InternalServerError()
         {
             _petService.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}?page=1&offset=10&keyword=test");
 
-            var response = await controller.GetAllPets(1, 10, "");
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
-
-            var obj = (ObjectResult)response;
-
-            Assert.AreEqual(obj.StatusCode, 500);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
         public async Task GetPetById_Success()
         {
             _petService.Setup(p => p.GetPetById(It.IsAny<long>()))
-                .ReturnsAsync(new Domain.Models.Pet()
-                {
-                    Id = 1,
-                    OwnerId = 1,
-                    BreedId = 1,
-                    PetTypeId = 1,
-                    Name = "Pet1",
-                    Weight = 30,
-                    Dob = "1/1/2022",
-                    Owner = new Domain.Models.Client()
-                    {
-                        Id = 1,
-                        FirstName = "John",
-                        LastName = "Doe"
-                    },
-                    BreedInfo = new Domain.Models.Breed()
-                    {
-                        Id = 1,
-                        BreedName = "Corgi"
-                    },
-                    PetType = new Domain.Models.PetType()
-                    {
-                        Id = 1,
-                        PetTypeName = "Dog"
-                    },
-                    Vaccines = new List<Domain.Models.VaccineStatus>()
-                    {
-                        new Domain.Models.VaccineStatus()
-                        {
-                            Id = 1,
-                            PetToVaccineId = 1,
-                            VaxName = "Bordetella",
-                            Inoculated = true
-                        }
-                    }
-                });
+                .ReturnsAsync(PetCreator.GetDomainPet());
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
 
-            var response = await controller.GetPetById(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkObjectResult), response.GetType());
+        [Test]
+        public async Task GetPetById_NotFound()
+        {
+            _petService.Setup(p => p.GetPetById(It.IsAny<long>()))
+                .ThrowsAsync(new EntityNotFoundException("Pet"));
 
-            var okObj = (OkObjectResult)response;
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
 
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            AssertContentIsAsExpected(response, _petNotFoundMessage);
         }
 
         [Test]
         public async Task GetPetById_InternalServerError()
         {
             _petService.Setup(p => p.GetPetById(It.IsAny<long>()))
-                .ReturnsAsync((Domain.Models.Pet)null);
+                .ReturnsAsync((Pet)null);
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
 
-            var response = await controller.GetPetById(1);
-
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(ObjectResult), response.GetType());
-
-            var obj = (ObjectResult)response;
-
-            Assert.AreEqual(obj.StatusCode, 500);
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
         }
 
         [Test]
         public async Task GetPetByName_Success()
         {
             _petService.Setup(p => p.GetPetByName(It.IsAny<string>()))
-                .ReturnsAsync(new Domain.Models.Pet()
-                {
-                    Id = 1,
-                    OwnerId = 1,
-                    BreedId = 1,
-                    PetTypeId = 1,
-                    Name = "Pet1",
-                    Weight = 30,
-                    Dob = "1/1/2022",
-                    Owner = new Domain.Models.Client()
-                    {
-                        Id = 1,
-                        FirstName = "John",
-                        LastName = "Doe"
-                    },
-                    BreedInfo = new Domain.Models.Breed()
-                    {
-                        Id = 1,
-                        BreedName = "Corgi"
-                    },
-                    PetType = new Domain.Models.PetType()
-                    {
-                        Id = 1,
-                        PetTypeName = "Dog"
-                    },
-                    Vaccines = new List<Domain.Models.VaccineStatus>()
-                    {
-                        new Domain.Models.VaccineStatus()
-                        {
-                            Id = 1,
-                            PetToVaccineId = 1,
-                            VaxName = "Bordetella",
-                            Inoculated = true
-                        }
-                    }
-                });
+                .ReturnsAsync(PetCreator.GetDomainPet());
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/Layla/name");
 
-            var response = await controller.GetPetByName("Pet1");
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkObjectResult), response.GetType());
+        [Test]
+        public async Task GetPetByName_NotFound()
+        {
+            _petService.Setup(p => p.GetPetByName(It.IsAny<string>()))
+                .ThrowsAsync(new EntityNotFoundException("Pet"));
 
-            var okObj = (OkObjectResult)response;
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/Layla/name");
 
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            AssertContentIsAsExpected(response, _petNotFoundMessage);
         }
 
         [Test]
         public async Task GetPetByName_InternalServerError()
         {
             _petService.Setup(p => p.GetPetByName(It.IsAny<string>()))
-                .ReturnsAsync((Domain.Models.Pet)null);
+                .ReturnsAsync((Pet)null);
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/Layla/name");
 
-            var response = await controller.GetPetByName("Pet1");
-
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(ObjectResult), response.GetType());
-
-            var obj = (ObjectResult)response;
-
-            Assert.AreEqual(obj.StatusCode, 500);
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
         }
 
         [Test]
         public async Task GetPetsByClientId_Success()
         {
-            var pets = new List<Domain.Models.Pet>()
+            var pets = new List<Pet>()
             {
-                new Domain.Models.Pet()
-                {
-                    Id = 1,
-                    OwnerId = 1,
-                    BreedId = 1,
-                    PetTypeId = 1,
-                    Name = "Pet1",
-                    Weight = 30,
-                    Dob = "1/1/2022",
-                    Owner = new Domain.Models.Client()
-                    {
-                        Id = 1,
-                        FirstName = "John",
-                        LastName = "Doe"
-                    },
-                    BreedInfo = new Domain.Models.Breed()
-                    {
-                        Id = 1,
-                        BreedName = "Corgi"
-                    },
-                    PetType = new Domain.Models.PetType()
-                    {
-                        Id = 1,
-                        PetTypeName = "Dog"
-                    }
-                }
+                PetCreator.GetDomainPet()
             };
 
             _petService.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-                .ReturnsAsync(new Domain.Models.PetsWithTotalPage(pets, 1));
+                .ReturnsAsync(new PetsWithTotalPage(pets, 1));
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/clientId?page=1&offset=10&keyword=test");
 
-            var response = await controller.GetPetsByClientId(1, 1, 10, "");
-
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
-
-            var okObj = (OkObjectResult)response;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
         public async Task GetPetsByClientId_InternalServerError()
         {
             _petService.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/clientId?page=1&offset=10&keyword=test");
 
-            var response = await controller.GetPetsByClientId(1, 1, 10, "");
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
-
-            var obj = (ObjectResult)response;
-
-            Assert.AreEqual(obj.StatusCode, 500);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
-        public async Task UpdatePet_Success()
+        public async Task UpdatePetInfo_Success()
         {
-            var pet = new API.DTO.PetDTO()
-            {
-                Id = 1,
-                OwnerId = 1,
-                BreedId = 1,
-                PetTypeId = 1,
-                Name = "Pet1",
-                Weight = 30,
-                Dob = "1/1/2022",
-                OwnerFirstName = "John",
-                OwnerLastName = "Doe",
-                BreedName = "Corgi",
-                Vaccines = new List<API.DTO.PetsVaccineDTO>()
-                {
-                    new API.DTO.PetsVaccineDTO()
-                    {
-                        Id = 1,
-                        PetsVaccineId = 1,
-                        VaccineName = "Bordetella",
-                        Inoculated = true
-                    }
-                }
-            };
+            var updatePet = PetCreator.GetPetDTO();
 
-            _petService.Setup(p => p.UpdatePet(It.IsAny<Domain.Models.Pet>()))
+            _petService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/updatePet", ConvertObjectToStringContent(updatePet));
 
-            var response = await controller.UpdatePetInfo(pet);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
+        [Test]
+        public async Task UpdatePetInfo_NotFound()
+        {
+            var updatePet = PetCreator.GetPetDTO();
 
-            var ok = (OkResult)response;
+            _petService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
+                .ThrowsAsync(new EntityNotFoundException("Pet"));
 
-            Assert.AreEqual(ok.StatusCode, 200);
+            var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/updatePet", ConvertObjectToStringContent(updatePet));
+
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            AssertContentIsAsExpected(response, _petNotFoundMessage);
         }
 
         [Test]
         public async Task UpdatePetInfo_BadRequestError()
         {
-            var pet = new API.DTO.PetDTO()
-            {
-                Id = 0,
-                OwnerId = 1,
-                BreedId = 1,
-                Name = "Pet1",
-                Weight = 30,
-                Dob = "1/1/2022",
-                OwnerFirstName = "John",
-                OwnerLastName = "Doe",
-                BreedName = "Corgi"
-            };
+            var updatePet = PetCreator.GetPetDTO();
 
-            _petService.Setup(p => p.UpdatePet(It.IsAny<Domain.Models.Pet>()))
-                .ThrowsAsync(new ArgumentException());
+            _petService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
+                .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/updatePet", ConvertObjectToStringContent(updatePet));
 
-            var response = await controller.UpdatePetInfo(pet);
+            AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
+            AssertContentIsAsExpected(response, _exceptionMsg);
+        }
 
-            var obj = (BadRequestObjectResult)response;
+        [Test]
+        public async Task UpdatePetInfo_InternalServerError()
+        {
+            var updatePet = PetCreator.GetPetDTO();
 
-            Assert.AreEqual(obj.StatusCode, 400);
+            _petService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
+
+            var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/updatePet", ConvertObjectToStringContent(updatePet));
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
@@ -441,42 +273,43 @@ namespace ClientManagementService.Test.Controller
             _petService.Setup(p => p.DeletePetById(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Employee", HttpMethod.Delete, $"{_baseUrl}/1");
 
-            var response = await controller.DeletePetById(1);
-
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
-
-            var ok = (OkResult)response;
-
-            Assert.AreEqual(ok.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
         public async Task DeletePetById_BadRequestError()
         {
             _petService.Setup(p => p.DeletePetById(It.IsAny<long>()))
-                .ThrowsAsync(new ArgumentException());
+                .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Employee", HttpMethod.Delete, $"{_baseUrl}/1");
 
-            var response = await controller.DeletePetById(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
+            AssertContentIsAsExpected(response, _exceptionMsg);
+        }
 
-            var obj = (BadRequestObjectResult)response;
+        [Test]
+        public async Task DeletePetById_InternalServerError()
+        {
+            _petService.Setup(p => p.DeletePetById(It.IsAny<long>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
-            Assert.AreEqual(obj.StatusCode, 400);
+            var response = await SendRequest("Employee", HttpMethod.Delete, $"{_baseUrl}/1");
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
         public async Task GetVaccinesByPetId_Success()
         {
-            var vaxStats = new List<Domain.Models.VaccineStatus>();
+            var vaxStats = new List<VaccineStatus>();
             {
-                new Domain.Models.VaccineStatus()
+                new VaccineStatus()
                 {
                     Id = 1,
                     PetToVaccineId = 1,
@@ -486,36 +319,37 @@ namespace ClientManagementService.Test.Controller
             };
 
             _petService.Setup(p => p.GetVaccinesByPetId(It.IsAny<long>()))
-                .ReturnsAsync(new List<Domain.Models.VaccineStatus>());
+                .ReturnsAsync(vaxStats);
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/1/vax");
 
-            var response = await controller.GetVaccinesByPetId(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+        [Test]
+        public async Task GetVaccinesByPetId_NotFound()
+        {
+            _petService.Setup(p => p.GetVaccinesByPetId(It.IsAny<long>()))
+                .ThrowsAsync(new EntityNotFoundException("Pet's vaccine records"));
 
-            var okObj = (OkObjectResult)response;
+            var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/1/vax");
 
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            AssertContentIsAsExpected(response, "Pet's vaccine records not found!");
         }
 
         [Test]
         public async Task GetVaccinesByPetId_InternalServerError()
         {
             _petService.Setup(p => p.GetVaccinesByPetId(It.IsAny<long>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var controller = new PetController(_petService.Object);
+            var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/1/vax");
 
-            var response = await controller.GetVaccinesByPetId(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(ObjectResult));
-
-            var obj = (ObjectResult)response;
-
-            Assert.AreEqual(obj.StatusCode, 500);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
     }
 }

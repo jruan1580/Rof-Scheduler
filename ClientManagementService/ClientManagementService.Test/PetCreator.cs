@@ -9,7 +9,16 @@ namespace ClientManagementService.Test
     {
         public static DbPet GetDbPet()
         {
-            return new DbPet();
+            return new DbPet()
+            {
+                Id = 1,
+                OwnerId = 1,
+                BreedId = 1,
+                PetTypeId = 1,
+                Name = "Layla",
+                Weight = 70,
+                Dob = "3/14/2019"
+            };
         }
 
         public static DomainPet GetDomainPet()
@@ -46,6 +55,7 @@ namespace ClientManagementService.Test
         {
             return new PetDTO()
             {
+                Id = 1,
                 OwnerId = 1,
                 BreedId = 1,
                 PetTypeId = 1,
