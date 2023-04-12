@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RofShared.Exceptions;
+using RofShared.Services;
 
 namespace ClientManagementService.Test.Service
 {
