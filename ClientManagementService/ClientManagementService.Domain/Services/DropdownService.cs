@@ -17,15 +17,15 @@ namespace ClientManagementService.Domain.Services
 
     public class DropdownService : IDropdownService
     {
-        private readonly IClientRepository _clientRepository;
+        private readonly IClientRetrievalRepository _clientRetrievalRepository;
         private readonly IPetRepository _petRepository;
         private readonly IPetToVaccinesRepository _petToVaccineRepository;
 
-        public DropdownService(IClientRepository clientRepository,
+        public DropdownService(IClientRetrievalRepository clientRetrievalRepository,
             IPetRepository petRepository, 
             IPetToVaccinesRepository petToVaccineToRepository)
         {
-            _clientRepository = clientRepository;
+            _clientRetrievalRepository = clientRetrievalRepository;
             _petRepository = petRepository;
             _petToVaccineRepository = petToVaccineToRepository;
         }
@@ -95,7 +95,7 @@ namespace ClientManagementService.Domain.Services
         {
             var  clients = new List<Client>();
 
-            foreach(var client in await _clientRepository.GetClientsForDropdown())
+            foreach(var client in await _clientRetrievalRepository.GetClientsForDropdown())
             {
                 clients.Add(ClientMapper.ToCoreClient(client));
             }
