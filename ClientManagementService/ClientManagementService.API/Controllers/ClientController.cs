@@ -15,10 +15,12 @@ namespace ClientManagementService.API.Controllers
     public class ClientController : ControllerBase
     {
         private readonly IClientService _clientService;
+        private readonly IClientRetrievalService _clientRetrievalService;
 
-        public ClientController(IClientService clientService)
+        public ClientController(IClientService clientService, IClientRetrievalService clientRetrievalService)
         {
             _clientService = clientService;
+            _clientRetrievalService = clientRetrievalService;
         }
 
         [AllowAnonymous]
@@ -36,7 +38,7 @@ namespace ClientManagementService.API.Controllers
         {
             var clientList = new List<ClientDTO>();
 
-            var result = await _clientService.GetAllClientsByKeyword(page, offset, keyword);
+            var result = await _clientRetrievalService.GetAllClientsByKeyword(page, offset, keyword);
 
             foreach (var client in result.Clients)
             {
@@ -50,7 +52,7 @@ namespace ClientManagementService.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetClientById(long id)
         {
-            var client = await _clientService.GetClientById(id);
+            var client = await _clientRetrievalService.GetClientById(id);
 
             return Ok(ClientDTOMapper.ToDTOClient(client));
         }
@@ -59,7 +61,7 @@ namespace ClientManagementService.API.Controllers
         [HttpGet("{email}/email")]
         public async Task<IActionResult> GetClientByEmail(string email)
         {
-            var client = await _clientService.GetClientByEmail(email);
+            var client = await _clientRetrievalService.GetClientByEmail(email);
 
             if (client == null)
             {
