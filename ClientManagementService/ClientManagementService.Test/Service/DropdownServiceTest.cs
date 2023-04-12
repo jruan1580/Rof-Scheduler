@@ -13,7 +13,7 @@ namespace ClientManagementService.Test.Service
     {
         private Mock<IPetRepository> _petRepository;
         private Mock<IPetToVaccinesRepository> _petToVaccinesRepository;
-        private Mock<IClientRepository> _clientRepository;
+        private Mock<IClientRetrievalRepository> _clientRetrievalRepository;
 
         private DropdownService _dropdownService;
 
@@ -70,9 +70,9 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
-            _clientRepository = new Mock<IClientRepository>();
+            _clientRetrievalRepository = new Mock<IClientRetrievalRepository>();
 
-            _clientRepository.Setup(c => c.GetClientsForDropdown())
+            _clientRetrievalRepository.Setup(c => c.GetClientsForDropdown())
                 .ReturnsAsync(new List<Client>()
                 {
                     new Client()
@@ -83,7 +83,7 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
-            _dropdownService = new DropdownService(_clientRepository.Object, _petRepository.Object, _petToVaccinesRepository.Object);
+            _dropdownService = new DropdownService(_clientRetrievalRepository.Object, _petRepository.Object, _petToVaccinesRepository.Object);
         }
 
         [Test]
