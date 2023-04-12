@@ -3,11 +3,12 @@ using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Filters.Client;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ClientDB = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 using RofShared.Exceptions;
 using RofShared.Services;
-using System.Net;
 
 namespace ClientManagementService.Domain.Services
 {
@@ -16,19 +17,21 @@ namespace ClientManagementService.Domain.Services
         Task<Client> ClientLogin(string email, string password);
         Task ClientLogout(long id);
         Task CreateClient(Client newClient, string password);
-        Task DeleteClientById(long id);      
+        Task DeleteClientById(long id);
+        Task<ClientsWithTotalPage> GetAllClientsByKeyword(int page, int offset, string keyword);
+        Task<Client> GetClientByEmail(string email);
+        Task<Client> GetClientById(long id);        
         Task ResetClientFailedLoginAttempts(long id);
         Task UpdateClientInfo(Client client);
         Task UpdatePassword(long id, string newPassword);
     }
 
-    public class ClientService : ClientBaseService, IClientService
+    public class ClientService : IClientService
     {
         private readonly IClientRepository _clientRepository;
         private readonly IPasswordService _passwordService;
 
-        public ClientService(IClientRepository clientRepository, IPasswordService passwordService, IClientRetrievalRepository clientRetrievalRepository)
-            : base(clientRetrievalRepository)
+        public ClientService(IClientRepository clientRepository, IPasswordService passwordService)
         {
             _clientRepository = clientRepository;
             _passwordService = passwordService;
@@ -45,10 +48,10 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var clientExists = await _clientRetrievalRepository.DoesClientExistByEmailOrUsername(newClient.Id, newClient.EmailAddress, newClient.Username);
+            var clientExists = await _clientRepository.ClientAlreadyExists(newClient.Id, newClient.EmailAddress, newClient.FirstName, newClient.LastName, newClient.Username);
             if (clientExists)
             {
-                throw new ArgumentException("An account with either username or email already exists.");
+                throw new ArgumentException("Either username already exists or email address and name combination already exists");
             }
 
             _passwordService.ValidatePasswordForCreate(password);
@@ -72,13 +75,17 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var clientExists = await _clientRetrievalRepository.DoesClientExistByEmailOrUsername(client.Id, client.EmailAddress, client.Username);
+            var clientExists = await _clientRepository.ClientAlreadyExists(client.Id, client.EmailAddress, client.FirstName, client.LastName, client.Username);
             if (clientExists)
             {
-                throw new ArgumentException("An account with either username or email already exists.");
+                throw new ArgumentException("Either username already exists or email address and name combination already exists");
             }
 
-            var origClient = await GetDbClientById(client.Id);
+            var origClient = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, client.Id));
+            if (origClient == null)
+            {
+                throw new EntityNotFoundException("Client was not found. Failed to update.");
+            }
 
             origClient.FirstName = client.FirstName;
             origClient.LastName = client.LastName;
@@ -93,9 +100,52 @@ namespace ClientManagementService.Domain.Services
             await _clientRepository.UpdateClient(origClient);
         }
 
+        public async Task<ClientsWithTotalPage> GetAllClientsByKeyword(int page, int offset, string keyword)
+        {
+            var result = await _clientRepository.GetAllClientsByKeyword(page, offset, keyword);
+            var clients = result.Item1;
+            var totalPages = result.Item2;
+
+            if (clients == null || clients.Count == 0)
+            {
+                return new ClientsWithTotalPage(new List<Client>(), 0);
+            }
+
+            return new ClientsWithTotalPage(clients.Select(c => ClientMapper.ToCoreClient(c)).ToList(), totalPages);
+        }
+
+        public async Task<Client> GetClientById(long id)
+        {
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, id));
+
+            if (client == null)
+            {
+                throw new EntityNotFoundException("Client was not found");
+            }
+
+            return ClientMapper.ToCoreClient(client);
+        }
+
+        public async Task<Client> GetClientByEmail(string email)
+        {
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<string>(GetClientFilterEnum.Email, email));
+
+            if (client == null)
+            {
+                return null;
+            }
+
+            return ClientMapper.ToCoreClient(client);
+        }       
+
         public async Task<Client> ClientLogin(string username, string password)
         {
-            var client = await GetDbClientByUsername(username);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<string>(GetClientFilterEnum.Username, username));
+
+            if (client == null)
+            {
+                throw new EntityNotFoundException("Client was not found");
+            }
 
             if (client.IsLocked)
             {
@@ -118,7 +168,7 @@ namespace ClientManagementService.Domain.Services
 
         public async Task ClientLogout(long id)
         {
-            var client = await GetDbClientById(id);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, id));
 
             if (!client.IsLoggedIn)
             {
@@ -132,7 +182,12 @@ namespace ClientManagementService.Domain.Services
 
         public async Task ResetClientFailedLoginAttempts(long id)
         {
-            var client = await GetDbClientById(id);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, id));
+
+            if(client == null)
+            {
+                throw new EntityNotFoundException("Client was not found");
+            }
 
             client.FailedLoginAttempts = 0;
             client.IsLocked = false;
@@ -142,7 +197,7 @@ namespace ClientManagementService.Domain.Services
 
         public async Task UpdatePassword(long id, string newPassword)
         {
-            var client = await GetDbClientById(id);
+            var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, id));
 
             _passwordService.ValidateNewPasswordForUpdate(newPassword, client.Password);
 
