@@ -152,7 +152,7 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException("Client account is locked. Contact admin to get unlocked.");
             }
 
-            _passwordService.ValidatePasswordForLogin(password, client.Password);
+            await VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(password, client);
 
             if (client.IsLoggedIn)
             {
@@ -231,6 +231,21 @@ namespace ClientManagementService.Domain.Services
             client.FailedLoginAttempts = attempts;
 
             await _clientRepository.UpdateClient(client);
+        }
+
+        private async Task VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(string password, ClientDB client)
+        {
+            try
+            {
+                _passwordService.ValidatePasswordForLogin(password, client.Password);
+            }
+            catch (ArgumentException)
+            {
+                //password was incorrect
+                await IncrementClientFailedLoginAttempts(client);
+
+                throw;
+            }
         }
     }
 }
