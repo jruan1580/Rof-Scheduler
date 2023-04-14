@@ -24,76 +24,41 @@ namespace ClientManagementService.API.Controllers
         [HttpGet("clients")]
         public async Task<IActionResult> GetClients()
         {
-            try
-            {
-                var clients = await _dropdownService.GetClients();
+            var clients = await _dropdownService.GetClients();
 
-                return Ok(DropdownDTOMapper.ToClientDTO(clients));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(DropdownDTOMapper.ToClientDTO(clients));
         }
 
         [HttpGet("pets")]
         public async Task<IActionResult> GetPets()
         {
-            try
-            {
-                var pets = await _dropdownService.GetPets();
+            var pets = await _dropdownService.GetPets();
 
-                return Ok(DropdownDTOMapper.ToPetDTO(pets));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(DropdownDTOMapper.ToPetDTO(pets));
         }
 
         [HttpGet("petTypes")]
         public async Task<IActionResult> GetPetTypes()
         {
-            try
-            {
-                var petTypes = await _dropdownService.GetPetTypes();
+            var petTypes = await _dropdownService.GetPetTypes();
 
-                return Ok(DropdownDTOMapper.ToPetTypeDTO(petTypes));
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(DropdownDTOMapper.ToPetTypeDTO(petTypes));
         }
 
         [HttpGet("{petTypeId}/vaccines")]
         public async Task<IActionResult> GetVaccineByPetType(short petTypeId)
         {
-            try
-            {
-                var vaccines = await _dropdownService.GetVaccinesByPetType(petTypeId);
+            var vaccines = await _dropdownService.GetVaccinesByPetType(petTypeId);
 
-                return Ok(DropdownDTOMapper.ToVaccineDTO(vaccines));
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(DropdownDTOMapper.ToVaccineDTO(vaccines));
         }
 
         [HttpGet("{petTypeId}/breeds")]
         public async Task<IActionResult> GetBreedsByPetType(short petTypeId)
         {
-            try
-            {
-                var breeds = await _dropdownService.GetBreedsByPetType(petTypeId);
+            var breeds = await _dropdownService.GetBreedsByPetType(petTypeId);
 
-                return Ok(DropdownDTOMapper.ToBreedDTO(breeds));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(DropdownDTOMapper.ToBreedDTO(breeds));
         }
     }
 }
