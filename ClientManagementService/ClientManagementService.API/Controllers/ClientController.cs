@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using ClientManagementService.API.DTO;
 using ClientManagementService.API.DTOMapper;
-using ClientManagementService.API.Filters;
 using ClientManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RofShared.FilterAttributes;
 
 namespace ClientManagementService.API.Controllers
 {    

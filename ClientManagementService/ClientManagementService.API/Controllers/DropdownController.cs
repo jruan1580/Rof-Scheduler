@@ -1,9 +1,8 @@
 ﻿using ClientManagementService.API.DTOMapper;
-using ClientManagementService.API.Filters;
 using ClientManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using RofShared.FilterAttributes;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.API.Controllers
