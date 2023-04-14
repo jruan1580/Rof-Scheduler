@@ -26,6 +26,7 @@ namespace ClientManagementService.Test.Controller
         protected ITokenHandler _tokenHandler;
 
         protected readonly Mock<IClientService> _clientService = new Mock<IClientService>();
+        protected readonly Mock<IClientRetrievalService> _clientRetrievalService = new Mock<IClientRetrievalService>();
         protected readonly Mock<IPetService> _petService = new Mock<IPetService>();
         protected readonly Mock<IDropdownService> _dropdownService = new Mock<IDropdownService>();
 
@@ -60,6 +61,7 @@ namespace ClientManagementService.Test.Controller
             Action<IServiceCollection> services = service =>
             {
                 service.AddTransient(provider => _clientService.Object);
+                service.AddTransient(provider => _clientRetrievalService.Object);
                 service.AddTransient(provider => _petService.Object);
                 service.AddTransient(provider => _dropdownService.Object);
 

@@ -70,7 +70,7 @@ namespace ClientManagementService.Test.Controller
                 ClientCreator.GetDomainClient(Encoding.UTF8.GetBytes(_passwordUnencrypted))
             };
 
-            _clientService.Setup(c =>
+            _clientRetrievalService.Setup(c =>
                 c.GetAllClientsByKeyword(It.IsAny<int>(),
                     It.IsAny<int>(),
                     It.IsAny<string>()))
@@ -84,7 +84,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetAllClients_InternalServerError()
         {
-            _clientService.Setup(c =>
+            _clientRetrievalService.Setup(c =>
                 c.GetAllClientsByKeyword(It.IsAny<int>(),
                     It.IsAny<int>(),
                     It.IsAny<string>()))
@@ -100,7 +100,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetClientById_Success()
         {
-            _clientService.Setup(c =>
+            _clientRetrievalService.Setup(c =>
                 c.GetClientById(It.IsAny<long>()))
             .ReturnsAsync(ClientCreator.GetDomainClient(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
 
@@ -112,7 +112,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetClientById_NotFound()
         {
-            _clientService.Setup(c =>
+            _clientRetrievalService.Setup(c =>
                 c.GetClientById(It.IsAny<long>()))
             .ThrowsAsync(new EntityNotFoundException("Client"));
 
@@ -126,7 +126,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetClientById_InternalServerError()
         {
-            _clientService.Setup(c => c.GetClientById(It.IsAny<long>()))
+            _clientRetrievalService.Setup(c => c.GetClientById(It.IsAny<long>()))
                 .ReturnsAsync((Client)null);
 
             var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/1");
@@ -137,7 +137,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetClientByEmail_Success()
         {
-            _clientService.Setup(c =>
+            _clientRetrievalService.Setup(c =>
                 c.GetClientByEmail(It.IsAny<string>()))
             .ReturnsAsync(ClientCreator.GetDomainClient(Encoding.UTF8.GetBytes(_passwordUnencrypted)));
 
@@ -149,7 +149,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetClientByEmail_NotFound()
         {
-            _clientService.Setup(c =>
+            _clientRetrievalService.Setup(c =>
                 c.GetClientByEmail(It.IsAny<string>()))
             .ThrowsAsync(new EntityNotFoundException("Client"));
 
