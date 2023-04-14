@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -120,23 +120,27 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
 
                 entity.Property(e => e.EventStartTime).HasColumnType("datetime");
 
+                entity.Property(e => e.LastModifiedDateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__Employ__2D12A970");
+                    .HasConstraintName("FK__JobEvent__Employ__10216507");
 
                 entity.HasOne(d => d.Pet)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetId__2E06CDA9");
+                    .HasConstraintName("FK__JobEvent__PetId__11158940");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetSer__2EFAF1E2");
+                    .HasConstraintName("FK__JobEvent__PetSer__1209AD79");
             });
 
             modelBuilder.Entity<Pet>(entity =>
