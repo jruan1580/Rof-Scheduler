@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ClientManagementService.API.DTO
+namespace ClientManagementService.DTO
 {
     public class PetDTO
     {
