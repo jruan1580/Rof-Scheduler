@@ -1,148 +1,97 @@
-﻿using ClientManagementService.API.Controllers;
-using ClientManagementService.Domain.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using ClientManagementService.Domain.Models;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ClientManagementService.Test.Controller
 {
     [TestFixture]
-    public class DropdownControllerTests
+    public class DropdownControllerTests : ApiTestSetup
     {
 
-        private Mock<IDropdownService> _dropdownService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _dropdownService = new Mock<IDropdownService>();
-
-            _dropdownService.Setup(d => d.GetPetTypes())
-                .ReturnsAsync(new List<Domain.Models.PetType>()
-                {
-                    new Domain.Models.PetType()
-                    {
-                        Id = 1,
-                        PetTypeName = "Dog"
-                    }
-                });
-
-            _dropdownService.Setup(d => d.GetVaccinesByPetType(It.IsAny<short>()))
-                .ReturnsAsync(new List<Domain.Models.Vaccine>()
-                {
-                    new Domain.Models.Vaccine()
-                    {
-                        Id = 1,
-                        VaxName = "Bordetella"
-                    }
-                });
-
-            _dropdownService.Setup(d => d.GetBreedsByPetType(It.IsAny<short>()))
-                .ReturnsAsync(new List<Domain.Models.Breed>()
-                {
-                    new Domain.Models.Breed()
-                    {
-                        Id = 1,
-                        BreedName = "Golden Retriever"
-                    }
-                });
-
-            _dropdownService.Setup(d => d.GetClients())
-                .ReturnsAsync(new List<Domain.Models.Client>()
-                {
-                    new Domain.Models.Client()
-                    {
-                        Id = 1,
-                        FullName = "Test User"
-                    }
-                });
-
-            _dropdownService.Setup(d => d.GetPets())
-                .ReturnsAsync(new List<Domain.Models.Pet>()
-                {
-                    new Domain.Models.Pet()
-                    {
-                        Id = 1,
-                        Name = "TestPet"
-                    }
-                });
-        }
+        private readonly string _baseUrl = "/api/Dropdown";
 
         [Test]
         public async Task GetClientTest()
         {
-            var controller = new DropdownController(_dropdownService.Object);
+            var clients = new List<Client>()
+            {
+                DropdownCreator.GetClientForDropdown()
+            };
 
-            var result = await controller.GetClients();
+            _dropdownService.Setup(d => d.GetClients())
+                .ReturnsAsync(clients);
 
-            Assert.NotNull(result);
-            Assert.AreEqual(typeof(OkObjectResult), result.GetType());
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/clients");
 
-            var okObj = (OkObjectResult)result;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
         public async Task GetPetTest()
         {
-            var controller = new DropdownController(_dropdownService.Object);
+            var pets = new List<Pet>()
+            {
+                DropdownCreator.GetPetForDropdown()
+            };
 
-            var result = await controller.GetPets();
+            _dropdownService.Setup(d => d.GetPets())
+                .ReturnsAsync(pets);
 
-            Assert.NotNull(result);
-            Assert.AreEqual(typeof(OkObjectResult), result.GetType());
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/pets");
 
-            var okObj = (OkObjectResult)result;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
         public async Task GetPetTypesTest()
         {
-            var controller = new DropdownController(_dropdownService.Object);
+            var petTypes = new List<PetType>()
+            {
+                DropdownCreator.GetPetTypeForDropdown()
+            };
 
-            var result = await controller.GetPetTypes();
+            _dropdownService.Setup(d => d.GetPetTypes())
+                .ReturnsAsync(petTypes);
 
-            Assert.NotNull(result);
-            Assert.AreEqual(typeof(OkObjectResult), result.GetType());
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/petTypes");
 
-            var okObj = (OkObjectResult)result;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
         public async Task GetVaccinesByPetTypeTest()
         {
-            var controller = new DropdownController(_dropdownService.Object);
+            var vaccines = new List<Vaccine>()
+            {
+                DropdownCreator.GetVaccineForDropdown()
+            };
 
-            var result = await controller.GetVaccineByPetType(1);
+            _dropdownService.Setup(d => d.GetVaccinesByPetType(It.IsAny<short>()))
+                .ReturnsAsync(vaccines);
 
-            Assert.NotNull(result);
-            Assert.AreEqual(typeof(OkObjectResult), result.GetType());
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1/vaccines");
 
-            var okObj = (OkObjectResult)result;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
         public async Task GetBreedByPetTypeTest()
         {
-            var controller = new DropdownController(_dropdownService.Object);
+            var breeds = new List<Breed>()
+            {
+                DropdownCreator.GetBreedForDropdown()
+            };
 
-            var result = await controller.GetBreedsByPetType(1);
+            _dropdownService.Setup(d => d.GetBreedsByPetType(It.IsAny<short>()))
+                .ReturnsAsync(breeds);
 
-            Assert.NotNull(result);
-            Assert.AreEqual(typeof(OkObjectResult), result.GetType());
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1/breeds");
 
-            var okObj = (OkObjectResult)result;
-
-            Assert.AreEqual(okObj.StatusCode, 200);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
     }
 }
