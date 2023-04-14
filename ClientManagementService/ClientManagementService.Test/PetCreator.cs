@@ -1,4 +1,4 @@
-﻿using ClientManagementService.API.DTO;
+﻿using ClientManagementService.DTO;
 using System.Collections.Generic;
 using DbPet = ClientManagementService.Infrastructure.Persistence.Entities.Pet;
 using DomainPet = ClientManagementService.Domain.Models.Pet;

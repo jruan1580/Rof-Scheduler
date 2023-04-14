@@ -1,4 +1,4 @@
-﻿using ClientManagementService.API.DTOMapper;
+﻿using ClientManagementService.Domain.Mappers.DTO;
 using ClientManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
