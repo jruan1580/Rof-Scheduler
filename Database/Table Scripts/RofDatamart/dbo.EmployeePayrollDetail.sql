@@ -14,9 +14,10 @@ CREATE TABLE dbo.EmployeePayrollDetail
 	PetServiceId BIGINT NOT NULL,
 	PetServiceName VARCHAR(255) NOT NULL,
 	EmployeePayForService DECIMAL(5,2) NOT NULL,
+	IsHolidayPay BIT NOT NULL,
 	ServiceDuration INT NOT NULL, 
 	ServiceDurationTimeUnit VARCHAR(10) NOT NULL,
 	JobEventId BIGINT NOT NULL,
 	ServiceStartDateTime DATETIME NOT NULL,
-	IsHolidayRate BIT NOT NULL
+	ServiceEndDateTime DATETIME NOT NULL
 );
