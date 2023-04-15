@@ -11,14 +11,14 @@ using DBClient = ClientManagementService.Infrastructure.Persistence.Entities.Cli
 
 namespace ClientManagementService.Domain.Services
 {
-    public class ClientUpsertService : ClientBaseService
+    public class ClientUpsertService : ClientBaseService, IClientUpsertService
     {
         private readonly IClientUpsertRepository _clientUpsertRepository;
 
         private readonly IPasswordService _passwordService;
 
         public ClientUpsertService(IClientRetrievalRepository clientRetrievalRepository,
-            IClientUpsertRepository clientUpsertRepository, 
+            IClientUpsertRepository clientUpsertRepository,
             IPasswordService passwordService) : base(clientRetrievalRepository)
         {
             _clientUpsertRepository = clientUpsertRepository;

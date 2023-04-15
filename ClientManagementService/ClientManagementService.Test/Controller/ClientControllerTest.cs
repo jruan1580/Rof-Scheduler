@@ -26,7 +26,7 @@ namespace ClientManagementService.Test.Controller
         {
             var newClient = ClientCreator.GetClientDTO("Client");
 
-            _clientService.Setup(c =>
+            _clientUpsertService.Setup(c =>
                 c.CreateClient(It.IsAny<Client>(),
                     It.IsAny<string>()))
             .Returns(Task.CompletedTask);
@@ -50,7 +50,7 @@ namespace ClientManagementService.Test.Controller
                 Address = null
             };
 
-            _clientService.Setup(c => 
+            _clientUpsertService.Setup(c => 
                 c.CreateClient(It.IsAny<Client>(), 
                     It.IsAny<string>()))
             .ThrowsAsync(new ArgumentException(_exceptionMsg));
@@ -261,7 +261,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task ResetLockedStatus_Success()
         {
-            _clientService.Setup(c => c.ResetClientFailedLoginAttempts(1))
+            _clientUpsertService.Setup(c => c.ResetClientFailedLoginAttempts(1))
                 .Returns(Task.CompletedTask);
 
             var response = await SendRequest("Administrator", HttpMethod.Patch, $"{_baseUrl}/1/locked");
@@ -272,7 +272,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task ResetLockedStatus_NotFound()
         {
-            _clientService.Setup(c => c.ResetClientFailedLoginAttempts(1))
+            _clientUpsertService.Setup(c => c.ResetClientFailedLoginAttempts(1))
                 .ThrowsAsync(new EntityNotFoundException("Client"));
 
             var response = await SendRequest("Administrator", HttpMethod.Patch, $"{_baseUrl}/1/locked");
@@ -287,7 +287,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task ResetLockedStatus_InternalServerError()
         {
-            _clientService.Setup(c => c.ResetClientFailedLoginAttempts(1))
+            _clientUpsertService.Setup(c => c.ResetClientFailedLoginAttempts(1))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Administrator", HttpMethod.Patch, $"{_baseUrl}/1/locked");
@@ -303,7 +303,7 @@ namespace ClientManagementService.Test.Controller
             var updateClient = ClientCreator.GetClientDTO("Client");
             updateClient.Id = 1;
 
-            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Client>()))
+            _clientUpsertService.Setup(c => c.UpdateClientInformation(It.IsAny<Client>()))
                 .Returns(Task.CompletedTask);
 
             var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateClient));
@@ -317,7 +317,7 @@ namespace ClientManagementService.Test.Controller
             var updateClient = ClientCreator.GetClientDTO("Client");
             updateClient.Id = 1;
 
-            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Client>()))
+            _clientUpsertService.Setup(c => c.UpdateClientInformation(It.IsAny<Client>()))
                 .ThrowsAsync(new EntityNotFoundException("Client"));
 
             var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateClient));
@@ -333,7 +333,7 @@ namespace ClientManagementService.Test.Controller
             var updateClient = ClientCreator.GetClientDTO("Client");
             updateClient.Id = 1;
 
-            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Client>()))
+            _clientUpsertService.Setup(c => c.UpdateClientInformation(It.IsAny<Client>()))
                 .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
             var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateClient));
@@ -349,7 +349,7 @@ namespace ClientManagementService.Test.Controller
             var updateClient = ClientCreator.GetClientDTO("Client");
             updateClient.Id = 1;
 
-            _clientService.Setup(c => c.UpdateClientInfo(It.IsAny<Client>()))
+            _clientUpsertService.Setup(c => c.UpdateClientInformation(It.IsAny<Client>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/info", ConvertObjectToStringContent(updateClient));
@@ -368,7 +368,7 @@ namespace ClientManagementService.Test.Controller
                 NewPassword = "NewTestPassword123!"
             };
 
-            _clientService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+            _clientUpsertService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
             var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/password", ConvertObjectToStringContent(password));
@@ -385,7 +385,7 @@ namespace ClientManagementService.Test.Controller
                 NewPassword = "NewTestPassword123!"
             };
 
-            _clientService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+            _clientUpsertService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .ThrowsAsync(new EntityNotFoundException("Client"));
 
             var response = await SendRequest("Client", HttpMethod.Patch, $"{ _baseUrl}/password", ConvertObjectToStringContent(password));
@@ -404,7 +404,7 @@ namespace ClientManagementService.Test.Controller
                 NewPassword = "NewTestPassword123!"
             };
 
-            _clientService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
+            _clientUpsertService.Setup(c => c.UpdatePassword(It.IsAny<long>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/password", ConvertObjectToStringContent(password));
@@ -417,7 +417,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task DeleteClientById_Success()
         {
-            _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
+            _clientUpsertService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
             var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
@@ -428,7 +428,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task DeleteClientById_NotFound()
         {
-            _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
+            _clientUpsertService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
                 .ThrowsAsync(new EntityNotFoundException("Client"));
 
             var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
@@ -441,7 +441,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task DeleteClientById_BadRequestError()
         {
-            _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
+            _clientUpsertService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
                 .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
             var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
@@ -454,7 +454,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task DeleteClientById_InternalServerError()
         {
-            _clientService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
+            _clientUpsertService.Setup(c => c.DeleteClientById(It.IsAny<long>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");

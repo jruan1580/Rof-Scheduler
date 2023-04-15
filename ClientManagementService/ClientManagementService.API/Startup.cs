@@ -30,6 +30,7 @@ namespace ClientManagementService.API
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddTransient<IClientService, ClientService>();
             services.AddTransient<IClientRetrievalService, ClientRetrievalService>();
+            services.AddTransient<IClientUpsertService, ClientUpsertService>();
             services.AddTransient<IPetService, PetService>();
             services.AddTransient<IDropdownService, DropdownService>();
 
