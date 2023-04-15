@@ -1,4 +1,5 @@
-﻿using CoreEvent = EventManagementService.Domain.Models.JobEvent;
+﻿using System;
+using CoreEvent = EventManagementService.Domain.Models.JobEvent;
 using DbEvent = EventManagementService.Infrastructure.Persistence.Entities.JobEvent;
 
 namespace EventManagementService.Domain.Mappers
@@ -63,6 +64,7 @@ namespace EventManagementService.Domain.Mappers
             entity.EventStartTime = coreEvent.EventStartTime;
             entity.EventEndTime = coreEvent.EventEndTime;
             entity.Completed = coreEvent.Completed;
+            entity.LastModifiedDateTime = DateTime.Now;
 
             return entity;
         }
