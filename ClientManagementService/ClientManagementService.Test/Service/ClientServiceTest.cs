@@ -1,4 +1,4 @@
-﻿using ClientManagementService.Domain.Services;
+using ClientManagementService.Domain.Services;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Entities;
 using ClientManagementService.Infrastructure.Persistence.Filters.Client;
@@ -17,6 +17,7 @@ namespace ClientManagementService.Test.Service
     public class ClientServiceTest
     {
         private Mock<IClientRepository> _clientRepository;
+        private Mock<IClientRetrievalRepository> _clientRetrievalRepository;
         private IPasswordService _passwordService;
         private Mock<IConfiguration> _config;
 
@@ -24,6 +25,7 @@ namespace ClientManagementService.Test.Service
         public void Setup()
         {
             _clientRepository = new Mock<IClientRepository>();
+            _clientRetrievalRepository = new Mock<IClientRetrievalRepository>();
 
             _config = new Mock<IConfiguration>();
             _config.Setup(c => c.GetSection(It.Is<string>(p => p.Equals("PasswordSalt"))).Value)
@@ -52,7 +54,7 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.CreateClient(newClient, "TestPassword123!"));
         }
@@ -77,10 +79,10 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.ClientAlreadyExists(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            _clientRetrievalRepository.Setup(c => c.DoesClientExistByEmailOrUsername(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.CreateClient(newClient, "TestPassword123!"));
         }
@@ -105,10 +107,10 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.ClientAlreadyExists(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-               .ReturnsAsync(true);
+            _clientRetrievalRepository.Setup(c => c.DoesClientExistByEmailOrUsername(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.CreateClient(newClient, "TestPassword123!"));
         }
@@ -133,7 +135,7 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.CreateClient(newClient, "abc123"));
         }
@@ -158,7 +160,7 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             await clientService.CreateClient(newClient, "TestPassword123!");
 
@@ -186,7 +188,7 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.UpdateClientInfo(client));
         }
@@ -212,10 +214,10 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.ClientAlreadyExists(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-               .ReturnsAsync(true);
+            _clientRetrievalRepository.Setup(c => c.DoesClientExistByEmailOrUsername(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.UpdateClientInfo(client));
         }
@@ -241,10 +243,10 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.ClientAlreadyExists(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-               .ReturnsAsync(true);
+            _clientRetrievalRepository.Setup(c => c.DoesClientExistByEmailOrUsername(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.UpdateClientInfo(client));
         }
@@ -270,10 +272,10 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client() { Id = 1 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             await clientService.UpdateClientInfo(client);
 
@@ -281,199 +283,11 @@ namespace ClientManagementService.Test.Service
         }
 
         [Test]
-        public void GetClientById_DoesNotExist()
-        {
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
-                .ReturnsAsync((Client)null);
-
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
-
-            Assert.ThrowsAsync<EntityNotFoundException>(() => clientService.GetClientById(1));
-        }
-
-        [Test]
-        public async Task GetClientById_Success()
-        {
-            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
-
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
-                .ReturnsAsync(new Client()
-                {
-                    Id = 1,
-                    CountryId = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    EmailAddress = "jdoe@gmail.com",
-                    PrimaryPhoneNum = "123-456-7890",
-                    Username = "jdoe",
-                    Password = encryptedPass,
-                    AddressLine1 = "123 Test St",
-                    City = "San Diego",
-                    State = "CA",
-                    ZipCode = "12345",
-                    IsLocked = false,
-                    IsLoggedIn = false,
-                    TempPasswordChanged = false,
-                    FailedLoginAttempts = 0
-                });
-
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
-
-            var client = await clientService.GetClientById(1);
-
-            Assert.IsNotNull(client);
-            Assert.AreEqual(1, client.Id);
-            Assert.AreEqual(1, client.CountryId);
-            Assert.AreEqual("John", client.FirstName);
-            Assert.AreEqual("Doe", client.LastName);
-            Assert.AreEqual("jdoe@gmail.com", client.EmailAddress);
-            Assert.AreEqual("jdoe", client.Username);
-            Assert.AreEqual("123-456-7890", client.PrimaryPhoneNum);
-            Assert.AreEqual(encryptedPass, client.Password);
-            Assert.IsFalse(client.IsLocked);
-            Assert.AreEqual(0, client.FailedLoginAttempts);
-            Assert.IsFalse(client.TempPasswordChanged);
-            Assert.IsFalse(client.IsLoggedIn);
-            Assert.AreEqual("John Doe", client.FullName);
-            Assert.AreEqual("123 Test St", client.Address.AddressLine1);
-            Assert.IsNull(client.Address.AddressLine2);
-            Assert.AreEqual("San Diego", client.Address.City);
-            Assert.AreEqual("CA", client.Address.State);
-            Assert.AreEqual("12345", client.Address.ZipCode);
-        }
-
-        [Test]
-        public async Task GetAllClients_NoClients()
-        {
-            _clientRepository.Setup(c => c.GetAllClientsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-                .ReturnsAsync((new List<Client>(), 0));
-
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
-
-            var result = await clientService.GetAllClientsByKeyword(1, 10, "");
-
-            Assert.IsEmpty(result.Clients);
-            Assert.AreEqual(0, result.TotalPages);
-        }
-
-        [Test]
-        public async Task GetAllClients_Success()
-        {
-            var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
-            var clients = new List<Client>()
-            {
-                new Client()
-                {
-                    Id = 1,
-                    CountryId = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    EmailAddress = "jdoe@gmail.com",
-                    PrimaryPhoneNum = "123-456-7890",
-                    Username = "jdoe",
-                    Password = encryptedPass,
-                    AddressLine1 = "123 Test St",
-                    City = "San Diego",
-                    State = "CA",
-                    ZipCode = "12345",
-                    IsLocked = false,
-                    IsLoggedIn = false,
-                    TempPasswordChanged = false,
-                    FailedLoginAttempts = 0
-                }
-            };
-
-            _clientRepository.Setup(c => c.GetAllClientsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-                .ReturnsAsync((clients, 1));
-
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
-
-            var result = await clientService.GetAllClientsByKeyword(1, 10, "");
-
-            Assert.IsNotEmpty(result.Clients);
-            Assert.AreEqual("John", result.Clients[0].FirstName);
-            Assert.AreEqual("Doe", result.Clients[0].LastName);
-            Assert.AreEqual("123-456-7890", result.Clients[0].PrimaryPhoneNum);
-            Assert.AreEqual("jdoe@gmail.com", result.Clients[0].EmailAddress);
-            Assert.AreEqual("jdoe", result.Clients[0].Username);
-            Assert.AreEqual(encryptedPass, result.Clients[0].Password);
-            Assert.AreEqual("123 Test St", result.Clients[0].Address.AddressLine1);
-            Assert.AreEqual("San Diego", result.Clients[0].Address.City);
-            Assert.AreEqual("CA", result.Clients[0].Address.State);
-            Assert.AreEqual("12345", result.Clients[0].Address.ZipCode);
-            Assert.IsFalse(result.Clients[0].IsLocked);
-            Assert.IsFalse(result.Clients[0].TempPasswordChanged);
-            Assert.IsFalse(result.Clients[0].IsLoggedIn);
-        }
-
-        [Test]
-        public void GetClientByEmail_DoesNotExist()
-        {
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
-                .ThrowsAsync(new ArgumentException());
-
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
-
-            Assert.ThrowsAsync<ArgumentException>(() => clientService.GetClientByEmail("jdoe@gmail.com"));
-        }
-
-        [Test]
-        public async Task GetClientByEmail_Success()
-        {
-            var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
-
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
-                .ReturnsAsync(new Client()
-                {
-                    Id = 1,
-                    CountryId = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    EmailAddress = "jdoe@gmail.com",
-                    Username = "jdoe",
-                    PrimaryPhoneNum = "123-456-7890",
-                    Password = encryptedPass,
-                    AddressLine1 = "123 Test St",
-                    City = "San Diego",
-                    State = "CA",
-                    ZipCode = "12345",
-                    IsLocked = false,
-                    IsLoggedIn = false,
-                    TempPasswordChanged = false,
-                    FailedLoginAttempts = 0
-                });
-
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
-
-            var client = await clientService.GetClientByEmail("jdoe@gmail.com");
-
-            Assert.IsNotNull(client);
-            Assert.AreEqual(1, client.Id);
-            Assert.AreEqual(1, client.CountryId);
-            Assert.AreEqual("John", client.FirstName);
-            Assert.AreEqual("Doe", client.LastName);
-            Assert.AreEqual("jdoe", client.Username);
-            Assert.AreEqual("jdoe@gmail.com", client.EmailAddress);
-            Assert.AreEqual("123-456-7890", client.PrimaryPhoneNum);
-            Assert.AreEqual(encryptedPass, client.Password);
-            Assert.IsFalse(client.IsLocked);
-            Assert.AreEqual(0, client.FailedLoginAttempts);
-            Assert.IsFalse(client.TempPasswordChanged);
-            Assert.IsFalse(client.IsLoggedIn);
-            Assert.AreEqual("John Doe", client.FullName);
-            Assert.AreEqual("123 Test St", client.Address.AddressLine1);
-            Assert.IsNull(client.Address.AddressLine2);
-            Assert.AreEqual("San Diego", client.Address.City);
-            Assert.AreEqual("CA", client.Address.State);
-            Assert.AreEqual("12345", client.Address.ZipCode);
-        }
-
-        [Test]
         public async Task ClientLogIn_AlreadyLoggedIn()
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -490,7 +304,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             var client = await clientService.ClientLogin("jdoe", "TestPassword123!");
 
@@ -518,14 +332,14 @@ namespace ClientManagementService.Test.Service
                 TempPasswordChanged = false
             };
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ReturnsAsync(client);
 
             short failedAttempts = 3;
             _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()))
                 .ReturnsAsync(failedAttempts);
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe", "Test123!"));
             _clientRepository.Verify(c => c.IncrementClientFailedLoginAttempts(It.Is<long>(id => id == 1)), Times.Once);
@@ -537,7 +351,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -554,7 +368,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             await clientService.ClientLogin("jdoe", "TestPassword123!");
 
@@ -566,7 +380,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -583,7 +397,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientRetrievalService(_clientRetrievalRepository.Object);
 
             var client = await clientService.GetClientById(1);
 
@@ -595,7 +409,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -612,7 +426,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             await clientService.ClientLogout(1);
 
@@ -622,10 +436,10 @@ namespace ClientManagementService.Test.Service
         [Test]
         public void ResetClientFailedLoginAttempt_ClientDoesNotExist()
         {
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync((Client)null);
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<EntityNotFoundException>(() => clientService.ResetClientFailedLoginAttempts(0));
         }
@@ -635,7 +449,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("t3$T1234");
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -652,7 +466,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             await clientService.ResetClientFailedLoginAttempts(1);
 
@@ -664,7 +478,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -681,7 +495,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.UpdatePassword(1, "abcdefg"));
         }
@@ -691,7 +505,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -708,7 +522,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.UpdatePassword(1, "TestPassword123!"));
         }
@@ -718,7 +532,7 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<long>>()))
                 .ReturnsAsync(new Client()
                 {
                     Id = 1,
@@ -735,7 +549,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             await clientService.UpdatePassword(1, "TestPassword1234!");
 
@@ -748,7 +562,7 @@ namespace ClientManagementService.Test.Service
             _clientRepository.Setup(c => c.DeleteClientById(It.IsAny<long>()))
                 .ThrowsAsync(new ArgumentException());
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.DeleteClientById(1));
         }
@@ -759,7 +573,7 @@ namespace ClientManagementService.Test.Service
             _clientRepository.Setup(c => c.DeleteClientById(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService);
+            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             await clientService.DeleteClientById(1);
 

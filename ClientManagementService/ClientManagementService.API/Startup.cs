@@ -22,12 +22,14 @@ namespace ClientManagementService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IClientRetrievalRepository, ClientRetrievalRepository>();
             services.AddSingleton<IClientRepository, ClientRepository>();
             services.AddSingleton<IPetRepository, PetRepository>();
             services.AddSingleton<IPetToVaccinesRepository, PetToVaccinesRepository>();
 
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddTransient<IClientService, ClientService>();
+            services.AddTransient<IClientRetrievalService, ClientRetrievalService>();
             services.AddTransient<IPetService, PetService>();
             services.AddTransient<IDropdownService, DropdownService>();
 
