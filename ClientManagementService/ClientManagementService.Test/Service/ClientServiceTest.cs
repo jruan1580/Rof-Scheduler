@@ -16,7 +16,7 @@ namespace ClientManagementService.Test.Service
     [TestFixture]
     public class ClientServiceTest
     {
-        private Mock<IClientRepository> _clientRepository;
+        private Mock<IClientUpsertRepository> _clientRepository;
         private Mock<IClientRetrievalRepository> _clientRetrievalRepository;
         private IPasswordService _passwordService;
         private Mock<IConfiguration> _config;
@@ -24,7 +24,7 @@ namespace ClientManagementService.Test.Service
         [SetUp]
         public void Setup()
         {
-            _clientRepository = new Mock<IClientRepository>();
+            _clientRepository = new Mock<IClientUpsertRepository>();
             _clientRetrievalRepository = new Mock<IClientRetrievalRepository>();
 
             _config = new Mock<IConfiguration>();

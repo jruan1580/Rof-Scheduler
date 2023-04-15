@@ -23,7 +23,7 @@ namespace ClientManagementService.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IClientRetrievalRepository, ClientRetrievalRepository>();
-            services.AddSingleton<IClientRepository, ClientRepository>();
+            services.AddSingleton<IClientUpsertRepository, ClientUpsertRepository>();
             services.AddSingleton<IPetRepository, PetRepository>();
             services.AddSingleton<IPetToVaccinesRepository, PetToVaccinesRepository>();
 

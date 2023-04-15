@@ -24,10 +24,10 @@ namespace ClientManagementService.Domain.Services
 
     public class ClientService : ClientBaseService, IClientService
     {
-        private readonly IClientRepository _clientRepository;
+        private readonly IClientUpsertRepository _clientRepository;
         private readonly IPasswordService _passwordService;
 
-        public ClientService(IClientRepository clientRepository, IPasswordService passwordService, IClientRetrievalRepository clientRetrievalRepository)
+        public ClientService(IClientUpsertRepository clientRepository, IPasswordService passwordService, IClientRetrievalRepository clientRetrievalRepository)
             : base(clientRetrievalRepository)
         {
             _clientRepository = clientRepository;
