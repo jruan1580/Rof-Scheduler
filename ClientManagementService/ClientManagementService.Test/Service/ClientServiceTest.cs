@@ -332,7 +332,7 @@ namespace ClientManagementService.Test.Service
                 TempPasswordChanged = false
             };
 
-            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
+            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ReturnsAsync(client);
 
             short failedAttempts = 3;
