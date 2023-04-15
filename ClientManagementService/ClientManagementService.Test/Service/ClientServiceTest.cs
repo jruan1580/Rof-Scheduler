@@ -333,7 +333,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            short failedAttempts = 1;
+            short failedAttempts = 2;
             _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()))
                 .ReturnsAsync(failedAttempts);
 
