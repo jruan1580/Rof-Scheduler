@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ClientDB = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 using RofShared.Exceptions;
+using RofShared.Services;
 
 namespace ClientManagementService.Domain.Services
 {
@@ -51,12 +52,9 @@ namespace ClientManagementService.Domain.Services
             if (clientExists)
             {
                 throw new ArgumentException("Either username already exists or email address and name combination already exists");
-            }           
-
-            if (!_passwordService.VerifyPasswordRequirements(password))
-            {
-                throw new ArgumentException("Password does not meet requirements");
             }
+
+            _passwordService.ValidatePasswordForCreate(password);
 
             var encryptedPass = _passwordService.EncryptPassword(password);
             newClient.Password = encryptedPass;
@@ -152,14 +150,9 @@ namespace ClientManagementService.Domain.Services
             if (client.IsLocked)
             {
                 throw new ArgumentException("Client account is locked. Contact admin to get unlocked.");
-            }            
-
-            if (!_passwordService.VerifyPasswordHash(password, client.Password))
-            {
-                await IncrementClientFailedLoginAttempts(client);
-
-                throw new ArgumentException("Incorrect password.");
             }
+
+            await VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(password, client);
 
             if (client.IsLoggedIn)
             {
@@ -206,15 +199,7 @@ namespace ClientManagementService.Domain.Services
         {
             var client = await _clientRepository.GetClientByFilter(new GetClientFilterModel<long>(GetClientFilterEnum.Id, id));
 
-            if (!_passwordService.VerifyPasswordRequirements(newPassword))
-            {
-                throw new ArgumentException("New password does not meet all requirements.");
-            }
-
-            if (_passwordService.VerifyPasswordHash(newPassword, client.Password))
-            {
-                throw new ArgumentException("New password cannot be the same as current password.");
-            }
+            _passwordService.ValidateNewPasswordForUpdate(newPassword, client.Password);
 
             var newEncryptedPass = _passwordService.EncryptPassword(newPassword);
 
@@ -246,6 +231,21 @@ namespace ClientManagementService.Domain.Services
             client.FailedLoginAttempts = attempts;
 
             await _clientRepository.UpdateClient(client);
+        }
+
+        private async Task VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(string password, ClientDB client)
+        {
+            try
+            {
+                _passwordService.ValidatePasswordForLogin(password, client.Password);
+            }
+            catch (ArgumentException)
+            {
+                //password was incorrect
+                await IncrementClientFailedLoginAttempts(client);
+
+                throw;
+            }
         }
     }
 }

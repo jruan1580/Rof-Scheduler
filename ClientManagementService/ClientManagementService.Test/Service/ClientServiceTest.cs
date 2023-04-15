@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RofShared.Exceptions;
+using RofShared.Services;
 
 namespace ClientManagementService.Test.Service
 {
@@ -518,7 +519,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            short failedAttempts = 1;
+            short failedAttempts = 2;
             _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()))
                 .ReturnsAsync(failedAttempts);
 
