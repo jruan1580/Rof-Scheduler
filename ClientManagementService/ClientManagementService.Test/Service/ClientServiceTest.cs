@@ -521,7 +521,7 @@ namespace ClientManagementService.Test.Service
             _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
                 .ReturnsAsync(client);
 
-            short failedAttempts = 2;
+            short failedAttempts = 3;
             _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()))
                 .ReturnsAsync(failedAttempts);
 
@@ -529,6 +529,7 @@ namespace ClientManagementService.Test.Service
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe", "Test123!"));
             _clientRepository.Verify(c => c.IncrementClientFailedLoginAttempts(It.Is<long>(id => id == 1)), Times.Once);
+            _clientRepository.Verify(c => c.UpdateClient(It.Is<Client>(c => c.Id == 1 && c.FailedLoginAttempts == 3 && c.IsLocked == true)), Times.Once);
         }
 
         [Test]
