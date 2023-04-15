@@ -528,7 +528,7 @@ namespace ClientManagementService.Test.Service
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe", "Test123!"));
-            _clientRepository.Verify(c => c.IncrementClientFailedLoginAttempts(client.Id), Times.Once);
+            _clientRepository.Verify(c => c.IncrementClientFailedLoginAttempts(It.Is<long>(id => id == 1)), Times.Once);
         }
 
         [Test]
