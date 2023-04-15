@@ -502,22 +502,24 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
+            var client = new Client()
+            {
+                Id = 1,
+                CountryId = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
+                Password = encryptedPass,
+                PrimaryPhoneNum = "123-456-7890",
+                IsLoggedIn = false,
+                IsLocked = false,
+                FailedLoginAttempts = 0,
+                TempPasswordChanged = false
+            };
+
             _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
-                .ReturnsAsync(new Client()
-                {
-                    Id = 1,
-                    CountryId = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    EmailAddress = "jdoe@gmail.com",
-                    Username = "jdoe",
-                    Password = encryptedPass,
-                    PrimaryPhoneNum = "123-456-7890",
-                    IsLoggedIn = false,
-                    IsLocked = false,
-                    FailedLoginAttempts = 0,
-                    TempPasswordChanged = false
-                });
+                .ReturnsAsync(client);
 
             short failedAttempts = 2;
             _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()))
@@ -526,6 +528,7 @@ namespace ClientManagementService.Test.Service
             var clientService = new ClientService(_clientRepository.Object, _passwordService);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe", "Test123!"));
+            _clientRepository.Verify(c => c.IncrementClientFailedLoginAttempts(client.Id), Times.Once);
         }
 
         [Test]
