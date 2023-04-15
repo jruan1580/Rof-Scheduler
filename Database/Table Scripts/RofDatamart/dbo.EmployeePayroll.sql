@@ -1,0 +1,17 @@
+USE [RofDatamart];
+GO
+
+IF (EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'EmployeePayroll'))
+BEGIN
+	DROP TABLE dbo.EmployeePayroll;
+END
+
+CREATE TABLE dbo.EmployeePayroll
+(
+	EmployeeId BIGINT NOT NULL,
+	FirstName VARCHAR(25) NOT NULL,
+	LastName VARCHAR(25) NOT NULL,
+	EmployeeTotalPay DECIMAL(10,2) NOT NULL,
+	PayPeriodStartDate DATE NOT NULL,
+	PayPeriodEndDate DATE NOT NULL
+);
