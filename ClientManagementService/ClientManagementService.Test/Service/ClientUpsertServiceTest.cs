@@ -6,9 +6,8 @@ using Moq;
 using NUnit.Framework;
 using RofShared.Services;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using DBClient = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 
 namespace ClientManagementService.Test.Service
 {
@@ -57,35 +56,7 @@ namespace ClientManagementService.Test.Service
         }
 
         [Test]
-        public void CreateClient_EmailNameNotUnique()
-        {
-            var newClient = new Domain.Models.Client()
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                EmailAddress = "jdoe@gmail.com",
-                Username = "jdoe",
-                PrimaryPhoneNum = "123-456-7890",
-                Password = new byte[100],
-                Address = new Domain.Models.Address()
-                {
-                    AddressLine1 = "123 Test St",
-                    City = "San Diego",
-                    State = "CA",
-                    ZipCode = "12345"
-                }
-            };
-
-            _clientRetrievalRepository.Setup(c => c.DoesClientExistByEmailOrUsername(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(true);
-
-            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
-
-            Assert.ThrowsAsync<ArgumentException>(() => clientService.CreateClient(newClient, "TestPassword123!"));
-        }
-
-        [Test]
-        public void CreateClient_UsernameNotUnique()
+        public void CreateClient_EmailOrUsernameNotUnique()
         {
             var clientRetrievalRepo = new Mock<IClientRetrievalRepository>();
             var clientUpsertRepo = new Mock<IClientUpsertRepository>();
@@ -99,35 +70,25 @@ namespace ClientManagementService.Test.Service
                     It.IsAny<string>()))
             .ReturnsAsync(true);
 
-            var clientService = new EmployeeUpsertService(employeeRetrievalRepo.Object,
-                employeeUpsertRepo.Object,
-                _passwordService,
-                _config.Object);
+            var clientService = new ClientUpsertService(clientRetrievalRepo.Object,
+                clientUpsertRepo.Object,
+                _passwordService);
 
-            Assert.ThrowsAsync<ArgumentException>(() => clientService.CreateEmployee(newClient, _passwordUnencrypted));
+            Assert.ThrowsAsync<ArgumentException>(() => clientService.CreateClient(newClient, _passwordUnencrypted));
         }
 
         [Test]
         public void CreateClient_PasswordReqNotMet()
         {
-            var newClient = new Domain.Models.Client()
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                EmailAddress = "jdoe@gmail.com",
-                Username = "jdoe",
-                PrimaryPhoneNum = "123-456-7890",
-                Password = null,
-                Address = new Domain.Models.Address()
-                {
-                    AddressLine1 = "123 Test St",
-                    City = "San Diego",
-                    State = "CA",
-                    ZipCode = "12345"
-                }
-            };
+            var clientRetrievalRepo = new Mock<IClientRetrievalRepository>();
+            var clientUpsertRepo = new Mock<IClientUpsertRepository>();
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
+            var newClient = ClientCreator.GetDomainClient(_passwordService.EncryptPassword(_passwordUnencrypted));
+            newClient.Password = null;
+
+            var clientService = new ClientUpsertService(clientRetrievalRepo.Object,
+                clientUpsertRepo.Object,
+                _passwordService);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.CreateClient(newClient, "abc123"));
         }
@@ -135,28 +96,24 @@ namespace ClientManagementService.Test.Service
         [Test]
         public async Task CreateClient_Success()
         {
-            var newClient = new Domain.Models.Client()
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                EmailAddress = "jdoe@gmail.com",
-                Username = "jdoe",
-                PrimaryPhoneNum = "123-456-7890",
-                Password = new byte[100],
-                Address = new Domain.Models.Address()
-                {
-                    AddressLine1 = "123 Test St",
-                    City = "San Diego",
-                    State = "CA",
-                    ZipCode = "12345"
-                }
-            };
+            var clientRetrievalRepo = new Mock<IClientRetrievalRepository>();
+            var clientUpsertRepo = new Mock<IClientUpsertRepository>();
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
+            var newClient = ClientCreator.GetDomainClient(_passwordService.EncryptPassword(_passwordUnencrypted));
+            newClient.Password = null;
+
+            var clientService = new ClientUpsertService(clientRetrievalRepo.Object,
+                clientUpsertRepo.Object,
+                _passwordService);
 
             await clientService.CreateClient(newClient, "TestPassword123!");
 
-            _clientRepository.Verify(c => c.CreateClient(It.IsAny<Client>()), Times.Once);
+            clientUpsertRepo.Verify(c => 
+                c.CreateClient(It.Is<DBClient>(c => c.FirstName == newClient.FirstName &&
+                    c.LastName == newClient.LastName &&
+                    c.EmailAddress == newClient.EmailAddress &&
+                    c.Username == newClient.Username)), 
+            Times.Once);
         }
     }
 }
