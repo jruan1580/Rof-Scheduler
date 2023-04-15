@@ -55,7 +55,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
+            var clientService = new ClientAuthService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             var client = await clientService.ClientLogin("jdoe", "TestPassword123!");
 
@@ -88,7 +88,7 @@ namespace ClientManagementService.Test.Service
             _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()))
                 .ReturnsAsync(failedAttempts);
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
+            var clientService = new ClientAuthService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe", "Test123!"));
         }
@@ -115,7 +115,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
+            var clientService = new ClientAuthService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             await clientService.ClientLogin("jdoe", "TestPassword123!");
 
@@ -173,7 +173,7 @@ namespace ClientManagementService.Test.Service
                     TempPasswordChanged = false
                 });
 
-            var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
+            var clientService = new ClientAuthService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             await clientService.ClientLogout(1);
 

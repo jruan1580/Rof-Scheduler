@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ClientManagementService.Domain.Services
 {
-    public class ClientRetrievalService : ClientBaseService, IClientRetrievalService
+    public class ClientRetrievalService : ClientService, IClientRetrievalService
     {
         public ClientRetrievalService(IClientRetrievalRepository clientRetrievalRepository)
             : base(clientRetrievalRepository) { }
