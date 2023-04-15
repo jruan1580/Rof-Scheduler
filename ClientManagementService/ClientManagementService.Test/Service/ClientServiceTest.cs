@@ -1,4 +1,4 @@
-﻿using ClientManagementService.Domain.Services;
+using ClientManagementService.Domain.Services;
 using ClientManagementService.Infrastructure.Persistence;
 using ClientManagementService.Infrastructure.Persistence.Entities;
 using ClientManagementService.Infrastructure.Persistence.Filters.Client;
@@ -316,30 +316,34 @@ namespace ClientManagementService.Test.Service
         {
             var encryptedPass = _passwordService.EncryptPassword("TestPassword123!");
 
-            _clientRetrievalRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
-                .ReturnsAsync(new Client()
-                {
-                    Id = 1,
-                    CountryId = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    EmailAddress = "jdoe@gmail.com",
-                    Username = "jdoe",
-                    Password = encryptedPass,
-                    PrimaryPhoneNum = "123-456-7890",
-                    IsLoggedIn = false,
-                    IsLocked = false,
-                    FailedLoginAttempts = 0,
-                    TempPasswordChanged = false
-                });
+            var client = new Client()
+            {
+                Id = 1,
+                CountryId = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                EmailAddress = "jdoe@gmail.com",
+                Username = "jdoe",
+                Password = encryptedPass,
+                PrimaryPhoneNum = "123-456-7890",
+                IsLoggedIn = false,
+                IsLocked = false,
+                FailedLoginAttempts = 0,
+                TempPasswordChanged = false
+            };
 
-            short failedAttempts = 1;
+            _clientRepository.Setup(c => c.GetClientByFilter(It.IsAny<GetClientFilterModel<string>>()))
+                .ReturnsAsync(client);
+
+            short failedAttempts = 3;
             _clientRepository.Setup(c => c.IncrementClientFailedLoginAttempts(It.IsAny<long>()))
                 .ReturnsAsync(failedAttempts);
 
             var clientService = new ClientService(_clientRepository.Object, _passwordService, _clientRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => clientService.ClientLogin("jdoe", "Test123!"));
+            _clientRepository.Verify(c => c.IncrementClientFailedLoginAttempts(It.Is<long>(id => id == 1)), Times.Once);
+            _clientRepository.Verify(c => c.UpdateClient(It.Is<Client>(c => c.Id == 1 && c.FailedLoginAttempts == 3 && c.IsLocked == true)), Times.Once);
         }
 
         [Test]
