@@ -16,18 +16,20 @@ namespace ClientManagementService.API.Controllers
     {
         private readonly IClientService _clientService;
         private readonly IClientRetrievalService _clientRetrievalService;
+        private readonly IClientUpsertService _clientUpsertService;
 
-        public ClientController(IClientService clientService, IClientRetrievalService clientRetrievalService)
+        public ClientController(IClientService clientService, IClientRetrievalService clientRetrievalService, IClientUpsertService clientUpsertService)
         {
             _clientService = clientService;
             _clientRetrievalService = clientRetrievalService;
+            _clientUpsertService = clientUpsertService;
         }
 
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateClient([FromBody] ClientDTO client)
         {
-            await _clientService.CreateClient(ClientDTOMapper.FromDTOClient(client), client.Password);
+            await _clientUpsertService.CreateClient(ClientDTOMapper.FromDTOClient(client), client.Password);
 
             return StatusCode(201);
         }
@@ -93,7 +95,7 @@ namespace ClientManagementService.API.Controllers
         [HttpPatch("{id}/locked")]
         public async Task<IActionResult> ResetClientLockedStatus(long id)
         {
-            await _clientService.ResetClientFailedLoginAttempts(id);
+            await _clientUpsertService.ResetClientFailedLoginAttempts(id);
 
             return Ok();
         }
@@ -102,7 +104,7 @@ namespace ClientManagementService.API.Controllers
         [HttpPatch("password")]
         public async Task<IActionResult> UpdatePassword([FromBody] PasswordDTO newPassword)
         {
-            await _clientService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
+            await _clientUpsertService.UpdatePassword(newPassword.Id, newPassword.NewPassword);
 
             return Ok();
         }
@@ -111,7 +113,7 @@ namespace ClientManagementService.API.Controllers
         [HttpPut("info")]
         public async Task<IActionResult> UpdateClientInfo([FromBody] ClientDTO client)
         {
-            await _clientService.UpdateClientInfo(ClientDTOMapper.FromDTOClient(client));
+            await _clientUpsertService.UpdateClientInformation(ClientDTOMapper.FromDTOClient(client));
 
             return Ok();
         }
@@ -120,7 +122,7 @@ namespace ClientManagementService.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClientById(long id)
         {
-            await _clientService.DeleteClientById(id);
+            await _clientUpsertService.DeleteClientById(id);
 
             return Ok();
         }

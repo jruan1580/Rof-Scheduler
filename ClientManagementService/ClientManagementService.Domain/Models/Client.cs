@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Intrinsics.X86;
 
 namespace ClientManagementService.Domain.Models
 {
@@ -53,108 +54,43 @@ namespace ClientManagementService.Domain.Models
             Address.ZipCode = zipcode;
         }
 
-        public List<string> IsValidClientToCreate()
+        public List<string> GetValidationErrorsForUpdate()
         {
-            var invalidErr = new List<string>();
-
-            if (string.IsNullOrEmpty(FirstName))
-            {
-                invalidErr.Add("Need first name.");
-            }
-
-            if (string.IsNullOrEmpty(LastName))
-            {
-                invalidErr.Add("Need last name.");
-            }
-
-            if (string.IsNullOrEmpty(EmailAddress))
-            {
-                invalidErr.Add("Need email address.");
-            }
-
-            if (string.IsNullOrEmpty(Username))
-            {
-                invalidErr.Add("Need username.");
-            }
-
-            if (string.IsNullOrEmpty(PrimaryPhoneNum))
-            {
-                invalidErr.Add("Need a primary phone number.");
-            }
-
-            if (string.IsNullOrEmpty(Address.AddressLine1))
-            {
-                invalidErr.Add("Need an Address Line 1.");
-            }
-
-            if (string.IsNullOrEmpty(Address.City))
-            {
-                invalidErr.Add("Need a City.");
-            }
-
-            if (string.IsNullOrEmpty(Address.State))
-            {
-                invalidErr.Add("Need a State.");
-            }
-
-            if (string.IsNullOrEmpty(Address.ZipCode))
-            {
-                invalidErr.Add("Need a Zipcode.");
-            }
-
-            return invalidErr;
-        }
-
-        public List<string> IsValidClientToUpdate()
-        {
-            var invalidErrs = new List<string>();
+            var validationErrors = new List<string>();
 
             if (Id <= 0)
             {
-                invalidErrs.Add($"Invalid Id: {Id}.");
+                validationErrors.Add($"Invalid Id: {Id}");
             }
 
-            if (string.IsNullOrEmpty(FirstName))
+            var remainingPropertyValidationErrors = GetValidationErrorsForBothCreateOrUpdate();
+            validationErrors.AddRange(remainingPropertyValidationErrors);
+
+            return validationErrors;
+        }
+
+        public List<string> GetValidationErrorsForBothCreateOrUpdate()
+        {
+            var validationErrors = new List<string>();
+            var failedMessageIfValidationResultIsTrue = new Dictionary<string, bool>();
+
+            failedMessageIfValidationResultIsTrue.Add("First name cannot be empty", string.IsNullOrEmpty(FirstName));
+            failedMessageIfValidationResultIsTrue.Add("Last name cannot be empty", string.IsNullOrEmpty(LastName));
+            failedMessageIfValidationResultIsTrue.Add("Email cannot be empty", string.IsNullOrEmpty(EmailAddress));
+            failedMessageIfValidationResultIsTrue.Add("Username cannot be empty", string.IsNullOrEmpty(Username));
+            failedMessageIfValidationResultIsTrue.Add("Primary phone number cannot be empty", string.IsNullOrEmpty(PrimaryPhoneNum));
+
+            foreach (var failedMessageToValidationResult in failedMessageIfValidationResultIsTrue)
             {
-                invalidErrs.Add("First name cannot be empty.");
+                var validationFailed = failedMessageToValidationResult.Value;
+                if (validationFailed)
+                {
+                    var msg = failedMessageToValidationResult.Key;
+                    validationErrors.Add(msg);
+                }
             }
 
-            if (string.IsNullOrEmpty(LastName))
-            {
-                invalidErrs.Add("Last name cannot be empty.");
-            }
-
-            if (string.IsNullOrEmpty(EmailAddress))
-            {
-                invalidErrs.Add("Email Address cannot be empty.");
-            }
-
-            if (string.IsNullOrEmpty(PrimaryPhoneNum))
-            {
-                invalidErrs.Add("Primary Phone Number cannot be empty.");
-            }
-
-            if (string.IsNullOrEmpty(Address.AddressLine1))
-            {
-                invalidErrs.Add("Address Line 1 cannot be empty.");
-            }
-
-            if (string.IsNullOrEmpty(Address.City))
-            {
-                invalidErrs.Add("City cannot be empty.");
-            }
-
-            if (string.IsNullOrEmpty(Address.State))
-            {
-                invalidErrs.Add("State cannot be empty.");
-            }
-
-            if (string.IsNullOrEmpty(Address.ZipCode))
-            {
-                invalidErrs.Add("Zipcode cannot be empty.");
-            }
-
-            return invalidErrs;
+            return validationErrors;
         }
     }
 }

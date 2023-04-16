@@ -23,13 +23,14 @@ namespace ClientManagementService.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IClientRetrievalRepository, ClientRetrievalRepository>();
-            services.AddSingleton<IClientRepository, ClientRepository>();
+            services.AddSingleton<IClientUpsertRepository, ClientUpsertRepository>();
             services.AddSingleton<IPetRepository, PetRepository>();
             services.AddSingleton<IPetToVaccinesRepository, PetToVaccinesRepository>();
 
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddTransient<IClientService, ClientService>();
             services.AddTransient<IClientRetrievalService, ClientRetrievalService>();
+            services.AddTransient<IClientUpsertService, ClientUpsertService>();
             services.AddTransient<IPetService, PetService>();
             services.AddTransient<IDropdownService, DropdownService>();
 
