@@ -18,7 +18,7 @@ namespace ClientManagementService.API.Controllers
         private readonly IClientRetrievalService _clientRetrievalService;
         private readonly IClientUpsertService _clientUpsertService;
 
-        public ClientController(IClientService clientService, IClientRetrievalService clientRetrievalService, IClientUpsertService clientUpsertService)
+        public ClientController(IClientAuthService clientAuthService, IClientRetrievalService clientRetrievalService, IClientUpsertService clientUpsertService)
         {
             _clientAuthService = clientAuthService;
             _clientRetrievalService = clientRetrievalService;
