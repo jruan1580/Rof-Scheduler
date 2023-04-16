@@ -1,7 +1,7 @@
 ﻿using CoreClient = ClientManagementService.Domain.Models.Client;
-using ClientManagementService.API.DTO;
+using ClientManagementService.DTO;
 
-namespace ClientManagementService.API.DTOMapper
+namespace ClientManagementService.Domain.Mappers.DTO
 {
     public static class ClientDTOMapper
     {

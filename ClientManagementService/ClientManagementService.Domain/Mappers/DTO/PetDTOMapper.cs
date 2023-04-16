@@ -1,10 +1,10 @@
-﻿using ClientManagementService.API.DTO;
-using ClientManagementService.Domain.Models;
+﻿using ClientManagementService.Domain.Models;
+using ClientManagementService.DTO;
 using System.Collections.Generic;
 using CorePet = ClientManagementService.Domain.Models.Pet;
 using CoreVaxStat = ClientManagementService.Domain.Models.VaccineStatus;
 
-namespace ClientManagementService.API.DTOMapper
+namespace ClientManagementService.Domain.Mappers.DTO
 {
     public static class PetDTOMapper
     {

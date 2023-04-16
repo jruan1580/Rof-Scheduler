@@ -1,8 +1,8 @@
-﻿using ClientManagementService.API.DTO;
-using ClientManagementService.Domain.Models;
+﻿using ClientManagementService.Domain.Models;
+using ClientManagementService.DTO;
 using System.Collections.Generic;
 
-namespace ClientManagementService.API.DTOMapper
+namespace ClientManagementService.Domain.Mappers.DTO
 {
     public static class DropdownDTOMapper
     {

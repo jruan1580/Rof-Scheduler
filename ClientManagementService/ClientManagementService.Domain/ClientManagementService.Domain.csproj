@@ -9,7 +9,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ClientManagementService.DTO\ClientManagementService.DTO.csproj" />
     <ProjectReference Include="..\ClientManagementService.Infrastructure\ClientManagementService.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Mappers\DTO\" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace ClientManagementService.API.DTO
+﻿namespace ClientManagementService.DTO
 {
     public class AddressDTO
     {

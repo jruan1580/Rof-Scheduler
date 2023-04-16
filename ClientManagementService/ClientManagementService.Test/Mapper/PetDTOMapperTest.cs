@@ -1,11 +1,10 @@
-﻿using ClientManagementService.API.DTO;
-using ClientManagementService.API.DTOMapper;
-using ClientManagementService.Domain.Models;
+﻿using ClientManagementService.Domain.Models;
 using NUnit.Framework;
 using System.Collections.Generic;
 using CorePet = ClientManagementService.Domain.Models.Pet;
-using DTOPet = ClientManagementService.API.DTO.PetDTO;
-using CorePetVax = ClientManagementService.API.DTO.PetsVaccineDTO;
+using DTOPet = ClientManagementService.DTO.PetDTO;
+using CorePetVax = ClientManagementService.DTO.PetsVaccineDTO;
+using ClientManagementService.Domain.Mappers.DTO;
 
 namespace ClientManagementService.Test.Mapper
 {
@@ -76,9 +75,9 @@ namespace ClientManagementService.Test.Mapper
             dtoPet.PetTypeName = "Dog";
             dtoPet.Dob = "1/1/2022";
             dtoPet.Weight = 30;
-            dtoPet.Vaccines = new List<PetsVaccineDTO>()
+            dtoPet.Vaccines = new List<CorePetVax>()
             {
-                new PetsVaccineDTO()
+                new CorePetVax()
                 {
                     Id = 1,
                     PetsVaccineId = 1,

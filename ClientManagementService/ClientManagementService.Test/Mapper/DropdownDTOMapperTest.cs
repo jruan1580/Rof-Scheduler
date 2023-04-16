@@ -1,4 +1,4 @@
-﻿using ClientManagementService.API.DTOMapper;
+﻿using ClientManagementService.Domain.Mappers.DTO;
 using ClientManagementService.Domain.Models;
 using NUnit.Framework;
 using System.Collections.Generic;

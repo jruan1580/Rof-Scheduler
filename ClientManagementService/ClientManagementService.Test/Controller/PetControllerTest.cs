@@ -1,5 +1,5 @@
-﻿using ClientManagementService.API.DTO;
-using ClientManagementService.Domain.Models;
+﻿using ClientManagementService.Domain.Models;
+using ClientManagementService.DTO;
 using Moq;
 using NUnit.Framework;
 using RofShared.Exceptions;

@@ -1,7 +1,7 @@
-﻿using ClientManagementService.API.DTOMapper;
+﻿using ClientManagementService.Domain.Mappers.DTO;
 using NUnit.Framework;
 using CoreClient = ClientManagementService.Domain.Models.Client;
-using DTOClient = ClientManagementService.API.DTO.ClientDTO;
+using DTOClient = ClientManagementService.DTO.ClientDTO;
 
 namespace ClientManagementService.Test.Mapper
 {
@@ -71,7 +71,7 @@ namespace ClientManagementService.Test.Mapper
             dtoClient.TempPasswordChanged = true;
             dtoClient.IsLoggedIn = false;
 
-            dtoClient.Address = new API.DTO.AddressDTO();
+            dtoClient.Address = new DTO.AddressDTO();
             dtoClient.Address.AddressLine1 = "123 Test St";
             dtoClient.Address.AddressLine2 = null;
             dtoClient.Address.City = "San Diego";

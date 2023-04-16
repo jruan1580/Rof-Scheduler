@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using ClientManagementService.API.DTO;
-using ClientManagementService.API.DTOMapper;
-using ClientManagementService.API.Filters;
+using ClientManagementService.Domain.Mappers.DTO;
 using ClientManagementService.Domain.Services;
+using ClientManagementService.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RofShared.FilterAttributes;
 
 namespace ClientManagementService.API.Controllers
 {    

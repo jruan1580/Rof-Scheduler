@@ -1,4 +1,4 @@
-﻿using ClientManagementService.API.DTO;
+﻿using ClientManagementService.DTO;
 using DbClient = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 using DomainClient = ClientManagementService.Domain.Models.Client;
 
