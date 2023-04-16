@@ -5,24 +5,20 @@ using System;
 using System.Threading.Tasks;
 using ClientDB = ClientManagementService.Infrastructure.Persistence.Entities.Client;
 using RofShared.Services;
+using ClientManagementService.Domain.Exceptions;
 
 namespace ClientManagementService.Domain.Services
 {
-    public interface IClientService
+    public class ClientAuthService : ClientService, IClientAuthService
     {
-        Task<Client> ClientLogin(string email, string password);
-        Task ClientLogout(long id);
-    }
-
-    public class ClientAuthService : ClientService, IClientService
-    {
-        private readonly IClientUpsertRepository _clientRepository;
+        private readonly IClientUpsertRepository _clientUpsertRepository;
         private readonly IPasswordService _passwordService;
 
-        public ClientAuthService(IClientUpsertRepository clientRepository, IPasswordService passwordService, IClientRetrievalRepository clientRetrievalRepository)
-            : base(clientRetrievalRepository)
+        public ClientAuthService(IClientRetrievalRepository clientRetrievalRepository,
+            IClientUpsertRepository clientUpsertRepository,
+            IPasswordService passwordService) : base(clientRetrievalRepository)
         {
-            _clientRepository = clientRepository;
+            _clientUpsertRepository = clientUpsertRepository;
             _passwordService = passwordService;
         }
 
@@ -30,37 +26,28 @@ namespace ClientManagementService.Domain.Services
         {
             var client = await GetDbClientByUsername(username);
 
-            if (client.IsLocked)
-            {
-                throw new ArgumentException("Client account is locked. Contact admin to get unlocked.");
-            }
-
             await VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(password, client);
 
-            if (client.IsLoggedIn)
+            if (client.IsLocked)
             {
-                return ClientMapper.ToCoreClient(client);
+                throw new ClientIsLockedException();
             }
 
-            client.IsLoggedIn = true;
-            
-            await _clientRepository.UpdateClient(client);
-
-            return ClientMapper.ToCoreClient(client);
+            return await UpdateClientStatusAndReturnClient(client, true);
         }
 
         public async Task ClientLogout(long id)
         {
             var client = await GetDbClientById(id);
 
-            if (!client.IsLoggedIn)
+            if (client.IsLoggedIn == false)
             {
                 return;
             }
 
             client.IsLoggedIn = false;
 
-            await _clientRepository.UpdateClient(client);
+            await _clientUpsertRepository.UpdateClient(client);
         }
 
         private async Task IncrementClientFailedLoginAttempts(ClientDB client)
@@ -70,7 +57,7 @@ namespace ClientManagementService.Domain.Services
                 return;
             }
 
-            var attempts = await _clientRepository.IncrementClientFailedLoginAttempts(client.Id);
+            var attempts = await _clientUpsertRepository.IncrementClientFailedLoginAttempts(client.Id);
 
             if (attempts != 3)
             {
@@ -80,7 +67,7 @@ namespace ClientManagementService.Domain.Services
             client.IsLocked = true;
             client.FailedLoginAttempts = attempts;
 
-            await _clientRepository.UpdateClient(client);
+            await _clientUpsertRepository.UpdateClient(client);
         }
 
         private async Task VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(string password, ClientDB client)
@@ -96,6 +83,18 @@ namespace ClientManagementService.Domain.Services
 
                 throw;
             }
+        }
+
+        private async Task<Client> UpdateClientStatusAndReturnClient(ClientDB client, bool clientStatus)
+        {
+            if (client.IsLoggedIn != clientStatus)
+            {
+                client.IsLoggedIn = clientStatus;
+
+                await _clientUpsertRepository.UpdateClient(client);
+            }
+
+            return ClientMapper.ToCoreClient(client);
         }
     }
 }
