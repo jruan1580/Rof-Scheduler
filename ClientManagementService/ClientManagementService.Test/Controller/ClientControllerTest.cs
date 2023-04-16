@@ -165,7 +165,7 @@ namespace ClientManagementService.Test.Controller
         {
             var client = ClientCreator.GetDomainClient(Encoding.UTF8.GetBytes(_passwordUnencrypted));
 
-            _clientService.Setup(c =>
+            _clientAuthService.Setup(c =>
                 c.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(client);
 
@@ -179,7 +179,7 @@ namespace ClientManagementService.Test.Controller
         {
             var client = ClientCreator.GetDomainClient(Encoding.UTF8.GetBytes(_passwordUnencrypted));
 
-            _clientService.Setup(c =>
+            _clientAuthService.Setup(c =>
                 c.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new EntityNotFoundException("Client"));
 
@@ -195,7 +195,7 @@ namespace ClientManagementService.Test.Controller
         {
             var client = ClientCreator.GetDomainClient(Encoding.UTF8.GetBytes(_passwordUnencrypted));
 
-            _clientService.Setup(c =>
+            _clientAuthService.Setup(c =>
                 c.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new ArgumentException("Client account is locked. Contact admin to get unlocked."));
 
@@ -211,7 +211,7 @@ namespace ClientManagementService.Test.Controller
         {
             var client = ClientCreator.GetDomainClient(Encoding.UTF8.GetBytes(_passwordUnencrypted));
 
-            _clientService.Setup(c => c.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
+            _clientAuthService.Setup(c => c.ClientLogin(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/login", ConvertObjectToStringContent(client));
@@ -224,7 +224,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task ClientLogout_Success()
         {
-            _clientService.Setup(c => c.ClientLogout(It.IsAny<long>()))
+            _clientAuthService.Setup(c => c.ClientLogout(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
             var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/1/logout");
@@ -235,7 +235,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task ClientLogout_NotFound()
         {
-            _clientService.Setup(c => c.ClientLogout(It.IsAny<long>()))
+            _clientAuthService.Setup(c => c.ClientLogout(It.IsAny<long>()))
                 .ThrowsAsync(new EntityNotFoundException("Client"));
 
             var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/1/logout");
@@ -248,7 +248,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task ClientLogout_InternalServerError()
         {
-            _clientService.Setup(c => c.ClientLogout(It.IsAny<long>()))
+            _clientAuthService.Setup(c => c.ClientLogout(It.IsAny<long>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Client", HttpMethod.Patch, $"{_baseUrl}/1/logout");
