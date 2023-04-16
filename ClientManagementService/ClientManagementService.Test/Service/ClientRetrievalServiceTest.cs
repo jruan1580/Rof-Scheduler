@@ -58,10 +58,7 @@ namespace ClientManagementService.Test.Service
             var result = await clientService.GetAllClientsByKeyword(1, 10, "");
 
             Assert.IsNotEmpty(result.Clients);
-            Assert.AreEqual("John", result.Clients[0].FirstName);
-            Assert.AreEqual("Doe", result.Clients[0].LastName);
-            Assert.AreEqual("jdoe", result.Clients[0].Username);
-            Assert.AreEqual("test@email.com", result.Clients[0].EmailAddress);
+            AssertClientExpectedEqualsActualValues(result.Clients[0]);
         }
 
         [Test]
@@ -89,11 +86,7 @@ namespace ClientManagementService.Test.Service
 
             var client = await clientService.GetClientById(1);
 
-            Assert.IsNotNull(client);
-            Assert.AreEqual("John", client.FirstName);
-            Assert.AreEqual("Doe", client.LastName);
-            Assert.AreEqual("jdoe", client.Username);
-            Assert.AreEqual("test@email.com", client.EmailAddress);
+            AssertClientExpectedEqualsActualValues(client);
         }
 
         [Test]
@@ -121,11 +114,7 @@ namespace ClientManagementService.Test.Service
 
             var client = await clientService.GetClientByEmail("test@email.com");
 
-            Assert.IsNotNull(client);
-            Assert.AreEqual("John", client.FirstName);
-            Assert.AreEqual("Doe", client.LastName);
-            Assert.AreEqual("jdoe", client.Username);
-            Assert.AreEqual("test@email.com", client.EmailAddress);
+            AssertClientExpectedEqualsActualValues(client);
         }
 
         [Test]
@@ -153,6 +142,11 @@ namespace ClientManagementService.Test.Service
 
             var client = await clientService.GetClientByUsername("jdoe");
 
+            AssertClientExpectedEqualsActualValues(client);
+        }
+
+        private void AssertClientExpectedEqualsActualValues(Domain.Models.Client client)
+        {
             Assert.IsNotNull(client);
             Assert.AreEqual("John", client.FirstName);
             Assert.AreEqual("Doe", client.LastName);

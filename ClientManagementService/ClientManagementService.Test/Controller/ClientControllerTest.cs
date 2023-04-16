@@ -1,4 +1,4 @@
-﻿using ClientManagementService.Domain.Models;
+using ClientManagementService.Domain.Models;
 using ClientManagementService.DTO;
 using Moq;
 using NUnit.Framework;
