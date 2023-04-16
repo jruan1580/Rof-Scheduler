@@ -28,7 +28,7 @@ namespace ClientManagementService.API
             services.AddSingleton<IPetToVaccinesRepository, PetToVaccinesRepository>();
 
             services.AddTransient<IPasswordService, PasswordService>();
-            services.AddTransient<IClientService, ClientAuthService>();
+            services.AddTransient<IClientAuthService, ClientAuthService>();
             services.AddTransient<IClientRetrievalService, ClientRetrievalService>();
             services.AddTransient<IClientUpsertService, ClientUpsertService>();
             services.AddTransient<IPetService, PetService>();
