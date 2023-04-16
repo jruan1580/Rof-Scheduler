@@ -1,0 +1,16 @@
+USE [RofDatamart];
+GO
+
+IF (EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'RofRevenueByDate'))
+BEGIN
+	DROP TABLE dbo.RofRevenueByDate;
+END
+
+CREATE TABLE dbo.RofRevenueByDate
+(	
+	RevenueDate DATE NOT NULL,
+	RevenueMonth SMALLINT NOT NULL,
+	RevenueYear SMALLINT NOT NULL, 
+	GrossRevenue DECIMAL(10, 2) NOT NULL,
+	NetRevenuePostEmployeePay DECIMAL(10, 2) NOT NULL
+);
