@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClientManagementService.Domain.Mappers.DTO;
 using ClientManagementService.Domain.Services;
@@ -14,13 +14,13 @@ namespace ClientManagementService.API.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
-        private readonly IClientService _clientService;
+        private readonly IClientAuthService _clientAuthService;
         private readonly IClientRetrievalService _clientRetrievalService;
         private readonly IClientUpsertService _clientUpsertService;
 
-        public ClientController(IClientService clientService, IClientRetrievalService clientRetrievalService, IClientUpsertService clientUpsertService)
+        public ClientController(IClientAuthService clientAuthService, IClientRetrievalService clientRetrievalService, IClientUpsertService clientUpsertService)
         {
-            _clientService = clientService;
+            _clientAuthService = clientAuthService;
             _clientRetrievalService = clientRetrievalService;
             _clientUpsertService = clientUpsertService;
         }
@@ -77,7 +77,7 @@ namespace ClientManagementService.API.Controllers
         [HttpPatch("login")]
         public async Task<IActionResult> ClientLogin([FromBody] ClientDTO client)
         {
-            var clientLogIn = await _clientService.ClientLogin(client.Username, client.Password);
+            var clientLogIn = await _clientAuthService.ClientLogin(client.Username, client.Password);
 
             return Ok(new { Id = clientLogIn.Id, FirstName = clientLogIn.FirstName, LastName = clientLogIn.LastName });
         }
@@ -86,7 +86,7 @@ namespace ClientManagementService.API.Controllers
         [HttpPatch("{id}/logout")]
         public async Task<IActionResult> ClientLogout(long id)
         {
-            await _clientService.ClientLogout(id);
+            await _clientAuthService.ClientLogout(id);
 
             return Ok();
         }

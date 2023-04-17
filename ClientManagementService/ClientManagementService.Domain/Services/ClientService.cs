@@ -1,101 +1,61 @@
-﻿using ClientManagementService.Domain.Mappers.Database;
-using ClientManagementService.Domain.Models;
-using ClientManagementService.Infrastructure.Persistence;
-using System;
+﻿using ClientManagementService.Infrastructure.Persistence;
+using ClientManagementService.Infrastructure.Persistence.Filters.Client;
+using RofShared.Exceptions;
 using System.Threading.Tasks;
-using ClientDB = ClientManagementService.Infrastructure.Persistence.Entities.Client;
-using RofShared.Services;
+using ClientDb = ClientManagementService.Infrastructure.Persistence.Entities.Client;
+
 
 namespace ClientManagementService.Domain.Services
 {
-    public interface IClientService
+    public class ClientService
     {
-        Task<Client> ClientLogin(string email, string password);
-        Task ClientLogout(long id);
-    }
+        protected readonly IClientRetrievalRepository _clientRetrievalRepository;
 
-    public class ClientService : ClientBaseService, IClientService
-    {
-        private readonly IClientUpsertRepository _clientRepository;
-        private readonly IPasswordService _passwordService;
-
-        public ClientService(IClientUpsertRepository clientRepository, IPasswordService passwordService, IClientRetrievalRepository clientRetrievalRepository)
-            : base(clientRetrievalRepository)
+        public ClientService(IClientRetrievalRepository clientRetrievalRepository)
         {
-            _clientRepository = clientRepository;
-            _passwordService = passwordService;
+            _clientRetrievalRepository = clientRetrievalRepository;
         }
 
-        public async Task<Client> ClientLogin(string username, string password)
+        protected async Task<ClientDb> GetDbClientById(long id)
         {
-            var client = await GetDbClientByUsername(username);
+            var filterModel = new GetClientFilterModel<long>(GetClientFilterEnum.Id, id);
 
-            if (client.IsLocked)
+            var client = await _clientRetrievalRepository.GetClientByFilter(filterModel);
+
+            if (client == null)
             {
-                throw new ArgumentException("Client account is locked. Contact admin to get unlocked.");
+                throw new EntityNotFoundException("Client");
             }
 
-            await VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(password, client);
-
-            if (client.IsLoggedIn)
-            {
-                return ClientMapper.ToCoreClient(client);
-            }
-
-            client.IsLoggedIn = true;
-            
-            await _clientRepository.UpdateClient(client);
-
-            return ClientMapper.ToCoreClient(client);
+            return client;
         }
 
-        public async Task ClientLogout(long id)
+        protected async Task<ClientDb> GetDbClientByUsername(string username)
         {
-            var client = await GetDbClientById(id);
+            var filterModel = new GetClientFilterModel<string>(GetClientFilterEnum.Username, username);
 
-            if (!client.IsLoggedIn)
+            var client = await _clientRetrievalRepository.GetClientByFilter(filterModel);
+
+            if (client == null)
             {
-                return;
+                throw new EntityNotFoundException("Client");
             }
 
-            client.IsLoggedIn = false;
-
-            await _clientRepository.UpdateClient(client);
+            return client;
         }
 
-        private async Task IncrementClientFailedLoginAttempts(ClientDB client)
+        protected async Task<ClientDb> GetDbClientByEmail(string email)
         {
-            if (client.IsLocked)
+            var filterModel = new GetClientFilterModel<string>(GetClientFilterEnum.Email, email);
+
+            var client = await _clientRetrievalRepository.GetClientByFilter(filterModel);
+
+            if (client == null)
             {
-                return;
+                throw new EntityNotFoundException("Client");
             }
 
-            var attempts = await _clientRepository.IncrementClientFailedLoginAttempts(client.Id);
-
-            if (attempts != 3)
-            {
-                return;
-            }
-
-            client.IsLocked = true;
-            client.FailedLoginAttempts = attempts;
-
-            await _clientRepository.UpdateClient(client);
-        }
-
-        private async Task VerifyLoginPasswordAndIncrementFailedLoginAttemptsIfFail(string password, ClientDB client)
-        {
-            try
-            {
-                _passwordService.ValidatePasswordForLogin(password, client.Password);
-            }
-            catch (ArgumentException)
-            {
-                //password was incorrect
-                await IncrementClientFailedLoginAttempts(client);
-
-                throw;
-            }
+            return client;
         }
     }
 }

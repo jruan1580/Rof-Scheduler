@@ -1,8 +1,6 @@
 ﻿using ClientManagementService.API.Controllers;
 using ClientManagementService.Domain.Services;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Newtonsoft.Json;
@@ -10,7 +8,6 @@ using NUnit.Framework;
 using RofShared.Services;
 using RofShared.StartupInits;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -25,7 +22,7 @@ namespace ClientManagementService.Test.Controller
         protected HttpClient _httpClient;
         protected ITokenHandler _tokenHandler;
 
-        protected readonly Mock<IClientService> _clientService = new Mock<IClientService>();
+        protected readonly Mock<IClientAuthService> _clientAuthService = new Mock<IClientAuthService>();
         protected readonly Mock<IClientRetrievalService> _clientRetrievalService = new Mock<IClientRetrievalService>();
         protected readonly Mock<IClientUpsertService> _clientUpsertService = new Mock<IClientUpsertService>();
         protected readonly Mock<IPetService> _petService = new Mock<IPetService>();
@@ -61,7 +58,7 @@ namespace ClientManagementService.Test.Controller
 
             Action<IServiceCollection> services = service =>
             {
-                service.AddTransient(provider => _clientService.Object);
+                service.AddTransient(provider => _clientAuthService.Object);
                 service.AddTransient(provider => _clientRetrievalService.Object);
                 service.AddTransient(provider => _clientUpsertService.Object);
                 service.AddTransient(provider => _petService.Object);

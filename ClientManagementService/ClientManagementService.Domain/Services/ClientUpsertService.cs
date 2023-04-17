@@ -11,7 +11,7 @@ using DBClient = ClientManagementService.Infrastructure.Persistence.Entities.Cli
 
 namespace ClientManagementService.Domain.Services
 {
-    public class ClientUpsertService : ClientBaseService, IClientUpsertService
+    public class ClientUpsertService : ClientService, IClientUpsertService
     {
         private readonly IClientUpsertRepository _clientUpsertRepository;
 
