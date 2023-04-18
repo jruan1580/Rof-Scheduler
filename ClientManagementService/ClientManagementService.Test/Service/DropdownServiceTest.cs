@@ -11,7 +11,7 @@ namespace ClientManagementService.Test.Service
     [TestFixture]
     public class DropdownServiceTest
     {
-        private Mock<IPetRepository> _petRepository;
+        private Mock<IPetRetrievalRepository> _petRepository;
         private Mock<IPetToVaccinesRepository> _petToVaccinesRepository;
         private Mock<IClientRetrievalRepository> _clientRetrievalRepository;
 
@@ -20,9 +20,9 @@ namespace ClientManagementService.Test.Service
         [SetUp]
         public void Setup()
         {
-            _petRepository = new Mock<IPetRepository>();
+            _petRepository = new Mock<IPetRetrievalRepository>();
 
-            _petRepository.Setup(p => p.GetAllPetTypes())
+            _petRepository.Setup(p => p.GetPetTypesForDropdown())
                 .ReturnsAsync(new List<PetType>()
                 {
                     new PetType()
@@ -37,7 +37,7 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
-            _petRepository.Setup(p => p.GetPetBreedByPetTypeId(It.IsAny<short>()))
+            _petRepository.Setup(p => p.GetBreedsByPetTypeIdForDropdown(It.IsAny<short>()))
                 .ReturnsAsync(new List<Breed>()
                 {
                     new Breed()

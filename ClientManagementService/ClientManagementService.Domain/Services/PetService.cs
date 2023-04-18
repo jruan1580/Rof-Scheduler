@@ -25,11 +25,16 @@ namespace ClientManagementService.Domain.Services
     public class PetService : IPetService
     {
         private readonly IPetRepository _petRepository;
+        private readonly IPetRetrievalRepository _petRetrievalRepository;
         private readonly IPetToVaccinesRepository _petToVaccinesRepository;
 
-        public PetService(IPetRepository petRepository, IPetToVaccinesRepository petToVaccinesRepository)
+        public PetService(IPetRepository petRepository, 
+            IPetRetrievalRepository petRetrievalRepository,
+            IPetToVaccinesRepository petToVaccinesRepository)
         {
             _petRepository = petRepository;
+
+            _petRetrievalRepository = petRetrievalRepository;
 
             _petToVaccinesRepository = petToVaccinesRepository;
         }
@@ -45,7 +50,7 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var petExists = await _petRepository.PetAlreadyExists(0, newPet.OwnerId, newPet.Name);
+            var petExists = await _petRetrievalRepository.DoesPetExistByNameAndOwner(0, newPet.OwnerId, newPet.Name);
             if (petExists)
             {
                 throw new ArgumentException($"This pet already exists under Owner with id: {newPet.OwnerId}.");
@@ -65,7 +70,7 @@ namespace ClientManagementService.Domain.Services
 
         public async Task<PetsWithTotalPage> GetAllPetsByKeyword(int page, int offset, string keyword)
         {
-            var result = await _petRepository.GetAllPetsByKeyword(page, offset, keyword);
+            var result = await _petRetrievalRepository.GetAllPetsByKeyword(page, offset, keyword);
             var pets = result.Item1;
             var totalPages = result.Item2;
 
@@ -81,7 +86,7 @@ namespace ClientManagementService.Domain.Services
 
         public async Task<Pet> GetPetById(long petId)
         {
-            var pet = await _petRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, petId));
+            var pet = await _petRetrievalRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, petId));
 
             if (pet == null)
             {
@@ -100,7 +105,7 @@ namespace ClientManagementService.Domain.Services
 
         public async Task<Pet> GetPetByName(string name)
         {
-            var pet = await _petRepository.GetPetByFilter(new GetPetFilterModel<string>(GetPetFilterEnum.Name, name));
+            var pet = await _petRetrievalRepository.GetPetByFilter(new GetPetFilterModel<string>(GetPetFilterEnum.Name, name));
 
             if (pet == null)
             {
@@ -119,7 +124,7 @@ namespace ClientManagementService.Domain.Services
 
         public async Task<PetsWithTotalPage> GetPetsByClientIdAndKeyword(long clientId, int page, int offset, string keyword)
         {
-            var result = await _petRepository.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
+            var result = await _petRetrievalRepository.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
             var pets = result.Item1;
             var totalPages = result.Item2;
 
@@ -142,13 +147,13 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var petExists = await _petRepository.PetAlreadyExists(updatePet.Id, updatePet.OwnerId, updatePet.Name);
+            var petExists = await _petRetrievalRepository.DoesPetExistByNameAndOwner(updatePet.Id, updatePet.OwnerId, updatePet.Name);
             if (petExists)
             {
                 throw new ArgumentException($"Pet with same name and breed already exist under this owner id {updatePet.OwnerId}");
             }
 
-            var origPet = await _petRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, updatePet.Id));
+            var origPet = await _petRetrievalRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, updatePet.Id));
             if (origPet == null)
             {
                 throw new EntityNotFoundException("Pet was not found. Failed to update.");
