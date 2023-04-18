@@ -1,6 +1,8 @@
 ﻿using ClientManagementService.Infrastructure.Persistence.Entities;
+using ClientManagementService.Infrastructure.Persistence.Filters.Client;
 using ClientManagementService.Infrastructure.Persistence.Filters.Pet;
 using Microsoft.EntityFrameworkCore;
+using RofShared.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,18 @@ using System.Threading.Tasks;
 
 namespace ClientManagementService.Infrastructure.Persistence
 {
-    public class PetRetrievalRepository
+    public interface IPetRetrievalRepository
+    {
+        Task<bool> DoesPetExistByNameAndOwner(long petId, long ownerId, string name);
+        Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
+        Task<List<Breed>> GetBreedsByPetTypeIdForDropdown(short petTypeId);
+        Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
+        Task<(List<Pet>, int)> GetPetsByClientIdAndKeyword(long clientId, int page = 1, int offset = 10, string keyword = "");
+        Task<List<Pet>> GetPetsForDropdown();
+        Task<List<PetType>> GetPetTypesForDropdown();
+    }
+
+    public class PetRetrievalRepository : IPetRetrievalRepository
     {
         public async Task<List<Pet>> GetPetsForDropdown()
         {
@@ -17,10 +30,6 @@ namespace ClientManagementService.Infrastructure.Persistence
             return await context.Pets.Select(p => new Pet() { Id = p.Id, Name = p.Name }).ToListAsync();
         }
 
-        /// <summary>
-        /// Will be called when we want to retrieve a list of pet types for drop down list
-        /// </summary>
-        /// <returns></returns>
         public async Task<List<PetType>> GetPetTypesForDropdown()
         {
             using var context = new RofSchedulerContext();
@@ -28,11 +37,6 @@ namespace ClientManagementService.Infrastructure.Persistence
             return await context.PetTypes.ToListAsync();
         }
 
-        /// <summary>
-        /// Will call to retrieve a list of breeds after pet type has been selected
-        /// </summary>
-        /// <param name="petTypeId"></param>
-        /// <returns></returns>
         public async Task<List<Breed>> GetBreedsByPetTypeIdForDropdown(short petTypeId)
         {
             using var context = new RofSchedulerContext();
@@ -45,36 +49,20 @@ namespace ClientManagementService.Infrastructure.Persistence
             using var context = new RofSchedulerContext();
 
             var skip = (page - 1) * offset;
+
             IQueryable<Pet> pets = context.Pets.Where(p => p.OwnerId == clientId);
 
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                keyword = keyword.ToLower();
+            var petList = FilterByKeyword(context, pets, keyword?.Trim()?.ToLower());
 
-                pets = context.Pets.Where(p => (p.Name.ToLower().Contains(keyword)));
-            }
+            var countByCriteria = await petList.CountAsync();
 
-            var countByCriteria = await pets.CountAsync();
+            var totalPages = DatabaseUtilities.GetTotalPages(countByCriteria, offset, page);
 
-            if (countByCriteria == 0)
-            {
-                return (new List<Pet>(), 0);
-            }
+            var result = await petList.OrderByDescending(p => p.Id).Skip(skip).Take(offset).ToListAsync();
 
-            var fullPages = countByCriteria / offset;
-            var remaining = countByCriteria % offset;
-            var totalPages = (remaining > 0) ? fullPages + 1 : fullPages;
+            await PopulateBreedOwnerAndPetType(context, result);
 
-            if (page > totalPages)
-            {
-                throw new ArgumentException("No more pets.");
-            }
-
-            var res = await pets.Skip(skip).Take(offset).ToListAsync();
-
-            await PopulateBreedOwnerAndPetType(context, res);
-
-            return (res, totalPages);
+            return (result, totalPages);
         }
 
         public async Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "")
@@ -82,32 +70,16 @@ namespace ClientManagementService.Infrastructure.Persistence
             using var context = new RofSchedulerContext();
 
             var skip = (page - 1) * offset;
-            IQueryable<Pet> pet = context.Pets;
 
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                keyword = keyword.ToLower();
+            IQueryable<Pet> pets = context.Pets;
 
-                pet = context.Pets.Where(p => (p.Name.ToLower().Contains(keyword)));
-            }
+            var petList = FilterByKeyword(context, pets, keyword?.Trim()?.ToLower());
 
-            var countByCriteria = await pet.CountAsync();
+            var countByCriteria = await petList.CountAsync();
 
-            if (countByCriteria == 0)
-            {
-                return (new List<Pet>(), 0);
-            }
+            var totalPages = DatabaseUtilities.GetTotalPages(countByCriteria, offset, page);
 
-            var fullPages = countByCriteria / offset;
-            var remaining = countByCriteria % offset;
-            var totalPages = (remaining > 0) ? fullPages + 1 : fullPages;
-
-            if (page > totalPages)
-            {
-                throw new ArgumentException("No more pets.");
-            }
-
-            var result = await pet.OrderByDescending(p => p.Id).Skip(skip).Take(offset).ToListAsync();
+            var result = await petList.OrderByDescending(p => p.Id).Skip(skip).Take(offset).ToListAsync();
 
             await PopulateBreedOwnerAndPetType(context, result);
 
@@ -122,11 +94,15 @@ namespace ClientManagementService.Infrastructure.Persistence
 
             if (filter.Filter == GetPetFilterEnum.Id)
             {
-                pet = await context.Pets.FirstOrDefaultAsync(p => p.Id == Convert.ToInt64(filter.Value));
+                var val = Convert.ToInt64(filter.Value);
+
+                pet = await context.Pets.FirstOrDefaultAsync(p => p.Id == val);
             }
             else if (filter.Filter == GetPetFilterEnum.Name)
             {
-                pet = await context.Pets.FirstOrDefaultAsync(p => p.Name.ToLower().Equals(Convert.ToString(filter.Value).ToLower()));
+                var name = Convert.ToString(filter.Value).ToLower();
+
+                pet = await context.Pets.FirstOrDefaultAsync(p => p.Name.ToLower().Equals(name));
             }
             else
             {
@@ -145,13 +121,15 @@ namespace ClientManagementService.Infrastructure.Persistence
             return pet;
         }
 
-        public async Task<bool> PetAlreadyExists(long petId, long ownerId, string name)
+        public async Task<bool> DoesPetExistByNameAndOwner(long petId, long ownerId, string name)
         {
             using var context = new RofSchedulerContext();
 
             name = name.ToLower();
 
-            return await context.Pets.AnyAsync(p => p.Id != petId && p.Name.ToLower().Equals(name) && p.OwnerId.Equals(ownerId));
+            return await context.Pets.AnyAsync(p => p.Id != petId
+                && p.Name.ToLower().Equals(name)
+                && p.OwnerId.Equals(ownerId));
         }
 
         private async Task PopulateBreedOwnerAndPetType(RofSchedulerContext context, List<Pet> pets)
@@ -171,6 +149,20 @@ namespace ClientManagementService.Infrastructure.Persistence
                 pet.Breed = breeds.First(b => b.Id == pet.BreedId);
                 pet.PetType = petTypes.First(pt => pt.Id == pet.PetTypeId);
             }
+        }
+
+        private IQueryable<Pet> FilterByKeyword(RofSchedulerContext context, IQueryable<Pet> pets, string keyword)
+        {
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return pets;
+            }
+
+            return pets.Where(p => (p.Name.ToLower().Contains(keyword))
+                || (p.PetType.PetTypeName.ToLower().Contains(keyword))
+                || (p.Breed.BreedName.ToLower().Contains(keyword))
+                || (p.Owner.FirstName.ToLower().Contains(keyword))
+                || (p.Owner.LastName.ToLower().Contains(keyword)));
         }
     }
 }
