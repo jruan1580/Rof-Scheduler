@@ -3,6 +3,7 @@ using ClientManagementService.Infrastructure.Persistence.Filters.Client;
 using ClientManagementService.Infrastructure.Persistence.Filters.Pet;
 using Microsoft.EntityFrameworkCore;
 using RofShared.Database;
+using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 {
     public interface IPetRetrievalRepository
     {
-        Task<bool> DoesPetExistByNameAndOwner(long petId, long ownerId, string name);
+        Task<bool> DoesPetWithNameAndBreedExistUnderOwner(long petId, long ownerId, string name, short breedId);
         Task<(List<Pet>, int)> GetAllPetsByKeyword(int page = 1, int offset = 10, string keyword = "");
         Task<List<Breed>> GetBreedsByPetTypeIdForDropdown(short petTypeId);
         Task<Pet> GetPetByFilter<T>(GetPetFilterModel<T> filter);
@@ -60,7 +61,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 
             var result = await petList.OrderByDescending(p => p.Id).Skip(skip).Take(offset).ToListAsync();
 
-            await PopulateBreedOwnerAndPetType(context, result);
+            await PopulateOwnerBreedAndPetType(context, result);
 
             return (result, totalPages);
         }
@@ -81,7 +82,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 
             var result = await petList.OrderByDescending(p => p.Id).Skip(skip).Take(offset).ToListAsync();
 
-            await PopulateBreedOwnerAndPetType(context, result);
+            await PopulateOwnerBreedAndPetType(context, result);
 
             return (result, totalPages);
         }
@@ -111,7 +112,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 
             if (pet == null)
             {
-                return null;
+                throw new EntityNotFoundException("Pet");
             }
 
             pet.Owner = await context.Clients.FirstOrDefaultAsync(c => c.Id == pet.OwnerId);
@@ -121,18 +122,29 @@ namespace ClientManagementService.Infrastructure.Persistence
             return pet;
         }
 
-        public async Task<bool> DoesPetExistByNameAndOwner(long petId, long ownerId, string name)
+        public async Task<bool> DoesPetWithNameAndBreedExistUnderOwner(long petId, long ownerId, string name, short breedId)
         {
             using var context = new RofSchedulerContext();
 
             name = name.ToLower();
 
             return await context.Pets.AnyAsync(p => p.Id != petId
+                && p.OwnerId.Equals(ownerId)
                 && p.Name.ToLower().Equals(name)
-                && p.OwnerId.Equals(ownerId));
+                && p.BreedId.Equals(breedId));
         }
 
-        private async Task PopulateBreedOwnerAndPetType(RofSchedulerContext context, List<Pet> pets)
+        private IQueryable<Pet> FilterByKeyword(RofSchedulerContext context, IQueryable<Pet> pets, string keyword)
+        {
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return pets;
+            }
+
+            return pets.Where(p => (p.Name.ToLower().Contains(keyword)));
+        }
+
+        private async Task PopulateOwnerBreedAndPetType(RofSchedulerContext context, List<Pet> pets)
         {
             var clientIds = pets.Select(p => p.OwnerId).Distinct().ToList();
             var clients = await context.Clients.Where(c => clientIds.Any(id => c.Id == id)).ToListAsync();
@@ -149,20 +161,6 @@ namespace ClientManagementService.Infrastructure.Persistence
                 pet.Breed = breeds.First(b => b.Id == pet.BreedId);
                 pet.PetType = petTypes.First(pt => pt.Id == pet.PetTypeId);
             }
-        }
-
-        private IQueryable<Pet> FilterByKeyword(RofSchedulerContext context, IQueryable<Pet> pets, string keyword)
-        {
-            if (string.IsNullOrEmpty(keyword))
-            {
-                return pets;
-            }
-
-            return pets.Where(p => (p.Name.ToLower().Contains(keyword))
-                || (p.PetType.PetTypeName.ToLower().Contains(keyword))
-                || (p.Breed.BreedName.ToLower().Contains(keyword))
-                || (p.Owner.FirstName.ToLower().Contains(keyword))
-                || (p.Owner.LastName.ToLower().Contains(keyword)));
         }
     }
 }

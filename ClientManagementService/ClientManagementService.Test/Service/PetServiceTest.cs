@@ -67,7 +67,7 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _petRetrievalRepo.Setup(p => p.DoesPetExistByNameAndOwner(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
+            _petRetrievalRepo.Setup(p => p.DoesPetWithNameAndBreedExistUnderOwner(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>(), It.IsAny<short>()))
                 .ReturnsAsync(true);
 
             var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
@@ -575,7 +575,7 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _petRetrievalRepo.Setup(p => p.DoesPetExistByNameAndOwner(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
+            _petRetrievalRepo.Setup(p => p.DoesPetWithNameAndBreedExistUnderOwner(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>(), It.IsAny<short>()))
                .ReturnsAsync(true);
 
             var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);

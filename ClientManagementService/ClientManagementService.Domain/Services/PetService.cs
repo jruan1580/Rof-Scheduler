@@ -50,7 +50,7 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var petExists = await _petRetrievalRepository.DoesPetExistByNameAndOwner(0, newPet.OwnerId, newPet.Name);
+            var petExists = await _petRetrievalRepository.DoesPetWithNameAndBreedExistUnderOwner(0, newPet.OwnerId, newPet.Name, newPet.BreedId);
             if (petExists)
             {
                 throw new ArgumentException($"This pet already exists under Owner with id: {newPet.OwnerId}.");
@@ -147,7 +147,7 @@ namespace ClientManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var petExists = await _petRetrievalRepository.DoesPetExistByNameAndOwner(updatePet.Id, updatePet.OwnerId, updatePet.Name);
+            var petExists = await _petRetrievalRepository.DoesPetWithNameAndBreedExistUnderOwner(updatePet.Id, updatePet.OwnerId, updatePet.Name, updatePet.BreedId);
             if (petExists)
             {
                 throw new ArgumentException($"Pet with same name and breed already exist under this owner id {updatePet.OwnerId}");
