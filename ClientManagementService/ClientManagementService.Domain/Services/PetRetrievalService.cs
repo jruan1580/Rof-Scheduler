@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClientManagementService.Domain.Services
 {
-    public class PetRetrievalService : PetBaseService
+    public class PetRetrievalService : PetBaseService, IPetRetrievalService
     {
         public PetRetrievalService(IPetRetrievalRepository petRetrievalRepository,
             IPetToVaccinesRepository petToVaccinesRepository)
@@ -54,6 +54,6 @@ namespace ClientManagementService.Domain.Services
             var petToVaccines = await GetDbPetToVaccineByPetId(pet.Id);
 
             return PetMapper.ToCorePet(pet, petToVaccines);
-        }        
+        }
     }
 }

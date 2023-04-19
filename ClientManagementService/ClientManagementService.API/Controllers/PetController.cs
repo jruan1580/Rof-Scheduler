@@ -15,6 +15,7 @@ namespace ClientManagementService.API.Controllers
     public class PetController : ControllerBase
     {
         private readonly IPetService _petService;
+        private readonly IPetRetrievalService _petRetrievalService;
 
         public PetController(IPetService petService)
         {
@@ -36,7 +37,7 @@ namespace ClientManagementService.API.Controllers
         {
             var petList = new List<PetDTO>();
 
-            var result = await _petService.GetAllPetsByKeyword(page, offset, keyword);
+            var result = await _petRetrievalService.GetAllPetsByKeyword(page, offset, keyword);
 
             foreach (var pet in result.Pets)
             {
@@ -50,7 +51,7 @@ namespace ClientManagementService.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPetById(long id)
         {
-            var pet = await _petService.GetPetById(id);
+            var pet = await _petRetrievalService.GetPetById(id);
 
             return Ok(PetDTOMapper.ToDTOPet(pet));
         }
@@ -59,7 +60,7 @@ namespace ClientManagementService.API.Controllers
         [HttpGet("{name}/name")]
         public async Task<IActionResult> GetPetByName(string name)
         {
-            var pet = await _petService.GetPetByName(name);
+            var pet = await _petRetrievalService.GetPetByName(name);
 
             return Ok(PetDTOMapper.ToDTOPet(pet));
         }
@@ -70,7 +71,7 @@ namespace ClientManagementService.API.Controllers
         {
             var petList = new List<PetDTO>();
 
-            var result = await _petService.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
+            var result = await _petRetrievalService.GetPetsByClientIdAndKeyword(clientId, page, offset, keyword);
 
             foreach (var pet in result.Pets)
             {
