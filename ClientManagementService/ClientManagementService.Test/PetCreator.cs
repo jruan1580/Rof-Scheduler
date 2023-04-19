@@ -17,7 +17,23 @@ namespace ClientManagementService.Test
                 PetTypeId = 1,
                 Name = "Layla",
                 Weight = 70,
-                Dob = "3/14/2019"
+                Dob = "3/14/2019",
+                Owner = new Infrastructure.Persistence.Entities.Client()
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe"
+                },
+                Breed = new Infrastructure.Persistence.Entities.Breed()
+                {
+                    Id = 1,
+                    BreedName = "Golden Retriever"
+                },
+                PetType = new Infrastructure.Persistence.Entities.PetType()
+                {
+                    Id = 1,
+                    PetTypeName = "Dog"
+                }
             };
         }
 
