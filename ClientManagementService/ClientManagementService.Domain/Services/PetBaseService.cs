@@ -1,10 +1,7 @@
 ﻿using ClientManagementService.Infrastructure.Persistence;
-using ClientManagementService.Infrastructure.Persistence.Filters.Client;
 using ClientManagementService.Infrastructure.Persistence.Filters.Pet;
 using RofShared.Exceptions;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using PetDb = ClientManagementService.Infrastructure.Persistence.Entities.Pet;
 using PetToVaccineDB = ClientManagementService.Infrastructure.Persistence.Entities.PetToVaccine;
