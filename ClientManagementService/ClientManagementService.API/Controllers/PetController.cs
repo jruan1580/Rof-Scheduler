@@ -17,9 +17,11 @@ namespace ClientManagementService.API.Controllers
         private readonly IPetService _petService;
         private readonly IPetRetrievalService _petRetrievalService;
 
-        public PetController(IPetService petService)
+        public PetController(IPetService petService,
+            IPetRetrievalService petRetrievalService)
         {
             _petService = petService;
+            _petRetrievalService = petRetrievalService;
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]

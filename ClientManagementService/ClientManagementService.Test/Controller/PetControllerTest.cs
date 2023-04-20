@@ -89,7 +89,7 @@ namespace ClientManagementService.Test.Controller
                 PetCreator.GetDomainPet()
             };
 
-            _petService.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _petRetrievalService.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(new PetsWithTotalPage(newPets, 1));
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}?page=1&offset=10&keyword=test");
@@ -100,7 +100,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetAllPets_InternalServerError()
         {
-            _petService.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _petRetrievalService.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}?page=1&offset=10&keyword=test");
@@ -113,7 +113,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetPetById_Success()
         {
-            _petService.Setup(p => p.GetPetById(It.IsAny<long>()))
+            _petRetrievalService.Setup(p => p.GetPetById(It.IsAny<long>()))
                 .ReturnsAsync(PetCreator.GetDomainPet());
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
@@ -124,7 +124,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetPetById_NotFound()
         {
-            _petService.Setup(p => p.GetPetById(It.IsAny<long>()))
+            _petRetrievalService.Setup(p => p.GetPetById(It.IsAny<long>()))
                 .ThrowsAsync(new EntityNotFoundException("Pet"));
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
@@ -137,7 +137,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetPetById_InternalServerError()
         {
-            _petService.Setup(p => p.GetPetById(It.IsAny<long>()))
+            _petRetrievalService.Setup(p => p.GetPetById(It.IsAny<long>()))
                 .ReturnsAsync((Pet)null);
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
@@ -148,7 +148,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetPetByName_Success()
         {
-            _petService.Setup(p => p.GetPetByName(It.IsAny<string>()))
+            _petRetrievalService.Setup(p => p.GetPetByName(It.IsAny<string>()))
                 .ReturnsAsync(PetCreator.GetDomainPet());
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/Layla/name");
@@ -159,7 +159,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetPetByName_NotFound()
         {
-            _petService.Setup(p => p.GetPetByName(It.IsAny<string>()))
+            _petRetrievalService.Setup(p => p.GetPetByName(It.IsAny<string>()))
                 .ThrowsAsync(new EntityNotFoundException("Pet"));
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/Layla/name");
@@ -172,7 +172,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetPetByName_InternalServerError()
         {
-            _petService.Setup(p => p.GetPetByName(It.IsAny<string>()))
+            _petRetrievalService.Setup(p => p.GetPetByName(It.IsAny<string>()))
                 .ReturnsAsync((Pet)null);
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/Layla/name");
@@ -188,7 +188,7 @@ namespace ClientManagementService.Test.Controller
                 PetCreator.GetDomainPet()
             };
 
-            _petService.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _petRetrievalService.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(new PetsWithTotalPage(pets, 1));
 
             var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/clientId?page=1&offset=10&keyword=test");
@@ -199,7 +199,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task GetPetsByClientId_InternalServerError()
         {
-            _petService.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _petRetrievalService.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/clientId?page=1&offset=10&keyword=test");
