@@ -24,6 +24,7 @@ namespace ClientManagementService.API
         {
             services.AddSingleton<IClientRetrievalRepository, ClientRetrievalRepository>();
             services.AddSingleton<IClientUpsertRepository, ClientUpsertRepository>();
+            services.AddSingleton<IPetRetrievalRepository, PetRetrievalRepository>();
             services.AddSingleton<IPetRepository, PetRepository>();
             services.AddSingleton<IPetToVaccinesRepository, PetToVaccinesRepository>();
 

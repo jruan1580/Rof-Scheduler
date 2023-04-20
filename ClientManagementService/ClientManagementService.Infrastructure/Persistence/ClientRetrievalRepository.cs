@@ -37,7 +37,7 @@ namespace ClientManagementService.Infrastructure.Persistence
 
             var totalPages = DatabaseUtilities.GetTotalPages(countByCriteria, offset, page);
 
-            var result = await clients.OrderByDescending(e => e.Id).Skip(skip).Take(offset).ToListAsync();
+            var result = await clients.OrderByDescending(c => c.Id).Skip(skip).Take(offset).ToListAsync();
 
             return (result, totalPages);
         }
@@ -56,7 +56,7 @@ namespace ClientManagementService.Infrastructure.Persistence
             {
                 var username = Convert.ToString(filter.Value).ToLower();
 
-                return await context.Clients.FirstOrDefaultAsync(e => e.Username.ToLower().Equals(username));
+                return await context.Clients.FirstOrDefaultAsync(c => c.Username.ToLower().Equals(username));
             }
             else if (filter.Filter == GetClientFilterEnum.Email)
             {
@@ -88,9 +88,9 @@ namespace ClientManagementService.Infrastructure.Persistence
                 return clients;
             }
 
-            return clients.Where(e => (e.FirstName.ToLower().Contains(keyword))
-                || (e.LastName.ToLower().Contains(keyword))
-                || (e.EmailAddress.ToLower().Contains(keyword)));
+            return clients.Where(c => (c.FirstName.ToLower().Contains(keyword))
+                || (c.LastName.ToLower().Contains(keyword))
+                || (c.EmailAddress.ToLower().Contains(keyword)));
         }
     }
 }

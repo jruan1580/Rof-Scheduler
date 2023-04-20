@@ -18,15 +18,15 @@ namespace ClientManagementService.Domain.Services
     public class DropdownService : IDropdownService
     {
         private readonly IClientRetrievalRepository _clientRetrievalRepository;
-        private readonly IPetRepository _petRepository;
+        private readonly IPetRetrievalRepository _petRetrievalRepository;
         private readonly IPetToVaccinesRepository _petToVaccineRepository;
 
         public DropdownService(IClientRetrievalRepository clientRetrievalRepository,
-            IPetRepository petRepository, 
+            IPetRetrievalRepository petRetrievalRepository, 
             IPetToVaccinesRepository petToVaccineToRepository)
         {
             _clientRetrievalRepository = clientRetrievalRepository;
-            _petRepository = petRepository;
+            _petRetrievalRepository = petRetrievalRepository;
             _petToVaccineRepository = petToVaccineToRepository;
         }
 
@@ -37,7 +37,7 @@ namespace ClientManagementService.Domain.Services
         /// <returns></returns>
         public async Task<List<PetType>> GetPetTypes()
         {
-            var pt = await _petRepository.GetAllPetTypes();
+            var pt = await _petRetrievalRepository.GetPetTypesForDropdown();
 
             var types = new List<PetType>();
             foreach (var petType in pt)
@@ -76,7 +76,7 @@ namespace ClientManagementService.Domain.Services
         {
             var breeds = new List<Breed>();
 
-            foreach (var breed in await _petRepository.GetPetBreedByPetTypeId(petTypeId))
+            foreach (var breed in await _petRetrievalRepository.GetBreedsByPetTypeIdForDropdown(petTypeId))
             {
                 breeds.Add(PetMapper.ToCoreBreed(breed));
             }
@@ -107,7 +107,7 @@ namespace ClientManagementService.Domain.Services
         {
             var pets = new List<Pet>();
 
-            foreach (var pet in await _petRepository.GetPetsForDropdown())
+            foreach (var pet in await _petRetrievalRepository.GetPetsForDropdown())
             {
                 pets.Add(PetMapper.ToCorePetDropDown(pet));
             }

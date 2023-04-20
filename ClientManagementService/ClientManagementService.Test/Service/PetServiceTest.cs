@@ -16,12 +16,14 @@ namespace ClientManagementService.Test.Service
     public class PetServiceTest
     {
         private Mock<IPetRepository> _petRepository;
+        private Mock<IPetRetrievalRepository> _petRetrievalRepo;
         private Mock<IPetToVaccinesRepository> _petToVaccinesRepository;
 
         [SetUp]
         public void Setup()
         {
             _petRepository = new Mock<IPetRepository>();
+            _petRetrievalRepo = new Mock<IPetRetrievalRepository>();
             _petToVaccinesRepository = new Mock<IPetToVaccinesRepository>();
         }
 
@@ -37,7 +39,7 @@ namespace ClientManagementService.Test.Service
                 Weight = 0
             };
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => petService.AddPet(newPet));
         }
@@ -65,10 +67,10 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _petRepository.Setup(p => p.PetAlreadyExists(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
+            _petRetrievalRepo.Setup(p => p.DoesPetWithNameAndBreedExistUnderOwner(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>(), It.IsAny<short>()))
                 .ReturnsAsync(true);
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => petService.AddPet(newPet));
         }
@@ -99,7 +101,7 @@ namespace ClientManagementService.Test.Service
             _petRepository.Setup(p => p.AddPet(It.IsAny<Pet>())).ReturnsAsync(1);
             _petToVaccinesRepository.Setup(p => p.AddPetToVaccines(It.IsAny<List<PetToVaccine>>())).Returns(Task.CompletedTask);
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             await petService.AddPet(newPet);
 
@@ -110,10 +112,10 @@ namespace ClientManagementService.Test.Service
         [Test]
         public async Task GetAllPets_NoPets()
         {
-            _petRepository.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _petRetrievalRepo.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((new List<Pet>(), 0));
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             var result = await petService.GetAllPetsByKeyword(1, 10, "");
 
@@ -155,10 +157,10 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _petRepository.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _petRetrievalRepo.Setup(p => p.GetAllPetsByKeyword(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((pets, 1));
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             var result = await petService.GetAllPetsByKeyword(1, 10, "");
 
@@ -190,10 +192,10 @@ namespace ClientManagementService.Test.Service
         [Test]
         public void GetPetById_DoesNotExist()
         {
-            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
+            _petRetrievalRepo.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
                 .ReturnsAsync((Pet)null);
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<EntityNotFoundException>(() => petService.GetPetById(1));
         }
@@ -201,7 +203,7 @@ namespace ClientManagementService.Test.Service
         [Test]
         public async Task GetPetById_Success()
         {
-            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
+            _petRetrievalRepo.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
                 .ReturnsAsync(new Pet()
                 {
                     Id = 1,
@@ -248,7 +250,7 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             var pet = await petService.GetPetById(1);
 
@@ -288,7 +290,7 @@ namespace ClientManagementService.Test.Service
         [Test]
         public void GetPetById_MissingVaccines()
         {
-            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
+            _petRetrievalRepo.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
                 .ReturnsAsync(new Pet()
                 {
                     Id = 1,
@@ -321,7 +323,7 @@ namespace ClientManagementService.Test.Service
             _petToVaccinesRepository.Setup(v => v.GetPetToVaccineByPetId(It.IsAny<long>()))
                 .ReturnsAsync(new List<PetToVaccine>());
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<EntityNotFoundException>(() => petService.GetPetById(1));
         }
@@ -329,10 +331,10 @@ namespace ClientManagementService.Test.Service
         [Test]
         public void GetPetByName_DoesNotExist()
         {
-            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<string>>()))
+            _petRetrievalRepo.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<string>>()))
                 .ReturnsAsync((Pet)null);
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<EntityNotFoundException>(() => petService.GetPetByName("Pet1"));
         }
@@ -340,7 +342,7 @@ namespace ClientManagementService.Test.Service
         [Test]
         public async Task GetPetByName_Success()
         {
-            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<string>>()))
+            _petRetrievalRepo.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<string>>()))
                  .ReturnsAsync(new Pet()
                  {
                      Id = 1,
@@ -387,7 +389,7 @@ namespace ClientManagementService.Test.Service
                     }
                 });
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             var pet = await petService.GetPetByName("Pet1");
 
@@ -427,7 +429,7 @@ namespace ClientManagementService.Test.Service
         [Test]
         public void GetPetByName_MissingVaccines()
         {
-            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
+            _petRetrievalRepo.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
                 .ReturnsAsync(new Pet()
                 {
                     Id = 1,
@@ -460,7 +462,7 @@ namespace ClientManagementService.Test.Service
             _petToVaccinesRepository.Setup(v => v.GetPetToVaccineByPetId(It.IsAny<long>()))
                 .ReturnsAsync(new List<PetToVaccine>());
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<EntityNotFoundException>(() => petService.GetPetByName("Pet1"));
         }
@@ -468,10 +470,10 @@ namespace ClientManagementService.Test.Service
         [Test]
         public async Task GetPetsByClientId_NoPets()
         {
-            _petRepository.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _petRetrievalRepo.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((new List<Pet>(), 0));
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             var result = await petService.GetPetsByClientIdAndKeyword(1, 1, 10, "");
 
@@ -514,10 +516,10 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _petRepository.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+            _petRetrievalRepo.Setup(p => p.GetPetsByClientIdAndKeyword(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync((pets, 1));
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             var result = await petService.GetPetsByClientIdAndKeyword(1, 1, 10, "");
 
@@ -573,10 +575,10 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _petRepository.Setup(p => p.PetAlreadyExists(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
+            _petRetrievalRepo.Setup(p => p.DoesPetWithNameAndBreedExistUnderOwner(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>(), It.IsAny<short>()))
                .ReturnsAsync(true);
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => petService.UpdatePet(pet));
         }
@@ -605,7 +607,7 @@ namespace ClientManagementService.Test.Service
                 }
             };
 
-            _petRepository.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
+            _petRetrievalRepo.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
                 .ReturnsAsync(new Pet() { Id = 1 });
 
             _petRepository.Setup(p => p.UpdatePet(It.IsAny<Pet>())).Returns(Task.CompletedTask);
@@ -620,7 +622,7 @@ namespace ClientManagementService.Test.Service
                 });
             _petToVaccinesRepository.Setup(v => v.UpdatePetToVaccines(It.IsAny<List<PetToVaccine>>())).Returns(Task.CompletedTask);
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             await petService.UpdatePet(pet);
 
@@ -634,7 +636,7 @@ namespace ClientManagementService.Test.Service
             _petRepository.Setup(p => p.DeletePetById(It.IsAny<long>()))
                 .ThrowsAsync(new ArgumentException());
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => petService.DeletePetById(1));
         }
@@ -645,7 +647,7 @@ namespace ClientManagementService.Test.Service
             _petRepository.Setup(p => p.DeletePetById(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             await petService.DeletePetById(1);
 
@@ -673,7 +675,7 @@ namespace ClientManagementService.Test.Service
             _petToVaccinesRepository.Setup(pv => pv.GetPetToVaccineByPetId(It.IsAny<long>()))
                 .ReturnsAsync(petToVax);
 
-            var petService = new PetService(_petRepository.Object, _petToVaccinesRepository.Object);
+            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             var result = await petService.GetVaccinesByPetId(1);
 
