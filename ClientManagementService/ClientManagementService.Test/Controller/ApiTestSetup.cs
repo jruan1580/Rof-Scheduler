@@ -25,6 +25,7 @@ namespace ClientManagementService.Test.Controller
         protected readonly Mock<IClientAuthService> _clientAuthService = new Mock<IClientAuthService>();
         protected readonly Mock<IClientRetrievalService> _clientRetrievalService = new Mock<IClientRetrievalService>();
         protected readonly Mock<IClientUpsertService> _clientUpsertService = new Mock<IClientUpsertService>();
+        protected readonly Mock<IPetRetrievalService> _petRetrievalService = new Mock<IPetRetrievalService>();
         protected readonly Mock<IPetService> _petService = new Mock<IPetService>();
         protected readonly Mock<IDropdownService> _dropdownService = new Mock<IDropdownService>();
 
@@ -61,6 +62,7 @@ namespace ClientManagementService.Test.Controller
                 service.AddTransient(provider => _clientAuthService.Object);
                 service.AddTransient(provider => _clientRetrievalService.Object);
                 service.AddTransient(provider => _clientUpsertService.Object);
+                service.AddTransient(provider => _petRetrievalService.Object);
                 service.AddTransient(provider => _petService.Object);
                 service.AddTransient(provider => _dropdownService.Object);
 
