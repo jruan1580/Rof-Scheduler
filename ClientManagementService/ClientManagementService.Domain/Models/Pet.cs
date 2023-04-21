@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Mail;
 
 namespace ClientManagementService.Domain.Models
 {
@@ -28,88 +29,44 @@ namespace ClientManagementService.Domain.Models
 
         public List<VaccineStatus> Vaccines { get; set; }
 
-        public List<string> IsValidPetToCreate()
+        public List<string> GetValidationErrorsForUpdate()
         {
-            var invalidErr = new List<string>();
-
-            if (string.IsNullOrEmpty(Name))
-            {
-                invalidErr.Add("Need pet's name.");
-            }
-
-            if (Weight <= 0)
-            {
-                invalidErr.Add("Need pet's weight.");
-            }
-
-            if (string.IsNullOrEmpty(Dob))
-            {
-                invalidErr.Add("Need pet's birthday.");
-            }
-
-            if (OwnerId <= 0)
-            {
-                invalidErr.Add("Need owner info.");
-            }
-
-            if(BreedId <= 0)
-            {
-                invalidErr.Add("Need breed info.");
-            }
-
-            if (PetTypeId <= 0)
-            {
-                invalidErr.Add("Need to specify pet type.");
-            }
-
-            if (Vaccines == null || Vaccines.Count == 0)
-            {
-                invalidErr.Add("Vaccines were not specified for pet.");
-            }
-
-            return invalidErr;
-        }
-
-        public List<string> IsValidPetToUpdate()
-        {
-            var invalidErr = new List<string>();
+            var validationErrors = new List<string>();
 
             if (Id <= 0)
             {
-                invalidErr.Add($"Invalid Id: {Id}.");
+                validationErrors.Add($"Invalid Id: {Id}.");
             }
 
-            if (string.IsNullOrEmpty(Name))
+            var remainingPropertyValidationErrors = GetValidationErrorsForBothCreateOrUpdate();
+            validationErrors.AddRange(remainingPropertyValidationErrors);
+
+            return validationErrors;
+        }
+
+        public List<string> GetValidationErrorsForBothCreateOrUpdate()
+        {
+            var validationErrors = new List<string>();
+            var failedMessageIfValidationResultIsTrue = new Dictionary<string, bool>();
+
+            failedMessageIfValidationResultIsTrue.Add("Pet name cannot be empty", string.IsNullOrEmpty(Name));
+            failedMessageIfValidationResultIsTrue.Add("Weight cannot be less than 0", Weight <= 0);
+            failedMessageIfValidationResultIsTrue.Add("DOB cannot be empty", string.IsNullOrEmpty(Dob));
+            failedMessageIfValidationResultIsTrue.Add("Owner cannot be empty", OwnerId <= 0);
+            failedMessageIfValidationResultIsTrue.Add("Breed cannot be empty", BreedId <= 0);
+            failedMessageIfValidationResultIsTrue.Add("Vaccines were not specified", Vaccines == null || Vaccines.Count == 0);
+
+            foreach (var failedMessageToValidationResult in failedMessageIfValidationResultIsTrue)
             {
-                invalidErr.Add("Need pet's name.");
+                var validationFailed = failedMessageToValidationResult.Value;
+                if (validationFailed)
+                {
+                    var msg = failedMessageToValidationResult.Key;
+                    validationErrors.Add(msg);
+                }
             }
 
-            if (Weight <= 0)
-            {
-                invalidErr.Add("Need pet's weight.");
-            }
-
-            if (string.IsNullOrEmpty(Dob))
-            {
-                invalidErr.Add("Need pet's birthday.");
-            }
-
-            if (OwnerId <= 0)
-            {
-                invalidErr.Add("Need owner info.");
-            }
-
-            if (BreedId <= 0)
-            {
-                invalidErr.Add("Need breed info.");
-            }
-
-            if (Vaccines == null || Vaccines.Count == 0)
-            {
-                invalidErr.Add("Vaccines were not specified for pet.");
-            }
-
-            return invalidErr;
+            return validationErrors;
         }
     }
 }
