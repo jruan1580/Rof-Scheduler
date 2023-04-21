@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClientManagementService.Domain.Services
 {
-    public class PetRetrievalService : PetBaseService, IPetRetrievalService
+    public class PetRetrievalService : PetService, IPetRetrievalService
     {
         public PetRetrievalService(IPetRetrievalRepository petRetrievalRepository,
             IPetToVaccinesRepository petToVaccinesRepository)

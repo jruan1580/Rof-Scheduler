@@ -8,12 +8,12 @@ using PetToVaccineDB = ClientManagementService.Infrastructure.Persistence.Entiti
 
 namespace ClientManagementService.Domain.Services
 {
-    public class PetBaseService
+    public class PetService
     {
         protected readonly IPetRetrievalRepository _petRetrievalRepository;
         protected readonly IPetToVaccinesRepository _petToVaccinesRepository;
 
-        public PetBaseService(IPetRetrievalRepository petRetrievalRepository, 
+        public PetService(IPetRetrievalRepository petRetrievalRepository, 
             IPetToVaccinesRepository petToVaccinesRepository)
         {
             _petRetrievalRepository = petRetrievalRepository;

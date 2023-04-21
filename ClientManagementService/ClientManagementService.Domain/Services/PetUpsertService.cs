@@ -7,115 +7,111 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RofShared.Exceptions;
+using DBPet = ClientManagementService.Infrastructure.Persistence.Entities.Pet;
 
 namespace ClientManagementService.Domain.Services
 {
-    public interface IPetService
+    public class PetUpsertService : PetService, IPetUpsertService
     {
-        Task<long> AddPet(Pet newPet);
-        Task DeletePetById(long petId);
-        Task UpdatePet(Pet updatePet);
-        Task<List<VaccineStatus>> GetVaccinesByPetId(long petId);
-    }
+        private readonly IPetUpsertRepository _petUpsertRepository;
 
-    public class PetService : IPetService
-    {
-        private readonly IPetRepository _petRepository;
-        private readonly IPetRetrievalRepository _petRetrievalRepository;
-        private readonly IPetToVaccinesRepository _petToVaccinesRepository;
-
-        public PetService(IPetRepository petRepository, 
+        public PetUpsertService(IPetUpsertRepository petUpsertRepository,
             IPetRetrievalRepository petRetrievalRepository,
             IPetToVaccinesRepository petToVaccinesRepository)
+            : base(petRetrievalRepository, petToVaccinesRepository)
         {
-            _petRepository = petRepository;
-
-            _petRetrievalRepository = petRetrievalRepository;
-
-            _petToVaccinesRepository = petToVaccinesRepository;
+            _petUpsertRepository = petUpsertRepository;
         }
 
         public async Task<long> AddPet(Pet newPet)
         {
-            var invalidErrs = newPet.IsValidPetToCreate().ToArray();
+            await ValidatePet(newPet, false);
 
-            if (invalidErrs.Length > 0)
-            {
-                var errMsg = string.Join("\n", invalidErrs);
+            var newPetEntity = PetMapper.FromCorePet(newPet);
 
-                throw new ArgumentException(errMsg);
-            }
+            var petId = await _petUpsertRepository.AddPet(newPetEntity);
 
-            var petExists = await _petRetrievalRepository.DoesPetWithNameAndBreedExistUnderOwner(0, newPet.OwnerId, newPet.Name, newPet.BreedId);
-            if (petExists)
-            {
-                throw new ArgumentException($"This pet already exists under Owner with id: {newPet.OwnerId}.");
-            }
-
-            var newPetEntity = PetMapper.FromCorePet(newPet);            
-
-            var petId = await _petRepository.AddPet(newPetEntity);
-
-            //add their vaccines after
-            var petsToVaccine = PetToVaccineMapper.ToPetToVaccine(petId, newPet.Vaccines);
-
-            await _petToVaccinesRepository.AddPetToVaccines(petsToVaccine);
+            await AddVaccinesToNewPet(petId, newPet.Vaccines);
 
             return petId;
         }
 
         public async Task UpdatePet(Pet updatePet)
         {
-            var invalidErrs = updatePet.IsValidPetToUpdate().ToArray();
+            await ValidatePet(updatePet, true);
 
-            if (invalidErrs.Length > 0)
-            {
-                var errMsg = string.Join("\n", invalidErrs);
+            var originalPet = await GetDbPetById(updatePet.Id);
 
-                throw new ArgumentException(errMsg);
-            }
+            MergePetPropertiesForUpdate(originalPet, updatePet);
 
-            var petExists = await _petRetrievalRepository.DoesPetWithNameAndBreedExistUnderOwner(updatePet.Id, updatePet.OwnerId, updatePet.Name, updatePet.BreedId);
-            if (petExists)
-            {
-                throw new ArgumentException($"Pet with same name and breed already exist under this owner id {updatePet.OwnerId}");
-            }
+            await _petUpsertRepository.UpdatePet(originalPet);
 
-            var origPet = await _petRetrievalRepository.GetPetByFilter(new GetPetFilterModel<long>(GetPetFilterEnum.Id, updatePet.Id));
-            if (origPet == null)
-            {
-                throw new EntityNotFoundException("Pet was not found. Failed to update.");
-            }
-            
-            var petEntity = PetMapper.FromCorePet(updatePet);
-
-            await _petRepository.UpdatePet(petEntity);
-
-            var origPetToVaccines = await _petToVaccinesRepository.GetPetToVaccineByPetId(origPet.Id);
-            foreach(var updatedPetToVaccine in updatePet.Vaccines)
-            {
-                var origPetToVaccine = origPetToVaccines.FirstOrDefault(o => o.Id == updatedPetToVaccine.PetToVaccineId);
-                origPetToVaccine.Inoculated = updatedPetToVaccine.Inoculated;
-            }         
-
-            await _petToVaccinesRepository.UpdatePetToVaccines(origPetToVaccines);
+            await MergePetVaccinesForUpdate(originalPet, updatePet);
         }
 
         public async Task DeletePetById(long petId)
         {
-            await _petRepository.DeletePetById(petId);
+            await _petUpsertRepository.DeletePetById(petId);
         }
 
-        public async Task<List<VaccineStatus>> GetVaccinesByPetId(long petId)
+        private async Task ValidatePet(Pet pet, bool isUpdate)
         {
-            var petToVaccines = await _petToVaccinesRepository.GetPetToVaccineByPetId(petId); //list of petToVax with Id, PetId, VaxId, and Innoculated
+            ValidatePetProperties(pet, isUpdate);
 
-            if (petToVaccines == null || petToVaccines.Count == 0)
+            await ValidateIfPetIsDuplicate(pet.Id, pet.OwnerId, pet.Name, pet.BreedId);
+        }
+
+        private void ValidatePetProperties(Pet pet, bool isUpdate)
+        {
+            var validationErrors = (isUpdate) ? pet.GetValidationErrorsForUpdate() : pet.GetValidationErrorsForBothCreateOrUpdate();
+
+            if (validationErrors.Count > 0)
             {
-                throw new EntityNotFoundException("Pet had no records of vaccines");
-            }            
+                var errorMessage = string.Join("\n", validationErrors);
 
-            return PetToVaccineMapper.ToVaccineStatus(petToVaccines);
+                throw new ArgumentException(errorMessage);
+            }
+        }
+
+        private async Task ValidateIfPetIsDuplicate(long petId, long ownerId, string name, short breedId)
+        {
+            var isDuplicate = await _petRetrievalRepository.DoesPetWithNameAndBreedExistUnderOwner(petId, ownerId, name, breedId);
+
+            if (isDuplicate)
+            {
+                throw new ArgumentException("Pet with same name and breed already exist under this owner.");
+            }
+        }
+
+        private async Task AddVaccinesToNewPet(long petId, List<VaccineStatus> vaccines)
+        {
+            var petsToVaccine = PetToVaccineMapper.ToPetToVaccine(petId, vaccines);
+
+            await _petToVaccinesRepository.AddPetToVaccines(petsToVaccine);
+        }
+
+        private void MergePetPropertiesForUpdate(DBPet originalPet, Pet updatePet)
+        {
+            originalPet.Name = updatePet.Name;
+            originalPet.Weight = updatePet.Weight;
+            originalPet.Dob = updatePet.Dob;
+            originalPet.OwnerId = updatePet.OwnerId;
+            originalPet.BreedId = updatePet.BreedId;
+            originalPet.PetTypeId = updatePet.PetTypeId;
+            originalPet.OtherInfo = updatePet.OtherInfo;
+        }
+
+        private async Task MergePetVaccinesForUpdate(DBPet originalPet, Pet updatePet)
+        {
+            var origPetToVaccines = await GetDbPetToVaccineByPetId(originalPet.Id);
+
+            foreach (var updatedPetToVaccine in updatePet.Vaccines)
+            {
+                var origPetToVaccine = origPetToVaccines.FirstOrDefault(o => o.Id == updatedPetToVaccine.PetToVaccineId);
+                origPetToVaccine.Inoculated = updatedPetToVaccine.Inoculated;
+            }
+
+            await _petToVaccinesRepository.UpdatePetToVaccines(origPetToVaccines);
         }
     }
 }
