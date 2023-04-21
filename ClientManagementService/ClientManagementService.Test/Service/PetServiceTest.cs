@@ -39,7 +39,7 @@ namespace ClientManagementService.Test.Service
                 Weight = 0
             };
 
-            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
+            var petService = new PetUpsertService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => petService.AddPet(newPet));
         }
@@ -70,7 +70,7 @@ namespace ClientManagementService.Test.Service
             _petRetrievalRepo.Setup(p => p.DoesPetWithNameAndBreedExistUnderOwner(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>(), It.IsAny<short>()))
                 .ReturnsAsync(true);
 
-            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
+            var petService = new PetUpsertService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => petService.AddPet(newPet));
         }
@@ -101,7 +101,7 @@ namespace ClientManagementService.Test.Service
             _petRepository.Setup(p => p.AddPet(It.IsAny<Pet>())).ReturnsAsync(1);
             _petToVaccinesRepository.Setup(p => p.AddPetToVaccines(It.IsAny<List<PetToVaccine>>())).Returns(Task.CompletedTask);
 
-            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
+            var petService = new PetUpsertService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             await petService.AddPet(newPet);
 
@@ -136,7 +136,7 @@ namespace ClientManagementService.Test.Service
             _petRetrievalRepo.Setup(p => p.DoesPetWithNameAndBreedExistUnderOwner(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>(), It.IsAny<short>()))
                .ReturnsAsync(true);
 
-            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
+            var petService = new PetUpsertService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => petService.UpdatePet(pet));
         }
@@ -180,7 +180,7 @@ namespace ClientManagementService.Test.Service
                 });
             _petToVaccinesRepository.Setup(v => v.UpdatePetToVaccines(It.IsAny<List<PetToVaccine>>())).Returns(Task.CompletedTask);
 
-            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
+            var petService = new PetUpsertService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             await petService.UpdatePet(pet);
 
@@ -194,7 +194,7 @@ namespace ClientManagementService.Test.Service
             _petRepository.Setup(p => p.DeletePetById(It.IsAny<long>()))
                 .ThrowsAsync(new ArgumentException());
 
-            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
+            var petService = new PetUpsertService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => petService.DeletePetById(1));
         }
@@ -205,7 +205,7 @@ namespace ClientManagementService.Test.Service
             _petRepository.Setup(p => p.DeletePetById(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
+            var petService = new PetUpsertService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             await petService.DeletePetById(1);
 
@@ -233,7 +233,7 @@ namespace ClientManagementService.Test.Service
             _petToVaccinesRepository.Setup(pv => pv.GetPetToVaccineByPetId(It.IsAny<long>()))
                 .ReturnsAsync(petToVax);
 
-            var petService = new PetService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
+            var petService = new PetUpsertService(_petRepository.Object, _petRetrievalRepo.Object, _petToVaccinesRepository.Object);
 
             var result = await petService.GetVaccinesByPetId(1);
 

@@ -33,7 +33,7 @@ namespace ClientManagementService.API
             services.AddTransient<IClientRetrievalService, ClientRetrievalService>();
             services.AddTransient<IClientUpsertService, ClientUpsertService>();
             services.AddTransient<IPetRetrievalService, PetRetrievalService>();
-            services.AddTransient<IPetService, PetService>();
+            services.AddTransient<IPetService, PetUpsertService>();
             services.AddTransient<IDropdownService, DropdownService>();
 
             services.AddMvc();
