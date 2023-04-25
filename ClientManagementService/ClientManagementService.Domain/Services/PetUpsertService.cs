@@ -15,8 +15,8 @@ namespace ClientManagementService.Domain.Services
     {
         private readonly IPetUpsertRepository _petUpsertRepository;
 
-        public PetUpsertService(IPetUpsertRepository petUpsertRepository,
-            IPetRetrievalRepository petRetrievalRepository,
+        public PetUpsertService(IPetRetrievalRepository petRetrievalRepository,
+            IPetUpsertRepository petUpsertRepository,
             IPetToVaccinesRepository petToVaccinesRepository)
             : base(petRetrievalRepository, petToVaccinesRepository)
         {

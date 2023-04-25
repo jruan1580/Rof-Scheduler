@@ -100,21 +100,5 @@ namespace ClientManagementService.API.Controllers
 
             return Ok();
         }
-
-        [Authorize(Roles = "Administrator,Employee,Client")]
-        [HttpGet("{petId}/vax")]
-        public async Task<IActionResult> GetVaccinesByPetId(long petId)
-        {
-            var vaxStats = new List<PetsVaccineDTO>();
-
-            var result = await _petService.GetVaccinesByPetId(petId);
-
-            foreach (var petVax in result)
-            {
-                vaxStats.Add(PetDTOMapper.ToDTOPetsVaccine(petVax));
-            }
-
-            return Ok(vaxStats);
-        }
     }
 }
