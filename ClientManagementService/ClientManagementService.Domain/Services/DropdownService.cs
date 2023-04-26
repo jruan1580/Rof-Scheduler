@@ -30,11 +30,6 @@ namespace ClientManagementService.Domain.Services
             _petToVaccineRepository = petToVaccineToRepository;
         }
 
-        /// <summary>
-        /// Returns a list of pet types.
-        /// Function is used mainaly to populate drop down list
-        /// </summary>
-        /// <returns></returns>
         public async Task<List<PetType>> GetPetTypes()
         {
             var pt = await _petRetrievalRepository.GetPetTypesForDropdown();
@@ -48,12 +43,6 @@ namespace ClientManagementService.Domain.Services
             return types;
         }
 
-        /// <summary>
-        /// Returns a list of vaccines by pet type.
-        /// Function is used mainaly to populate drop down list
-        /// </summary>
-        /// <param name="petTypeId"></param>
-        /// <returns></returns>
         public async Task<List<Vaccine>> GetVaccinesByPetType(short petTypeId)
         {
             var vaccines = new List<Vaccine>();
@@ -66,12 +55,6 @@ namespace ClientManagementService.Domain.Services
             return vaccines;
         }
 
-        /// <summary>
-        /// Returns a list of breeds by pet type.
-        /// Function is use to get breed for drop down list.
-        /// </summary>
-        /// <param name="petTypeId"></param>
-        /// <returns></returns>
         public async Task<List<Breed>> GetBreedsByPetType(short petTypeId)
         {
             var breeds = new List<Breed>();
@@ -84,13 +67,6 @@ namespace ClientManagementService.Domain.Services
             return breeds;
         }
 
-        /// <summary>
-        /// Returns a list of clients.
-        /// 
-        /// When admin/employee is adding a pet, they are adding it for a client.
-        /// Need to give admins/employees a list of clients to select from as pet owner
-        /// </summary>
-        /// <returns></returns>
         public async Task<List<Client>> GetClients()
         {
             var  clients = new List<Client>();

@@ -1,100 +1,45 @@
 ﻿using ClientManagementService.Domain.Services;
+using ClientManagementService.Domain.Models;
 using ClientManagementService.Infrastructure.Persistence;
-using ClientManagementService.Infrastructure.Persistence.Entities;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DbClient = ClientManagementService.Infrastructure.Persistence.Entities.Client;
+using DbPet = ClientManagementService.Infrastructure.Persistence.Entities.Pet;
+using DbPetType = ClientManagementService.Infrastructure.Persistence.Entities.PetType;
+using DbVaccine = ClientManagementService.Infrastructure.Persistence.Entities.Vaccine;
+using DbBreed = ClientManagementService.Infrastructure.Persistence.Entities.Breed;
 
 namespace ClientManagementService.Test.Service
 {
     [TestFixture]
     public class DropdownServiceTest
     {
-        private Mock<IPetRetrievalRepository> _petRepository;
-        private Mock<IPetToVaccinesRepository> _petToVaccinesRepository;
-        private Mock<IClientRetrievalRepository> _clientRetrievalRepository;
-
-        private DropdownService _dropdownService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _petRepository = new Mock<IPetRetrievalRepository>();
-
-            _petRepository.Setup(p => p.GetPetTypesForDropdown())
-                .ReturnsAsync(new List<PetType>()
-                {
-                    new PetType()
-                    {
-                        Id = 1,
-                        PetTypeName = "Dog"
-                    },
-                    new PetType()
-                    {
-                        Id = 2,
-                        PetTypeName = "Cat"
-                    }
-                });
-
-            _petRepository.Setup(p => p.GetBreedsByPetTypeIdForDropdown(It.IsAny<short>()))
-                .ReturnsAsync(new List<Breed>()
-                {
-                    new Breed()
-                    {
-                        Id = 1,
-                        BreedName = "Golden Retriever"
-                    }
-                });
-
-            _petRepository.Setup(p => p.GetPetsForDropdown())
-                .ReturnsAsync(new List<Pet>()
-                {
-                    new Pet()
-                    {
-                        Id = 1,
-                        Name = "TestPet"
-                    }
-                });
-
-            _petToVaccinesRepository = new Mock<IPetToVaccinesRepository>();
-
-            _petToVaccinesRepository.Setup(v => v.GetVaccinesByPetType(It.IsAny<short>()))
-                .ReturnsAsync(new List<Vaccine>()
-                {
-                    new Vaccine()
-                    {
-                        Id = 1,
-                        PetTypeId = 1,
-                        VaxName = "Bordetella"
-                    }
-                });
-
-            _clientRetrievalRepository = new Mock<IClientRetrievalRepository>();
-
-            _clientRetrievalRepository.Setup(c => c.GetClientsForDropdown())
-                .ReturnsAsync(new List<Client>()
-                {
-                    new Client()
-                    {
-                        Id = 1,
-                        FirstName = "Test",
-                        LastName = "User",
-                    }
-                });
-
-            _dropdownService = new DropdownService(_clientRetrievalRepository.Object, _petRepository.Object, _petToVaccinesRepository.Object);
-        }
-
         [Test]
         public async Task GetVaccinesByPetTypeSuccess()
         {
-            var vaccines = await _dropdownService.GetVaccinesByPetType(1);
+            var clientRetrievalRepo = new Mock<IClientRetrievalRepository>();
+            var petRetrievalRepo = new Mock<IPetRetrievalRepository>();
+            var petToVaccineRepo = new Mock<IPetToVaccinesRepository>();
 
-            Assert.IsNotNull(vaccines);
-            Assert.AreEqual(1, vaccines.Count);
+            var vaccines = new List<DbVaccine>()
+            {
+                DropdownCreator.GetDbVaccineForDropdown()
+            };
 
-            var vax = vaccines[0];
+            petToVaccineRepo.Setup(v => v.GetVaccinesByPetType(It.IsAny<short>()))
+                .ReturnsAsync(vaccines);
+
+            var dropdownService = new DropdownService(clientRetrievalRepo.Object, 
+                petRetrievalRepo.Object, 
+                petToVaccineRepo.Object);
+
+            var results = await dropdownService.GetVaccinesByPetType(1);
+
+            AssertResultsNotNullAndCount<Vaccine>(results);
+
+            var vax = results[0];
             Assert.AreEqual(1, vax.Id);
             Assert.AreEqual("Bordetella", vax.VaxName);
         }
@@ -102,29 +47,55 @@ namespace ClientManagementService.Test.Service
         [Test]
         public async Task GetPetTypeSuccess()
         {
-            var petTypes = await _dropdownService.GetPetTypes();
+            var clientRetrievalRepo = new Mock<IClientRetrievalRepository>();
+            var petRetrievalRepo = new Mock<IPetRetrievalRepository>();
+            var petToVaccineRepo = new Mock<IPetToVaccinesRepository>();
 
-            Assert.IsNotNull(petTypes);
-            Assert.AreEqual(2, petTypes.Count);
+            var petTypes = new List<DbPetType>()
+            {
+                DropdownCreator.GetDbPetTypeForDropdown()
+            };
 
-            var dog = petTypes[0];
+            petRetrievalRepo.Setup(p => p.GetPetTypesForDropdown())
+                .ReturnsAsync(petTypes);
+
+            var dropdownService = new DropdownService(clientRetrievalRepo.Object,
+                petRetrievalRepo.Object,
+                petToVaccineRepo.Object);
+
+            var results = await dropdownService.GetPetTypes();
+
+            AssertResultsNotNullAndCount<PetType>(results);
+
+            var dog = results[0];
             Assert.AreEqual(1, dog.Id);
             Assert.AreEqual("Dog", dog.PetTypeName);
-
-            var cat = petTypes[1];
-            Assert.AreEqual(2, cat.Id);
-            Assert.AreEqual("Cat", cat.PetTypeName);
         }
 
         [Test]
         public async Task GetPetBreedByPetTypeSuccess()
         {
-            var breeds = await _dropdownService.GetBreedsByPetType(1);
+            var clientRetrievalRepo = new Mock<IClientRetrievalRepository>();
+            var petRetrievalRepo = new Mock<IPetRetrievalRepository>();
+            var petToVaccineRepo = new Mock<IPetToVaccinesRepository>();
 
-            Assert.IsNotNull(breeds);
-            Assert.AreEqual(1, breeds.Count);
+            var breeds = new List<DbBreed>()
+            {
+                DropdownCreator.GetDbBreedForDropdown()
+            };
 
-            var breed = breeds[0];
+            petRetrievalRepo.Setup(p => p.GetBreedsByPetTypeIdForDropdown(It.IsAny<short>()))
+                .ReturnsAsync(breeds);
+
+            var dropdownService = new DropdownService(clientRetrievalRepo.Object,
+                petRetrievalRepo.Object,
+                petToVaccineRepo.Object);
+
+            var results = await dropdownService.GetBreedsByPetType(1);
+
+            AssertResultsNotNullAndCount<Breed>(results);
+
+            var breed = results[0];
             Assert.AreEqual(1, breed.Id);
             Assert.AreEqual("Golden Retriever", breed.BreedName);
         }
@@ -132,12 +103,27 @@ namespace ClientManagementService.Test.Service
         [Test]
         public async Task GetClientsSuccess()
         {
-            var clients = await _dropdownService.GetClients();
+            var clientRetrievalRepo = new Mock<IClientRetrievalRepository>();
+            var petRetrievalRepo = new Mock<IPetRetrievalRepository>();
+            var petToVaccineRepo = new Mock<IPetToVaccinesRepository>();
 
-            Assert.IsNotNull(clients);
-            Assert.AreEqual(1, clients.Count);
+            var clients = new List<DbClient>()
+            {
+                DropdownCreator.GetDbClientForDropdown()
+            };
 
-            var client = clients[0];
+            clientRetrievalRepo.Setup(c => c.GetClientsForDropdown())
+                .ReturnsAsync(clients);
+
+            var dropdownService = new DropdownService(clientRetrievalRepo.Object,
+                petRetrievalRepo.Object,
+                petToVaccineRepo.Object);
+
+            var results = await dropdownService.GetClients();
+
+            AssertResultsNotNullAndCount<Client>(results);
+
+            var client = results[0];
             Assert.AreEqual(1, client.Id);
             Assert.AreEqual("Test", client.FirstName);
             Assert.AreEqual("User", client.LastName);
@@ -147,14 +133,35 @@ namespace ClientManagementService.Test.Service
         [Test]
         public async Task GetPetsSuccess()
         {
-            var pets = await _dropdownService.GetPets();
+            var clientRetrievalRepo = new Mock<IClientRetrievalRepository>();
+            var petRetrievalRepo = new Mock<IPetRetrievalRepository>();
+            var petToVaccineRepo = new Mock<IPetToVaccinesRepository>();
 
-            Assert.IsNotNull(pets);
-            Assert.AreEqual(1, pets.Count);
+            var pets = new List<DbPet>()
+            {
+                DropdownCreator.GetDbPetForDropdown()
+            };
 
-            var pet = pets[0];
+            petRetrievalRepo.Setup(p => p.GetPetsForDropdown())
+                .ReturnsAsync(pets);
+
+            var dropdownService = new DropdownService(clientRetrievalRepo.Object,
+                petRetrievalRepo.Object,
+                petToVaccineRepo.Object);
+
+            var results = await dropdownService.GetPets();
+
+            AssertResultsNotNullAndCount<Pet>(results);
+
+            var pet = results[0];
             Assert.AreEqual(1, pet.Id);
-            Assert.AreEqual("TestPet", pet.Name);
+            Assert.AreEqual("Layla", pet.Name);
+        }
+
+        private void AssertResultsNotNullAndCount<T>(List<T> results)
+        {
+            Assert.IsNotNull(results);
+            Assert.AreEqual(1, results.Count);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace ClientManagementService.Test.Controller
         {
             var clients = new List<Client>()
             {
-                DropdownCreator.GetClientForDropdown()
+                DropdownCreator.GetDomainClientForDropdown()
             };
 
             _dropdownService.Setup(d => d.GetClients())
@@ -35,7 +35,7 @@ namespace ClientManagementService.Test.Controller
         {
             var pets = new List<Pet>()
             {
-                DropdownCreator.GetPetForDropdown()
+                DropdownCreator.GetDomainPetForDropdown()
             };
 
             _dropdownService.Setup(d => d.GetPets())
@@ -51,7 +51,7 @@ namespace ClientManagementService.Test.Controller
         {
             var petTypes = new List<PetType>()
             {
-                DropdownCreator.GetPetTypeForDropdown()
+                DropdownCreator.GetDomainPetTypeForDropdown()
             };
 
             _dropdownService.Setup(d => d.GetPetTypes())
@@ -67,7 +67,7 @@ namespace ClientManagementService.Test.Controller
         {
             var vaccines = new List<Vaccine>()
             {
-                DropdownCreator.GetVaccineForDropdown()
+                DropdownCreator.GetDomainVaccineForDropdown()
             };
 
             _dropdownService.Setup(d => d.GetVaccinesByPetType(It.IsAny<short>()))
@@ -83,7 +83,7 @@ namespace ClientManagementService.Test.Controller
         {
             var breeds = new List<Breed>()
             {
-                DropdownCreator.GetBreedForDropdown()
+                DropdownCreator.GetDomainBreedForDropdown()
             };
 
             _dropdownService.Setup(d => d.GetBreedsByPetType(It.IsAny<short>()))
