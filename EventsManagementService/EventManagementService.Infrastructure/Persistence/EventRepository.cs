@@ -20,12 +20,6 @@ namespace EventManagementService.Infrastructure.Persistence
 
     public class EventRepository : IEventRepository
     {
-        /// <summary>
-        /// Calculate and update the end time.
-        /// Adds new job event.
-        /// </summary>
-        /// <param name="jobEvent"></param>
-        /// <returns></returns>
         public async Task AddEvent(JobEvent jobEvent)
         {
             using (var context = new RofSchedulerContext())
@@ -38,12 +32,6 @@ namespace EventManagementService.Infrastructure.Persistence
             }
         }
 
-        /// <summary>
-        /// Use to get all details of an individual job event
-        /// Or used to get original version of the event for updates
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public async Task<JobEvent> GetJobEventById(int id)
         {
             using (var context = new RofSchedulerContext())
@@ -58,10 +46,6 @@ namespace EventManagementService.Infrastructure.Persistence
             }
         }
 
-        /// <summary>
-        /// Displays all job events for specific month & year
-        /// </summary>
-        /// <returns></returns>
         public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year)
         {
             using (var context = new RofSchedulerContext())
@@ -90,10 +74,6 @@ namespace EventManagementService.Infrastructure.Persistence
             }
         }
 
-        /// <summary>
-        /// Displays all job events
-        /// </summary>
-        /// <returns></returns>
         public async Task<List<JobEvent>> GetAllJobEvents()
         {
             using (var context = new RofSchedulerContext())
@@ -120,10 +100,6 @@ namespace EventManagementService.Infrastructure.Persistence
             }
         }
 
-        /// <summary>
-        /// Updates a job service
-        /// </summary>
-        /// <returns></returns>
         public async Task UpdateJobEvent(JobEvent jobEvent)
         {
             using (var context = new RofSchedulerContext())
@@ -146,13 +122,6 @@ namespace EventManagementService.Infrastructure.Persistence
             }
         }
 
-        /// <summary>
-        /// Removes an event
-        /// Maybe also used to remove upon completion of job?
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         public async Task DeleteJobEventById(int id)
         {
             using (var context = new RofSchedulerContext())
@@ -170,15 +139,6 @@ namespace EventManagementService.Infrastructure.Persistence
             }
         }
 
-        /// <summary>
-        /// Verify no same pet and employee scheduled at one time
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="employeeId"></param>
-        /// <param name="petId"></param>
-        /// <param name="petServiceId"></param>
-        /// <param name="eventStart"></param>
-        /// <returns></returns>
         public async Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart)
         {
             using (var context = new RofSchedulerContext())
@@ -187,11 +147,6 @@ namespace EventManagementService.Infrastructure.Persistence
             }
         }
 
-        /// <summary>
-        /// Grabs duration and unit of pet service & adds duration to start time to get end time
-        /// </summary>
-        /// <param name="jobEvent"></param>
-        /// <returns></returns>
         private async Task CalculateEndTime(JobEvent jobEvent)
         {
             using (var context = new RofSchedulerContext())

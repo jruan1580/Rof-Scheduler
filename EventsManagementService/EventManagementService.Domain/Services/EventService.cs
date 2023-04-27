@@ -1,7 +1,7 @@
-﻿using EventManagementService.Domain.Exceptions;
-using EventManagementService.Domain.Mappers;
+﻿using EventManagementService.Domain.Mappers;
 using EventManagementService.Domain.Models;
 using EventManagementService.Infrastructure.Persistence;
+using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,12 +28,6 @@ namespace EventManagementService.Domain.Services
             _eventRepository = eventRepository;
         }
 
-        /// <summary>
-        /// Adds new job event.
-        /// </summary>
-        /// <param name="newEvent"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         public async Task AddEvent(JobEvent newEvent)
         {
             var invalidErrs = newEvent.IsValidEventToCreate().ToArray();
@@ -56,10 +50,6 @@ namespace EventManagementService.Domain.Services
             await _eventRepository.AddEvent(newEventEntity);
         }
 
-        /// <summary>
-        /// Grabs all events by month and year
-        /// </summary>
-        /// <returns></returns>
         public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year)
         {
             var results = await _eventRepository.GetAllJobEventsByMonthAndYear(month, year);
@@ -72,10 +62,6 @@ namespace EventManagementService.Domain.Services
             return new List<JobEvent>(results.Select(e => EventMapper.ToCoreEvent(e))).ToList();
         }
 
-        /// <summary>
-        /// Grabs all job events
-        /// </summary>
-        /// <returns></returns>
         public async Task<List<JobEvent>> GetAllJobEvents()
         {
             var results = await _eventRepository.GetAllJobEvents();
@@ -87,13 +73,7 @@ namespace EventManagementService.Domain.Services
 
             return new List<JobEvent>(results.Select(e => EventMapper.ToCoreEvent(e))).ToList();
         }
-
-        /// <summary>
-        /// Gets info for specific event for more info and details
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <exception cref="EntryPointNotFoundException"></exception>
+        
         public async Task<JobEvent> GetJobEventById(int id)
         {
             var jobEvent = await _eventRepository.GetJobEventById(id);
@@ -106,12 +86,6 @@ namespace EventManagementService.Domain.Services
             return EventMapper.ToCoreEvent(jobEvent);
         }
 
-        /// <summary>
-        /// Update the event
-        /// </summary>
-        /// <param name="updateEvent"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         public async Task UpdateJobEvent(JobEvent updateEvent)
         {
             var invalidErrs = updateEvent.IsValidEventToUpdate().ToArray();

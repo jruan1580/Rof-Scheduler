@@ -1,9 +1,9 @@
-﻿using EventManagementService.Domain.Exceptions;
-using EventManagementService.Domain.Services;
+﻿using EventManagementService.Domain.Services;
 using EventManagementService.Infrastructure.Persistence;
 using EventManagementService.Infrastructure.Persistence.Entities;
 using Moq;
 using NUnit.Framework;
+using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

@@ -1,10 +1,10 @@
 ﻿using EventManagementService.API.DTO;
 using EventManagementService.API.DtoMapper;
-using EventManagementService.API.Filters;
-using EventManagementService.Domain.Exceptions;
 using EventManagementService.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RofShared.Exceptions;
+using RofShared.FilterAttributes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
