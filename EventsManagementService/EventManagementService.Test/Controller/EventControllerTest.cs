@@ -8,45 +8,30 @@ using NUnit.Framework;
 using RofShared.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace EventManagementService.Test.Controller
 {
     [TestFixture]
-    public class EventControllerTest
+    public class EventControllerTest : ApiTestSetup
     {
-        private Mock<IEventService> _eventService;
+        private readonly string _baseUrl = "/api/Event";
 
-        [SetUp]
-        public void Setup()
-        {
-            _eventService = new Mock<IEventService>();
-        }
+        private readonly string _exceptionMsg = "Test Exception Message";
 
         [Test]
         public async Task AddEvent_Success()
         {
-            var newEvent = new EventDTO()
-            {
-                EmployeeId = 1,
-                EmployeeFullName = "John Doe",
-                PetId = 1,
-                PetName = "Dog1",
-                PetServiceId = 1,
-                PetServiceName = "Walk",
-                EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
-                Completed = false,
-            };
+            var newEvent = EventCreator.GetEventDTO();
 
             _eventService.Setup(e => e.AddEvent(It.IsAny<JobEvent>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EventController(_eventService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newEvent));
 
-            var response = await controller.AddEvent(newEvent);
-
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
+            AssertExpectedStatusCode(response, HttpStatusCode.Created);
         }
 
         [Test]
@@ -54,29 +39,24 @@ namespace EventManagementService.Test.Controller
         {
             var newEvent = new EventDTO()
             {
-                EmployeeId = 1,
-                EmployeeFullName = "John Doe",
-                PetId = 1,
-                PetName = "Dog1",
-                PetServiceId = 1,
-                PetServiceName = "Walk",
+                EmployeeId = 0,
+                EmployeeFullName = "",
+                PetId = 0,
+                PetName = "",
+                PetServiceId = 0,
+                PetServiceName = "",
                 EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 Completed = false,
             };
 
             _eventService.Setup(e => e.AddEvent(It.IsAny<JobEvent>()))
-                .ThrowsAsync(new ArgumentException("test"));
+                .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var controller = new EventController(_eventService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newEvent));
 
-            var response = await controller.AddEvent(newEvent);
+            AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
-
-            var badRequestObj = (BadRequestObjectResult)response;
-            Assert.AreEqual(typeof(string), badRequestObj.Value.GetType());
-            Assert.AreEqual("test", badRequestObj.Value.ToString());
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
@@ -84,197 +64,131 @@ namespace EventManagementService.Test.Controller
         {
             var events = new List<JobEvent>()
             {
-                new JobEvent()
-                {
-                    Id = 1,
-                    EmployeeId = 1,
-                    PetId = 1,
-                    PetServiceId = 1,
-                    EventStartTime = DateTime.Today,
-                    Completed = false,
-                    Employee = new Employee()
-                    {
-                        Id = 1,
-                        FullName = "John Doe"
-                    },
-                    Pet = new Pet()
-                    {
-                        Id = 1,
-                        Name = "Dog1"
-                    },
-                    PetService = new PetService()
-                    {
-                        Id = 1,
-                        ServiceName = "Walk"
-                    }
-                }
+                EventCreator.GetDomainEvent()
             };
 
-            _eventService.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(events);
+            _eventService.Setup(e => 
+                e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), 
+                    It.IsAny<int>()))
+            .ReturnsAsync(events);
 
-            var controller = new EventController(_eventService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Get,$"{_baseUrl}?month=1&year=2023");
 
-            var response = await controller.GetAllJobEventsByMonthAndYear(DateTime.Today.Month, DateTime.Today.Year);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+        [Test]
+        public async Task GetAllJobEventsByMonthAndYear_InternalServerError()
+        {
+            _eventService.Setup(e =>
+                e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(),
+                    It.IsAny<int>()))
+            .ThrowsAsync(new Exception(_exceptionMsg));
 
-            var okObj = (OkObjectResult)response;
-            Assert.IsNotNull(okObj);
-            Assert.AreEqual(okObj.StatusCode, 200);
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}?month=1&year=2023");
 
-            Assert.AreEqual(typeof(List<EventDTO>), okObj.Value.GetType());
-            
-            var eventDTO = (List<EventDTO>)okObj.Value;
-            Assert.AreEqual(1, eventDTO.Count);
-            Assert.AreEqual(events[0].Id, eventDTO[0].Id);
-            Assert.AreEqual(events[0].EmployeeId, eventDTO[0].EmployeeId);
-            Assert.AreEqual(events[0].PetId, eventDTO[0].PetId);
-            Assert.AreEqual(events[0].PetServiceId, eventDTO[0].PetServiceId);
-            Assert.AreEqual(events[0].EventStartTime.ToString("yyyy-MM-ddTHH:mm:ss"), eventDTO[0].EventStartTime);
-            Assert.AreEqual(events[0].Completed, eventDTO[0].Completed);
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 
-            Assert.AreEqual(events[0].Employee.FullName, eventDTO[0].EmployeeFullName);
-            Assert.AreEqual(events[0].Pet.Name, eventDTO[0].PetName);
-            Assert.AreEqual(events[0].PetService.ServiceName, eventDTO[0].PetServiceName);
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
         public async Task GetJobEventById_Success()
         {
-            var jobEvent = new JobEvent()
-            {
-                Id = 1,
-                EmployeeId = 1,
-                PetId = 1,
-                PetServiceId = 1,
-                EventStartTime = DateTime.Now,
-                EventEndTime = DateTime.Now,
-                Completed = false,
-                Employee = new Employee()
-                {
-                    Id = 1,
-                    FullName = "John Doe"
-                },
-                Pet = new Pet()
-                {
-                    Id = 1,
-                    Name = "Dog1"
-                },
-                PetService = new PetService()
-                {
-                    Id = 1,
-                    ServiceName = "Walk"
-                }
-            };
-
             _eventService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
-                .ReturnsAsync(jobEvent);
+                .ReturnsAsync(EventCreator.GetDomainEvent());
 
-            var controller = new EventController(_eventService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
 
-            var response = await controller.GetJobEventById(1);
-
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkObjectResult), response.GetType());
-
-            var okObj = (OkObjectResult)response;
-            Assert.IsNotNull(okObj);
-            Assert.AreEqual(okObj.StatusCode, 200);
-
-            Assert.AreEqual(typeof(EventDTO), okObj.Value.GetType());
-
-            var eventDTO = (EventDTO)okObj.Value;
-            Assert.AreEqual(jobEvent.Id, eventDTO.Id);
-            Assert.AreEqual(jobEvent.EmployeeId, eventDTO.EmployeeId);
-            Assert.AreEqual(jobEvent.PetId, eventDTO.PetId);
-            Assert.AreEqual(jobEvent.PetServiceId, eventDTO.PetServiceId);
-            Assert.AreEqual(jobEvent.EventStartTime.ToString("yyyy-MM-ddTHH:mm:ss"), eventDTO.EventStartTime);
-            Assert.AreEqual(jobEvent.EventEndTime.ToString("yyyy-MM-ddTHH:mm:ss"), eventDTO.EventEndTime);
-            Assert.AreEqual(jobEvent.Completed, eventDTO.Completed);
-
-            Assert.AreEqual(jobEvent.Employee.FullName, eventDTO.EmployeeFullName);
-            Assert.AreEqual(jobEvent.Pet.Name, eventDTO.PetName);
-            Assert.AreEqual(jobEvent.PetService.ServiceName, eventDTO.PetServiceName);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
         }
 
         [Test]
         public async Task GetJobEventById_NotFound()
         {
             _eventService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
-                .ThrowsAsync(new EntityNotFoundException("test"));
+                .ThrowsAsync(new EntityNotFoundException("Event"));
 
-            var controller = new EventController(_eventService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
 
-            var response = await controller.GetJobEventById(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(typeof(NotFoundObjectResult), response.GetType());
+            AssertContentIsAsExpected(response, _eventNotFoundMessage);
+        }
 
-            var notFoundObj = (NotFoundObjectResult)response;
-            Assert.AreEqual(typeof(string), notFoundObj.Value.GetType());
-            Assert.AreEqual("test", notFoundObj.Value.ToString());
+        [Test]
+        public async Task GetJobEventById_InternalServerError()
+        {
+            _eventService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
+
+            var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
         public async Task UpdateJobEvent_Success()
         {
-            var updateEvent = new EventDTO()
-            {
-                EmployeeId = 1,
-                EmployeeFullName = "John Doe",
-                PetId = 1,
-                PetName = "Dog1",
-                PetServiceId = 1,
-                PetServiceName = "Walk",
-                EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
-                Completed = true,
-            };
+            var updateEvent = EventCreator.GetEventDTO();
+            updateEvent.Id = 1;
 
             _eventService.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EventController(_eventService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Put, _baseUrl, ConvertObjectToStringContent(updateEvent));
 
-            var response = await controller.UpdateJobEvent(updateEvent);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.NotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
+        [Test]
+        public async Task UpdateJobEvent_NotFound()
+        {
+            var updateEvent = EventCreator.GetEventDTO();
+            updateEvent.Id = 1;
 
-            var ok = (OkResult)response;
+            _eventService.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))
+                .ThrowsAsync(new EntityNotFoundException("Event"));
 
-            Assert.AreEqual(ok.StatusCode, 200);
+            var response = await SendRequest("Administrator", HttpMethod.Put, _baseUrl, ConvertObjectToStringContent(updateEvent));
+
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            AssertContentIsAsExpected(response, _eventNotFoundMessage);
         }
 
         [Test]
         public async Task UpdateJobEvent_BadRequest()
         {
-            var updateEvent = new EventDTO()
-            {
-                EmployeeId = 1,
-                EmployeeFullName = "John Doe",
-                PetId = 1,
-                PetName = "Dog1",
-                PetServiceId = 1,
-                PetServiceName = "Walk",
-                EventStartTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
-                Completed = true,
-            };
+            var updateEvent = EventCreator.GetEventDTO();
+            updateEvent.Id = 1;
 
             _eventService.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))
-                .ThrowsAsync(new ArgumentException("test"));
+                .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
-            var controller = new EventController(_eventService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Put, _baseUrl, ConvertObjectToStringContent(updateEvent));
 
-            var response = await controller.UpdateJobEvent(updateEvent);
+            AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(typeof(BadRequestObjectResult), response.GetType());
+            AssertContentIsAsExpected(response, _exceptionMsg);
+        }
 
-            var badRequestObj = (BadRequestObjectResult)response;
-            Assert.AreEqual(typeof(string), badRequestObj.Value.GetType());
-            Assert.AreEqual("test", badRequestObj.Value.ToString());
+        [Test]
+        public async Task UpdateJobEvent_InternalServerError()
+        {
+            var updateEvent = EventCreator.GetEventDTO();
+            updateEvent.Id = 1;
+
+            _eventService.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
+
+            var response = await SendRequest("Administrator", HttpMethod.Put, _baseUrl, ConvertObjectToStringContent(updateEvent));
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
 
         [Test]
@@ -283,12 +197,48 @@ namespace EventManagementService.Test.Controller
             _eventService.Setup(e => e.DeleteEventById(It.IsAny<int>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new EventController(_eventService.Object);
+            var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
 
-            var response = await controller.DeleteEventById(1);
+            AssertExpectedStatusCode(response, HttpStatusCode.OK);
+        }
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(typeof(OkResult), response.GetType());
+        [Test]
+        public async Task DeleteEventById_NotFound()
+        {
+            _eventService.Setup(e => e.DeleteEventById(It.IsAny<int>()))
+                .ThrowsAsync(new EntityNotFoundException("Event"));
+
+            var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
+
+            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
+
+            AssertContentIsAsExpected(response, _eventNotFoundMessage);
+        }
+
+        [Test]
+        public async Task DeleteEventById_BadRequest()
+        {
+            _eventService.Setup(e => e.DeleteEventById(It.IsAny<int>()))
+                .ThrowsAsync(new ArgumentException(_exceptionMsg));
+
+            var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
+
+            AssertExpectedStatusCode(response, HttpStatusCode.BadRequest);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
+        }
+
+        [Test]
+        public async Task DeleteEventById_InternalServerError()
+        {
+            _eventService.Setup(e => e.DeleteEventById(It.IsAny<int>()))
+                .ThrowsAsync(new Exception(_exceptionMsg));
+
+            var response = await SendRequest("Administrator", HttpMethod.Delete, $"{_baseUrl}/1");
+
+            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
+
+            AssertContentIsAsExpected(response, _exceptionMsg);
         }
     }
 }

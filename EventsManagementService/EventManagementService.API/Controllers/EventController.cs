@@ -29,7 +29,7 @@ namespace EventManagementService.API.Controllers
         {
             await _eventService.AddEvent(EventDTOMapper.FromDTOEvent(newEvent));
 
-            return Ok();
+            return StatusCode(201);
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
