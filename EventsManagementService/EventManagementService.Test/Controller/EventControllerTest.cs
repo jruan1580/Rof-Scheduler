@@ -1,8 +1,5 @@
-﻿using EventManagementService.API.Controllers;
-using EventManagementService.API.DTO;
+﻿using EventManagementService.API.DTO;
 using EventManagementService.Domain.Models;
-using EventManagementService.Domain.Services;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using RofShared.Exceptions;
