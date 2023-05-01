@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace EventManagementService.API.DTO
+﻿namespace EventManagementService.DTO
 {
     public class EventDTO
     {
