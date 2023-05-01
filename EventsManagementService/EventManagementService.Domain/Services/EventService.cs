@@ -1,4 +1,4 @@
-﻿using EventManagementService.Domain.Mappers;
+﻿using EventManagementService.Domain.Mappers.Database;
 using EventManagementService.Domain.Models;
 using EventManagementService.Infrastructure.Persistence;
 using RofShared.Exceptions;

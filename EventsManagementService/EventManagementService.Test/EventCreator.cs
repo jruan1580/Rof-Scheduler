@@ -1,4 +1,4 @@
-﻿using EventManagementService.API.DTO;
+﻿using EventManagementService.DTO;
 using System;
 using DbEvent = EventManagementService.Infrastructure.Persistence.Entities.JobEvent;
 using DomainEvent = EventManagementService.Domain.Models.JobEvent;

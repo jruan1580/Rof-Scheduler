@@ -1,6 +1,6 @@
-﻿using EventManagementService.API.DTO;
-using EventManagementService.API.DtoMapper;
+﻿using EventManagementService.Domain.Mappers.DTO;
 using EventManagementService.Domain.Services;
+using EventManagementService.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RofShared.FilterAttributes;

@@ -1,6 +1,6 @@
-﻿using EventManagementService.API.DTO;
-using EventManagementService.API.DtoMapper;
+﻿using EventManagementService.Domain.Mappers.DTO;
 using EventManagementService.Domain.Models;
+using EventManagementService.DTO;
 using NUnit.Framework;
 using System;
 

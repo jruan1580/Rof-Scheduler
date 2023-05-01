@@ -1,5 +1,5 @@
-﻿using EventManagementService.API.DTO;
-using EventManagementService.Domain.Models;
+﻿using EventManagementService.Domain.Models;
+using EventManagementService.DTO;
 using Moq;
 using NUnit.Framework;
 using RofShared.Exceptions;

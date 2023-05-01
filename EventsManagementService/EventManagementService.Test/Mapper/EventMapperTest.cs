@@ -1,4 +1,4 @@
-﻿using EventManagementService.Domain.Mappers;
+﻿using EventManagementService.Domain.Mappers.Database;
 using EventManagementService.Infrastructure.Persistence.Entities;
 using NUnit.Framework;
 using System;
