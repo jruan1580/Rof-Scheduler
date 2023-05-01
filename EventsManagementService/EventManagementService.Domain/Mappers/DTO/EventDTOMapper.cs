@@ -1,16 +1,16 @@
-﻿using EventManagementService.API.DTO;
-using EventManagementService.Domain.Models;
+﻿using EventManagementService.Domain.Models;
+using EventManagementService.DTO;
 using System;
 
-namespace EventManagementService.API.DtoMapper
+namespace EventManagementService.Domain.Mappers.DTO
 {
     public static class EventDTOMapper
     {
         public static EventDTO ToDTOEvent(JobEvent coreEvent)
         {
-            if(coreEvent == null)
+            if (coreEvent == null)
             {
-                return null;    
+                return null;
             }
 
             var dtoEvent = new EventDTO();
@@ -23,7 +23,7 @@ namespace EventManagementService.API.DtoMapper
             dtoEvent.EventEndTime = coreEvent.EventEndTime.ToString("yyyy-MM-ddTHH:mm:ss");
             dtoEvent.Completed = coreEvent.Completed;
 
-            if(coreEvent.Employee != null)
+            if (coreEvent.Employee != null)
             {
                 dtoEvent.EmployeeFullName = coreEvent.Employee.FullName;
             }
@@ -33,7 +33,7 @@ namespace EventManagementService.API.DtoMapper
                 dtoEvent.PetName = coreEvent.Pet.Name;
             }
 
-            if(coreEvent.PetService != null)
+            if (coreEvent.PetService != null)
             {
                 dtoEvent.PetServiceName = coreEvent.PetService.ServiceName;
             }
@@ -43,7 +43,7 @@ namespace EventManagementService.API.DtoMapper
 
         public static JobEvent FromDTOEvent(EventDTO eventDTO)
         {
-            if(eventDTO == null)
+            if (eventDTO == null)
             {
                 return null;
             }

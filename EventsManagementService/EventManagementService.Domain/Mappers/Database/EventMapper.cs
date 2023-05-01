@@ -2,7 +2,7 @@
 using CoreEvent = EventManagementService.Domain.Models.JobEvent;
 using DbEvent = EventManagementService.Infrastructure.Persistence.Entities.JobEvent;
 
-namespace EventManagementService.Domain.Mappers
+namespace EventManagementService.Domain.Mappers.Database
 {
     public static class EventMapper
     {
@@ -18,7 +18,7 @@ namespace EventManagementService.Domain.Mappers
             coreEvent.EventEndTime = dbEvent.EventEndTime;
             coreEvent.Completed = dbEvent.Completed;
 
-            if(dbEvent.Employee != null)
+            if (dbEvent.Employee != null)
             {
                 coreEvent.Employee = new Models.Employee()
                 {
@@ -30,7 +30,7 @@ namespace EventManagementService.Domain.Mappers
                 };
             }
 
-            if(dbEvent.Pet != null)
+            if (dbEvent.Pet != null)
             {
                 coreEvent.Pet = new Models.Pet()
                 {
