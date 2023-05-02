@@ -11,11 +11,7 @@ namespace EventManagementService.Infrastructure.Persistence
     {
         Task AddEvent(JobEvent jobEvent);
         Task DeleteJobEventById(int id);
-        Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year);
-        Task<JobEvent> GetJobEventById(int id);
-        Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart);
         Task UpdateJobEvent(JobEvent jobEvent);
-        Task<List<JobEvent>> GetAllJobEvents();
     }
 
     public class EventRepository : IEventRepository
@@ -29,74 +25,6 @@ namespace EventManagementService.Infrastructure.Persistence
                 context.JobEvents.Add(jobEvent);
 
                 await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<JobEvent> GetJobEventById(int id)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var result = await context.JobEvents.FirstOrDefaultAsync(j => j.Id == id);
-
-                result.Employee = context.Employees.FirstOrDefault(e => e.Id == result.EmployeeId);
-                result.Pet = context.Pets.FirstOrDefault(p => p.Id == result.PetId);
-                result.PetService = context.PetServices.FirstOrDefault(s => s.Id == result.PetServiceId);
-
-                return result;
-            }
-        }
-
-        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                IQueryable<JobEvent> allEvents = context.JobEvents;
-
-                var result = await allEvents.Where(j => j.EventStartTime.Month == month && j.EventStartTime.Year == year).ToListAsync();
-
-                //populate employee, pet, and pet service
-                var uniqueEmployeeIds = result.Select(j => j.EmployeeId).Distinct().ToList();
-                var uniquePetIds = result.Select(j => j.PetId).Distinct().ToList();
-                var uniquePetServiceIds = result.Select(j => j.PetServiceId).Distinct().ToList();
-
-                var employees = context.Employees.Where(a => uniqueEmployeeIds.Contains(a.Id));
-                var pets = context.Pets.Where(a => uniquePetIds.Contains(a.Id));
-                var petServices = context.PetServices.Where(a => uniquePetServiceIds.Contains(a.Id));
-
-                foreach(var jobEvent in result)
-                {
-                    jobEvent.Employee = employees.FirstOrDefault(e => e.Id == jobEvent.EmployeeId);
-                    jobEvent.Pet = pets.FirstOrDefault(p => p.Id == jobEvent.PetId);
-                    jobEvent.PetService = petServices.FirstOrDefault(s => s.Id == jobEvent.PetServiceId);
-                }
-
-                return result;
-            }
-        }
-
-        public async Task<List<JobEvent>> GetAllJobEvents()
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                var result = await context.JobEvents.ToListAsync();
-
-                //populate employee, pet, and pet service
-                var uniqueEmployeeIds = result.Select(j => j.EmployeeId).Distinct().ToList();
-                var uniquePetIds = result.Select(j => j.PetId).Distinct().ToList();
-                var uniquePetServiceIds = result.Select(j => j.PetServiceId).Distinct().ToList();
-
-                var employees = context.Employees.Where(a => uniqueEmployeeIds.Contains(a.Id));
-                var pets = context.Pets.Where(a => uniquePetIds.Contains(a.Id));
-                var petServices = context.PetServices.Where(a => uniquePetServiceIds.Contains(a.Id));
-
-                foreach (var jobEvent in result)
-                {
-                    jobEvent.Employee = employees.FirstOrDefault(e => e.Id == jobEvent.EmployeeId);
-                    jobEvent.Pet = pets.FirstOrDefault(p => p.Id == jobEvent.PetId);
-                    jobEvent.PetService = petServices.FirstOrDefault(s => s.Id == jobEvent.PetServiceId);
-                }
-
-                return result;
             }
         }
 
@@ -136,14 +64,6 @@ namespace EventManagementService.Infrastructure.Persistence
                 context.Remove(job);
 
                 await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<bool> JobEventAlreadyExists(int id, long employeeId, long petId, DateTime eventStart)
-        {
-            using (var context = new RofSchedulerContext())
-            {
-                return await context.JobEvents.AnyAsync(j => j.Id != id && j.EventStartTime.Equals(eventStart) && (j.EmployeeId.Equals(employeeId) || j.PetId.Equals(petId)));
             }
         }
 
