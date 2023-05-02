@@ -14,11 +14,13 @@ namespace EventManagementService.Test.SerivceTest
     public class EventServiceTest
     {
         private Mock<IEventRepository> _eventRepository;
+        private Mock<IEventRetrievalRepository> _eventRetrievalRepository;
 
         [SetUp]
         public void Setup()
         {
             _eventRepository = new Mock<IEventRepository>();
+            _eventRetrievalRepository = new Mock<IEventRetrievalRepository>();
         }
 
         [Test]
@@ -33,7 +35,7 @@ namespace EventManagementService.Test.SerivceTest
                 Completed = false
             };
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => eventService.AddEvent(newEvent));
         }
@@ -50,10 +52,10 @@ namespace EventManagementService.Test.SerivceTest
                 Completed = false
             };
 
-            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>()))
+            _eventRetrievalRepository.Setup(e => e.DoesJobEventAtThisTimeAlreadyExistsForPetOrEmployee(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(true);
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => eventService.AddEvent(newEvent));
         }
@@ -73,7 +75,7 @@ namespace EventManagementService.Test.SerivceTest
             _eventRepository.Setup(e => e.AddEvent(It.IsAny<JobEvent>()))
                 .Returns(Task.CompletedTask);
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             await eventService.AddEvent(newEvent);
             _eventRepository.Verify(e => e.AddEvent(It.IsAny<JobEvent>()), Times.Once);
@@ -82,10 +84,10 @@ namespace EventManagementService.Test.SerivceTest
         [Test]
         public async Task GetAllJobEventsByMonthAndYear_NoEvents()
         {
-            _eventRepository.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), It.IsAny<int>()))
+            _eventRetrievalRepository.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(new List<JobEvent>());
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             var results = await eventService.GetAllJobEventsByMonthAndYear(DateTime.Today.Month, DateTime.Today.Year);
 
@@ -126,10 +128,10 @@ namespace EventManagementService.Test.SerivceTest
                 }
             };
 
-            _eventRepository.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), It.IsAny<int>()))
+            _eventRetrievalRepository.Setup(e => e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(events);
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             var results = await eventService.GetAllJobEventsByMonthAndYear(DateTime.Today.Month, DateTime.Today.Year);
 
@@ -158,10 +160,10 @@ namespace EventManagementService.Test.SerivceTest
         [Test]
         public void GetJobEventById_DoesNotExist()
         {
-            _eventRepository.Setup(e => e.GetJobEventById(It.IsAny<int>()))
+            _eventRetrievalRepository.Setup(e => e.GetJobEventById(It.IsAny<int>()))
                 .ReturnsAsync((JobEvent)null);
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             Assert.ThrowsAsync<EntityNotFoundException>(() => eventService.GetJobEventById(1));
         }
@@ -169,7 +171,7 @@ namespace EventManagementService.Test.SerivceTest
         [Test]
         public async Task GetJobEventById_Success()
         {
-            _eventRepository.Setup(e => e.GetJobEventById(It.IsAny<int>()))
+            _eventRetrievalRepository.Setup(e => e.GetJobEventById(It.IsAny<int>()))
                 .ReturnsAsync(new JobEvent()
                 {
                     Id = 1,
@@ -198,7 +200,7 @@ namespace EventManagementService.Test.SerivceTest
                     }
                 });
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             var result = await eventService.GetJobEventById(1);
 
@@ -236,7 +238,7 @@ namespace EventManagementService.Test.SerivceTest
                 EventStartTime = DateTime.Now
             };
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => eventService.UpdateJobEvent(updateEvent));
         }
@@ -253,10 +255,10 @@ namespace EventManagementService.Test.SerivceTest
                 EventStartTime = DateTime.Now
             };
 
-            _eventRepository.Setup(e => e.JobEventAlreadyExists(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>()))
+            _eventRetrievalRepository.Setup(e => e.DoesJobEventAtThisTimeAlreadyExistsForPetOrEmployee(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(true);
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             Assert.ThrowsAsync<ArgumentException>(() => eventService.UpdateJobEvent(updateEvent));
         }
@@ -276,7 +278,7 @@ namespace EventManagementService.Test.SerivceTest
             _eventRepository.Setup(e => e.UpdateJobEvent(It.IsAny<JobEvent>()))
                 .Returns(Task.CompletedTask);
 
-            var eventService = new EventService(_eventRepository.Object);
+            var eventService = new EventService(_eventRepository.Object, _eventRetrievalRepository.Object);
 
             await eventService.UpdateJobEvent(updateEvent);
             _eventRepository.Verify(e => e.UpdateJobEvent(It.IsAny<JobEvent>()), Times.Once);

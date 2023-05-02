@@ -22,10 +22,12 @@ namespace EventManagementService.Domain.Services
     public class EventService : IEventService
     {
         private readonly IEventRepository _eventRepository;
+        private readonly IEventRetrievalRepository _eventRetrievalRepository;
 
-        public EventService(IEventRepository eventRepository)
+        public EventService(IEventRepository eventRepository, IEventRetrievalRepository eventRetrievalRepository)
         {
             _eventRepository = eventRepository;
+            _eventRetrievalRepository = eventRetrievalRepository;
         }
 
         public async Task AddEvent(JobEvent newEvent)
@@ -39,7 +41,7 @@ namespace EventManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var eventExists = await _eventRepository.JobEventAlreadyExists(0, newEvent.EmployeeId, newEvent.PetId, newEvent.EventStartTime);
+            var eventExists = await _eventRetrievalRepository.DoesJobEventAtThisTimeAlreadyExistsForPetOrEmployee(0, newEvent.EmployeeId, newEvent.PetId, newEvent.EventStartTime);
             if (eventExists)
             {
                 throw new ArgumentException("This Pet Service for this Pet is already scheduled under this Employee at this date and time.");
@@ -52,7 +54,7 @@ namespace EventManagementService.Domain.Services
 
         public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year)
         {
-            var results = await _eventRepository.GetAllJobEventsByMonthAndYear(month, year);
+            var results = await _eventRetrievalRepository.GetAllJobEventsByMonthAndYear(month, year);
 
             if (results == null || results.Count == 0)
             {
@@ -64,7 +66,7 @@ namespace EventManagementService.Domain.Services
 
         public async Task<List<JobEvent>> GetAllJobEvents()
         {
-            var results = await _eventRepository.GetAllJobEvents();
+            var results = await _eventRetrievalRepository.GetAllJobEvents();
 
             if (results == null || results.Count == 0)
             {
@@ -76,7 +78,7 @@ namespace EventManagementService.Domain.Services
         
         public async Task<JobEvent> GetJobEventById(int id)
         {
-            var jobEvent = await _eventRepository.GetJobEventById(id);
+            var jobEvent = await _eventRetrievalRepository.GetJobEventById(id);
 
             if (jobEvent == null)
             {
@@ -97,7 +99,7 @@ namespace EventManagementService.Domain.Services
                 throw new ArgumentException(errMsg);
             }
 
-            var eventExists = await _eventRepository.JobEventAlreadyExists(updateEvent.Id, updateEvent.EmployeeId, updateEvent.PetId, updateEvent.EventStartTime);
+            var eventExists = await _eventRetrievalRepository.DoesJobEventAtThisTimeAlreadyExistsForPetOrEmployee(updateEvent.Id, updateEvent.EmployeeId, updateEvent.PetId, updateEvent.EventStartTime);
             if (eventExists)
             {
                 throw new ArgumentException("This Pet or Employee is already scheduled for another service at this date and time.");
@@ -114,11 +116,6 @@ namespace EventManagementService.Domain.Services
             await _eventRepository.UpdateJobEvent(eventEntity);
         }
 
-        /// <summary>
-        /// Removes event.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public async Task DeleteEventById(int id)
         {
             await _eventRepository.DeleteJobEventById(id);
