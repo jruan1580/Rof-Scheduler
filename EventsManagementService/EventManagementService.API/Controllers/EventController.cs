@@ -15,10 +15,12 @@ namespace EventManagementService.API.Controllers
     public class EventController : ControllerBase
     {
         private readonly IEventService _eventService;
+        private readonly IEventRetrievalService _eventRetrievalService;
 
-        public EventController(IEventService eventService)
+        public EventController(IEventService eventService, IEventRetrievalService eventRetrievalService)
         {
             _eventService = eventService;
+            _eventRetrievalService = eventRetrievalService; 
         }
 
         [Authorize(Roles = "Administrator,Employee")]
@@ -34,7 +36,7 @@ namespace EventManagementService.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllJobEventsByMonthAndYear([FromQuery] int month, [FromQuery] int year)
         {
-            var jobEvents = await _eventService.GetAllJobEventsByMonthAndYear(month, year);
+            var jobEvents = await _eventRetrievalService.GetAllJobEventsByMonthAndYear(month, year);
 
             var eventList = new List<EventDTO>();
 
@@ -50,7 +52,7 @@ namespace EventManagementService.API.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllJobEvents()
         {
-            var jobEvents = await _eventService.GetAllJobEvents();
+            var jobEvents = await _eventRetrievalService.GetAllJobEvents();
 
             var eventList = new List<EventDTO>();
 
@@ -66,7 +68,7 @@ namespace EventManagementService.API.Controllers
         [HttpGet("{eventId}")]
         public async Task<IActionResult> GetJobEventById(int eventId)
         {
-            var jobEvent = await _eventService.GetJobEventById(eventId);
+            var jobEvent = await _eventRetrievalService.GetJobEventById(eventId);
 
             return Ok(EventDTOMapper.ToDTOEvent(jobEvent));
         }

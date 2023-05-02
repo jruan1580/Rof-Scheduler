@@ -64,7 +64,7 @@ namespace EventManagementService.Test.Controller
                 EventCreator.GetDomainEvent()
             };
 
-            _eventService.Setup(e => 
+            _eventRetrievalService.Setup(e => 
                 e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(), 
                     It.IsAny<int>()))
             .ReturnsAsync(events);
@@ -77,7 +77,7 @@ namespace EventManagementService.Test.Controller
         [Test]
         public async Task GetAllJobEventsByMonthAndYear_InternalServerError()
         {
-            _eventService.Setup(e =>
+            _eventRetrievalService.Setup(e =>
                 e.GetAllJobEventsByMonthAndYear(It.IsAny<int>(),
                     It.IsAny<int>()))
             .ThrowsAsync(new Exception(_exceptionMsg));
@@ -92,7 +92,7 @@ namespace EventManagementService.Test.Controller
         [Test]
         public async Task GetJobEventById_Success()
         {
-            _eventService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
+            _eventRetrievalService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
                 .ReturnsAsync(EventCreator.GetDomainEvent());
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
@@ -103,7 +103,7 @@ namespace EventManagementService.Test.Controller
         [Test]
         public async Task GetJobEventById_NotFound()
         {
-            _eventService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
+            _eventRetrievalService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
                 .ThrowsAsync(new EntityNotFoundException("Event"));
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");
@@ -116,7 +116,7 @@ namespace EventManagementService.Test.Controller
         [Test]
         public async Task GetJobEventById_InternalServerError()
         {
-            _eventService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
+            _eventRetrievalService.Setup(e => e.GetJobEventById(It.IsAny<int>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Administrator", HttpMethod.Get, $"{_baseUrl}/1");

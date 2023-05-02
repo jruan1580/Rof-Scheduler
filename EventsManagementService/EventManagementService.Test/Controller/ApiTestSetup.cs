@@ -23,6 +23,7 @@ namespace EventManagementService.Test.Controller
         protected ITokenHandler _tokenHandler;
 
         protected readonly Mock<IEventService> _eventService = new Mock<IEventService>();
+        protected readonly Mock<IEventRetrievalService> _eventRetrievalService = new Mock<IEventRetrievalService>();
 
         protected readonly string _eventNotFoundMessage = "Event not found!";
 
@@ -53,6 +54,7 @@ namespace EventManagementService.Test.Controller
 
             Action<IServiceCollection> services = service =>
             {
+                service.AddTransient(provider => _eventRetrievalService.Object);
                 service.AddTransient(provider => _eventService.Object);
 
                 service.AddMvc()
