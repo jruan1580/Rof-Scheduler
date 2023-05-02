@@ -3,8 +3,6 @@ using EventManagementService.Domain.Models;
 using EventManagementService.Infrastructure.Persistence;
 using RofShared.Exceptions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventManagementService.Domain.Services
@@ -13,21 +11,17 @@ namespace EventManagementService.Domain.Services
     {
         Task AddEvent(JobEvent newEvent);
         Task DeleteEventById(int id);
-        Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year);
-        Task<JobEvent> GetJobEventById(int id);
         Task UpdateJobEvent(JobEvent updateEvent);
-        Task<List<JobEvent>> GetAllJobEvents();
     }
 
-    public class EventService : IEventService
+    public class EventService : EventBaseService, IEventService
     {
         private readonly IEventRepository _eventRepository;
-        private readonly IEventRetrievalRepository _eventRetrievalRepository;
 
-        public EventService(IEventRepository eventRepository, IEventRetrievalRepository eventRetrievalRepository)
+        public EventService(IEventRepository eventRepository, 
+            IEventRetrievalRepository eventRetrievalRepository) : base(eventRetrievalRepository)
         {
             _eventRepository = eventRepository;
-            _eventRetrievalRepository = eventRetrievalRepository;
         }
 
         public async Task AddEvent(JobEvent newEvent)
@@ -52,42 +46,6 @@ namespace EventManagementService.Domain.Services
             await _eventRepository.AddEvent(newEventEntity);
         }
 
-        public async Task<List<JobEvent>> GetAllJobEventsByMonthAndYear(int month, int year)
-        {
-            var results = await _eventRetrievalRepository.GetAllJobEventsByMonthAndYear(month, year);
-
-            if (results == null || results.Count == 0)
-            {
-                return new List<JobEvent>();
-            }
-
-            return new List<JobEvent>(results.Select(e => EventMapper.ToCoreEvent(e))).ToList();
-        }
-
-        public async Task<List<JobEvent>> GetAllJobEvents()
-        {
-            var results = await _eventRetrievalRepository.GetAllJobEvents();
-
-            if (results == null || results.Count == 0)
-            {
-                return new List<JobEvent>();
-            }
-
-            return new List<JobEvent>(results.Select(e => EventMapper.ToCoreEvent(e))).ToList();
-        }
-        
-        public async Task<JobEvent> GetJobEventById(int id)
-        {
-            var jobEvent = await _eventRetrievalRepository.GetJobEventById(id);
-
-            if (jobEvent == null)
-            {
-                throw new EntityNotFoundException("Event not found.");
-            }
-
-            return EventMapper.ToCoreEvent(jobEvent);
-        }
-
         public async Task UpdateJobEvent(JobEvent updateEvent)
         {
             var invalidErrs = updateEvent.IsValidEventToUpdate().ToArray();
@@ -105,7 +63,7 @@ namespace EventManagementService.Domain.Services
                 throw new ArgumentException("This Pet or Employee is already scheduled for another service at this date and time.");
             }
 
-            var origEvent = GetJobEventById(updateEvent.Id);
+            var origEvent = await GetDbJobEventById(updateEvent.Id);
             if (origEvent == null)
             {
                 throw new EntityNotFoundException("Event was not found. Failed to udpate.");
