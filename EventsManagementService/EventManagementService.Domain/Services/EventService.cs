@@ -16,9 +16,9 @@ namespace EventManagementService.Domain.Services
 
     public class EventService : EventBaseService, IEventService
     {
-        private readonly IEventRepository _eventRepository;
+        private readonly IEventUpsertRepository _eventRepository;
 
-        public EventService(IEventRepository eventRepository, 
+        public EventService(IEventUpsertRepository eventRepository, 
             IEventRetrievalRepository eventRetrievalRepository) : base(eventRetrievalRepository)
         {
             _eventRepository = eventRepository;

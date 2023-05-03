@@ -13,13 +13,13 @@ namespace EventManagementService.Test.SerivceTest
     [TestFixture]
     public class EventServiceTest
     {
-        private Mock<IEventRepository> _eventRepository;
+        private Mock<IEventUpsertRepository> _eventRepository;
         private Mock<IEventRetrievalRepository> _eventRetrievalRepository;
 
         [SetUp]
         public void Setup()
         {
-            _eventRepository = new Mock<IEventRepository>();
+            _eventRepository = new Mock<IEventUpsertRepository>();
             _eventRetrievalRepository = new Mock<IEventRetrievalRepository>();
         }
 
