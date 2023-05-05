@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EventManagementService.Domain.Services
 {
-    public class EventRetrievalService : EventBaseService, IEventRetrievalService
+    public class EventRetrievalService : EventService, IEventRetrievalService
     {
         public EventRetrievalService(IEventRetrievalRepository eventRetrievalRepository)
             : base(eventRetrievalRepository) { }
