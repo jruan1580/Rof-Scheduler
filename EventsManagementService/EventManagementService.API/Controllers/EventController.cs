@@ -14,12 +14,12 @@ namespace EventManagementService.API.Controllers
     [ApiController]
     public class EventController : ControllerBase
     {
-        private readonly IEventService _eventService;
+        private readonly IEventUpsertService _eventUpsertService;
         private readonly IEventRetrievalService _eventRetrievalService;
 
-        public EventController(IEventService eventService, IEventRetrievalService eventRetrievalService)
+        public EventController(IEventUpsertService eventUpsertService, IEventRetrievalService eventRetrievalService)
         {
-            _eventService = eventService;
+            _eventUpsertService = eventUpsertService;
             _eventRetrievalService = eventRetrievalService; 
         }
 
@@ -27,7 +27,7 @@ namespace EventManagementService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddEvent([FromBody] EventDTO newEvent)
         {
-            await _eventService.AddEvent(EventDTOMapper.FromDTOEvent(newEvent));
+            await _eventUpsertService.AddEvent(EventDTOMapper.FromDTOEvent(newEvent));
 
             return StatusCode(201);
         }
@@ -79,7 +79,7 @@ namespace EventManagementService.API.Controllers
         {
             var update = EventDTOMapper.FromDTOEvent(updateEvent);
 
-            await _eventService.UpdateJobEvent(update);
+            await _eventUpsertService.UpdateJobEvent(update);
 
             return Ok();
         }
@@ -88,7 +88,7 @@ namespace EventManagementService.API.Controllers
         [HttpDelete("{eventId}")]
         public async Task<IActionResult> DeleteEventById(int eventId)
         {
-            await _eventService.DeleteEventById(eventId);
+            await _eventUpsertService.DeleteEventById(eventId);
 
             return Ok();
         }

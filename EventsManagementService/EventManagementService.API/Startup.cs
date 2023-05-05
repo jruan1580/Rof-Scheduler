@@ -28,7 +28,7 @@ namespace EventManagementService.API
             services.AddSingleton<IEventUpsertRepository, EventUpsertRepository>();
 
             services.AddTransient<IEventRetrievalRepository, EventRetrievalRepository>();
-            services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IEventUpsertService, EventUpsertService>();
 
             services.AddControllers();
 

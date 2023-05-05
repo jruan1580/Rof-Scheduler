@@ -22,8 +22,8 @@ namespace EventManagementService.Test.Controller
         protected HttpClient _httpClient;
         protected ITokenHandler _tokenHandler;
 
-        protected readonly Mock<IEventService> _eventService = new Mock<IEventService>();
         protected readonly Mock<IEventRetrievalService> _eventRetrievalService = new Mock<IEventRetrievalService>();
+        protected readonly Mock<IEventUpsertService> _eventService = new Mock<IEventUpsertService>();
 
         protected readonly string _eventNotFoundMessage = "Event not found!";
 
