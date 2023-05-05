@@ -25,63 +25,42 @@ namespace EventManagementService.Domain.Models
         
         public PetService PetService { get; set; }
 
-        public List<string> IsValidEventToCreate()
+        public List<string> GetValidationErrorsForUpdate()
         {
-            var invalidErr = new List<string>();
+            var validationErrors = new List<string>();
 
-            if (EmployeeId <= 0)
+            if (Id <= 0)
             {
-                invalidErr.Add($"Invalid EmployeeId: {EmployeeId}.");
+                validationErrors.Add($"Invalid Id: {Id}");
             }
 
-            if (PetId <= 0)
-            {
-                invalidErr.Add($"Invalid PetId: {PetId}.");
-            }
+            var remainingPropertyValidationErrors = GetValidationErrorsForBothCreateOrUpdate();
+            validationErrors.AddRange(remainingPropertyValidationErrors);
 
-            if (PetServiceId <= 0)
-            {
-                invalidErr.Add($"Invalid PetServiceId: {PetServiceId}.");
-            }
-
-            if(EventStartTime == null)
-            {
-                invalidErr.Add("Please set a start date and time for event.");
-            }
-
-            return invalidErr;
+            return validationErrors;
         }
 
-        public List<string> IsValidEventToUpdate()
+        public List<string> GetValidationErrorsForBothCreateOrUpdate()
         {
-            var invalidErr = new List<string>();
+            var validationErrors = new List<string>();
+            var failedMessageIfValidationResultIsTrue = new Dictionary<string, bool>();
 
-            if(Id <= 0)
+            failedMessageIfValidationResultIsTrue.Add($"Invalid EmployeeId: {EmployeeId}", EmployeeId <= 0);
+            failedMessageIfValidationResultIsTrue.Add($"Invalid PetId: {PetId}", PetId <= 0);
+            failedMessageIfValidationResultIsTrue.Add($"Invalid PetServiceId: {PetServiceId}", PetServiceId <= 0);
+            failedMessageIfValidationResultIsTrue.Add("Please set a start date and time for event.", EventStartTime == null);
+
+            foreach (var failedMessageToValidationResult in failedMessageIfValidationResultIsTrue)
             {
-                invalidErr.Add($"Invalid Id: {Id}.");
+                var validationFailed = failedMessageToValidationResult.Value;
+                if (validationFailed)
+                {
+                    var msg = failedMessageToValidationResult.Key;
+                    validationErrors.Add(msg);
+                }
             }
 
-            if (EmployeeId <= 0)
-            {
-                invalidErr.Add($"Invalid EmployeeId: {EmployeeId}.");
-            }
-
-            if (PetId <= 0)
-            {
-                invalidErr.Add($"Invalid PetId: {PetId}.");
-            }
-
-            if (PetServiceId <= 0)
-            {
-                invalidErr.Add($"Invalid PetServiceId: {PetServiceId}.");
-            }
-
-            if (EventStartTime == null)
-            {
-                invalidErr.Add("Please set a start date and time for event.");
-            }
-
-            return invalidErr;
+            return validationErrors;
         }
     }
 }
