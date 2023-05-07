@@ -81,7 +81,7 @@ namespace ClientManagementService.Test.Service
             var pet = PetCreator.GetDbPet();
             var petToVaccines = new List<PetToVaccine>()
             {
-                PetToVaccineCreator.GetDbPetToVaccine()
+                VaccineCreator.GetDbPetToVaccine()
             };
 
             petRetrievalRepo.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<long>>()))
@@ -141,7 +141,7 @@ namespace ClientManagementService.Test.Service
             var pet = PetCreator.GetDbPet();
             var petToVaccines = new List<PetToVaccine>()
             {
-                PetToVaccineCreator.GetDbPetToVaccine()
+                VaccineCreator.GetDbPetToVaccine()
             };
 
             petRetrievalRepo.Setup(p => p.GetPetByFilter(It.IsAny<GetPetFilterModel<string>>()))

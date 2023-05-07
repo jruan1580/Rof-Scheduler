@@ -25,7 +25,7 @@ namespace ClientManagementService.API
             services.AddSingleton<IClientRetrievalRepository, ClientRetrievalRepository>();
             services.AddSingleton<IClientUpsertRepository, ClientUpsertRepository>();
             services.AddSingleton<IPetRetrievalRepository, PetRetrievalRepository>();
-            services.AddSingleton<IPetRepository, PetRepository>();
+            services.AddSingleton<IPetUpsertRepository, PetUpsertRepository>();
             services.AddSingleton<IPetToVaccinesRepository, PetToVaccinesRepository>();
 
             services.AddTransient<IPasswordService, PasswordService>();
@@ -33,7 +33,7 @@ namespace ClientManagementService.API
             services.AddTransient<IClientRetrievalService, ClientRetrievalService>();
             services.AddTransient<IClientUpsertService, ClientUpsertService>();
             services.AddTransient<IPetRetrievalService, PetRetrievalService>();
-            services.AddTransient<IPetService, PetService>();
+            services.AddTransient<IPetUpsertService, PetUpsertService>();
             services.AddTransient<IDropdownService, DropdownService>();
 
             services.AddMvc();

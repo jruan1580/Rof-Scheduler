@@ -23,7 +23,7 @@ namespace ClientManagementService.Test.Controller
         {
             var newPet = PetCreator.GetPetDTO();
 
-            _petService.Setup(p => p.AddPet(It.IsAny<Domain.Models.Pet>()))
+            _petUpsertService.Setup(p => p.AddPet(It.IsAny<Pet>()))
                 .ReturnsAsync(1);
 
             var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newPet));
@@ -46,7 +46,7 @@ namespace ClientManagementService.Test.Controller
                 BreedName = ""
             };
 
-            _petService.Setup(p => p.AddPet(It.IsAny<Pet>()))
+            _petUpsertService.Setup(p => p.AddPet(It.IsAny<Pet>()))
                 .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
             var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newPet));
@@ -71,7 +71,7 @@ namespace ClientManagementService.Test.Controller
                 BreedName = ""
             };
 
-            _petService.Setup(p => p.AddPet(It.IsAny<Pet>()))
+            _petUpsertService.Setup(p => p.AddPet(It.IsAny<Pet>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Administrator", HttpMethod.Post, _baseUrl, ConvertObjectToStringContent(newPet));
@@ -214,7 +214,7 @@ namespace ClientManagementService.Test.Controller
         {
             var updatePet = PetCreator.GetPetDTO();
 
-            _petService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
+            _petUpsertService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
                 .Returns(Task.CompletedTask);
 
             var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/updatePet", ConvertObjectToStringContent(updatePet));
@@ -227,7 +227,7 @@ namespace ClientManagementService.Test.Controller
         {
             var updatePet = PetCreator.GetPetDTO();
 
-            _petService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
+            _petUpsertService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
                 .ThrowsAsync(new EntityNotFoundException("Pet"));
 
             var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/updatePet", ConvertObjectToStringContent(updatePet));
@@ -242,7 +242,7 @@ namespace ClientManagementService.Test.Controller
         {
             var updatePet = PetCreator.GetPetDTO();
 
-            _petService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
+            _petUpsertService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
                 .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
             var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/updatePet", ConvertObjectToStringContent(updatePet));
@@ -257,7 +257,7 @@ namespace ClientManagementService.Test.Controller
         {
             var updatePet = PetCreator.GetPetDTO();
 
-            _petService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
+            _petUpsertService.Setup(p => p.UpdatePet(It.IsAny<Pet>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Client", HttpMethod.Put, $"{_baseUrl}/updatePet", ConvertObjectToStringContent(updatePet));
@@ -270,7 +270,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task DeletePetById_Success()
         {
-            _petService.Setup(p => p.DeletePetById(It.IsAny<long>()))
+            _petUpsertService.Setup(p => p.DeletePetById(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
             var response = await SendRequest("Employee", HttpMethod.Delete, $"{_baseUrl}/1");
@@ -281,7 +281,7 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task DeletePetById_BadRequestError()
         {
-            _petService.Setup(p => p.DeletePetById(It.IsAny<long>()))
+            _petUpsertService.Setup(p => p.DeletePetById(It.IsAny<long>()))
                 .ThrowsAsync(new ArgumentException(_exceptionMsg));
 
             var response = await SendRequest("Employee", HttpMethod.Delete, $"{_baseUrl}/1");
@@ -294,58 +294,10 @@ namespace ClientManagementService.Test.Controller
         [Test]
         public async Task DeletePetById_InternalServerError()
         {
-            _petService.Setup(p => p.DeletePetById(It.IsAny<long>()))
+            _petUpsertService.Setup(p => p.DeletePetById(It.IsAny<long>()))
                 .ThrowsAsync(new Exception(_exceptionMsg));
 
             var response = await SendRequest("Employee", HttpMethod.Delete, $"{_baseUrl}/1");
-
-            AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
-
-            AssertContentIsAsExpected(response, _exceptionMsg);
-        }
-
-        [Test]
-        public async Task GetVaccinesByPetId_Success()
-        {
-            var vaxStats = new List<VaccineStatus>();
-            {
-                new VaccineStatus()
-                {
-                    Id = 1,
-                    PetToVaccineId = 1,
-                    VaxName = "Bordetella",
-                    Inoculated = true
-                };
-            };
-
-            _petService.Setup(p => p.GetVaccinesByPetId(It.IsAny<long>()))
-                .ReturnsAsync(vaxStats);
-
-            var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/1/vax");
-
-            AssertExpectedStatusCode(response, HttpStatusCode.OK);
-        }
-
-        [Test]
-        public async Task GetVaccinesByPetId_NotFound()
-        {
-            _petService.Setup(p => p.GetVaccinesByPetId(It.IsAny<long>()))
-                .ThrowsAsync(new EntityNotFoundException("Pet's vaccine records"));
-
-            var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/1/vax");
-
-            AssertExpectedStatusCode(response, HttpStatusCode.NotFound);
-
-            AssertContentIsAsExpected(response, "Pet's vaccine records not found!");
-        }
-
-        [Test]
-        public async Task GetVaccinesByPetId_InternalServerError()
-        {
-            _petService.Setup(p => p.GetVaccinesByPetId(It.IsAny<long>()))
-                .ThrowsAsync(new Exception(_exceptionMsg));
-
-            var response = await SendRequest("Client", HttpMethod.Get, $"{_baseUrl}/1/vax");
 
             AssertExpectedStatusCode(response, HttpStatusCode.InternalServerError);
 

@@ -14,21 +14,21 @@ namespace ClientManagementService.API.Controllers
     [ApiController]
     public class PetController : ControllerBase
     {
-        private readonly IPetService _petService;
         private readonly IPetRetrievalService _petRetrievalService;
+        private readonly IPetUpsertService _petUpsertService;
 
-        public PetController(IPetService petService,
-            IPetRetrievalService petRetrievalService)
+        public PetController(IPetRetrievalService petRetrievalService,
+            IPetUpsertService petUpsertService)
         {
-            _petService = petService;
             _petRetrievalService = petRetrievalService;
+            _petUpsertService = petUpsertService;
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpPost]
         public async Task<IActionResult> AddPet([FromBody] PetDTO pet)
         {
-            var petId = await _petService.AddPet(PetDTOMapper.FromDTOPet(pet));
+            var petId = await _petUpsertService.AddPet(PetDTOMapper.FromDTOPet(pet));
 
             return Ok(new { Id = petId });
         }
@@ -87,7 +87,7 @@ namespace ClientManagementService.API.Controllers
         [HttpPut("updatePet")]
         public async Task<IActionResult> UpdatePetInfo([FromBody] PetDTO pet)
         {
-            await _petService.UpdatePet(PetDTOMapper.FromDTOPet(pet));
+            await _petUpsertService.UpdatePet(PetDTOMapper.FromDTOPet(pet));
 
             return Ok();
         }
@@ -96,25 +96,9 @@ namespace ClientManagementService.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePetById(long id)
         {
-            await _petService.DeletePetById(id);
+            await _petUpsertService.DeletePetById(id);
 
             return Ok();
-        }
-
-        [Authorize(Roles = "Administrator,Employee,Client")]
-        [HttpGet("{petId}/vax")]
-        public async Task<IActionResult> GetVaccinesByPetId(long petId)
-        {
-            var vaxStats = new List<PetsVaccineDTO>();
-
-            var result = await _petService.GetVaccinesByPetId(petId);
-
-            foreach (var petVax in result)
-            {
-                vaxStats.Add(PetDTOMapper.ToDTOPetsVaccine(petVax));
-            }
-
-            return Ok(vaxStats);
         }
     }
 }

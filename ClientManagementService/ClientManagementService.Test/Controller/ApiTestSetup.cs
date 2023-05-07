@@ -26,7 +26,7 @@ namespace ClientManagementService.Test.Controller
         protected readonly Mock<IClientRetrievalService> _clientRetrievalService = new Mock<IClientRetrievalService>();
         protected readonly Mock<IClientUpsertService> _clientUpsertService = new Mock<IClientUpsertService>();
         protected readonly Mock<IPetRetrievalService> _petRetrievalService = new Mock<IPetRetrievalService>();
-        protected readonly Mock<IPetService> _petService = new Mock<IPetService>();
+        protected readonly Mock<IPetUpsertService> _petUpsertService = new Mock<IPetUpsertService>();
         protected readonly Mock<IDropdownService> _dropdownService = new Mock<IDropdownService>();
 
         protected readonly string _clientNotFoundMessage = "Client not found!";
@@ -63,7 +63,7 @@ namespace ClientManagementService.Test.Controller
                 service.AddTransient(provider => _clientRetrievalService.Object);
                 service.AddTransient(provider => _clientUpsertService.Object);
                 service.AddTransient(provider => _petRetrievalService.Object);
-                service.AddTransient(provider => _petService.Object);
+                service.AddTransient(provider => _petUpsertService.Object);
                 service.AddTransient(provider => _dropdownService.Object);
 
                 service.AddMvc()
