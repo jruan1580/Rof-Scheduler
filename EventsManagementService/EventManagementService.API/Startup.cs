@@ -24,9 +24,11 @@ namespace EventManagementService.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IEventRepository, EventRepository>();
+            services.AddSingleton<IEventRetrievalRepository, EventRetrievalRepository>();
+            services.AddSingleton<IEventUpsertRepository, EventUpsertRepository>();
 
-            services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IEventRetrievalRepository, EventRetrievalRepository>();
+            services.AddTransient<IEventUpsertService, EventUpsertService>();
 
             services.AddControllers();
 

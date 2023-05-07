@@ -1,11 +1,9 @@
-﻿using EventManagementService.API.DTO;
-using EventManagementService.API.DtoMapper;
-using EventManagementService.API.Filters;
-using EventManagementService.Domain.Exceptions;
+﻿using EventManagementService.Domain.Mappers.DTO;
 using EventManagementService.Domain.Services;
+using EventManagementService.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using RofShared.FilterAttributes;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -16,135 +14,83 @@ namespace EventManagementService.API.Controllers
     [ApiController]
     public class EventController : ControllerBase
     {
-        private readonly IEventService _eventService;
+        private readonly IEventUpsertService _eventUpsertService;
+        private readonly IEventRetrievalService _eventRetrievalService;
 
-        public EventController(IEventService eventService)
+        public EventController(IEventUpsertService eventUpsertService, IEventRetrievalService eventRetrievalService)
         {
-            _eventService = eventService;
+            _eventUpsertService = eventUpsertService;
+            _eventRetrievalService = eventRetrievalService; 
         }
 
         [Authorize(Roles = "Administrator,Employee")]
         [HttpPost]
         public async Task<IActionResult> AddEvent([FromBody] EventDTO newEvent)
         {
-            try
-            {
-                await _eventService.AddEvent(EventDTOMapper.FromDTOEvent(newEvent));
+            await _eventUpsertService.AddEvent(EventDTOMapper.FromDTOEvent(newEvent));
 
-                return Ok();
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return StatusCode(201);
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet]
         public async Task<IActionResult> GetAllJobEventsByMonthAndYear([FromQuery] int month, [FromQuery] int year)
         {
-            try
+            var jobEvents = await _eventRetrievalService.GetAllJobEventsByMonthAndYear(month, year);
+
+            var eventList = new List<EventDTO>();
+
+            foreach (var jobEvent in jobEvents)
             {
-                var jobEvents = await _eventService.GetAllJobEventsByMonthAndYear(month, year);
-
-                var eventList = new List<EventDTO>();
-
-                foreach (var jobEvent in jobEvents)
-                {
-                    eventList.Add(EventDTOMapper.ToDTOEvent(jobEvent));
-                }
-
-                return Ok(eventList);
+                eventList.Add(EventDTOMapper.ToDTOEvent(jobEvent));
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+
+            return Ok(eventList);
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllJobEvents()
         {
-            try
+            var jobEvents = await _eventRetrievalService.GetAllJobEvents();
+
+            var eventList = new List<EventDTO>();
+
+            foreach (var jobEvent in jobEvents)
             {
-                var jobEvents = await _eventService.GetAllJobEvents();
-
-                var eventList = new List<EventDTO>();
-
-                foreach (var jobEvent in jobEvents)
-                {
-                    eventList.Add(EventDTOMapper.ToDTOEvent(jobEvent));
-                }
-
-                return Ok(eventList);
+                eventList.Add(EventDTOMapper.ToDTOEvent(jobEvent));
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+
+            return Ok(eventList);
         }
 
         [Authorize(Roles = "Administrator,Employee,Client")]
         [HttpGet("{eventId}")]
         public async Task<IActionResult> GetJobEventById(int eventId)
         {
-            try
-            {
-                var jobEvent = await _eventService.GetJobEventById(eventId);
+            var jobEvent = await _eventRetrievalService.GetJobEventById(eventId);
 
-                return Ok(EventDTOMapper.ToDTOEvent(jobEvent));
-            }
-            catch (EntityNotFoundException notFound)
-            {
-                return NotFound(notFound.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(EventDTOMapper.ToDTOEvent(jobEvent));
         }
 
         [Authorize(Roles = "Administrator,Employee")]
         [HttpPut]
         public async Task<IActionResult> UpdateJobEvent([FromBody] EventDTO updateEvent)
         {
-            try
-            {
-                var update = EventDTOMapper.FromDTOEvent(updateEvent);
+            var update = EventDTOMapper.FromDTOEvent(updateEvent);
 
-                await _eventService.UpdateJobEvent(update);
+            await _eventUpsertService.UpdateJobEvent(update);
 
-                return Ok();
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
 
         [Authorize(Roles = "Administrator,Employee")]
         [HttpDelete("{eventId}")]
         public async Task<IActionResult> DeleteEventById(int eventId)
         {
-            try
-            {
-                await _eventService.DeleteEventById(eventId);
+            await _eventUpsertService.DeleteEventById(eventId);
 
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
     }
 }
