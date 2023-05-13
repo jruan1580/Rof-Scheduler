@@ -12,13 +12,13 @@ namespace DatamartManagementService.Infrastructure.Persistence
         /// <summary>
         /// Adding a pay period into payroll
         /// </summary>
-        /// <param name="payroll"></param>
+        /// <param name="newPayroll"></param>
         /// <returns></returns>
-        public async Task AddEmployeePayroll(EmployeePayroll payroll)
+        public async Task AddEmployeePayroll(EmployeePayroll newPayroll)
         {
             using var context = new RofDatamartContext();
 
-            context.EmployeePayroll.Add(payroll);
+            context.EmployeePayroll.Add(newPayroll);
 
             await context.SaveChangesAsync();
         }
@@ -61,6 +61,62 @@ namespace DatamartManagementService.Infrastructure.Persistence
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Updates payroll
+        /// </summary>
+        /// <param name="updatePayroll"></param>
+        /// <returns></returns>
+        public async Task UpdateEmployeePayroll(EmployeePayroll updatePayroll)
+        {
+            using var context = new RofDatamartContext();
+
+            context.Update(updatePayroll);
+
+            await context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Adds  detailed payroll info
+        /// </summary>
+        /// <param name="newPayrollDetail"></param>
+        /// <returns></returns>
+        public async Task AddEmployeePayrollDetail(EmployeePayrollDetail newPayrollDetail)
+        {
+            using var context = new RofDatamartContext();
+
+            context.EmployeePayrollDetail.Add(newPayrollDetail);
+
+            await context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Gets list of detailed payroll info for employee
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<EmployeePayrollDetail>> GetEmployeePayrollDetailByEmployeeId(long id)
+        {
+            using var context = new RofDatamartContext();
+
+            var result = await context.EmployeePayrollDetail.Where(pd => pd.EmployeeId == id).ToListAsync();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Updates detailed payroll info
+        /// </summary>
+        /// <param name="updatePayrollDetail"></param>
+        /// <returns></returns>
+        public async Task UpdateEmployeePayrollDetail(EmployeePayrollDetail updatePayrollDetail)
+        {
+            using var context = new RofDatamartContext();
+
+            context.Update(updatePayrollDetail);
+
+            await context.SaveChangesAsync();
         }
     }
 }
