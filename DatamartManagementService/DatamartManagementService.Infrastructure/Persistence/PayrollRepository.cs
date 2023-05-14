@@ -7,7 +7,18 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence
 {
-    public class PayrollRepository
+    public interface IPayrollRepository
+    {
+        Task AddEmployeePayroll(EmployeePayroll newPayroll);
+        Task AddEmployeePayrollDetail(EmployeePayrollDetail newPayrollDetail);
+        Task<List<EmployeePayroll>> GetEmployeePayrollByEmployeeId(long id);
+        Task<List<EmployeePayrollDetail>> GetEmployeePayrollDetailByEmployeeId(long id);
+        Task<List<EmployeePayroll>> GetEmployeePayrollForCertainPeriodByEmployeeId(long id, DateTime startDate, DateTime endDate);
+        Task UpdateEmployeePayroll(EmployeePayroll updatePayroll);
+        Task UpdateEmployeePayrollDetail(EmployeePayrollDetail updatePayrollDetail);
+    }
+
+    public class PayrollRepository : IPayrollRepository
     {
         /// <summary>
         /// Adding a pay period into payroll
@@ -52,9 +63,9 @@ namespace DatamartManagementService.Infrastructure.Persistence
 
             var result = new List<EmployeePayroll>();
 
-            foreach(var payroll in employeePayroll)
+            foreach (var payroll in employeePayroll)
             {
-                if(payroll.PayPeriodStartDate >= startDate && payroll.PayPeriodEndDate <= endDate)
+                if (payroll.PayPeriodStartDate >= startDate && payroll.PayPeriodEndDate <= endDate)
                 {
                     result.Add(payroll);
                 }
