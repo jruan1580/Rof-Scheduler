@@ -9,13 +9,10 @@ namespace DatamartManagementService.Infrastructure.Persistence
 {
     public interface IPayrollRepository
     {
-        Task AddEmployeePayroll(EmployeePayroll newPayroll);
-        Task AddEmployeePayrollDetail(EmployeePayrollDetail newPayrollDetail);
+        Task AddEmployeePayroll(List<EmployeePayroll> newPayrolls);
         Task<List<EmployeePayroll>> GetEmployeePayrollByEmployeeId(long id);
-        Task<List<EmployeePayrollDetail>> GetEmployeePayrollDetailByEmployeeId(long id);
         Task<List<EmployeePayroll>> GetEmployeePayrollForCertainPeriodByEmployeeId(long id, DateTime startDate, DateTime endDate);
         Task UpdateEmployeePayroll(EmployeePayroll updatePayroll);
-        Task UpdateEmployeePayrollDetail(EmployeePayrollDetail updatePayrollDetail);
     }
 
     public class PayrollRepository : IPayrollRepository
@@ -23,13 +20,13 @@ namespace DatamartManagementService.Infrastructure.Persistence
         /// <summary>
         /// Adding a pay period into payroll
         /// </summary>
-        /// <param name="newPayroll"></param>
+        /// <param name="newPayrolls"></param>
         /// <returns></returns>
-        public async Task AddEmployeePayroll(EmployeePayroll newPayroll)
+        public async Task AddEmployeePayroll(List<EmployeePayroll> newPayrolls)
         {
             using var context = new RofDatamartContext();
 
-            context.EmployeePayroll.Add(newPayroll);
+            context.EmployeePayroll.AddRange(newPayrolls);
 
             await context.SaveChangesAsync();
         }
@@ -59,19 +56,11 @@ namespace DatamartManagementService.Infrastructure.Persistence
         {
             using var context = new RofDatamartContext();
 
-            var employeePayroll = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id).ToListAsync();
+            var employeePayroll = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id 
+                && ep.PayPeriodStartDate >= startDate 
+                && ep.PayPeriodEndDate <= endDate).ToListAsync();
 
-            var result = new List<EmployeePayroll>();
-
-            foreach (var payroll in employeePayroll)
-            {
-                if (payroll.PayPeriodStartDate >= startDate && payroll.PayPeriodEndDate <= endDate)
-                {
-                    result.Add(payroll);
-                }
-            }
-
-            return result;
+            return employeePayroll;
         }
 
         /// <summary>
@@ -84,48 +73,6 @@ namespace DatamartManagementService.Infrastructure.Persistence
             using var context = new RofDatamartContext();
 
             context.Update(updatePayroll);
-
-            await context.SaveChangesAsync();
-        }
-
-        /// <summary>
-        /// Adds  detailed payroll info
-        /// </summary>
-        /// <param name="newPayrollDetail"></param>
-        /// <returns></returns>
-        public async Task AddEmployeePayrollDetail(EmployeePayrollDetail newPayrollDetail)
-        {
-            using var context = new RofDatamartContext();
-
-            context.EmployeePayrollDetail.Add(newPayrollDetail);
-
-            await context.SaveChangesAsync();
-        }
-
-        /// <summary>
-        /// Gets list of detailed payroll info for employee
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<List<EmployeePayrollDetail>> GetEmployeePayrollDetailByEmployeeId(long id)
-        {
-            using var context = new RofDatamartContext();
-
-            var result = await context.EmployeePayrollDetail.Where(pd => pd.EmployeeId == id).ToListAsync();
-
-            return result;
-        }
-
-        /// <summary>
-        /// Updates detailed payroll info
-        /// </summary>
-        /// <param name="updatePayrollDetail"></param>
-        /// <returns></returns>
-        public async Task UpdateEmployeePayrollDetail(EmployeePayrollDetail updatePayrollDetail)
-        {
-            using var context = new RofDatamartContext();
-
-            context.Update(updatePayrollDetail);
 
             await context.SaveChangesAsync();
         }
