@@ -15,11 +15,6 @@ namespace DatamartManagementService.Infrastructure.Persistence
 
     public class PayrollDetailrepository : IPayrollDetailrepository
     {
-        /// <summary>
-        /// Inserting list of payroll details
-        /// </summary>
-        /// <param name="newPayrollDetails"></param>
-        /// <returns></returns>
         public async Task AddEmployeePayrollDetail(List<EmployeePayrollDetail> newPayrollDetails)
         {
             using var context = new RofDatamartContext();
@@ -29,11 +24,6 @@ namespace DatamartManagementService.Infrastructure.Persistence
             await context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Get payroll details of a certain employee
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public async Task<List<EmployeePayrollDetail>> GetEmployeePayrollDetailByEmployeeId(long id)
         {
             using var context = new RofDatamartContext();
@@ -43,11 +33,6 @@ namespace DatamartManagementService.Infrastructure.Persistence
             return result;
         }
 
-        /// <summary>
-        /// Updating payroll detail of employee
-        /// </summary>
-        /// <param name="updatePayrollDetail"></param>
-        /// <returns></returns>
         public async Task UpdateEmployeePayrollDetail(EmployeePayrollDetail updatePayrollDetail)
         {
             using var context = new RofDatamartContext();
