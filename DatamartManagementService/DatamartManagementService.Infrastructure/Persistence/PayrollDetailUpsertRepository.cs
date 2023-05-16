@@ -1,19 +1,16 @@
 ﻿using DatamartManagementService.Infrastructure.Persistence.Entities;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence
 {
-    public interface IPayrollDetailrepository
+    public interface IPayrollDetailUpsertRepository
     {
         Task AddEmployeePayrollDetail(List<EmployeePayrollDetail> newPayrollDetails);
-        Task<List<EmployeePayrollDetail>> GetEmployeePayrollDetailByEmployeeId(long id);
         Task UpdateEmployeePayrollDetail(EmployeePayrollDetail updatePayrollDetail);
     }
 
-    public class PayrollDetailrepository : IPayrollDetailrepository
+    public class PayrollDetailUpsertRepository : IPayrollDetailUpsertRepository
     {
         public async Task AddEmployeePayrollDetail(List<EmployeePayrollDetail> newPayrollDetails)
         {
@@ -22,15 +19,6 @@ namespace DatamartManagementService.Infrastructure.Persistence
             context.EmployeePayrollDetail.AddRange(newPayrollDetails);
 
             await context.SaveChangesAsync();
-        }
-
-        public async Task<List<EmployeePayrollDetail>> GetEmployeePayrollDetailByEmployeeId(long id)
-        {
-            using var context = new RofDatamartContext();
-
-            var result = await context.EmployeePayrollDetail.Where(pd => pd.EmployeeId == id).ToListAsync();
-
-            return result;
         }
 
         public async Task UpdateEmployeePayrollDetail(EmployeePayrollDetail updatePayrollDetail)

@@ -7,25 +7,14 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence
 {
-    public interface IPayrollRepository
+    public interface IPayrollRetrievalRepository
     {
-        Task AddEmployeePayroll(List<EmployeePayroll> newPayrolls);
         Task<List<EmployeePayroll>> GetEmployeePayrollByEmployeeId(long id);
         Task<List<EmployeePayroll>> GetEmployeePayrollForCertainPeriodByEmployeeId(long id, DateTime startDate, DateTime endDate);
-        Task UpdateEmployeePayroll(EmployeePayroll updatePayroll);
     }
 
-    public class PayrollRepository : IPayrollRepository
+    public class PayrollRetrievalRepository : IPayrollRetrievalRepository
     {
-        public async Task AddEmployeePayroll(List<EmployeePayroll> newPayrolls)
-        {
-            using var context = new RofDatamartContext();
-
-            context.EmployeePayroll.AddRange(newPayrolls);
-
-            await context.SaveChangesAsync();
-        }
-
         public async Task<List<EmployeePayroll>> GetEmployeePayrollByEmployeeId(long id)
         {
             using var context = new RofDatamartContext();
@@ -44,15 +33,6 @@ namespace DatamartManagementService.Infrastructure.Persistence
                 && ep.PayPeriodEndDate <= endDate).ToListAsync();
 
             return employeePayroll;
-        }
-
-        public async Task UpdateEmployeePayroll(EmployeePayroll updatePayroll)
-        {
-            using var context = new RofDatamartContext();
-
-            context.Update(updatePayroll);
-
-            await context.SaveChangesAsync();
         }
     }
 }
