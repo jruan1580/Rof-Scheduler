@@ -17,18 +17,9 @@ namespace DatamartManagementService.Infrastructure.Persistence
         {
             using var context = new RofDatamartContext();
 
-            var result = await context.EmployeePayrollDetail.Where(pd => pd.EmployeeId == id).ToListAsync();
+            var payrollDetail = await context.EmployeePayrollDetail.Where(pd => pd.EmployeeId == id).ToListAsync();
 
-            return result;
-        }
-
-        public async Task UpdateEmployeePayrollDetail(EmployeePayrollDetail updatePayrollDetail)
-        {
-            using var context = new RofDatamartContext();
-
-            context.Update(updatePayrollDetail);
-
-            await context.SaveChangesAsync();
+            return payrollDetail;
         }
     }
 }

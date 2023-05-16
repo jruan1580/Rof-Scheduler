@@ -19,20 +19,20 @@ namespace DatamartManagementService.Infrastructure.Persistence
         {
             using var context = new RofDatamartContext();
 
-            var result = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id).ToListAsync();
+            var employeePayroll = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id).ToListAsync();
 
-            return result;
+            return employeePayroll;
         }
 
         public async Task<List<EmployeePayroll>> GetEmployeePayrollForCertainPeriodByEmployeeId(long id, DateTime startDate, DateTime endDate)
         {
             using var context = new RofDatamartContext();
 
-            var employeePayroll = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id 
+            var employeePayrollByDate = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id 
                 && ep.PayPeriodStartDate >= startDate 
                 && ep.PayPeriodEndDate <= endDate).ToListAsync();
 
-            return employeePayroll;
+            return employeePayrollByDate;
         }
     }
 }
