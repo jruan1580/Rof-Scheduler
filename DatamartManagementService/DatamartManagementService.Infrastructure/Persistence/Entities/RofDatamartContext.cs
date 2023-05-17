@@ -21,6 +21,8 @@ namespace DatamartManagementService.Infrastructure.Persistence.Entities
 
         public virtual DbSet<EmployeePayroll> EmployeePayroll { get; set; }
         public virtual DbSet<EmployeePayrollDetail> EmployeePayrollDetail { get; set; }
+        public virtual DbSet<RofRevenueByDate> RofRevenueByDate { get; set; }
+        public virtual DbSet<RofRevenueFromServicesCompletedByDate> RofRevenueFromServicesCompletedByDate { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -83,6 +85,45 @@ namespace DatamartManagementService.Infrastructure.Persistence.Entities
                 entity.Property(e => e.ServiceEndDateTime).HasColumnType("datetime");
 
                 entity.Property(e => e.ServiceStartDateTime).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<RofRevenueByDate>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.GrossRevenue).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.NetRevenuePostEmployeePay).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.RevenueDate).HasColumnType("date");
+            });
+
+            modelBuilder.Entity<RofRevenueFromServicesCompletedByDate>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.EmployeeFirstName)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeeLastName)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmployeePay).HasColumnType("decimal(5, 2)");
+
+                entity.Property(e => e.NetRevenuePostEmployeeCut).HasColumnType("decimal(5, 2)");
+
+                entity.Property(e => e.PetServiceName)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PetServiceRate).HasColumnType("decimal(5, 2)");
+
+                entity.Property(e => e.RevenueDate).HasColumnType("date");
             });
 
             OnModelCreatingPartial(modelBuilder);
