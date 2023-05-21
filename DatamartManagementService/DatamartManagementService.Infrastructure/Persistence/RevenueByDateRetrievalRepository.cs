@@ -1,22 +1,15 @@
 ﻿using DatamartManagementService.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence
 {
-    public class RevenueByDateRepository
+    public class RevenueByDateRetrievalRepository
     {
-        public async Task AddRevenue(List<RofRevenueByDate> newRevenueByDate)
-        {
-            using var context = new RofDatamartContext();
-
-            context.RofRevenueByDate.AddRange(newRevenueByDate);
-
-            await context.SaveChangesAsync();
-        }
-
         public async Task<List<RofRevenueByDate>> GetRevenueForTheYear(short year)
         {
             using var context = new RofDatamartContext();
@@ -33,15 +26,6 @@ namespace DatamartManagementService.Infrastructure.Persistence
             var monthlyRevenue = await context.RofRevenueByDate.Where(r => r.RevenueMonth == month && r.RevenueYear == year).ToListAsync();
 
             return monthlyRevenue;
-        }
-
-        public async Task UpdateRevenue(RofRevenueByDate updateRevenueByDate)
-        {
-            using var context = new RofDatamartContext();
-
-            context.Update(updateRevenueByDate);
-
-            await context.SaveChangesAsync();
         }
     }
 }
