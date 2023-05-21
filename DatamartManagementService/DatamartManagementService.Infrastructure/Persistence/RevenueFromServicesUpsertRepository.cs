@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence
 {
-    public class RevenueFromServicesUpsertRepository
+    public interface IRevenueFromServicesUpsertRepository
+    {
+        Task AddRevenueFromServices(List<RofRevenueFromServicesCompletedByDate> newRevenueFromServices);
+        Task UpdateRevenueFromServices(RofRevenueFromServicesCompletedByDate updateRevenueFromServices);
+    }
+
+    public class RevenueFromServicesUpsertRepository : IRevenueFromServicesUpsertRepository
     {
         public async Task AddRevenueFromServices(List<RofRevenueFromServicesCompletedByDate> newRevenueFromServices)
         {

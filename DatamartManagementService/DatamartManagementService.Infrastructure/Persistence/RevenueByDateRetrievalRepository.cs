@@ -8,7 +8,13 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence
 {
-    public class RevenueByDateRetrievalRepository
+    public interface IRevenueByDateRetrievalRepository
+    {
+        Task<List<RofRevenueByDate>> GetRevenueForTheMonthOfCertainYear(short month, short year);
+        Task<List<RofRevenueByDate>> GetRevenueForTheYear(short year);
+    }
+
+    public class RevenueByDateRetrievalRepository : IRevenueByDateRetrievalRepository
     {
         public async Task<List<RofRevenueByDate>> GetRevenueForTheYear(short year)
         {
