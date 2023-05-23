@@ -6,17 +6,14 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence
 {
-    public class RevenueFromServicesCompletedByDateRepository
+    public interface IRevenueFromServicesRetrievalRepository
     {
-        public async Task AddRevenueFromServices(List<RofRevenueFromServicesCompletedByDate> newRevenueFromServices)
-        {
-            using var context = new RofDatamartContext();
+        Task<List<RofRevenueFromServicesCompletedByDate>> GetRevenueFromServicesByEmployee(long employeeId);
+        Task<List<RofRevenueFromServicesCompletedByDate>> GetRevenueFromServicesByPetService(long petServiceId);
+    }
 
-            context.RofRevenueFromServicesCompletedByDate.AddRange(newRevenueFromServices);
-
-            await context.SaveChangesAsync();
-        }
-
+    public class RevenueFromServicesRetrievalRepository : IRevenueFromServicesRetrievalRepository
+    {
         public async Task<List<RofRevenueFromServicesCompletedByDate>> GetRevenueFromServicesByEmployee(long employeeId)
         {
             using var context = new RofDatamartContext();
@@ -26,22 +23,13 @@ namespace DatamartManagementService.Infrastructure.Persistence
             return employeeRevenue;
         }
 
-        public async Task<List<RofRevenueFromServicesCompletedByDate>> RevenueFromServicesByPetService(long petServiceId)
+        public async Task<List<RofRevenueFromServicesCompletedByDate>> GetRevenueFromServicesByPetService(long petServiceId)
         {
             using var context = new RofDatamartContext();
 
             var petServiceRevenue = await context.RofRevenueFromServicesCompletedByDate.Where(r => r.PetServiceId == petServiceId).ToListAsync();
 
             return petServiceRevenue;
-        }
-
-        public async Task UpdateRevenueFromServices(RofRevenueFromServicesCompletedByDate updateRevenueFromServices)
-        {
-            using var context = new RofDatamartContext();
-
-            context.Update(updateRevenueFromServices);
-
-            await context.SaveChangesAsync();
         }
     }
 }
