@@ -5,7 +5,11 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatamartManagementService.Infrastructure", "DatamartManagementService.Infrastructure\DatamartManagementService.Infrastructure.csproj", "{10F40564-91A2-4114-8BF9-01AC2097BF46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatamartManagementService.Domain", "DatamartManagementService.Domain\DatamartManagementService.Domain.csproj", "{05580032-5455-4E65-B1E7-F3A250F78EC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatamartManagementService.Domain", "DatamartManagementService.Domain\DatamartManagementService.Domain.csproj", "{05580032-5455-4E65-B1E7-F3A250F78EC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatamartManagementService.Test", "DatamartManagementService.Test\DatamartManagementService.Test.csproj", "{1AA59604-0F14-4CF4-BAAB-717D7081D90B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatamartManagementService.API", "DatamartManagementService.API\DatamartManagementService.API.csproj", "{C64C9F83-B1B9-40DA-B5E2-072C4C33F187}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{05580032-5455-4E65-B1E7-F3A250F78EC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05580032-5455-4E65-B1E7-F3A250F78EC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05580032-5455-4E65-B1E7-F3A250F78EC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AA59604-0F14-4CF4-BAAB-717D7081D90B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AA59604-0F14-4CF4-BAAB-717D7081D90B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AA59604-0F14-4CF4-BAAB-717D7081D90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AA59604-0F14-4CF4-BAAB-717D7081D90B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C64C9F83-B1B9-40DA-B5E2-072C4C33F187}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64C9F83-B1B9-40DA-B5E2-072C4C33F187}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C64C9F83-B1B9-40DA-B5E2-072C4C33F187}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C64C9F83-B1B9-40DA-B5E2-072C4C33F187}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
