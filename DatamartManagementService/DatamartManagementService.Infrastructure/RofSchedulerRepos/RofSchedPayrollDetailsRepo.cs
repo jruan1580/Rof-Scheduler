@@ -23,18 +23,37 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
 
     public class RofSchedPayrollDetailsRepo
     {
-        public async Task<List<Employee>> GetEmployeeDetails()
+        //public async Task<List<Employee>> GetEmployeeDetails()
+        //{
+        //    using var context = new RofSchedulerContext();
+
+        //    return await context.Employee.Select(e => new Employee() { Id = e.Id, FirstName = e.FirstName, LastName = e.LastName }).ToListAsync();
+        //}
+
+        //public async Task<List<PetServices>> GetPetServiceDetails()
+        //{
+        //    using var context = new RofSchedulerContext();
+
+        //    return await context.PetServices.Select(s => new PetServices() { Id = s.Id, ServiceName = s.ServiceName, Duration = s.Duration, TimeUnit = s.TimeUnit }).ToListAsync();
+        //}
+
+        public async Task<List<JobEvent>> GetCompletedJobEventsOfAnEmployeeForCertainPeriod(long id, DateTime startTime, DateTime endPe)
         {
             using var context = new RofSchedulerContext();
 
-            return await context.Employee.Select(e => new Employee() { Id = e.Id, FirstName = e.FirstName, LastName = e.LastName }).ToListAsync();
+            var employeeCompletedJobEvents = await context.JobEvent.Where(j => 
+                j.EmployeeId == id 
+                && j.Completed == true 
+                && (j.EventStartTime.Month >= startTime.Month && j.EventEndTime).ToListAsync();
         }
 
-        public async Task<List<PetServices>> GetPetServiceDetails()
+        private bool CheckIfEventWasOnHoliday(JobEvent jobEvent)
         {
             using var context = new RofSchedulerContext();
 
-            return await context.PetServices.Select(s => new PetServices() { Id = s.Id, ServiceName = s.ServiceName }).ToListAsync();
+            var holiday = context.Holidays.FirstOrDefaultAsync(h => h.HolidayMonth == jobEvent.EventStartTime.Month && h.HolidayDay == jobEvent.EventStartTime.Day);
+
+            return holiday != null;
         }
     }
 }
