@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
@@ -50,11 +49,11 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
             return holiday != null;
         }
 
-        public async Task<HolidayRates> GetHolidayRateById(int id)
+        public async Task<HolidayRates> GetHolidayRateByHolidayId(short id)
         {
             using var context = new RofSchedulerContext();
 
-            return await context.HolidayRates.FirstOrDefaultAsync(r => r.Id == id);
+            return await context.HolidayRates.FirstOrDefaultAsync(r => r.HolidayId == id);
         }
     }
 }
