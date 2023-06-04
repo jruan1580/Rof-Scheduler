@@ -40,20 +40,18 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
             return await context.JobEvent.FirstOrDefaultAsync(j => j.Id == id);
         }
 
-        public async Task<bool> CheckIfJobDateIsHoliday(DateTime eventDate)
+        public async Task<Holidays> CheckIfJobDateIsHoliday(DateTime jobDate)
         {
             using var context = new RofSchedulerContext();
 
-            var holiday = await context.Holidays.FirstOrDefaultAsync(h => h.HolidayMonth == eventDate.Month && h.HolidayDay == eventDate.Day);
-
-            return holiday != null;
+            return await context.Holidays.FirstOrDefaultAsync(h => h.HolidayMonth == jobDate.Month && h.HolidayDay == jobDate.Day);
         }
 
-        public async Task<HolidayRates> GetHolidayRateByHolidayId(short id)
+        public async Task<HolidayRates> GetHolidayRateByHolidayId(short holidayId)
         {
             using var context = new RofSchedulerContext();
 
-            return await context.HolidayRates.FirstOrDefaultAsync(r => r.HolidayId == id);
+            return await context.HolidayRates.FirstOrDefaultAsync(r => r.HolidayId == holidayId);
         }
     }
 }
