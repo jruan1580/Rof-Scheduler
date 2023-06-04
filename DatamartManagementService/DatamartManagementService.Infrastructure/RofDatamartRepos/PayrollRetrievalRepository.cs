@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DatamartManagementService.Infrastructure.Persistence
+namespace DatamartManagementService.Infrastructure.RofDatamartRepos
 {
     public interface IPayrollRetrievalRepository
     {
@@ -28,8 +28,8 @@ namespace DatamartManagementService.Infrastructure.Persistence
         {
             using var context = new RofDatamartContext();
 
-            var employeePayrollByDate = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id 
-                && ep.PayPeriodStartDate >= startDate 
+            var employeePayrollByDate = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id
+                && ep.PayPeriodStartDate >= startDate
                 && ep.PayPeriodEndDate <= endDate).ToListAsync();
 
             return employeePayrollByDate;
