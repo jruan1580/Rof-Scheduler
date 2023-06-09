@@ -1,4 +1,6 @@
-﻿namespace EventManagementService.DTO
+﻿using System;
+
+namespace EventManagementService.DTO
 {
     public class EventDTO
     {
@@ -21,5 +23,7 @@
         public string EventEndTime { get; set; }
 
         public bool Completed { get; set; }
+
+        public DateTime LastModifiedDateTime { get; set; }
     }
 }

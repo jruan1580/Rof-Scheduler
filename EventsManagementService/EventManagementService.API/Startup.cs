@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using RofShared.StartupInits;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,7 +28,7 @@ namespace EventManagementService.API
             services.AddSingleton<IEventRetrievalRepository, EventRetrievalRepository>();
             services.AddSingleton<IEventUpsertRepository, EventUpsertRepository>();
 
-            services.AddTransient<IEventRetrievalRepository, EventRetrievalRepository>();
+            services.AddTransient<IEventRetrievalService, EventRetrievalService>();
             services.AddTransient<IEventUpsertService, EventUpsertService>();
 
             services.AddControllers();
@@ -81,6 +82,8 @@ namespace EventManagementService.API
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.AddExceptionHandlerForApi();
 
             app.UseHttpsRedirection();
 

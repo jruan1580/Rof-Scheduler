@@ -16,6 +16,7 @@ namespace EventManagementService.Domain.Mappers.Database
             coreEvent.PetServiceId = dbEvent.PetServiceId;
             coreEvent.EventStartTime = dbEvent.EventStartTime;
             coreEvent.EventEndTime = dbEvent.EventEndTime;
+            coreEvent.LastModifiedDateTime = dbEvent.LastModifiedDateTime;
             coreEvent.Completed = dbEvent.Completed;
 
             if (dbEvent.Employee != null)
@@ -63,8 +64,8 @@ namespace EventManagementService.Domain.Mappers.Database
             entity.PetServiceId = coreEvent.PetServiceId;
             entity.EventStartTime = coreEvent.EventStartTime;
             entity.EventEndTime = coreEvent.EventEndTime;
-            entity.Completed = coreEvent.Completed;
             entity.LastModifiedDateTime = DateTime.Now;
+            entity.Completed = coreEvent.Completed;
 
             return entity;
         }

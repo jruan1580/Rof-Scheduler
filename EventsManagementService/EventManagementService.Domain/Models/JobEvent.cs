@@ -18,7 +18,9 @@ namespace EventManagementService.Domain.Models
         public DateTime EventEndTime { get; set; }
 
         public bool Completed { get; set; }
-        
+
+        public DateTime LastModifiedDateTime { get; set; }
+
         public Employee Employee { get; set; }
 
         public Pet Pet { get; set; }

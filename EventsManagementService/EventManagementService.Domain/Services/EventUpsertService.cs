@@ -80,6 +80,8 @@ namespace EventManagementService.Domain.Services
             originalEvent.PetId = updateEvent.PetId;
             originalEvent.PetServiceId = updateEvent.PetServiceId;
             originalEvent.EventStartTime = updateEvent.EventStartTime;
+            originalEvent.Completed = updateEvent.Completed;
+            originalEvent.LastModifiedDateTime = DateTime.Now;
         }
     }
 }

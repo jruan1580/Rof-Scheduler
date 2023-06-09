@@ -22,6 +22,7 @@ namespace EventManagementService.Domain.Mappers.DTO
             dtoEvent.EventStartTime = coreEvent.EventStartTime.ToString("yyyy-MM-ddTHH:mm:ss");
             dtoEvent.EventEndTime = coreEvent.EventEndTime.ToString("yyyy-MM-ddTHH:mm:ss");
             dtoEvent.Completed = coreEvent.Completed;
+            dtoEvent.LastModifiedDateTime = coreEvent.LastModifiedDateTime;
 
             if (coreEvent.Employee != null)
             {
@@ -63,6 +64,7 @@ namespace EventManagementService.Domain.Mappers.DTO
             jobEvent.PetServiceId = eventDTO.PetServiceId;
             jobEvent.EventStartTime = date;
             jobEvent.Completed = eventDTO.Completed;
+            jobEvent.LastModifiedDateTime = DateTime.Now;
             jobEvent.Employee = new Employee() { Id = eventDTO.EmployeeId, FullName = eventDTO.EmployeeFullName };
             jobEvent.Pet = new Pet() { Id = eventDTO.PetId, Name = eventDTO.PetName };
             jobEvent.PetService = new PetService() { Id = eventDTO.PetServiceId, ServiceName = eventDTO.PetServiceName };
