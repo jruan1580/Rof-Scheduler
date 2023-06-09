@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -128,19 +128,19 @@ namespace EventManagementService.Infrastructure.Persistence.Entities
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__Employ__10216507");
+                    .HasConstraintName("FK__JobEvent__Employ__795DFB40");
 
                 entity.HasOne(d => d.Pet)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetId__11158940");
+                    .HasConstraintName("FK__JobEvent__PetId__7A521F79");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.JobEvents)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetSer__1209AD79");
+                    .HasConstraintName("FK__JobEvent__PetSer__7B4643B2");
             });
 
             modelBuilder.Entity<Pet>(entity =>
