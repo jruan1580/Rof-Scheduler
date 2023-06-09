@@ -1,4 +1,5 @@
-﻿using CoreEmployee = EmployeeManagementService.Domain.Models.Employee;
+﻿using System;
+using CoreEmployee = EmployeeManagementService.Domain.Models.Employee;
 using DbEmployee = EmployeeManagementService.Infrastructure.Persistence.Entities.Employee;
 
 namespace EmployeeManagementService.Domain.Mappers.Database
@@ -30,6 +31,8 @@ namespace EmployeeManagementService.Domain.Mappers.Database
 
             coreEmp.SetFullName();
 
+            coreEmp.LastModifiedDate = dbEmployee.LastModifiedDate;
+
             return coreEmp;
         }
 
@@ -59,6 +62,8 @@ namespace EmployeeManagementService.Domain.Mappers.Database
             entity.ZipCode = coreEmployee.Address?.ZipCode;
 
             entity.Ssn = coreEmployee.Ssn;
+
+            entity.LastModifiedDate = DateTime.Now;
 
             return entity;
         }

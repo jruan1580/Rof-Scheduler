@@ -1,6 +1,7 @@
 ﻿using CoreEmployee = EmployeeManagementService.Domain.Models.Employee;
 using EmployeeManagementService.DTO;
 using System.Collections.Generic;
+using System;
 
 namespace EmployeeManagementService.Domain.Mappers.DTO
 {
@@ -33,6 +34,8 @@ namespace EmployeeManagementService.Domain.Mappers.DTO
             dtoEmp.Address.State = coreEmp.Address?.State;
             dtoEmp.Address.ZipCode = coreEmp.Address?.ZipCode;
 
+            dtoEmp.LastModifiedDate = coreEmp.LastModifiedDate;
+
 
             return dtoEmp;
         }
@@ -61,7 +64,9 @@ namespace EmployeeManagementService.Domain.Mappers.DTO
             coreEmp.Status = dtoEmp.Status;
             coreEmp.Active = dtoEmp.Active;
 
-            coreEmp.SetAddress(dtoEmp.Address?.AddressLine1, dtoEmp.Address?.AddressLine2, dtoEmp.Address?.City, dtoEmp.Address?.State, dtoEmp.Address?.ZipCode);          
+            coreEmp.SetAddress(dtoEmp.Address?.AddressLine1, dtoEmp.Address?.AddressLine2, dtoEmp.Address?.City, dtoEmp.Address?.State, dtoEmp.Address?.ZipCode);
+
+            coreEmp.LastModifiedDate = DateTime.Now;
 
             return coreEmp;
         }
