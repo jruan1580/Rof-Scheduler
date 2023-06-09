@@ -41,6 +41,8 @@ namespace EmployeeManagementService.Domain.Models
 
         public Address Address { get; set; }
 
+        public DateTime LastModifiedDate { get; set; }
+
         //public string GetNotSanitizedSSN()
         //{
         //    return _notSantizedSSN;
