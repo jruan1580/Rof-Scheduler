@@ -7,7 +7,17 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
 {
-    public class RofSchedPayrollDetailsRepo
+    public interface IRofSchedRepo
+    {
+        Task<Holidays> CheckIfJobDateIsHoliday(DateTime jobDate);
+        Task<List<JobEvent>> GetCompletedServicesDoneByEmployee(long id);
+        Task<Employee> GetEmployeeById(long id);
+        Task<HolidayRates> GetHolidayRateByHolidayId(short holidayId);
+        Task<JobEvent> GetJobEventById(int id);
+        Task<PetServices> GetPetServiceById(short id);
+    }
+
+    public class RofSchedRepo : IRofSchedRepo
     {
         public async Task<Employee> GetEmployeeById(long id)
         {
@@ -20,7 +30,7 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
         {
             using var context = new RofSchedulerContext();
 
-            var employeeCompletedServices = await context.JobEvent.Where(j => j.EmployeeId == id 
+            var employeeCompletedServices = await context.JobEvent.Where(j => j.EmployeeId == id
                 && j.Completed == true).ToListAsync();
 
             return employeeCompletedServices;
