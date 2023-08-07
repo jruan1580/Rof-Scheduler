@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DatamartManagementService.Domain.Models
+{
+    public class EmployeePayrollDetail
+    {
+        public long EmployeeId { get; set; }
+        
+        public string FirstName { get; set; }
+        
+        public string LastName { get; set; }
+        
+        public long PetServiceId { get; set; }
+        
+        public string PetServiceName { get; set; }
+        
+        public decimal EmployeePayForService { get; set; }
+        
+        public bool IsHolidayPay { get; set; }
+        
+        public int ServiceDuration { get; set; }
+        
+        public string ServiceDurationTimeUnit { get; set; }
+        
+        public long JobEventId { get; set; }
+        
+        public DateTime ServiceStartDateTime { get; set; }
+        
+        public DateTime ServiceEndDateTime { get; set; }
+    }
+}

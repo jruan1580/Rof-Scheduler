@@ -13,6 +13,7 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
         Task<List<JobEvent>> GetCompletedServicesDoneByEmployee(long id);
         Task<Employee> GetEmployeeById(long id);
         Task<HolidayRates> GetHolidayRateByHolidayId(short holidayId);
+        Task<HolidayRates> GetHolidayRateByPetServiceId(short petServiceId);
         Task<JobEvent> GetJobEventById(int id);
         Task<PetServices> GetPetServiceById(short id);
     }
@@ -62,6 +63,13 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
             using var context = new RofSchedulerContext();
 
             return await context.HolidayRates.FirstOrDefaultAsync(r => r.HolidayId == holidayId);
+        }
+
+        public async Task<HolidayRates> GetHolidayRateByPetServiceId(short petServiceId)
+        {
+            using var context = new RofSchedulerContext();
+
+            return await context.HolidayRates.FirstOrDefaultAsync(r => r.PetServiceId == petServiceId);
         }
     }
 }
