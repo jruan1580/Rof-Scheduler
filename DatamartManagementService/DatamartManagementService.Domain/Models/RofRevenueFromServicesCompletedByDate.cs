@@ -14,7 +14,7 @@ namespace DatamartManagementService.Domain.Models
         
         public decimal EmployeePay { get; set; }
         
-        public long PetServiceId { get; set; }
+        public short PetServiceId { get; set; }
         
         public string PetServiceName { get; set; }
         
