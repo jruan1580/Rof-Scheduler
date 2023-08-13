@@ -12,7 +12,7 @@ CREATE TABLE dbo.RofRevenueFromServicesCompletedByDate
 	EmployeeFirstName VARCHAR(25) NOT NULL,
 	EmployeeLastName VARCHAR(25) NOT NULL,
 	EmployeePay DECIMAL(5,2) NOT NULL,
-	PetServiceId BIGINT NOT NULL,
+	PetServiceId SMALLINT NOT NULL,
 	PetServiceName VARCHAR(255) NOT NULL,
 	PetServiceRate DECIMAL(5, 2) NOT NULL,
 	IsHolidayRate BIT NOT NULL,
