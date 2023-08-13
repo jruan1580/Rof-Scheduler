@@ -5,7 +5,7 @@ using System.Collections.Generic;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace DatamartManagementService.Infrastructure.Persistence.Entities
+namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities
 {
     public partial class RofRevenueFromServicesCompletedByDate
     {
@@ -13,7 +13,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.Entities
         public string EmployeeFirstName { get; set; }
         public string EmployeeLastName { get; set; }
         public decimal EmployeePay { get; set; }
-        public long PetServiceId { get; set; }
+        public short PetServiceId { get; set; }
         public string PetServiceName { get; set; }
         public decimal PetServiceRate { get; set; }
         public bool IsHolidayRate { get; set; }
