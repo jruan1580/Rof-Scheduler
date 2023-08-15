@@ -31,52 +31,21 @@ namespace DatamartManagementService.Domain
             }       
         }
 
-        public async Task<EmployeePayroll> PopulateEmployeePayroll(long employeeId, DateTime startDate, DateTime endDate)
+        public async Task<List<RofRevenueFromServicesCompletedByDate>> PopulateListOfRofRevenueOfCompletedServiceByDate(List<EmployeePayrollDetail> employees)
         {
-            var employeeInfo = await _rofSchedRepo.GetEmployeeById(employeeId);
-            var employeeTotalPay = await CalculatePayForCompletedJobEventsByDate(employeeId, startDate, endDate);
+            var revenueForServiceCompleted = new List<RofRevenueFromServicesCompletedByDate>();
 
-            var newEmployeePayroll = new EmployeePayroll()
+            foreach(var employee in employees)
             {
-                EmployeeId = employeeInfo.Id,
-                FirstName = employeeInfo.FirstName,
-                LastName = employeeInfo.LastName,
-                EmployeeTotalPay = employeeTotalPay,
-                PayPeriodStartDate = startDate,
-                PayPeriodEndDate = endDate
-            };
+                var revenue = await PopulateRofRevenueForServicesCompletedByDate(employee);
 
-            return newEmployeePayroll;
-        }
+                revenueForServiceCompleted.Add(revenue);
+            }
 
-        public async Task<EmployeePayrollDetail> PopulateEmployeePayrollDetail(long employeeId, short petServiceId, int jobEventId)
-        {
-            var employeeInfo = await _rofSchedRepo.GetEmployeeById(employeeId);
-            var petService = await _rofSchedRepo.GetPetServiceById(petServiceId);
-            var jobEvent = await _rofSchedRepo.GetJobEventById(jobEventId);
-
-            var isHoliday = await CheckIfEventIsHoliday(jobEvent.EventStartTime);
-
-            var employeePayrollDetail = new EmployeePayrollDetail()
-            {
-                EmployeeId = employeeInfo.Id,
-                FirstName = employeeInfo.FirstName,
-                LastName = employeeInfo.LastName,
-                PetServiceId = petService.Id,
-                PetServiceName = petService.ServiceName,
-                EmployeePayForService = petService.EmployeeRate,
-                ServiceDuration = petService.Duration,
-                ServiceDurationTimeUnit = petService.TimeUnit,
-                JobEventId = jobEventId,
-                IsHolidayPay = isHoliday,
-                ServiceStartDateTime = jobEvent.EventStartTime,
-                ServiceEndDateTime = jobEvent.EventEndTime
-            };
-
-            return employeePayrollDetail;
+            return revenueForServiceCompleted;
         }
         
-        public async Task<RofRevenueFromServicesCompletedByDate> PopulateRofRevenueForServicesCompletedByDate(EmployeePayrollDetail employeePayrollDetail)
+        private async Task<RofRevenueFromServicesCompletedByDate> PopulateRofRevenueForServicesCompletedByDate(EmployeePayrollDetail employeePayrollDetail)
         {
             var petService = await _rofSchedRepo.GetPetServiceById(employeePayrollDetail.PetServiceId);
 
@@ -98,6 +67,11 @@ namespace DatamartManagementService.Domain
             };
 
             return rofRevenueForService;
+        }
+
+        private async Task PopulateRofRevenueByDate()
+        {
+
         }
 
         private async Task<decimal> CalculatePayForCompletedJobEventsByDate(long employeeId, DateTime startDate, DateTime endDate)
@@ -218,6 +192,79 @@ namespace DatamartManagementService.Domain
             var holiday = await _rofSchedRepo.CheckIfJobDateIsHoliday(jobDate);
 
             return holiday == null;
+        }
+
+
+        //Payroll / Payroll Detail Methods
+        public async Task<List<EmployeePayroll>> PopulateListOfEmployeePayroll(List<long> employeeIds, DateTime startDate, DateTime endDate)
+        {
+            var employeePayrolls = new List<EmployeePayroll>();
+
+            foreach (var employee in employeeIds)
+            {
+                var payroll = await PopulateEmployeePayroll(employee, startDate, endDate);
+                employeePayrolls.Add(payroll);
+            }
+
+            return employeePayrolls;
+        }
+
+        public async Task<List<EmployeePayrollDetail>> PopulateListOfEmployeePayrollDetails(List<JobEvent> jobEvents)
+        {
+            var employeePayrollDetails = new List<EmployeePayrollDetail>();
+
+            foreach (var job in jobEvents)
+            {
+                var payrollDetail = await PopulateEmployeePayrollDetail(job.EmployeeId, job.PetServiceId, job.Id);
+                employeePayrollDetails.Add(payrollDetail);
+            }
+
+            return employeePayrollDetails;
+        }
+
+        private async Task<EmployeePayroll> PopulateEmployeePayroll(long employeeId, DateTime startDate, DateTime endDate)
+        {
+            var employeeInfo = await _rofSchedRepo.GetEmployeeById(employeeId);
+            var employeeTotalPay = await CalculatePayForCompletedJobEventsByDate(employeeId, startDate, endDate);
+
+            var newEmployeePayroll = new EmployeePayroll()
+            {
+                EmployeeId = employeeInfo.Id,
+                FirstName = employeeInfo.FirstName,
+                LastName = employeeInfo.LastName,
+                EmployeeTotalPay = employeeTotalPay,
+                PayPeriodStartDate = startDate,
+                PayPeriodEndDate = endDate
+            };
+
+            return newEmployeePayroll;
+        }
+
+        private async Task<EmployeePayrollDetail> PopulateEmployeePayrollDetail(long employeeId, short petServiceId, int jobEventId)
+        {
+            var employeeInfo = await _rofSchedRepo.GetEmployeeById(employeeId);
+            var petService = await _rofSchedRepo.GetPetServiceById(petServiceId);
+            var jobEvent = await _rofSchedRepo.GetJobEventById(jobEventId);
+
+            var isHoliday = await CheckIfEventIsHoliday(jobEvent.EventStartTime);
+
+            var employeePayrollDetail = new EmployeePayrollDetail()
+            {
+                EmployeeId = employeeInfo.Id,
+                FirstName = employeeInfo.FirstName,
+                LastName = employeeInfo.LastName,
+                PetServiceId = petService.Id,
+                PetServiceName = petService.ServiceName,
+                EmployeePayForService = petService.EmployeeRate,
+                ServiceDuration = petService.Duration,
+                ServiceDurationTimeUnit = petService.TimeUnit,
+                JobEventId = jobEventId,
+                IsHolidayPay = isHoliday,
+                ServiceStartDateTime = jobEvent.EventStartTime,
+                ServiceEndDateTime = jobEvent.EventEndTime
+            };
+
+            return employeePayrollDetail;
         }
     }
 }
