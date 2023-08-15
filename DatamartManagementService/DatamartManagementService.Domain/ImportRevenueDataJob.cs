@@ -44,6 +44,20 @@ namespace DatamartManagementService.Domain
 
             return revenueForServiceCompleted;
         }
+
+        public async Task<List<RofRevenueByDate>> PopulateListOfRofRevenueByDate(List<EmployeePayrollDetail> employees)
+        {
+            var revenueByDate = new List<RofRevenueByDate>();
+
+            foreach (var employee in employees)
+            {
+                var revenue = await PopulateRofRevenueByDate(employee);
+
+                revenueByDate.Add(revenue);
+            }
+
+            return revenueByDate;
+        }
         
         private async Task<RofRevenueFromServicesCompletedByDate> PopulateRofRevenueForServicesCompletedByDate(EmployeePayrollDetail employeePayrollDetail)
         {
@@ -69,9 +83,24 @@ namespace DatamartManagementService.Domain
             return rofRevenueForService;
         }
 
-        private async Task PopulateRofRevenueByDate()
+        private async Task<RofRevenueByDate> PopulateRofRevenueByDate(EmployeePayrollDetail employeePayrollDetail)
         {
+            var grossRevenue = await CalculateRevenueEarnedByEmployeeByDate(employeePayrollDetail.EmployeeId, 
+                employeePayrollDetail.ServiceStartDateTime, employeePayrollDetail.ServiceEndDateTime);
 
+            var netRevenue = await CalculateNetRevenueEarnedByDate(employeePayrollDetail.EmployeeId,
+                employeePayrollDetail.ServiceStartDateTime, employeePayrollDetail.ServiceEndDateTime);
+
+            var revenueByDate = new RofRevenueByDate()
+            {
+                RevenueDate = employeePayrollDetail.ServiceEndDateTime,
+                RevenueMonth = Convert.ToInt16(employeePayrollDetail.ServiceEndDateTime.Month),
+                RevenueYear = Convert.ToInt16(employeePayrollDetail.ServiceEndDateTime.Year),
+                GrossRevenue = grossRevenue,
+                NetRevenuePostEmployeePay = netRevenue
+            };
+
+            return revenueByDate;
         }
 
         private async Task<decimal> CalculatePayForCompletedJobEventsByDate(long employeeId, DateTime startDate, DateTime endDate)
