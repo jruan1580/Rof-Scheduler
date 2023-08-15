@@ -1,5 +1,6 @@
 ﻿using DatamartManagementService.Domain.Models;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities;
+using DatamartManagementService.Infrastructure.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.RofSchedulerRepos;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -13,6 +14,8 @@ namespace DatamartManagementService.Domain
     {
         private readonly int _hoursInBetweenRun = 12;
         private readonly IRofSchedRepo _rofSchedRepo;
+        private readonly IRevenueByDateUpsertRepository _revenueByDateUpsertRepo;
+        private readonly IRevenueFromServicesUpsertRepository revenueFromServicesUpsertRepo;
 
         public ImportRevenueDataJob(IRofSchedRepo rofSchedRepo)
         {
@@ -191,21 +194,6 @@ namespace DatamartManagementService.Domain
             return totalRevenue;
         }
 
-        private async Task<decimal> CalculatateTotalRevenueByDate(List<RofRevenueFromServicesCompletedByDate> rofRevenueFromServicesCompletedByDates, 
-            DateTime startDate, DateTime endDate)
-        {
-            decimal totalRevenue = 0;
-
-            foreach(var rofRevenue in rofRevenueFromServicesCompletedByDates)
-            {
-                var revenuePerEmployee = await CalculateRevenueEarnedByEmployeeByDate(rofRevenue.EmployeeId, startDate, endDate);
-
-                totalRevenue += revenuePerEmployee;
-            }
-
-            return totalRevenue;
-        }
-
         private async Task<decimal> CalculateNetRevenueEarnedByDate(long employeeId, DateTime startDate, DateTime endDate)
         {
             var totalRevenue = await CalculateRevenueEarnedByEmployeeByDate(employeeId, startDate, endDate);
@@ -223,8 +211,25 @@ namespace DatamartManagementService.Domain
             return holiday == null;
         }
 
+        //private async Task<decimal> CalculatateTotalRevenueByDate(List<RofRevenueFromServicesCompletedByDate> rofRevenueFromServicesCompletedByDates, 
+        //    DateTime startDate, DateTime endDate)
+        //{
+        //    decimal totalRevenue = 0;
+
+        //    foreach(var rofRevenue in rofRevenueFromServicesCompletedByDates)
+        //    {
+        //        var revenuePerEmployee = await CalculateRevenueEarnedByEmployeeByDate(rofRevenue.EmployeeId, startDate, endDate);
+
+        //        totalRevenue += revenuePerEmployee;
+        //    }
+
+        //    return totalRevenue;
+        //}
 
         //Payroll / Payroll Detail Methods
+
+
+
         public async Task<List<EmployeePayroll>> PopulateListOfEmployeePayroll(List<long> employeeIds, DateTime startDate, DateTime endDate)
         {
             var employeePayrolls = new List<EmployeePayroll>();
