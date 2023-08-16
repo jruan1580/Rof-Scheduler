@@ -2,22 +2,21 @@
 using DatamartManagementService.Infrastructure.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
     public class ImportRevenueByDate : AImportRevenuePayroll
     {
-        private readonly IRofSchedRepo _rofSchedRepo;
+        public ImportRevenueByDate(IRofSchedRepo rofSchedRepo) : base(rofSchedRepo) { }
 
-        public async Task<List<RofRevenueByDate>> PopulateListOfRofRevenueByDate(List<EmployeePayrollDetail> employees)
+        public async Task<List<RofRevenueByDate>> PopulateListOfRofRevenueByDate(List<long> employeeIds, DateTime revenueDate)
         {
             var revenueByDate = new List<RofRevenueByDate>();
 
-            foreach (var employee in employees)
+            foreach (var employee in employeeIds)
             {
-                var revenue = await PopulateRofRevenueByDate(employee);
+                var revenue = await PopulateRofRevenueByDate(employee, revenueDate);
 
                 revenueByDate.Add(revenue);
             }
@@ -25,19 +24,17 @@ namespace DatamartManagementService.Domain
             return revenueByDate;
         }
 
-        public async Task<RofRevenueByDate> PopulateRofRevenueByDate(EmployeePayrollDetail employeePayrollDetail)
+        public async Task<RofRevenueByDate> PopulateRofRevenueByDate(long employeeId, DateTime revenueDate)
         {
-            var grossRevenue = await CalculateRevenueEarnedByEmployeeByDate(employeePayrollDetail.EmployeeId,
-                employeePayrollDetail.ServiceStartDateTime, employeePayrollDetail.ServiceEndDateTime);
+            var grossRevenue = await CalculateRevenueEarnedByEmployeeByDate(employeeId, revenueDate, revenueDate);
 
-            var netRevenue = await CalculateNetRevenueEarnedByDate(employeePayrollDetail.EmployeeId,
-                employeePayrollDetail.ServiceStartDateTime, employeePayrollDetail.ServiceEndDateTime);
+            var netRevenue = await CalculateNetRevenueEarnedByDate(employeeId, revenueDate, revenueDate);
 
             var revenueByDate = new RofRevenueByDate()
             {
-                RevenueDate = employeePayrollDetail.ServiceEndDateTime,
-                RevenueMonth = Convert.ToInt16(employeePayrollDetail.ServiceEndDateTime.Month),
-                RevenueYear = Convert.ToInt16(employeePayrollDetail.ServiceEndDateTime.Year),
+                RevenueDate = revenueDate,
+                RevenueMonth = Convert.ToInt16(revenueDate.Month),
+                RevenueYear = Convert.ToInt16(revenueDate.Year),
                 GrossRevenue = grossRevenue,
                 NetRevenuePostEmployeePay = netRevenue
             };
