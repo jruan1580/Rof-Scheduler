@@ -9,7 +9,7 @@ namespace DatamartManagementService.Domain
 {
     public class ImportEmployeePayroll : AImportRevenuePayroll
     {
-        private readonly IRofSchedRepo _rofSchedRepo;
+        public ImportEmployeePayroll(IRofSchedRepo rofSchedRepo) : base(rofSchedRepo) { }
 
         public async Task<List<EmployeePayroll>> PopulateListOfEmployeePayroll(List<long> employeeIds, DateTime startDate, DateTime endDate)
         {
