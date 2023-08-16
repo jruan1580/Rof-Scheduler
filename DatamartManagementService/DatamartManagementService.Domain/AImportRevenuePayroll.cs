@@ -1,47 +1,56 @@
-﻿using DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities;
+﻿using DatamartManagementService.Domain.Mappers.Database;
+using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
     public abstract class AImportRevenuePayroll
     {
-        private readonly IRofSchedRepo _rofSchedRepo;
+        protected readonly IRofSchedRepo _rofSchedRepo;
+
+        public AImportRevenuePayroll(IRofSchedRepo rofSchedRepo)
+        {
+            _rofSchedRepo = rofSchedRepo;
+        }
 
         public async Task<decimal> CalculatePayForCompletedJobEventsByDate(long employeeId, DateTime startDate, DateTime endDate)
         {
             var completedEvents = await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId);
 
             var eventsByDate = new List<JobEvent>();
+
             if (startDate != null && endDate != null)
             {
                 for (int i = 0; i < completedEvents.Count; i++)
                 {
                     if (completedEvents[i].EventStartTime >= startDate && completedEvents[i].EventEndTime <= endDate)
                     {
-                        eventsByDate.Add(completedEvents[i]);
+                        eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
                     }
                 }
             }
             else
             {
-                eventsByDate.AddRange(completedEvents);
+                foreach (var jobEvent in completedEvents)
+                {
+                    eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(jobEvent));
+                }
             }
 
             decimal totalGrossPay = 0;
 
             foreach (var completed in eventsByDate)
             {
-                var petService = await _rofSchedRepo.GetPetServiceById(completed.PetServiceId);
-                var jobEvent = await _rofSchedRepo.GetJobEventById(completed.Id);
+                var petService = RofSchedulerMappers.ToCorePetService(await _rofSchedRepo.GetPetServiceById(completed.PetServiceId));
+                var jobEvent = RofSchedulerMappers.ToCoreJobEvent(await _rofSchedRepo.GetJobEventById(completed.Id));
                 var isHoliday = await CheckIfEventIsHoliday(jobEvent.EventStartTime);
 
                 if (isHoliday)
                 {
-                    var holidayRate = await _rofSchedRepo.GetHolidayRateByPetServiceId(petService.Id);
+                    var holidayRate = RofSchedulerMappers.ToCoreHolidayRate(await _rofSchedRepo.GetHolidayRateByPetServiceId(petService.Id));
 
                     petService.EmployeeRate = holidayRate.HolidayRate;
                 }
@@ -77,21 +86,24 @@ namespace DatamartManagementService.Domain
                 {
                     if (completedEvents[i].EventStartTime >= startDate && completedEvents[i].EventEndTime <= endDate)
                     {
-                        eventsByDate.Add(completedEvents[i]);
+                        eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
                     }
                 }
             }
             else
             {
-                eventsByDate.AddRange(completedEvents);
+                foreach (var jobEvent in completedEvents)
+                {
+                    eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(jobEvent));
+                }
             }
 
             decimal totalRevenue = 0;
 
             foreach (var completed in eventsByDate)
             {
-                var petService = await _rofSchedRepo.GetPetServiceById(completed.PetServiceId);
-                var jobEvent = await _rofSchedRepo.GetJobEventById(completed.Id);
+                var petService = RofSchedulerMappers.ToCorePetService(await _rofSchedRepo.GetPetServiceById(completed.PetServiceId));
+                var jobEvent = RofSchedulerMappers.ToCoreJobEvent(await _rofSchedRepo.GetJobEventById(completed.Id));
 
                 totalRevenue += petService.Price;
             }
