@@ -7,16 +7,18 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public abstract class AImportRevenuePayroll
+    public abstract class AImportRevenue
     {
         protected readonly IRofSchedRepo _rofSchedRepo;
 
-        public AImportRevenuePayroll(IRofSchedRepo rofSchedRepo)
+        public AImportRevenue(IRofSchedRepo rofSchedRepo)
         {
             _rofSchedRepo = rofSchedRepo;
         }
 
-        public async Task<decimal> CalculatePayForCompletedJobEventsByDate(long employeeId, DateTime startDate, DateTime endDate)
+        public abstract Task ImportRevenueData();
+
+        protected async Task<decimal> CalculatePayForCompletedJobEventsByDate(long employeeId, DateTime startDate, DateTime endDate)
         {
             var completedEvents = await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId);
 
@@ -74,7 +76,7 @@ namespace DatamartManagementService.Domain
             return totalGrossPay;
         }
 
-        public async Task<decimal> CalculateRevenueEarnedByEmployeeByDate(long employeeId, DateTime startDate, DateTime endDate)
+        protected async Task<decimal> CalculateRevenueEarnedByEmployeeByDate(long employeeId, DateTime startDate, DateTime endDate)
         {
             var completedEvents = await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId);
 
@@ -103,7 +105,6 @@ namespace DatamartManagementService.Domain
             foreach (var completed in eventsByDate)
             {
                 var petService = RofSchedulerMappers.ToCorePetService(await _rofSchedRepo.GetPetServiceById(completed.PetServiceId));
-                var jobEvent = RofSchedulerMappers.ToCoreJobEvent(await _rofSchedRepo.GetJobEventById(completed.Id));
 
                 totalRevenue += petService.Price;
             }
@@ -111,7 +112,7 @@ namespace DatamartManagementService.Domain
             return totalRevenue;
         }
 
-        public async Task<decimal> CalculateNetRevenueEarnedByDate(long employeeId, DateTime startDate, DateTime endDate)
+        protected async Task<decimal> CalculateNetRevenueEarnedByDate(long employeeId, DateTime startDate, DateTime endDate)
         {
             var totalRevenue = await CalculateRevenueEarnedByEmployeeByDate(employeeId, startDate, endDate);
             var totalPay = await CalculatePayForCompletedJobEventsByDate(employeeId, startDate, endDate);
@@ -121,7 +122,7 @@ namespace DatamartManagementService.Domain
             return netRevenue;
         }
 
-        public async Task<bool> CheckIfEventIsHoliday(DateTime jobDate)
+        protected async Task<bool> CheckIfEventIsHoliday(DateTime jobDate)
         {
             var holiday = await _rofSchedRepo.CheckIfJobDateIsHoliday(jobDate);
 
