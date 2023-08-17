@@ -1,10 +1,6 @@
-﻿using DatamartManagementService.Domain.Models;
-using DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities;
-using DatamartManagementService.Infrastructure.RofDatamartRepos;
-using DatamartManagementService.Infrastructure.RofSchedulerRepos;
+﻿using DatamartManagementService.Infrastructure.RofDatamartRepos;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,11 +9,14 @@ namespace DatamartManagementService.Domain
     public class ImportRevenueDataJob : BackgroundService
     {
         private readonly int _hoursInBetweenRun = 12;
-        private readonly IRofSchedRepo _rofSchedRepo;
+        private readonly IRevenueByDateUpsertRepository _revenueByDateUpsertRepo;
+        private readonly IImportRofRevenueFromServicesCompletedByDate _singleRevenueDateImporter;
 
-        public ImportRevenueDataJob(IRofSchedRepo rofSchedRepo)
+        public ImportRevenueDataJob(IRevenueByDateUpsertRepository revenueByDateUpsertRepo, 
+            IImportRofRevenueFromServicesCompletedByDate singleRevenueDateImporter)
         {
-            _rofSchedRepo = rofSchedRepo;
+            _revenueByDateUpsertRepo = revenueByDateUpsertRepo;
+            _singleRevenueDateImporter = singleRevenueDateImporter;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,6 +26,8 @@ namespace DatamartManagementService.Domain
             {
                 //TODO: import data
                 Console.WriteLine("hello from the job");
+
+                await _singleRevenueDateImporter.ImportRevenueData();
 
                 await Task.Delay(TimeSpan.FromHours(_hoursInBetweenRun), stoppingToken);
             }       

@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ImportEmployeePayroll.cs" />
+    <Compile Remove="ImportEmployeePayrollDetail.cs" />
+    <Compile Remove="ImportRevenueByDate.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
   </ItemGroup>
 

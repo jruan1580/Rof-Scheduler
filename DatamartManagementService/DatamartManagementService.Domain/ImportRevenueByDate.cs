@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public class ImportRevenueByDate : AImportRevenuePayroll
+    public interface IImportRevenueByDate
+    {
+        Task<List<RofRevenueByDate>> PopulateListOfRofRevenueByDate(List<long> employeeIds, DateTime revenueDate);
+        Task<RofRevenueByDate> PopulateRofRevenueByDate(long employeeId, DateTime revenueDate);
+    }
+
+    public class ImportRevenueByDate : AImportRevenuePayroll, IImportRevenueByDate
     {
         public ImportRevenueByDate(IRofSchedRepo rofSchedRepo) : base(rofSchedRepo) { }
 
