@@ -12,10 +12,12 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
         Task<Holidays> CheckIfJobDateIsHoliday(DateTime jobDate);
         Task<List<JobEvent>> GetCompletedServicesDoneByEmployee(long id);
         Task<Employee> GetEmployeeById(long id);
+        Task<List<Employee>> GetEmployees();
         Task<HolidayRates> GetHolidayRateByHolidayId(short holidayId);
         Task<HolidayRates> GetHolidayRateByPetServiceId(short petServiceId);
         Task<JobEvent> GetJobEventById(int id);
         Task<PetServices> GetPetServiceById(short id);
+        Task<List<PetServices>> GetPetServices();
     }
 
     public class RofSchedRepo : IRofSchedRepo
@@ -25,6 +27,13 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
             using var context = new RofSchedulerContext();
 
             return await context.Employee.FirstOrDefaultAsync(e => e.Id == id);
+        }
+
+        public async Task<List<Employee>> GetEmployees()
+        {
+            using var context = new RofSchedulerContext();
+
+            return await context.Employee.ToListAsync();
         }
 
         public async Task<List<JobEvent>> GetCompletedServicesDoneByEmployee(long id)
@@ -42,6 +51,13 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
             using var context = new RofSchedulerContext();
 
             return await context.PetServices.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public async Task<List<PetServices>> GetPetServices()
+        {
+            using var context = new RofSchedulerContext();
+
+            return await context.PetServices.ToListAsync();
         }
 
         public async Task<JobEvent> GetJobEventById(int id)

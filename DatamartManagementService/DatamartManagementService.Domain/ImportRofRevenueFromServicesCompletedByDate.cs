@@ -4,7 +4,6 @@ using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
@@ -24,15 +23,26 @@ namespace DatamartManagementService.Domain
         public override async Task ImportRevenueData()
         {
             //call from rof scheduler db to give you data since lastRevenueDateProcessed
-            var employeeIds = await _rofSchedRepo.GetEmployeeById();
-            var petServiceIds = await _rofSchedRepo.GetPetServiceById();
-            //and if lastRevenueDateProcessed is null, get all data up to yesterday
-            var lastRevenueDateProcessed = new DateTime();
-            if (_lastRevenueDateProcessed == null)
+            var employees = RofSchedulerMappers.ToCoreEmployees(
+                await _rofSchedRepo.GetEmployees());
+            var petServices = RofSchedulerMappers.ToCorePetServices(
+                await _rofSchedRepo.GetPetServices());
+
+            var employeeIds = new List<long>();
+            var petServiceIds = new List<short>();
+
+            foreach(var employee in employees)
             {
-                lastRevenueDateProcessed = DateTime.Today.AddDays(-1);
+                employeeIds.Add(employee.Id);
             }
-            await PopulateListOfRofRevenueOfCompletedServiceByDate(employeeIds, petServiceIds, lastRevenueDateProcessed);
+
+            foreach(var petService in petServices)
+            {
+                petServiceIds.Add(petService.Id);
+            }
+            //and if lastRevenueDateProcessed is null, get all data up to yesterday
+            
+            await PopulateListOfRofRevenueOfCompletedServiceByDate(employeeIds, petServiceIds, _lastRevenueDateProcessed.Value);
         }
 
         private async Task<List<RofRevenueFromServicesCompletedByDate>> PopulateListOfRofRevenueOfCompletedServiceByDate(
@@ -58,10 +68,14 @@ namespace DatamartManagementService.Domain
         // Populate revenue for a single employee for a single petservice completed for a single day
         private async Task<RofRevenueFromServicesCompletedByDate> PopulateRofRevenueForServicesCompletedByDate(long employeeId, short petServiceId, DateTime singleDate)
         {
-            var employeeInfo = RofSchedulerMappers.ToCoreEmployee(await _rofSchedRepo.GetEmployeeById(employeeId));
-            var petServiceInfo = RofSchedulerMappers.ToCorePetService(await _rofSchedRepo.GetPetServiceById(petServiceId));
-            var isHoliday = RofSchedulerMappers.ToCoreHoliday(await _rofSchedRepo.CheckIfJobDateIsHoliday(singleDate));
-            var completedEvents = await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId);
+            var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
+                await _rofSchedRepo.GetEmployeeById(employeeId));
+            var petServiceInfo = RofSchedulerMappers.ToCorePetService(
+                await _rofSchedRepo.GetPetServiceById(petServiceId));
+            var isHoliday = RofSchedulerMappers.ToCoreHoliday(
+                await _rofSchedRepo.CheckIfJobDateIsHoliday(singleDate));
+            var completedEvents = RofSchedulerMappers.ToCoreJobEvents(
+                await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId));
 
             var completedPetServiceEventsForTheDay = new List<JobEvent>();
 
@@ -69,7 +83,7 @@ namespace DatamartManagementService.Domain
             {
                 if(completed.PetServiceId == petServiceInfo.Id && completed.EventEndTime.Date == singleDate.Date)
                 {
-                    completedPetServiceEventsForTheDay.Add(RofSchedulerMappers.ToCoreJobEvent(completed));
+                    completedPetServiceEventsForTheDay.Add(completed);
                 }
             }
 
@@ -105,29 +119,5 @@ namespace DatamartManagementService.Domain
 
             return rofRevenueForService;
         }
-
-        //private async Task<RofRevenueFromServicesCompletedByDate> PopulateRofRevenueForServicesCompletedByDate(EmployeePayrollDetail employeePayrollDetail)
-        //{
-        //    var petService = await _rofSchedRepo.GetPetServiceById(employeePayrollDetail.PetServiceId);
-
-        //    var netRevenue = await CalculateNetRevenueEarnedByDate(employeePayrollDetail.EmployeeId,
-        //        employeePayrollDetail.ServiceStartDateTime, employeePayrollDetail.ServiceEndDateTime);
-
-        //    var rofRevenueForService = new RofRevenueFromServicesCompletedByDate()
-        //    {
-        //        EmployeeId = employeePayrollDetail.EmployeeId,
-        //        EmployeeFirstName = employeePayrollDetail.FirstName,
-        //        EmployeeLastName = employeePayrollDetail.LastName,
-        //        EmployeePay = employeePayrollDetail.EmployeePayForService,
-        //        PetServiceId = employeePayrollDetail.PetServiceId,
-        //        PetServiceName = employeePayrollDetail.PetServiceName,
-        //        PetServiceRate = petService.EmployeeRate,
-        //        IsHolidayRate = employeePayrollDetail.IsHolidayPay,
-        //        NetRevenuePostEmployeeCut = netRevenue,
-        //        RevenueDate = employeePayrollDetail.ServiceEndDateTime
-        //    };
-
-        //    return rofRevenueForService;
-        //}
     }
 }
