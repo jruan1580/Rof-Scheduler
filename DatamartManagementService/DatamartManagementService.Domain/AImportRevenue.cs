@@ -18,17 +18,17 @@ namespace DatamartManagementService.Domain
 
         public abstract Task ImportRevenueData();
 
-        protected async Task<decimal> CalculatePayForCompletedJobEventsByDate(long employeeId, DateTime startDate, DateTime endDate)
+        protected async Task<decimal> CalculatePayForCompletedJobEventsByDate(long employeeId, DateTime revenueDate)
         {
             var completedEvents = await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId);
 
             var eventsByDate = new List<JobEvent>();
 
-            if (startDate != null && endDate != null)
+            if (revenueDate != null)
             {
                 for (int i = 0; i < completedEvents.Count; i++)
                 {
-                    if (completedEvents[i].EventStartTime >= startDate && completedEvents[i].EventEndTime <= endDate)
+                    if (completedEvents[i].EventEndTime.Date == revenueDate.Date)
                     {
                         eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
                     }
@@ -76,17 +76,17 @@ namespace DatamartManagementService.Domain
             return totalGrossPay;
         }
 
-        protected async Task<decimal> CalculateRevenueEarnedByEmployeeByDate(long employeeId, DateTime startDate, DateTime endDate)
+        protected async Task<decimal> CalculateRevenueEarnedByEmployeeByDate(long employeeId, DateTime revenueDate)
         {
             var completedEvents = await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId);
 
             var eventsByDate = new List<JobEvent>();
 
-            if (startDate != null && endDate != null)
+            if (revenueDate != null)
             {
                 for (int i = 0; i < completedEvents.Count; i++)
                 {
-                    if (completedEvents[i].EventStartTime >= startDate && completedEvents[i].EventEndTime <= endDate)
+                    if (completedEvents[i].EventEndTime.Date == revenueDate.Date)
                     {
                         eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
                     }
@@ -112,10 +112,10 @@ namespace DatamartManagementService.Domain
             return totalRevenue;
         }
 
-        protected async Task<decimal> CalculateNetRevenueEarnedByDate(long employeeId, DateTime startDate, DateTime endDate)
+        protected async Task<decimal> CalculateNetRevenueEarnedByDate(long employeeId, DateTime revenueDate)
         {
-            var totalRevenue = await CalculateRevenueEarnedByEmployeeByDate(employeeId, startDate, endDate);
-            var totalPay = await CalculatePayForCompletedJobEventsByDate(employeeId, startDate, endDate);
+            var totalRevenue = await CalculateRevenueEarnedByEmployeeByDate(employeeId, revenueDate);
+            var totalPay = await CalculatePayForCompletedJobEventsByDate(employeeId, revenueDate);
 
             var netRevenue = totalRevenue - totalPay;
 
