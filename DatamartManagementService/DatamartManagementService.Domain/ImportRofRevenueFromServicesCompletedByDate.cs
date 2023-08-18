@@ -1,6 +1,7 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
 using DatamartManagementService.Domain.Models;
 using DatamartManagementService.Domain.Models.RofSchedulerModels;
+using DatamartManagementService.Infrastructure.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,14 @@ namespace DatamartManagementService.Domain
     public class ImportRofRevenueFromServicesCompletedByDate : AImportRevenue, IImportRofRevenueFromServicesCompletedByDate
     {
         private readonly DateTime? _lastRevenueDateProcessed;
+        private readonly IRevenueFromServicesUpsertRepository _singleRevenueUpsertRepo;
 
-        public ImportRofRevenueFromServicesCompletedByDate(IRofSchedRepo rofSchedRepo)
-            : base(rofSchedRepo) { }
+        public ImportRofRevenueFromServicesCompletedByDate(IRofSchedRepo rofSchedRepo,
+            IRevenueFromServicesUpsertRepository singleRevenueUpsertRepo)
+            : base(rofSchedRepo)
+        {
+            _singleRevenueUpsertRepo = singleRevenueUpsertRepo;
+        }
 
         public override async Task ImportRevenueData()
         {
@@ -41,8 +47,11 @@ namespace DatamartManagementService.Domain
                 petServiceIds.Add(petService.Id);
             }
             //and if lastRevenueDateProcessed is null, get all data up to yesterday
-            
-            await PopulateListOfRofRevenueOfCompletedServiceByDate(employeeIds, petServiceIds, _lastRevenueDateProcessed.Value);
+
+            var listOfSingleRevenues = RofDatamartMappers.FromCoreRofRevenueFromServicesCompletedByDate(
+                await PopulateListOfRofRevenueOfCompletedServiceByDate(employeeIds, petServiceIds, _lastRevenueDateProcessed.Value));
+
+            await _singleRevenueUpsertRepo.AddRevenueFromServices(listOfSingleRevenues);
         }
 
         private async Task<List<RofRevenueFromServicesCompletedByDate>> PopulateListOfRofRevenueOfCompletedServiceByDate(

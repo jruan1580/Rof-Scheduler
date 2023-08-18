@@ -9,13 +9,11 @@ namespace DatamartManagementService.Domain
     public class ImportRevenueDataJob : BackgroundService
     {
         private readonly int _hoursInBetweenRun = 12;
-        private readonly IRevenueByDateUpsertRepository _revenueByDateUpsertRepo;
         private readonly IImportRofRevenueFromServicesCompletedByDate _singleRevenueDateImporter;
 
-        public ImportRevenueDataJob(IRevenueByDateUpsertRepository revenueByDateUpsertRepo, 
+        public ImportRevenueDataJob( 
             IImportRofRevenueFromServicesCompletedByDate singleRevenueDateImporter)
         {
-            _revenueByDateUpsertRepo = revenueByDateUpsertRepo;
             _singleRevenueDateImporter = singleRevenueDateImporter;
         }
 
