@@ -1,5 +1,6 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
 using DatamartManagementService.Domain.Models;
+using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.RofSchedulerRepos;
 using System;
@@ -107,12 +108,7 @@ namespace DatamartManagementService.Domain
                 isHolidayRate = true;
             }
 
-            decimal netRevenue = 0;
-
-            foreach (var completed in completedPetServiceEventsForTheDay)
-            {
-                netRevenue += await CalculateNetRevenueEarnedByDate(employeeInfo.Id, revenueDate);
-            }
+            var netRevenue = await CalculateTotalNetRevenueFromPetServiceComplete(completedPetServiceEventsForTheDay, revenueDate);
 
             var rofRevenueForService = new RofRevenueFromServicesCompletedByDate()
             {
@@ -144,6 +140,28 @@ namespace DatamartManagementService.Domain
             }
 
             return completedPetServiceEventsForTheDay;
+        }
+
+        private async Task PopulateEmployeeAndPetService()
+        {
+
+        }
+        
+        private async Task UpdateEmployeePayrateIfJobDateIsHoliday(PetServices petService, DateTime revenueDate)
+        {
+            
+        }
+
+        private async Task<decimal> CalculateTotalNetRevenueFromPetServiceComplete(List<JobEvent> completedEvents, DateTime revenueDate)
+        {
+            decimal netRevenue = 0;
+
+            foreach (var completed in completedEvents)
+            {
+                netRevenue += await CalculateNetRevenueEarnedByDate(completed.EmployeeId, revenueDate);
+            }
+
+            return netRevenue;
         }
     }
 }
