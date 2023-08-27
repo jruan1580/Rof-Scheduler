@@ -22,36 +22,7 @@ namespace DatamartManagementService.Domain
         {
             var eventsByDate = await GetEmployeeCompletedEventsByDate(employeeId, revenueDate);
 
-            decimal totalGrossPay = 0;
-
-            foreach (var completed in eventsByDate)
-            {
-                var petService = RofSchedulerMappers.ToCorePetService(await _rofSchedRepo.GetPetServiceById(completed.PetServiceId));
-                var jobEvent = RofSchedulerMappers.ToCoreJobEvent(await _rofSchedRepo.GetJobEventById(completed.Id));
-                var isHoliday = await CheckIfEventIsHoliday(jobEvent.EventStartTime);
-
-                if (isHoliday)
-                {
-                    var holidayRate = RofSchedulerMappers.ToCoreHolidayRate(await _rofSchedRepo.GetHolidayRateByPetServiceId(petService.Id));
-
-                    petService.EmployeeRate = holidayRate.HolidayRate;
-                }
-
-                decimal grosswageEarnedPerService = 0;
-
-                if (petService.TimeUnit.ToLower() == "hour")
-                {
-                    grosswageEarnedPerService = petService.EmployeeRate * petService.Duration;
-                }
-                else if (petService.TimeUnit.ToLower() == "min")
-                {
-                    var time = petService.Duration / 60; //gets how many of an hour
-
-                    grosswageEarnedPerService = petService.EmployeeRate * time;
-                }
-
-                totalGrossPay += grosswageEarnedPerService;
-            }
+            decimal totalGrossPay = await CalculateTotalGrossPay(eventsByDate);
 
             return totalGrossPay;
         }
@@ -60,14 +31,7 @@ namespace DatamartManagementService.Domain
         {
             var eventsByDate = await GetEmployeeCompletedEventsByDate(employeeId, revenueDate);
 
-            decimal totalRevenue = 0;
-
-            foreach (var completed in eventsByDate)
-            {
-                var petService = RofSchedulerMappers.ToCorePetService(await _rofSchedRepo.GetPetServiceById(completed.PetServiceId));
-
-                totalRevenue += petService.Price;
-            }
+            decimal totalRevenue = await CalculateTotalRevenue(eventsByDate);
 
             return totalRevenue;
         }
@@ -75,6 +39,7 @@ namespace DatamartManagementService.Domain
         protected async Task<decimal> CalculateNetRevenueEarnedByDate(long employeeId, DateTime revenueDate)
         {
             var totalRevenue = await CalculateRevenueEarnedByEmployeeByDate(employeeId, revenueDate);
+
             var totalPay = await CalculatePayForCompletedJobEventsByDate(employeeId, revenueDate);
 
             var netRevenue = totalRevenue - totalPay;
@@ -82,11 +47,83 @@ namespace DatamartManagementService.Domain
             return netRevenue;
         }
 
-        protected async Task<bool> CheckIfEventIsHoliday(DateTime jobDate)
+        protected async Task<PetServices> GetPetServicePayRate(JobEvent jobEvent)
+        {
+            var petService = RofSchedulerMappers.ToCorePetService(
+                await _rofSchedRepo.GetPetServiceById(jobEvent.PetServiceId));
+
+            await IfEventIsHolidayUpdateRate(petService, jobEvent.EventStartTime);
+
+            return petService;
+        }
+
+        private async Task IfEventIsHolidayUpdateRate(PetServices petService, DateTime jobDate)
         {
             var holiday = await _rofSchedRepo.CheckIfJobDateIsHoliday(jobDate);
 
-            return holiday == null;
+            if (holiday != null)
+            {
+                await UpdateToHolidayPayRate(petService);
+            }
+        }
+
+        private async Task UpdateToHolidayPayRate(PetServices petService)
+        {
+            var holidayRate = RofSchedulerMappers.ToCoreHolidayRate(
+                    await _rofSchedRepo.GetHolidayRateByPetServiceId(petService.Id));
+
+            petService.EmployeeRate = holidayRate.HolidayRate;
+        }
+
+        private async Task<decimal> CalculateTotalGrossPay(List<JobEvent> jobEvents)
+        {
+            decimal totalGrossPay = 0;
+
+            foreach (var job in jobEvents)
+            {
+                var petService = RofSchedulerMappers.ToCorePetService(
+                    await _rofSchedRepo.GetPetServiceById(job.PetServiceId));
+
+                await IfEventIsHolidayUpdateRate(petService, job.EventStartTime);
+
+                decimal grosswageEarnedPerService = await CalculateGrossWages(petService);
+
+                totalGrossPay += grosswageEarnedPerService;
+            }
+
+            return totalGrossPay;
+        }
+
+        private async Task<decimal> CalculateGrossWages(PetServices petService)
+        {
+            decimal grosswageEarnedPerService = 0;
+
+            if (petService.TimeUnit.ToLower() == "hour")
+            {
+                grosswageEarnedPerService = petService.EmployeeRate * petService.Duration;
+            }
+            else if (petService.TimeUnit.ToLower() == "min")
+            {
+                var time = petService.Duration / 60; //gets how many of an hour
+
+                grosswageEarnedPerService = petService.EmployeeRate * time;
+            }
+
+            return grosswageEarnedPerService;
+        }
+
+        private async Task<decimal> CalculateTotalRevenue(List<JobEvent> jobEvents)
+        {
+            decimal totalRevenue = 0;
+
+            foreach (var job in jobEvents)
+            {
+                var petService = RofSchedulerMappers.ToCorePetService(await _rofSchedRepo.GetPetServiceById(job.PetServiceId));
+
+                totalRevenue += petService.Price;
+            }
+
+            return totalRevenue;
         }
 
         private async Task<List<JobEvent>> GetEmployeeCompletedEventsByDate(long employeeId, DateTime date)
@@ -95,40 +132,15 @@ namespace DatamartManagementService.Domain
 
             var eventsByDate = new List<JobEvent>();
 
-            if (date != null)
+            for (int i = 0; i < completedEvents.Count; i++)
             {
-                for (int i = 0; i < completedEvents.Count; i++)
+                if (completedEvents[i].EventEndTime.Date == date.Date)
                 {
-                    if (completedEvents[i].EventEndTime.Date == date.Date)
-                    {
-                        eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
-                    }
-                }
-            }
-            else
-            {
-                foreach (var jobEvent in completedEvents)
-                {
-                    eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(jobEvent));
+                    eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
                 }
             }
 
             return eventsByDate;
-        }
-
-        //private async Task<decimal> CalculatateTotalRevenueByDate(List<RofRevenueFromServicesCompletedByDate> rofRevenueFromServicesCompletedByDates, 
-        //    DateTime startDate, DateTime endDate)
-        //{
-        //    decimal totalRevenue = 0;
-
-        //    foreach(var rofRevenue in rofRevenueFromServicesCompletedByDates)
-        //    {
-        //        var revenuePerEmployee = await CalculateRevenueEarnedByEmployeeByDate(rofRevenue.EmployeeId, startDate, endDate);
-
-        //        totalRevenue += revenuePerEmployee;
-        //    }
-
-        //    return totalRevenue;
-        //}
+        }        
     }
 }
