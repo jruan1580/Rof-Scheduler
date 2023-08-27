@@ -18,6 +18,33 @@ namespace DatamartManagementService.Domain
 
         public abstract Task ImportRevenueData();
 
+        protected async Task<List<JobEvent>> GetEmployeeCompletedEventsByDate(long employeeId, DateTime date)
+        {
+            var completedEvents = await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId);
+
+            var eventsByDate = new List<JobEvent>();
+
+            for (int i = 0; i < completedEvents.Count; i++)
+            {
+                if (completedEvents[i].EventEndTime.Date == date.Date)
+                {
+                    eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
+                }
+            }
+
+            return eventsByDate;
+        }
+
+        protected async Task<PetServices> GetPetServiceWitPayRate(short petServiceId, DateTime jobDate)
+        {
+            var petService = RofSchedulerMappers.ToCorePetService(
+                await _rofSchedRepo.GetPetServiceById(petServiceId));
+
+            await IfEventIsHolidayUpdateRate(petService, jobDate);
+
+            return petService;
+        }
+
         protected async Task<decimal> CalculatePayForCompletedJobEventsByDate(long employeeId, DateTime revenueDate)
         {
             var eventsByDate = await GetEmployeeCompletedEventsByDate(employeeId, revenueDate);
@@ -45,16 +72,6 @@ namespace DatamartManagementService.Domain
             var netRevenue = totalRevenue - totalPay;
 
             return netRevenue;
-        }
-
-        protected async Task<PetServices> GetPetServicePayRate(JobEvent jobEvent)
-        {
-            var petService = RofSchedulerMappers.ToCorePetService(
-                await _rofSchedRepo.GetPetServiceById(jobEvent.PetServiceId));
-
-            await IfEventIsHolidayUpdateRate(petService, jobEvent.EventStartTime);
-
-            return petService;
         }
 
         private async Task IfEventIsHolidayUpdateRate(PetServices petService, DateTime jobDate)
@@ -125,22 +142,5 @@ namespace DatamartManagementService.Domain
 
             return totalRevenue;
         }
-
-        private async Task<List<JobEvent>> GetEmployeeCompletedEventsByDate(long employeeId, DateTime date)
-        {
-            var completedEvents = await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId);
-
-            var eventsByDate = new List<JobEvent>();
-
-            for (int i = 0; i < completedEvents.Count; i++)
-            {
-                if (completedEvents[i].EventEndTime.Date == date.Date)
-                {
-                    eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
-                }
-            }
-
-            return eventsByDate;
-        }        
     }
 }

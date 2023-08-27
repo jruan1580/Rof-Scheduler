@@ -84,29 +84,18 @@ namespace DatamartManagementService.Domain
             return revenueForServiceCompleted;
         }
 
-        // Populate revenue for a single employee for a single petservice completed for a single day
         private async Task<RofRevenueFromServicesCompletedByDate> PopulateRofRevenueForServicesCompletedByDate(long employeeId, short petServiceId, DateTime revenueDate)
         {
             var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
                 await _rofSchedRepo.GetEmployeeById(employeeId));
-            var petServiceInfo = RofSchedulerMappers.ToCorePetService(
-                await _rofSchedRepo.GetPetServiceById(petServiceId));
-            var isHoliday = RofSchedulerMappers.ToCoreHoliday(
-                await _rofSchedRepo.CheckIfJobDateIsHoliday(revenueDate));
-            var completedEvents = RofSchedulerMappers.ToCoreJobEvents(
-                await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId));
 
-            var completedPetServiceEventsForTheDay = 
-                await PullCompletedJobEventsOfAPetServiceForTheDay(completedEvents, petServiceId, revenueDate);
+            var petServiceInfo = await GetPetServiceWitPayRate(petServiceId, revenueDate);
 
-            var isHolidayRate = false;
+            var completedEvents = await GetEmployeeCompletedEventsByDate(employeeId, revenueDate);
 
-            if(isHoliday != null)
-            {
-                var holidayRate = RofSchedulerMappers.ToCoreHolidayRate(await _rofSchedRepo.GetHolidayRateByPetServiceId(petServiceId));
-                petServiceInfo.EmployeeRate = holidayRate.HolidayRate;
-                isHolidayRate = true;
-            }
+            var completedPetServiceEventsForTheDay = await PullCompletedJobEventsOfAPetServiceForTheDay(completedEvents, petServiceId);
+
+            var isHolidayRate = await CheckIfHolidayRate(revenueDate);
 
             var netRevenue = await CalculateTotalNetRevenueFromPetServiceComplete(completedPetServiceEventsForTheDay, revenueDate);
 
@@ -127,29 +116,19 @@ namespace DatamartManagementService.Domain
             return rofRevenueForService;
         }
 
-        private async Task<List<JobEvent>> PullCompletedJobEventsOfAPetServiceForTheDay(List<JobEvent> completedEvents, short petServiceId, DateTime revenueDate)
+        private async Task<List<JobEvent>> PullCompletedJobEventsOfAPetServiceForTheDay(List<JobEvent> completedEvents, short petServiceId)
         {
             var completedPetServiceEventsForTheDay = new List<JobEvent>();
 
             foreach (var completed in completedEvents)
             {
-                if (completed.PetServiceId == petServiceId && completed.EventEndTime.Date == revenueDate.Date) //want all completed pet service event w/ id from this date (do not take time into factor)
+                if (completed.PetServiceId == petServiceId)
                 {
                     completedPetServiceEventsForTheDay.Add(completed);
                 }
             }
 
             return completedPetServiceEventsForTheDay;
-        }
-
-        private async Task PopulateEmployeeAndPetService()
-        {
-
-        }
-        
-        private async Task UpdateEmployeePayrateIfJobDateIsHoliday(PetServices petService, DateTime revenueDate)
-        {
-            
         }
 
         private async Task<decimal> CalculateTotalNetRevenueFromPetServiceComplete(List<JobEvent> completedEvents, DateTime revenueDate)
@@ -162,6 +141,16 @@ namespace DatamartManagementService.Domain
             }
 
             return netRevenue;
+        }
+
+        private async Task<bool> CheckIfHolidayRate(DateTime revenueDate)
+        {
+            var isHoliday = RofSchedulerMappers.ToCoreHoliday(
+                await _rofSchedRepo.CheckIfJobDateIsHoliday(revenueDate));
+
+            var isHolidayRate = (isHoliday != null);
+
+            return isHolidayRate;
         }
     }
 }
