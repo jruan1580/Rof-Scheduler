@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace DatamartManagementService.Infrastructure.Persistence.Entities
+namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities
 {
     public partial class RofDatamartContext : DbContext
     {
@@ -21,6 +21,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.Entities
 
         public virtual DbSet<EmployeePayroll> EmployeePayroll { get; set; }
         public virtual DbSet<EmployeePayrollDetail> EmployeePayrollDetail { get; set; }
+        public virtual DbSet<JobExecutionHistory> JobExecutionHistory { get; set; }
         public virtual DbSet<RofRevenueByDate> RofRevenueByDate { get; set; }
         public virtual DbSet<RofRevenueFromServicesCompletedByDate> RofRevenueFromServicesCompletedByDate { get; set; }
 
@@ -85,6 +86,18 @@ namespace DatamartManagementService.Infrastructure.Persistence.Entities
                 entity.Property(e => e.ServiceEndDateTime).HasColumnType("datetime");
 
                 entity.Property(e => e.ServiceStartDateTime).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<JobExecutionHistory>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.JobType)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LastDatePulled).HasColumnType("date");
             });
 
             modelBuilder.Entity<RofRevenueByDate>(entity =>

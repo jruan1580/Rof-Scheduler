@@ -7,12 +7,10 @@ using System.Collections.Generic;
 
 namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities
 {
-    public partial class RofRevenueByDate
+    public partial class JobExecutionHistory
     {
-        public DateTime RevenueDate { get; set; }
-        public short RevenueMonth { get; set; }
-        public short RevenueYear { get; set; }
-        public decimal GrossRevenue { get; set; }
-        public decimal NetRevenuePostEmployeePay { get; set; }
+        public long Id { get; set; }
+        public string JobType { get; set; }
+        public DateTime LastDatePulled { get; set; }
     }
 }
