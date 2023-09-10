@@ -1,4 +1,4 @@
-﻿using DatamartManagementService.Infrastructure.Persistence.Entities;
+﻿using DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;

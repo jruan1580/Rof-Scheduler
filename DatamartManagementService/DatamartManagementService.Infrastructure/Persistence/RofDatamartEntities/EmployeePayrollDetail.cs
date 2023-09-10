@@ -5,14 +5,14 @@ using System.Collections.Generic;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace DatamartManagementService.Infrastructure.Persistence.Entities
+namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities
 {
     public partial class EmployeePayrollDetail
     {
         public long EmployeeId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public long PetServiceId { get; set; }
+        public short PetServiceId { get; set; }
         public string PetServiceName { get; set; }
         public decimal EmployeePayForService { get; set; }
         public bool IsHolidayPay { get; set; }
