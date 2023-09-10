@@ -17,10 +17,10 @@ namespace DatamartManagementService.Infrastructure.RofDatamartRepos
         {
             using var context = new RofDatamartContext();
 
-            var jobExecutionHistory = await context.JobExecutionHistory.Where(j => j.JobType == jobType)
-                .OrderByDescending(j => j.Id).ToListAsync();
-
-            return jobExecutionHistory[0];
+            return await context.JobExecutionHistory
+                .Where(j => j.JobType == jobType)
+                .OrderByDescending(j => j.Id)
+                .FirstOrDefaultAsync();
         }
 
         public async Task AddJobExecutionHistory(JobExecutionHistory jobExecutionHistory)
