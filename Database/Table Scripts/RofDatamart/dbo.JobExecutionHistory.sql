@@ -1,0 +1,14 @@
+USE [RofDatamart];
+GO
+
+IF (EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'JobExecutionHistory'))
+BEGIN
+	DROP TABLE dbo.JobExecutionHistory;
+END
+
+CREATE TABLE dbo.JobExecutionHistory
+(
+	Id BIGINT NOT NULL,
+	JobType VARCHAR(25) NOT NULL,
+	LastDatePulled DATE NOT NULL
+);

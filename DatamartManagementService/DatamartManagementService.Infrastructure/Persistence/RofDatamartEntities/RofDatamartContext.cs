@@ -21,6 +21,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
 
         public virtual DbSet<EmployeePayroll> EmployeePayroll { get; set; }
         public virtual DbSet<EmployeePayrollDetail> EmployeePayrollDetail { get; set; }
+        public virtual DbSet<JobExecutionHistory> JobExecutionHistory { get; set; }
         public virtual DbSet<RofRevenueByDate> RofRevenueByDate { get; set; }
         public virtual DbSet<RofRevenueFromServicesCompletedByDate> RofRevenueFromServicesCompletedByDate { get; set; }
 
@@ -85,6 +86,18 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
                 entity.Property(e => e.ServiceEndDateTime).HasColumnType("datetime");
 
                 entity.Property(e => e.ServiceStartDateTime).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<JobExecutionHistory>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.JobType)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LastDatePulled).HasColumnType("date");
             });
 
             modelBuilder.Entity<RofRevenueByDate>(entity =>
