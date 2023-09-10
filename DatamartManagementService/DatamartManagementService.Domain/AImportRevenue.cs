@@ -18,18 +18,16 @@ namespace DatamartManagementService.Domain
 
         public abstract Task ImportRevenueData();
 
-        protected async Task<List<JobEvent>> GetEmployeeCompletedEventsByDate(long employeeId, DateTime date)
+        protected async Task<List<JobEvent>> GetCompletedEventsByDate(DateTime startDate, DateTime endDate)
         {
-            var completedEvents = await _rofSchedRepo.GetCompletedServicesDoneByEmployee(employeeId);
+            var completedEvents = await _rofSchedRepo.GetCompletedServicesByDate(startDate, endDate);
 
             var eventsByDate = new List<JobEvent>();
 
             for (int i = 0; i < completedEvents.Count; i++)
             {
-                if (completedEvents[i].EventEndTime.Date == date.Date)
-                {
-                    eventsByDate.Add(RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
-                }
+                eventsByDate.Add(
+                    RofSchedulerMappers.ToCoreJobEvent(completedEvents[i]));
             }
 
             return eventsByDate;
