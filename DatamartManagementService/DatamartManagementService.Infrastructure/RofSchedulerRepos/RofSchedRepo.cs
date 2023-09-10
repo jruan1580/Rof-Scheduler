@@ -10,7 +10,8 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
     public interface IRofSchedRepo
     {
         Task<Holidays> CheckIfJobDateIsHoliday(DateTime jobDate);
-        Task<List<JobEvent>> GetCompletedServicesDoneByEmployee(long id);
+        Task<List<JobEvent>> GetCompletedServicesByDate(DateTime startDate, DateTime endDate);
+        Task<List<JobEvent>> GetCompletedServicesByEndDate(DateTime endDate);
         Task<Employee> GetEmployeeById(long id);
         Task<List<Employee>> GetEmployees();
         Task<HolidayRates> GetHolidayRateByHolidayId(short holidayId);
@@ -36,14 +37,25 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
             return await context.Employee.ToListAsync();
         }
 
-        public async Task<List<JobEvent>> GetCompletedServicesDoneByEmployee(long id)
+        public async Task<List<JobEvent>> GetCompletedServicesByDate(DateTime startDate, DateTime endDate)
         {
             using var context = new RofSchedulerContext();
 
-            var employeeCompletedServices = await context.JobEvent.Where(j => j.EmployeeId == id
-                && j.Completed == true).ToListAsync();
+            return await context.JobEvent
+                .Where(j => j.EventStartTime.Date >= startDate.Date
+                && j.EventEndTime.Date <= endDate.Date
+                && j.Completed == true)
+                .ToListAsync();
+        }
 
-            return employeeCompletedServices;
+        public async Task<List<JobEvent>> GetCompletedServicesByEndDate(DateTime endDate)
+        {
+            using var context = new RofSchedulerContext();
+
+            return await context.JobEvent
+                .Where(j => j.EventEndTime.Date <= endDate.Date
+                && j.Completed == true)
+                .ToListAsync();
         }
 
         public async Task<PetServices> GetPetServiceById(short id)
