@@ -1,4 +1,6 @@
-﻿namespace EmployeeManagementService.DTO
+﻿using System;
+
+namespace EmployeeManagementService.DTO
 {
     public class EmployeeDTO
     {
@@ -35,5 +37,7 @@
         public bool? Active { get; set; }
 
         public AddressDTO Address { get; set; }
+
+        public DateTime LastModifiedDate { get; set; }
     }
 }

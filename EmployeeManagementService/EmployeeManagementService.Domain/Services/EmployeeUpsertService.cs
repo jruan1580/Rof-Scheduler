@@ -115,6 +115,7 @@ namespace EmployeeManagementService.Domain.Services
             originalEmployee.State = updatedEmployee.Address?.State;
             originalEmployee.City = updatedEmployee.Address?.City;
             originalEmployee.ZipCode = updatedEmployee.Address?.ZipCode;
+            originalEmployee.LastModifiedDate = updatedEmployee.LastModifiedDate;
         }
 
         private async Task ValidateEmployee(Employee employee, bool isUpdate)

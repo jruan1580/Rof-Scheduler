@@ -27,6 +27,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
         public string City { get; set; }
         public string State { get; set; }
         public string ZipCode { get; set; }
+        public DateTime LastModifiedDate { get; set; }
 
         public virtual Country Country { get; set; }
     }

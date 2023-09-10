@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -78,6 +78,10 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
+                entity.Property(e => e.LastModifiedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.LastName)
                     .IsRequired()
                     .HasMaxLength(25)
@@ -120,7 +124,7 @@ namespace EmployeeManagementService.Infrastructure.Persistence.Entities
                     .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.CountryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Employee__Countr__46E78A0C");
+                    .HasConstraintName("FK__Employee__Countr__6F9F86DC");
             });
 
             OnModelCreatingPartial(modelBuilder);
