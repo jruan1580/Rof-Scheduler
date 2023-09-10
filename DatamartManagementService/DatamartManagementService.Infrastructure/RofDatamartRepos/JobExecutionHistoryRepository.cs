@@ -5,7 +5,13 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.RofDatamartRepos
 {
-    public class JobExecutionHistoryRepository
+    public interface IJobExecutionHistoryRepository
+    {
+        Task AddJobExecutionHistory(JobExecutionHistory jobExecutionHistory);
+        Task<JobExecutionHistory> GetJobExecutionHistoryByJobType(string jobType);
+    }
+
+    public class JobExecutionHistoryRepository : IJobExecutionHistoryRepository
     {
         public async Task<JobExecutionHistory> GetJobExecutionHistoryByJobType(string jobType)
         {
