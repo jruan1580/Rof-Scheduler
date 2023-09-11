@@ -1,6 +1,6 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
 using DatamartManagementService.Domain.Models.RofSchedulerModels;
-using DatamartManagementService.Infrastructure.RofSchedulerRepos;
+using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
