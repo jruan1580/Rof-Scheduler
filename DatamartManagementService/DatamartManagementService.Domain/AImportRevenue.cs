@@ -20,7 +20,7 @@ namespace DatamartManagementService.Domain
 
         protected async Task<List<JobEvent>> GetCompletedEventsByDate(DateTime startDate, DateTime endDate)
         {
-            var completedEvents = await _rofSchedRepo.GetCompletedServicesByDate(startDate, endDate);
+            var completedEvents = await _rofSchedRepo.GetCompletedServicesBetweenDate(startDate, endDate);
 
             var eventsByDate = new List<JobEvent>();
 

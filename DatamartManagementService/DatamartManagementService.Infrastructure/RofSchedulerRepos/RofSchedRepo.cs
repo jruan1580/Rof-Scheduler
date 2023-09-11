@@ -10,8 +10,8 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
     public interface IRofSchedRepo
     {
         Task<Holidays> CheckIfJobDateIsHoliday(DateTime jobDate);
-        Task<List<JobEvent>> GetCompletedServicesByDate(DateTime startDate, DateTime endDate);
-        Task<List<JobEvent>> GetCompletedServicesByEndDate(DateTime endDate);
+        Task<List<JobEvent>> GetCompletedServicesBetweenDate(DateTime startDate, DateTime endDate);
+        Task<List<JobEvent>> GetCompletedServicesUpUntilDate(DateTime endDate);
         Task<Employee> GetEmployeeById(long id);
         Task<List<Employee>> GetEmployees();
         Task<HolidayRates> GetHolidayRateByHolidayId(short holidayId);
@@ -37,24 +37,24 @@ namespace DatamartManagementService.Infrastructure.RofSchedulerRepos
             return await context.Employee.ToListAsync();
         }
 
-        public async Task<List<JobEvent>> GetCompletedServicesByDate(DateTime startDate, DateTime endDate)
+        public async Task<List<JobEvent>> GetCompletedServicesBetweenDate(DateTime startDate, DateTime endDate)
         {
             using var context = new RofSchedulerContext();
 
             return await context.JobEvent
-                .Where(j => j.EventStartTime.Date >= startDate.Date
-                && j.EventEndTime.Date <= endDate.Date
-                && j.Completed == true)
+                .Where(j => j.EventStartTime.Date > startDate.Date
+                    && j.EventEndTime.Date <= endDate.Date
+                    && j.Completed == true)
                 .ToListAsync();
         }
 
-        public async Task<List<JobEvent>> GetCompletedServicesByEndDate(DateTime endDate)
+        public async Task<List<JobEvent>> GetCompletedServicesUpUntilDate(DateTime date)
         {
             using var context = new RofSchedulerContext();
 
             return await context.JobEvent
-                .Where(j => j.EventEndTime.Date <= endDate.Date
-                && j.Completed == true)
+                .Where(j => j.EventEndTime.Date <= date.Date
+                    && j.Completed == true)
                 .ToListAsync();
         }
 

@@ -35,7 +35,7 @@ namespace DatamartManagementService.Domain
 
             var yesterday = DateTime.Today.AddDays(-1);
 
-            var completedEvents = await PullCompletedJobEventsByDate(lastExecution.LastDatePulled, yesterday);
+            var completedEvents = await PullCompletedJobEventsBetweenDate(lastExecution.LastDatePulled, yesterday);
         }
 
         private async Task<List<RofRevenueFromServicesCompletedByDate>> PopulateListOfRofRevenueOfCompletedServiceByDate(
@@ -90,22 +90,16 @@ namespace DatamartManagementService.Domain
             return rofRevenueForService;
         }
 
-        private async Task<List<JobEvent>> PullCompletedJobEventsByDate(DateTime startDate, DateTime endDate)
+        private async Task<List<JobEvent>> PullCompletedJobEventsBetweenDate(DateTime startDate, DateTime endDate)
         {
-            var completedEvents = new List<JobEvent>();
-
             if (startDate == null)
             {
-                completedEvents = RofSchedulerMappers.ToCoreJobEvents(
-                    await _rofSchedRepo.GetCompletedServicesByEndDate(endDate));
-            }
-            else
-            {
-                completedEvents = RofSchedulerMappers.ToCoreJobEvents(
-                    await _rofSchedRepo.GetCompletedServicesByDate(startDate, endDate));
+                return RofSchedulerMappers.ToCoreJobEvents(
+                    await _rofSchedRepo.GetCompletedServicesUpUntilDate(endDate));
             }
 
-            return completedEvents;
+            return RofSchedulerMappers.ToCoreJobEvents(
+                await _rofSchedRepo.GetCompletedServicesBetweenDate(startDate, endDate));
         }
 
         private async Task<decimal> CalculateTotalNetRevenueFromPetServiceComplete(List<JobEvent> completedEvents, DateTime revenueDate)
