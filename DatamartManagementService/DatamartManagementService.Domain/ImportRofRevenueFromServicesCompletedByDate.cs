@@ -30,13 +30,19 @@ namespace DatamartManagementService.Domain
 
         public override async Task ImportRevenueData()
         {
-            var lastExecution = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType("revenue");
+            var lastExecution = RofDatamartMappers.ToCoreJobExecutionHistory(
+                await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType("revenue"));
 
             var yesterday = DateTime.Today.AddDays(-1);
 
             var completedEvents = await PullCompletedJobEventsBetweenDate(lastExecution.LastDatePulled, yesterday);
 
             var listOfDetailedRofRev = await PopulateListOfRofRevenueOfCompletedServiceByDate(completedEvents);
+
+            await _singleRevenueUpsertRepo.AddRevenueFromServices(
+                RofDatamartMappers.FromCoreRofRevenueFromServicesCompletedByDate(listOfDetailedRofRev));
+
+            await AddJobExecutionHistory("Revenue", yesterday);
         }
 
         private async Task<List<RofRevenueFromServicesCompletedByDate>> PopulateListOfRofRevenueOfCompletedServiceByDate(List<JobEvent> completedEvents)
@@ -99,6 +105,18 @@ namespace DatamartManagementService.Domain
                 await _rofSchedRepo.CheckIfJobDateIsHoliday(revenueDate));
 
             return isHoliday != null;
+        }
+
+        private async Task AddJobExecutionHistory(string jobType, DateTime lastDatePulled)
+        {
+            var newExecution = new JobExecutionHistory()
+            {
+                JobType = jobType,
+                LastDatePulled = lastDatePulled
+            };
+
+            await _jobExecutionHistoryRepo.AddJobExecutionHistory(
+                RofDatamartMappers.FromCoreJobExecutionHistory(newExecution));
         }
     }
 }
