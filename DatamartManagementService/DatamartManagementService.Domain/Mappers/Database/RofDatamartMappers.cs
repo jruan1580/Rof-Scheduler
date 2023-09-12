@@ -1,6 +1,8 @@
 ﻿using CoreSingleRevenue = DatamartManagementService.Domain.Models.RofRevenueFromServicesCompletedByDate;
 using DbSingleRevenue = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate;
 using System.Collections.Generic;
+using DbJobExecutionHistory = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.JobExecutionHistory;
+using CoreJobExecutionHistory = DatamartManagementService.Domain.Models.JobExecutionHistory;
 
 namespace DatamartManagementService.Domain.Mappers.Database
 {
@@ -28,6 +30,28 @@ namespace DatamartManagementService.Domain.Mappers.Database
             }
 
             return dbSingleRevs;
+        }
+
+        public static CoreJobExecutionHistory ToCoreJobExecutionHistory(DbJobExecutionHistory dbHistory)
+        {
+            var coreHistory = new CoreJobExecutionHistory();
+
+            coreHistory.Id = dbHistory.Id;
+            coreHistory.JobType = dbHistory.JobType;
+            coreHistory.LastDatePulled = dbHistory.LastDatePulled;
+
+            return coreHistory;
+        }
+
+        public static DbJobExecutionHistory FromCoreJobExecutionHistory(CoreJobExecutionHistory coreHistory)
+        {
+            var dbHistory = new DbJobExecutionHistory();
+
+            dbHistory.Id = coreHistory.Id;
+            dbHistory.JobType = coreHistory.JobType;
+            dbHistory.LastDatePulled = coreHistory.LastDatePulled;
+
+            return dbHistory;
         }
     }
 }
