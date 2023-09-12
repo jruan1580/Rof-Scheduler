@@ -90,7 +90,7 @@ namespace DatamartManagementService.Domain
             }
 
             return RofSchedulerMappers.ToCoreJobEvents(
-                await _rofSchedRepo.GetCompletedServicesBetweenDate(startDate, endDate));
+                await _rofSchedRepo.GetCompletedServicesBetweenDates(startDate, endDate));
         }
 
         private async Task<bool> CheckIfHolidayRate(DateTime revenueDate)

@@ -10,7 +10,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
     public interface IRofSchedRepo
     {
         Task<Holidays> CheckIfJobDateIsHoliday(DateTime jobDate);
-        Task<List<JobEvent>> GetCompletedServicesBetweenDate(DateTime startDate, DateTime endDate);
+        Task<List<JobEvent>> GetCompletedServicesBetweenDates(DateTime startDate, DateTime endDate);
         Task<List<JobEvent>> GetCompletedServicesUpUntilDate(DateTime endDate);
         Task<Employee> GetEmployeeById(long id);
         Task<List<Employee>> GetEmployees();
@@ -37,7 +37,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
             return await context.Employee.ToListAsync();
         }
 
-        public async Task<List<JobEvent>> GetCompletedServicesBetweenDate(DateTime startDate, DateTime endDate)
+        public async Task<List<JobEvent>> GetCompletedServicesBetweenDates(DateTime startDate, DateTime endDate)
         {
             using var context = new RofSchedulerContext();
 
