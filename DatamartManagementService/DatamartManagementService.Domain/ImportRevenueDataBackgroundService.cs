@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public class ImportRevenueDataJob : BackgroundService
+    public class ImportRevenueDataBackgroundService : BackgroundService
     {
         private readonly int _hoursInBetweenRun = 12;
         private readonly IImportRofRevenueFromServicesCompletedByDate _singleRevenueDateImporter;
 
-        public ImportRevenueDataJob( 
+        public ImportRevenueDataBackgroundService( 
             IImportRofRevenueFromServicesCompletedByDate singleRevenueDateImporter)
         {
             _singleRevenueDateImporter = singleRevenueDateImporter;
