@@ -14,4 +14,9 @@
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DatamartManagementService.Domain\DatamartManagementService.Domain.csproj" />
+    <ProjectReference Include="..\DatamartManagementService.Infrastructure\DatamartManagementService.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
