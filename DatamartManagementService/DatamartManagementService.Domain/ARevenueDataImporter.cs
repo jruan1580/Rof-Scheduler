@@ -18,34 +18,13 @@ namespace DatamartManagementService.Domain
 
         public abstract Task ImportRevenueData();
 
-        protected async Task<PetServices> GetPetServiceWithCorrectPayRate(short petServiceId, DateTime jobDate)
-        {
-            var petService = RofSchedulerMappers.ToCorePetService(
-                await _rofSchedRepo.GetPetServiceById(petServiceId));
-
-            await IfDateIsHolidayUpdateRate(petService, jobDate);
-
-            return petService;
-        }
-
-        private async Task IfDateIsHolidayUpdateRate(PetServices petService, DateTime jobDate)
-        {
-            var holiday = await _rofSchedRepo.CheckIfJobDateIsHoliday(jobDate);
-
-            if (holiday != null)
-            {
-                await UpdateToHolidayPayRate(petService);
-            }
-        }
-
-        private async Task UpdateToHolidayPayRate(PetServices petService)
+        protected async Task UpdateToHolidayPayRate(PetServices petService)
         {
             var holidayRate = RofSchedulerMappers.ToCoreHolidayRate(
                     await _rofSchedRepo.GetHolidayRateByPetServiceId(petService.Id));
 
             petService.EmployeeRate = holidayRate.HolidayRate;
         }
-
 
         protected decimal CalculateNetRevenueForCompletedService(PetServices petService)
         {

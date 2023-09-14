@@ -86,9 +86,15 @@ namespace DatamartManagementService.Domain
             var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
                 await _rofSchedRepo.GetEmployeeById(employeeId));
 
-            var petServiceInfo = await GetPetServiceWithCorrectPayRate(petServiceId, revenueDate);
+            var petServiceInfo = RofSchedulerMappers.ToCorePetService(
+                await _rofSchedRepo.GetPetServiceById(petServiceId));
 
             var isHolidayRate = await CheckIfHolidayRate(revenueDate);
+
+            if (isHolidayRate)
+            {
+                await UpdateToHolidayPayRate(petServiceInfo);
+            }
 
             var netRevenue = CalculateNetRevenueForCompletedService(petServiceInfo);
 
