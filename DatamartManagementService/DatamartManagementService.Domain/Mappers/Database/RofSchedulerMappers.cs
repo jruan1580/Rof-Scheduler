@@ -15,20 +15,6 @@ namespace DatamartManagementService.Domain.Mappers.Database
 {
     public static class RofSchedulerMappers
     {
-        public static CoreJobEvent ToCoreJobEvent(DbJobEvent dbJobEvent)
-        {
-            var coreEvent = new CoreJobEvent();
-
-            coreEvent.Id = dbJobEvent.Id;
-            coreEvent.EmployeeId = dbJobEvent.EmployeeId;
-            coreEvent.PetServiceId = dbJobEvent.PetServiceId;
-            coreEvent.EventStartTime = dbJobEvent.EventStartTime;
-            coreEvent.EventEndTime = dbJobEvent.EventEndTime;
-            coreEvent.Completed = dbJobEvent.Completed;
-
-            return coreEvent;
-        }
-
         public static List<CoreJobEvent> ToCoreJobEvents(List<DbJobEvent> dbJobEvents)
         {
             var coreEvents = new List<CoreJobEvent>();
@@ -60,23 +46,6 @@ namespace DatamartManagementService.Domain.Mappers.Database
             return coreEmployee;
         }
 
-        public static List<CoreEmployee> ToCoreEmployees(List<DbEmployee> dbEmployees)
-        {
-            var coreEmployees = new List<CoreEmployee>();
-
-            foreach (var dbEmployee in dbEmployees)
-            {
-                coreEmployees.Add(new CoreEmployee()
-                {
-                    Id = dbEmployee.Id,
-                    FirstName = dbEmployee.FirstName,
-                    LastName = dbEmployee.LastName
-                });
-            }
-
-            return coreEmployees;
-        }
-
         public static CorePetService ToCorePetService(DbPetService dbPetService)
         {
             var corePetService = new CorePetService();
@@ -89,26 +58,6 @@ namespace DatamartManagementService.Domain.Mappers.Database
             corePetService.TimeUnit = dbPetService.TimeUnit;
 
             return corePetService;
-        }
-
-        public static List<CorePetService> ToCorePetServices(List<DbPetService> dbPetServices)
-        {
-            var corePetServices = new List<CorePetService>();
-
-            foreach (var dbPetService in dbPetServices)
-            {
-                corePetServices.Add(new CorePetService()
-                {
-                    Id = dbPetService.Id,
-                    ServiceName = dbPetService.ServiceName,
-                    Price = dbPetService.Price,
-                    EmployeeRate = dbPetService.EmployeeRate,
-                    Duration = dbPetService.Duration,
-                    TimeUnit = dbPetService.TimeUnit
-                });
-            };            
-
-            return corePetServices;
         }
 
         public static CoreHoliday ToCoreHoliday(DbHoliday dbHoliday)
