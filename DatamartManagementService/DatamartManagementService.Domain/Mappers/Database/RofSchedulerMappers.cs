@@ -4,12 +4,9 @@ using CoreEmployee = DatamartManagementService.Domain.Models.RofSchedulerModels.
 using DbEmployee = DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities.Employee;
 using CorePetService = DatamartManagementService.Domain.Models.RofSchedulerModels.PetServices;
 using DbPetService = DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities.PetServices;
-using CoreHoliday = DatamartManagementService.Domain.Models.RofSchedulerModels.Holiday;
-using DbHoliday = DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities.Holidays;
 using CoreHolidayRate = DatamartManagementService.Domain.Models.RofSchedulerModels.HolidayRates;
 using DbHolidayRate = DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities.HolidayRates;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace DatamartManagementService.Domain.Mappers.Database
 {
@@ -58,18 +55,6 @@ namespace DatamartManagementService.Domain.Mappers.Database
             corePetService.TimeUnit = dbPetService.TimeUnit;
 
             return corePetService;
-        }
-
-        public static CoreHoliday ToCoreHoliday(DbHoliday dbHoliday)
-        {
-            var coreHoliday = new CoreHoliday();
-
-            coreHoliday.Id = dbHoliday.Id;
-            coreHoliday.HolidayName = dbHoliday.HolidayName;
-            coreHoliday.HolidayMonth = dbHoliday.HolidayMonth;
-            coreHoliday.HolidayDay = dbHoliday.HolidayDay;
-
-            return coreHoliday;
         }
 
         public static CoreHolidayRate ToCoreHolidayRate(DbHolidayRate dbHolidayRate)

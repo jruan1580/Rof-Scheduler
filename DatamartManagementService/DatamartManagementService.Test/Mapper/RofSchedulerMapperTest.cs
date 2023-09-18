@@ -78,25 +78,6 @@ namespace DatamartManagementService.Test.Mapper
             Assert.AreEqual(entity.TimeUnit, core.TimeUnit);
         }
 
-        public void ToCoreHoliday()
-        {
-            var entity = new Holidays()
-            {
-                Id = 1,
-                HolidayName = "Christmas",
-                HolidayMonth = 12,
-                HolidayDay = 25
-            };
-
-            var core = RofSchedulerMappers.ToCoreHoliday(entity);
-
-            Assert.IsNotNull(entity);
-            Assert.AreEqual(entity.Id, core.Id);
-            Assert.AreEqual(entity.HolidayName, core.HolidayName);
-            Assert.AreEqual(entity.HolidayMonth, core.HolidayMonth);
-            Assert.AreEqual(entity.HolidayDay, core.HolidayDay);
-        }
-
         public void ToCoreHolidayRate()
         {
             var entity = new HolidayRates()
