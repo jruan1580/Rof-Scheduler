@@ -14,7 +14,7 @@ namespace DatamartManagementService.Test
             {
                 Id = 1,
                 JobType = "Revenue",
-                LastDatePulled = DateTime.Today
+                LastDatePulled = new DateTime(2023, 9, 15)
             };
         }
 
@@ -25,8 +25,8 @@ namespace DatamartManagementService.Test
                 Id = 1,
                 EmployeeId = 1,
                 PetServiceId = 1,
-                EventStartTime = DateTime.Now,
-                EventEndTime = DateTime.Now.AddHours(1),
+                EventStartTime = new DateTime(2023, 9, 16, 7, 30, 0),
+                EventEndTime = new DateTime(2023, 9, 16, 8, 30, 0),
                 Completed = true
             };
         }

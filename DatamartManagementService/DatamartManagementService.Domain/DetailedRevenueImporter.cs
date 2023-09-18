@@ -30,13 +30,11 @@ namespace DatamartManagementService.Domain
 
         public override async Task ImportRevenueData()
         {
-            var executionHistory = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType("revenue");
-
-            var lastExecution = RofDatamartMappers.ToCoreJobExecutionHistory(executionHistory);
+            var lastExecution = await GetJobExecutionHistory();
 
             var yesterday = DateTime.Today.AddDays(-1);
 
-            var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution.LastDatePulled, yesterday);
+            var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, yesterday);
 
             var listOfDetailedRofRev = await GetListOfRofRevenueOfCompletedServiceByDate(completedEvents);
 
@@ -48,16 +46,31 @@ namespace DatamartManagementService.Domain
             await AddJobExecutionHistory("Revenue", yesterday);
         }
 
-        private async Task<List<JobEvent>> GetCompletedJobEventsBetweenDate(DateTime startDate, DateTime endDate)
+        private async Task<JobExecutionHistory> GetJobExecutionHistory()
         {
-            if (startDate == null)
+            var executionHistory = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType("revenue");
+
+            if(executionHistory == null)
             {
-                return RofSchedulerMappers.ToCoreJobEvents(
-                    await _rofSchedRepo.GetCompletedServicesUpUntilDate(endDate));
+                return null;
             }
 
-            return RofSchedulerMappers.ToCoreJobEvents(
-                await _rofSchedRepo.GetCompletedServicesBetweenDates(startDate, endDate));
+            return RofDatamartMappers.ToCoreJobExecutionHistory(executionHistory);
+        }
+
+        private async Task<List<JobEvent>> GetCompletedJobEventsBetweenDate(JobExecutionHistory jobExecution, DateTime endDate)
+        {
+            var jobEvents = new List<Infrastructure.Persistence.RofSchedulerEntities.JobEvent>();
+
+            if (jobExecution == null)
+            {
+                jobEvents = await _rofSchedRepo.GetCompletedServicesUpUntilDate(endDate);
+                return RofSchedulerMappers.ToCoreJobEvents(jobEvents);
+            }
+
+            jobEvents = await _rofSchedRepo.GetCompletedServicesBetweenDates(jobExecution.LastDatePulled, endDate);
+
+            return RofSchedulerMappers.ToCoreJobEvents(jobEvents);
         }
 
         private async Task<List<RofRevenueFromServicesCompletedByDate>> GetListOfRofRevenueOfCompletedServiceByDate(
@@ -106,7 +119,7 @@ namespace DatamartManagementService.Domain
                 EmployeePay = petServiceInfo.EmployeeRate,
                 PetServiceId = petServiceInfo.Id,
                 PetServiceName = petServiceInfo.ServiceName,
-                PetServiceRate = petServiceInfo.EmployeeRate,
+                PetServiceRate = petServiceInfo.Price,
                 IsHolidayRate = isHolidayRate,
                 NetRevenuePostEmployeeCut = netRevenue,
                 RevenueDate = revenueDate
@@ -117,8 +130,7 @@ namespace DatamartManagementService.Domain
 
         private async Task<bool> CheckIfHolidayRate(DateTime revenueDate)
         {
-            var isHoliday = RofSchedulerMappers.ToCoreHoliday(
-                await _rofSchedRepo.CheckIfJobDateIsHoliday(revenueDate));
+            var isHoliday = await _rofSchedRepo.CheckIfJobDateIsHoliday(revenueDate);
 
             return isHoliday != null;
         }
