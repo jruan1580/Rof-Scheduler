@@ -3,7 +3,6 @@ using DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace DatamartManagementService.Test.Mapper
 {

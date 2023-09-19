@@ -56,7 +56,8 @@ namespace DatamartManagementService.Test.Importer
             await detailedRevenueImporter.ImportRevenueData();
 
             detailedRevenueRepo.Verify(d => 
-                d.AddRevenueFromServices(It.Is<List<RofRevenueFromServicesCompletedByDate>>(lr => lr[0].EmployeeId == 1 &&
+                d.AddRevenueFromServices(It.Is<List<RofRevenueFromServicesCompletedByDate>>(lr => 
+                    lr[0].EmployeeId == 1 &&
                     lr[0].EmployeeFirstName == "John" && 
                     lr[0].EmployeeLastName == "Doe" && 
                     lr[0].EmployeePay == 15 &&
@@ -69,7 +70,8 @@ namespace DatamartManagementService.Test.Importer
             Times.Once);
 
             jobExecutionHistoryRepo.Verify(j => 
-                j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j => j.JobType == "Revenue" &&
+                j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j => 
+                    j.JobType == "Revenue" &&
                     j.LastDatePulled == DateTime.Today.AddDays(-1))), 
             Times.Once);
         }
@@ -121,7 +123,8 @@ namespace DatamartManagementService.Test.Importer
             await detailedRevenueImporter.ImportRevenueData();
 
             detailedRevenueRepo.Verify(d =>
-                d.AddRevenueFromServices(It.Is<List<RofRevenueFromServicesCompletedByDate>>(lr => lr[0].EmployeeId == 1 &&
+                d.AddRevenueFromServices(It.Is<List<RofRevenueFromServicesCompletedByDate>>(lr => 
+                    lr[0].EmployeeId == 1 &&
                     lr[0].EmployeeFirstName == "John" &&
                     lr[0].EmployeeLastName == "Doe" &&
                     lr[0].EmployeePay == 23 &&
@@ -134,7 +137,8 @@ namespace DatamartManagementService.Test.Importer
             Times.Once);
 
             jobExecutionHistoryRepo.Verify(j =>
-                j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j => j.JobType == "Revenue" &&
+                j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j => 
+                    j.JobType == "Revenue" &&
                     j.LastDatePulled == DateTime.Today.AddDays(-1))),
             Times.Once);
         }
