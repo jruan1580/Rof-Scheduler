@@ -29,8 +29,8 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
             using var context = new RofSchedulerContext();
 
             return await context.JobEvent
-                .Where(j => j.EventStartTime.Date > startDate.Date
-                    && j.EventEndTime.Date <= endDate.Date
+                .Where(j => j.EventStartTime > startDate
+                    && j.EventEndTime <= endDate
                     && j.Completed == true)
                 .ToListAsync();
         }
