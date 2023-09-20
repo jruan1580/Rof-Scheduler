@@ -7,11 +7,11 @@ namespace DatamartManagementService.Domain
 {
     public class ImportRevenueDataBackgroundService : BackgroundService
     {
-        private readonly int _hoursInBetweenRun = 12;
-        private readonly IImportRofRevenueFromServicesCompletedByDate _singleRevenueDateImporter;
+        private readonly int _hoursInBetweenRun = 24;
+        private readonly IDetailedRevenueImporter _singleRevenueDateImporter;
 
-        public ImportRevenueDataBackgroundService( 
-            IImportRofRevenueFromServicesCompletedByDate singleRevenueDateImporter)
+        public ImportRevenueDataBackgroundService(
+            IDetailedRevenueImporter singleRevenueDateImporter)
         {
             _singleRevenueDateImporter = singleRevenueDateImporter;
         }
@@ -25,7 +25,7 @@ namespace DatamartManagementService.Domain
                 Console.WriteLine("hello from the job");
 
                 await _singleRevenueDateImporter.ImportRevenueData();
-
+             
                 await Task.Delay(TimeSpan.FromHours(_hoursInBetweenRun), stoppingToken);
             }       
         }

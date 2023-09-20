@@ -9,12 +9,12 @@ using JobEvent = DatamartManagementService.Domain.Models.RofSchedulerModels.JobE
 
 namespace DatamartManagementService.Domain
 {
-    public interface IImportRofRevenueFromServicesCompletedByDate
+    public interface IDetailedRevenueImporter
     {
         Task ImportRevenueData();
     }
 
-    public class DetailedRevenueImporter : ARevenueDataImporter, IImportRofRevenueFromServicesCompletedByDate
+    public class DetailedRevenueImporter : ARevenueDataImporter, IDetailedRevenueImporter
     {
         private readonly IRevenueFromServicesUpsertRepository _singleRevenueUpsertRepo;
         private readonly IJobExecutionHistoryRepository _jobExecutionHistoryRepo;
@@ -30,20 +30,27 @@ namespace DatamartManagementService.Domain
 
         public override async Task ImportRevenueData()
         {
-            var lastExecution = await GetJobExecutionHistory();
+            try
+            {
+                var lastExecution = await GetJobExecutionHistory();
 
-            var yesterday = DateTime.Today.AddDays(-1);
+                var yesterday = DateTime.Today.AddDays(-1);
 
-            var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, yesterday);
+                var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, yesterday);
 
-            var listOfDetailedRofRev = await GetListOfRofRevenueOfCompletedServiceByDate(completedEvents);
+                var listOfDetailedRofRev = await GetListOfRofRevenueOfCompletedServiceByDate(completedEvents);
 
-            var revenueForServicesByDateDbEntity = 
-                RofDatamartMappers.FromCoreRofRevenueFromServicesCompletedByDate(listOfDetailedRofRev);
+                var revenueForServicesByDateDbEntity =
+                    RofDatamartMappers.FromCoreRofRevenueFromServicesCompletedByDate(listOfDetailedRofRev);
 
-            await _singleRevenueUpsertRepo.AddRevenueFromServices(revenueForServicesByDateDbEntity);
+                await _singleRevenueUpsertRepo.AddRevenueFromServices(revenueForServicesByDateDbEntity);
 
-            await AddJobExecutionHistory("Revenue", yesterday);
+                await AddJobExecutionHistory("Revenue", yesterday);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }           
         }
 
         private async Task<JobExecutionHistory> GetJobExecutionHistory()

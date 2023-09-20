@@ -7,20 +7,6 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
 {
-    public interface IRofSchedRepo
-    {
-        Task<Holidays> CheckIfJobDateIsHoliday(DateTime jobDate);
-        Task<List<JobEvent>> GetCompletedServicesBetweenDates(DateTime startDate, DateTime endDate);
-        Task<List<JobEvent>> GetCompletedServicesUpUntilDate(DateTime endDate);
-        Task<Employee> GetEmployeeById(long id);
-        Task<List<Employee>> GetEmployees();
-        Task<HolidayRates> GetHolidayRateByHolidayId(short holidayId);
-        Task<HolidayRates> GetHolidayRateByPetServiceId(short petServiceId);
-        Task<JobEvent> GetJobEventById(int id);
-        Task<PetServices> GetPetServiceById(short id);
-        Task<List<PetServices>> GetPetServices();
-    }
-
     public class RofSchedRepo : IRofSchedRepo
     {
         public async Task<Employee> GetEmployeeById(long id)
@@ -37,7 +23,8 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
             return await context.Employee.ToListAsync();
         }
 
-        public async Task<List<JobEvent>> GetCompletedServicesBetweenDates(DateTime startDate, DateTime endDate)
+        public async Task<List<JobEvent>> GetCompletedServicesBetweenDates(DateTime startDate,
+            DateTime endDate)
         {
             using var context = new RofSchedulerContext();
 
@@ -83,21 +70,25 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
         {
             using var context = new RofSchedulerContext();
 
-            return await context.Holidays.FirstOrDefaultAsync(h => h.HolidayMonth == jobDate.Month && h.HolidayDay == jobDate.Day);
+            return await context.Holidays.FirstOrDefaultAsync(h =>
+                h.HolidayMonth == jobDate.Month &&
+                h.HolidayDay == jobDate.Day);
         }
 
         public async Task<HolidayRates> GetHolidayRateByHolidayId(short holidayId)
         {
             using var context = new RofSchedulerContext();
 
-            return await context.HolidayRates.FirstOrDefaultAsync(r => r.HolidayId == holidayId);
+            return await context.HolidayRates.
+                FirstOrDefaultAsync(r => r.HolidayId == holidayId);
         }
 
         public async Task<HolidayRates> GetHolidayRateByPetServiceId(short petServiceId)
         {
             using var context = new RofSchedulerContext();
 
-            return await context.HolidayRates.FirstOrDefaultAsync(r => r.PetServiceId == petServiceId);
+            return await context.HolidayRates
+                .FirstOrDefaultAsync(r => r.PetServiceId == petServiceId);
         }
     }
 }
