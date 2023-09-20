@@ -16,13 +16,6 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
             return await context.Employee.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<List<Employee>> GetEmployees()
-        {
-            using var context = new RofSchedulerContext();
-
-            return await context.Employee.ToListAsync();
-        }
-
         public async Task<List<JobEvent>> GetCompletedServicesBetweenDates(DateTime startDate,
             DateTime endDate)
         {
@@ -52,20 +45,6 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
             return await context.PetServices.FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<List<PetServices>> GetPetServices()
-        {
-            using var context = new RofSchedulerContext();
-
-            return await context.PetServices.ToListAsync();
-        }
-
-        public async Task<JobEvent> GetJobEventById(int id)
-        {
-            using var context = new RofSchedulerContext();
-
-            return await context.JobEvent.FirstOrDefaultAsync(j => j.Id == id);
-        }
-
         public async Task<Holidays> CheckIfJobDateIsHoliday(DateTime jobDate)
         {
             using var context = new RofSchedulerContext();
@@ -73,14 +52,6 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
             return await context.Holidays.FirstOrDefaultAsync(h =>
                 h.HolidayMonth == jobDate.Month &&
                 h.HolidayDay == jobDate.Day);
-        }
-
-        public async Task<HolidayRates> GetHolidayRateByHolidayId(short holidayId)
-        {
-            using var context = new RofSchedulerContext();
-
-            return await context.HolidayRates.
-                FirstOrDefaultAsync(r => r.HolidayId == holidayId);
         }
 
         public async Task<HolidayRates> GetHolidayRateByPetServiceId(short petServiceId)
