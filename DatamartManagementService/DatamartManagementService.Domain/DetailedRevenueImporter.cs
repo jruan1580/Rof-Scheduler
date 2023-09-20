@@ -49,7 +49,7 @@ namespace DatamartManagementService.Domain
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("Exception: " + ex.Message);
             }           
         }
 

@@ -4,6 +4,8 @@ namespace DatamartManagementService.Domain.Models
 {
     public class RofRevenueFromServicesCompletedByDate
     {
+        public long Id { get; set; }
+
         public long EmployeeId { get; set; }
         
         public string EmployeeFirstName { get; set; }

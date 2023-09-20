@@ -9,6 +9,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
 {
     public partial class EmployeePayrollDetail
     {
+        public long Id { get; set; }
         public long EmployeeId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

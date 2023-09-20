@@ -4,6 +4,8 @@ namespace DatamartManagementService.Domain.Models
 {
     public class EmployeePayroll
     {
+        public long Id { get; set; }
+
         public long EmployeeId { get; set; }
         
         public string FirstName { get; set; }
