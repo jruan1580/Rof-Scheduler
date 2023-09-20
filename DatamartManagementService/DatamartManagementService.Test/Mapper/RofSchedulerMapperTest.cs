@@ -21,7 +21,8 @@ namespace DatamartManagementService.Test.Mapper
                     PetServiceId = 1,
                     EventStartTime = DateTime.Today,
                     EventEndTime = DateTime.Today.AddDays(1),
-                    Completed = true
+                    Completed = true,
+                    LastModifiedDateTime = DateTime.Today.AddDays(-1),
                 }
             };
 
@@ -33,6 +34,7 @@ namespace DatamartManagementService.Test.Mapper
             Assert.AreEqual(entities[0].PetServiceId, core[0].PetServiceId);
             Assert.AreEqual(entities[0].EventStartTime, core[0].EventStartTime);
             Assert.AreEqual(entities[0].EventEndTime, core[0].EventEndTime);
+            Assert.AreEqual(entities[0].LastModifiedDateTime, core[0].LastModifiedDateTime);
         }
 
         [Test]

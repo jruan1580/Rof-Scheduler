@@ -25,7 +25,8 @@ namespace DatamartManagementService.Domain.Mappers.Database
                     PetServiceId = dbJob.PetServiceId,
                     EventStartTime = dbJob.EventStartTime,
                     EventEndTime = dbJob.EventEndTime,
-                    Completed = dbJob.Completed
+                    Completed = dbJob.Completed,
+                    LastModifiedDateTime = dbJob.LastModifiedDateTime
                 });
             }
 

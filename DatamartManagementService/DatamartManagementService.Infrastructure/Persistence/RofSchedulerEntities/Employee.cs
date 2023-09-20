@@ -34,6 +34,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntit
         public string City { get; set; }
         public string State { get; set; }
         public string ZipCode { get; set; }
+        public DateTime LastModifiedDate { get; set; }
 
         public virtual ICollection<JobEvent> JobEvent { get; set; }
     }

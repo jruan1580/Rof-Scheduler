@@ -27,7 +27,8 @@ namespace DatamartManagementService.Test
                 PetServiceId = 1,
                 EventStartTime = new DateTime(2023, 9, 16, 7, 30, 0),
                 EventEndTime = new DateTime(2023, 9, 16, 8, 30, 0),
-                Completed = true
+                Completed = true,
+                LastModifiedDateTime = new DateTime(2023, 9, 17, 8, 0, 0)
             };
         }
 
