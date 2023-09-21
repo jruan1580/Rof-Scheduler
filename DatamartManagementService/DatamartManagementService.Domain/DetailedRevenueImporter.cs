@@ -58,10 +58,7 @@ namespace DatamartManagementService.Domain
 
             foreach(var completed in completedEvents)
             {
-                var revenue = await GetRofRevenueForServicesCompletedByDate(
-                    completed.EmployeeId, 
-                    completed.PetServiceId, 
-                    completed.EventEndTime);
+                var revenue = await GetRofRevenueForServicesCompletedByDate(completed);
 
                 revenueForServiceCompleted.Add(revenue);
             }
@@ -69,18 +66,15 @@ namespace DatamartManagementService.Domain
             return revenueForServiceCompleted;
         }
 
-        private async Task<RofRevenueFromServicesCompletedByDate> GetRofRevenueForServicesCompletedByDate(
-            long employeeId, 
-            short petServiceId, 
-            DateTime revenueDate)
+        private async Task<RofRevenueFromServicesCompletedByDate> GetRofRevenueForServicesCompletedByDate(JobEvent jobEvent)
         {           
             var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
-                await _rofSchedRepo.GetEmployeeById(employeeId));
+                await _rofSchedRepo.GetEmployeeById(jobEvent.EmployeeId));
 
             var petServiceInfo = RofSchedulerMappers.ToCorePetService(
-                await _rofSchedRepo.GetPetServiceById(petServiceId));
+                await _rofSchedRepo.GetPetServiceById(jobEvent.PetServiceId));
 
-            var isHolidayRate = await CheckIfHolidayRate(revenueDate);
+            var isHolidayRate = await CheckIfHolidayRate(jobEvent.EventEndTime);
 
             if (isHolidayRate)
             {
@@ -100,7 +94,7 @@ namespace DatamartManagementService.Domain
                 PetServiceRate = petServiceInfo.Price,
                 IsHolidayRate = isHolidayRate,
                 NetRevenuePostEmployeeCut = netRevenue,
-                RevenueDate = revenueDate
+                RevenueDate = jobEvent.EventEndTime
             };
 
             return rofRevenueForService;
