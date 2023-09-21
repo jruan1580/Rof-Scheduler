@@ -9,6 +9,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
 {
     public partial class RofRevenueFromServicesCompletedByDate
     {
+        public long Id { get; set; }
         public long EmployeeId { get; set; }
         public string EmployeeFirstName { get; set; }
         public string EmployeeLastName { get; set; }

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DatamartManagementService.Domain.Models
 {
     public class RofRevenueByDate
     {
+        public long Id { get; set; }
+
         public DateTime RevenueDate { get; set; }
         
         public short RevenueMonth { get; set; }

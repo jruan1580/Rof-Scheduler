@@ -70,6 +70,10 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntit
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
+                entity.Property(e => e.LastModifiedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.LastName)
                     .IsRequired()
                     .HasMaxLength(25)
@@ -121,13 +125,13 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntit
                     .WithMany(p => p.HolidayRates)
                     .HasForeignKey(d => d.HolidayId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__HolidayRa__Holid__6A1BB7B0");
+                    .HasConstraintName("FK__HolidayRa__Holid__5F691F13");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.HolidayRates)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__HolidayRa__PetSe__69279377");
+                    .HasConstraintName("FK__HolidayRa__PetSe__5E74FADA");
             });
 
             modelBuilder.Entity<Holidays>(entity =>
@@ -152,17 +156,21 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntit
 
                 entity.Property(e => e.EventStartTime).HasColumnType("datetime");
 
+                entity.Property(e => e.LastModifiedDateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.JobEvent)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__Employ__6DEC4894");
+                    .HasConstraintName("FK__JobEvent__Employ__7928F116");
 
                 entity.HasOne(d => d.PetService)
                     .WithMany(p => p.JobEvent)
                     .HasForeignKey(d => d.PetServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__JobEvent__PetSer__6FD49106");
+                    .HasConstraintName("FK__JobEvent__PetSer__7B113988");
             });
 
             modelBuilder.Entity<PetServices>(entity =>

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DatamartManagementService.Domain.Models.RofSchedulerModels
 {
@@ -17,5 +15,7 @@ namespace DatamartManagementService.Domain.Models.RofSchedulerModels
         public DateTime EventEndTime { get; set; }
         
         public bool Completed { get; set; }
+
+        public DateTime LastModifiedDateTime { get; set; }
     }
 }

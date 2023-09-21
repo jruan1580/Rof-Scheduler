@@ -2,7 +2,6 @@
 using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
@@ -41,9 +40,9 @@ namespace DatamartManagementService.Domain
             {
                grosswageEarnedPerService = petService.EmployeeRate * petService.Duration;
             }
-            else if (petService.TimeUnit.ToLower() == "min")
+            else if (petService.TimeUnit.ToLower() == "minutes")
             {
-                var time = petService.Duration / 60; //gets how many of an hour
+                var time = Math.Round((decimal)petService.Duration / 60, 2); //gets how many of an hour
 
                 grosswageEarnedPerService = petService.EmployeeRate * time;
             }

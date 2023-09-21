@@ -8,6 +8,7 @@ END
 
 CREATE TABLE dbo.RofRevenueByDate
 (	
+	Id BIGINT PRIMARY KEY IDENTITY(1,1) NOT NULL,
 	RevenueDate DATE NOT NULL,
 	RevenueMonth SMALLINT NOT NULL,
 	RevenueYear SMALLINT NOT NULL, 

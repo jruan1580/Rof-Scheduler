@@ -8,6 +8,7 @@ END
 
 CREATE TABLE dbo.RofRevenueFromServicesCompletedByDate
 (	
+	Id BIGINT PRIMARY KEY IDENTITY(1,1) NOT NULL,
 	EmployeeId BIGINT NOT NULL,
 	EmployeeFirstName VARCHAR(25) NOT NULL,
 	EmployeeLastName VARCHAR(25) NOT NULL,

@@ -38,8 +38,6 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
         {
             modelBuilder.Entity<EmployeePayroll>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.Property(e => e.EmployeeTotalPay).HasColumnType("decimal(10, 2)");
 
                 entity.Property(e => e.FirstName)
@@ -59,8 +57,6 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
 
             modelBuilder.Entity<EmployeePayrollDetail>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.Property(e => e.EmployeePayForService).HasColumnType("decimal(5, 2)");
 
                 entity.Property(e => e.FirstName)
@@ -90,8 +86,6 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
 
             modelBuilder.Entity<JobExecutionHistory>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.Property(e => e.JobType)
                     .IsRequired()
                     .HasMaxLength(25)
@@ -102,8 +96,6 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
 
             modelBuilder.Entity<RofRevenueByDate>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.Property(e => e.GrossRevenue).HasColumnType("decimal(10, 2)");
 
                 entity.Property(e => e.NetRevenuePostEmployeePay).HasColumnType("decimal(10, 2)");
@@ -113,8 +105,6 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
 
             modelBuilder.Entity<RofRevenueFromServicesCompletedByDate>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.Property(e => e.EmployeeFirstName)
                     .IsRequired()
                     .HasMaxLength(25)
