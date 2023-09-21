@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DatamartManagementService.Infrastructure.RofDatamartRepos
+namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
 {
     public interface IJobExecutionHistoryRepository
     {
@@ -18,7 +18,7 @@ namespace DatamartManagementService.Infrastructure.RofDatamartRepos
             using var context = new RofDatamartContext();
 
             return await context.JobExecutionHistory
-                .Where(j => j.JobType == jobType)
+                .Where(j => j.JobType == jobType.ToLower())
                 .OrderByDescending(j => j.Id)
                 .FirstOrDefaultAsync();
         }

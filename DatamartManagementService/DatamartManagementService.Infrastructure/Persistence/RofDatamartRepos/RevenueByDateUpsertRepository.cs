@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DatamartManagementService.Infrastructure.RofDatamartRepos
+namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
 {
     public interface IRevenueByDateUpsertRepository
     {

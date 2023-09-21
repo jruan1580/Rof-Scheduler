@@ -11,7 +11,7 @@ CREATE TABLE dbo.EmployeePayrollDetail
 	EmployeeId BIGINT NOT NULL,
 	FirstName VARCHAR(25) NOT NULL,
 	LastName VARCHAR(25) NOT NULL,
-	PetServiceId BIGINT NOT NULL,
+	PetServiceId SMALLINT NOT NULL,
 	PetServiceName VARCHAR(255) NOT NULL,
 	EmployeePayForService DECIMAL(5,2) NOT NULL,
 	IsHolidayPay BIT NOT NULL,

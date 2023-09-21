@@ -5,13 +5,15 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public class ImportRevenueDataJob : BackgroundService
+    public class ImportRevenueDataBackgroundService : BackgroundService
     {
         private readonly int _hoursInBetweenRun = 12;
+        private readonly IImportRofRevenueFromServicesCompletedByDate _singleRevenueDateImporter;
 
-        public ImportRevenueDataJob()
+        public ImportRevenueDataBackgroundService( 
+            IImportRofRevenueFromServicesCompletedByDate singleRevenueDateImporter)
         {
-
+            _singleRevenueDateImporter = singleRevenueDateImporter;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -21,6 +23,8 @@ namespace DatamartManagementService.Domain
             {
                 //TODO: import data
                 Console.WriteLine("hello from the job");
+
+                await _singleRevenueDateImporter.ImportRevenueData();
 
                 await Task.Delay(TimeSpan.FromHours(_hoursInBetweenRun), stoppingToken);
             }       
