@@ -1,11 +1,11 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
 using DatamartManagementService.Domain.Models;
+using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using JobEvent = DatamartManagementService.Domain.Models.RofSchedulerModels.JobEvent;
 
 namespace DatamartManagementService.Domain
 {
@@ -14,21 +14,19 @@ namespace DatamartManagementService.Domain
         Task ImportRevenueData();
     }
 
-    public class DetailedRevenueImporter : ARevenueDataImporter, IDetailedRevenueImporter
+    public class DetailedRevenueImporter : DetailedDataImporter, IDetailedRevenueImporter
     {
-        private readonly IRevenueFromServicesUpsertRepository _singleRevenueUpsertRepo;
-        private readonly IJobExecutionHistoryRepository _jobExecutionHistoryRepo;
+        private readonly IRevenueFromServicesUpsertRepository _detailedRevenueUpsertRepo;
 
         public DetailedRevenueImporter(IRofSchedRepo rofSchedRepo,
-            IRevenueFromServicesUpsertRepository singleRevenueUpsertRepo,
+            IRevenueFromServicesUpsertRepository detailedRevenueUpsertRepo,
             IJobExecutionHistoryRepository jobExecutionHistoryRepo)
-        : base(rofSchedRepo)
+        : base(rofSchedRepo, jobExecutionHistoryRepo)
         {
-            _singleRevenueUpsertRepo = singleRevenueUpsertRepo;
-            _jobExecutionHistoryRepo = jobExecutionHistoryRepo;
+            _detailedRevenueUpsertRepo = detailedRevenueUpsertRepo;
         }
 
-        public override async Task ImportRevenueData()
+        public async Task ImportRevenueData()
         {
             try
             {
@@ -43,7 +41,7 @@ namespace DatamartManagementService.Domain
                 var revenueForServicesByDateDbEntity =
                     RofDatamartMappers.FromCoreRofRevenueFromServicesCompletedByDate(listOfDetailedRofRev);
 
-                await _singleRevenueUpsertRepo.AddRevenueFromServices(revenueForServicesByDateDbEntity);
+                await _detailedRevenueUpsertRepo.AddRevenueFromServices(revenueForServicesByDateDbEntity);
 
                 await AddJobExecutionHistory("Revenue", yesterday);
             }
@@ -51,33 +49,6 @@ namespace DatamartManagementService.Domain
             {
                 Console.WriteLine("Exception: " + ex.Message);
             }           
-        }
-
-        private async Task<JobExecutionHistory> GetJobExecutionHistory()
-        {
-            var executionHistory = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType("revenue");
-
-            if(executionHistory == null)
-            {
-                return null;
-            }
-
-            return RofDatamartMappers.ToCoreJobExecutionHistory(executionHistory);
-        }
-
-        private async Task<List<JobEvent>> GetCompletedJobEventsBetweenDate(JobExecutionHistory jobExecution, DateTime endDate)
-        {
-            var jobEvents = new List<Infrastructure.Persistence.RofSchedulerEntities.JobEvent>();
-
-            if (jobExecution == null)
-            {
-                jobEvents = await _rofSchedRepo.GetCompletedServicesUpUntilDate(endDate);
-                return RofSchedulerMappers.ToCoreJobEvents(jobEvents);
-            }
-
-            jobEvents = await _rofSchedRepo.GetCompletedServicesBetweenDates(jobExecution.LastDatePulled, endDate);
-
-            return RofSchedulerMappers.ToCoreJobEvents(jobEvents);
         }
 
         private async Task<List<RofRevenueFromServicesCompletedByDate>> GetListOfRofRevenueOfCompletedServiceByDate(
@@ -135,23 +106,11 @@ namespace DatamartManagementService.Domain
             return rofRevenueForService;
         }
 
-        private async Task<bool> CheckIfHolidayRate(DateTime revenueDate)
+        private decimal CalculateNetRevenueForCompletedService(PetServices petService)
         {
-            var isHoliday = await _rofSchedRepo.CheckIfJobDateIsHoliday(revenueDate);
+            var pay = CalculatePayForCompletedService(petService);
 
-            return isHoliday != null;
-        }
-
-        private async Task AddJobExecutionHistory(string jobType, DateTime lastDatePulled)
-        {
-            var newExecution = new JobExecutionHistory()
-            {
-                JobType = jobType,
-                LastDatePulled = lastDatePulled
-            };
-
-            await _jobExecutionHistoryRepo.AddJobExecutionHistory(
-                RofDatamartMappers.FromCoreJobExecutionHistory(newExecution));
+            return petService.Price - pay;
         }
     }
 }

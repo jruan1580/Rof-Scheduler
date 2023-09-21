@@ -5,24 +5,25 @@ using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public class DetailedPayrollImporter
+    public interface IDetailedPayrollImporter
     {
-        private readonly IRofSchedRepo _rofSchedRepo;
+        Task ImportPayrollData();
+    }
+
+    public class DetailedPayrollImporter : DetailedDataImporter, IDetailedPayrollImporter
+    {
         private readonly IPayrollDetailUpsertRepository _payrollDetailUpsertRepo;
-        private readonly IJobExecutionHistoryRepository _jobExecutionHistoryRepo;
 
         public DetailedPayrollImporter(IRofSchedRepo rofSchedRepo,
-            IPayrollDetailUpsertRepository payrollDetailUpsertRepo, 
+            IPayrollDetailUpsertRepository payrollDetailUpsertRepo,
             IJobExecutionHistoryRepository jobExecutionHistoryRepo)
+        : base(rofSchedRepo, jobExecutionHistoryRepo)
         {
-            _rofSchedRepo = rofSchedRepo;
             _payrollDetailUpsertRepo = payrollDetailUpsertRepo;
-            _jobExecutionHistoryRepo = jobExecutionHistoryRepo;
         }
 
         public async Task ImportPayrollData()
@@ -44,37 +45,10 @@ namespace DatamartManagementService.Domain
 
                 await AddJobExecutionHistory("Payroll", yesterday);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Exception: " + ex.Message);
             }
-        }
-
-        private async Task<JobExecutionHistory> GetJobExecutionHistory()
-        {
-            var executionHistory = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType("revenue");
-
-            if (executionHistory == null)
-            {
-                return null;
-            }
-
-            return RofDatamartMappers.ToCoreJobExecutionHistory(executionHistory);
-        }
-
-        private async Task<List<JobEvent>> GetCompletedJobEventsBetweenDate(JobExecutionHistory jobExecution, DateTime endDate)
-        {
-            var jobEvents = new List<Infrastructure.Persistence.RofSchedulerEntities.JobEvent>();
-
-            if (jobExecution == null)
-            {
-                jobEvents = await _rofSchedRepo.GetCompletedServicesUpUntilDate(endDate);
-                return RofSchedulerMappers.ToCoreJobEvents(jobEvents);
-            }
-
-            jobEvents = await _rofSchedRepo.GetCompletedServicesBetweenDates(jobExecution.LastDatePulled, endDate);
-
-            return RofSchedulerMappers.ToCoreJobEvents(jobEvents);
         }
 
         private async Task<List<EmployeePayrollDetail>> GetListOfEmployeePayrollDetails(
@@ -104,10 +78,10 @@ namespace DatamartManagementService.Domain
 
             if (isHolidayRate)
             {
-                //UpdateToHolidayPayRate
+                await UpdateToHolidayPayRate(petServiceInfo);
             }
 
-            var employeePay = 0m;
+            var employeePay = CalculatePayForCompletedService(petServiceInfo);
 
             var payrollDetail = new EmployeePayrollDetail()
             {
@@ -120,31 +94,12 @@ namespace DatamartManagementService.Domain
                 ServiceDuration = petServiceInfo.Duration,
                 ServiceDurationTimeUnit = petServiceInfo.TimeUnit,
                 IsHolidayPay = isHolidayRate,
-                JobEventId = 0,
+                JobEventId = jobEvent.Id,
                 ServiceStartDateTime = jobEvent.EventStartTime,
                 ServiceEndDateTime = jobEvent.EventEndTime
             };
 
             return payrollDetail;
-        }
-
-        private async Task<bool> CheckIfHolidayRate(DateTime revenueDate)
-        {
-            var isHoliday = await _rofSchedRepo.CheckIfJobDateIsHoliday(revenueDate);
-
-            return isHoliday != null;
-        }
-
-        private async Task AddJobExecutionHistory(string jobType, DateTime lastDatePulled)
-        {
-            var newExecution = new JobExecutionHistory()
-            {
-                JobType = jobType,
-                LastDatePulled = lastDatePulled
-            };
-
-            await _jobExecutionHistoryRepo.AddJobExecutionHistory(
-                RofDatamartMappers.FromCoreJobExecutionHistory(newExecution));
         }
     }
 }
