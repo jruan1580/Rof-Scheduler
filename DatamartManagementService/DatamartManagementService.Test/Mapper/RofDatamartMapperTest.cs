@@ -43,6 +43,43 @@ namespace DatamartManagementService.Test.Mapper
         }
 
         [Test]
+        public void FromCoreEmployeePayrollDetailTest()
+        {
+            var core = new List<EmployeePayrollDetail>()
+            {
+                new EmployeePayrollDetail()
+                {
+                    EmployeeId = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmployeePayForService = 15,
+                    PetServiceId = 1,
+                    PetServiceName = "Walking",
+                    ServiceDuration = 30,
+                    ServiceDurationTimeUnit = "minutes",
+                    IsHolidayPay = false,
+                    ServiceStartDateTime = DateTime.Today,
+                    ServiceEndDateTime = DateTime.Today
+                }
+            };
+
+            var entity = RofDatamartMappers.FromCoreEmployeePayrollDetail(core);
+
+            Assert.IsNotNull(entity);
+            Assert.AreEqual(entity[0].EmployeeId, core[0].EmployeeId);
+            Assert.AreEqual(entity[0].FirstName, core[0].FirstName);
+            Assert.AreEqual(entity[0].LastName, core[0].LastName);
+            Assert.AreEqual(entity[0].EmployeePayForService, core[0].EmployeePayForService);
+            Assert.AreEqual(entity[0].PetServiceId, core[0].PetServiceId);
+            Assert.AreEqual(entity[0].PetServiceName, core[0].PetServiceName);
+            Assert.AreEqual(entity[0].ServiceDuration, core[0].ServiceDuration);
+            Assert.AreEqual(entity[0].ServiceDurationTimeUnit, core[0].ServiceDurationTimeUnit);
+            Assert.AreEqual(entity[0].IsHolidayPay, core[0].IsHolidayPay);
+            Assert.AreEqual(entity[0].ServiceStartDateTime, core[0].ServiceStartDateTime);
+            Assert.AreEqual(entity[0].ServiceEndDateTime, core[0].ServiceEndDateTime);
+        }
+
+        [Test]
         public void ToCoreJobExecutionHistoryTest()
         {
             var entity = new Infrastructure.Persistence.RofDatamartEntities.JobExecutionHistory()
