@@ -18,6 +18,7 @@ namespace DataMart
             services.AddDatabaseDependencies();
 
             services.AddHostedService<ImportRevenueDataBackgroundService>();
+            services.AddHostedService<ImportPayrollDataBackgroundService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

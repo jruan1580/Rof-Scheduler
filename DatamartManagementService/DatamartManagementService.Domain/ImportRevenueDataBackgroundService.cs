@@ -8,12 +8,12 @@ namespace DatamartManagementService.Domain
     public class ImportRevenueDataBackgroundService : BackgroundService
     {
         private readonly int _hoursInBetweenRun = 24;
-        private readonly IDetailedRevenueImporter _singleRevenueDateImporter;
+        private readonly IDetailedRevenueImporter _detailedRevenueImporter;
 
         public ImportRevenueDataBackgroundService(
-            IDetailedRevenueImporter singleRevenueDateImporter)
+            IDetailedRevenueImporter detailedRevenueImporter)
         {
-            _singleRevenueDateImporter = singleRevenueDateImporter;
+            _detailedRevenueImporter = detailedRevenueImporter;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -22,9 +22,9 @@ namespace DatamartManagementService.Domain
             while (!stoppingToken.IsCancellationRequested)
             {
                 //TODO: import data
-                Console.WriteLine("hello from the job");
+                Console.WriteLine("hello from revenue job");
 
-                await _singleRevenueDateImporter.ImportRevenueData();
+                await _detailedRevenueImporter.ImportRevenueData();
              
                 await Task.Delay(TimeSpan.FromHours(_hoursInBetweenRun), stoppingToken);
             }       
