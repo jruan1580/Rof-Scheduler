@@ -21,9 +21,9 @@ namespace DatamartManagementService.Domain
             _jobExecutionHistoryRepo = jobExecutionHistoryRepo;
         }
 
-        protected async Task<JobExecutionHistory> GetJobExecutionHistory()
+        protected async Task<JobExecutionHistory> GetJobExecutionHistory(string jobType)
         {
-            var executionHistory = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType("revenue");
+            var executionHistory = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType(jobType);
 
             if (executionHistory == null)
             {
@@ -61,24 +61,6 @@ namespace DatamartManagementService.Domain
                     await _rofSchedRepo.GetHolidayRateByPetServiceId(petService.Id));
 
             petService.EmployeeRate = holidayRate.HolidayRate;
-        }
-
-        protected decimal CalculatePayForCompletedService(PetServices petService)
-        {
-            var grosswageEarnedPerService = 0m;
-
-            if (petService.TimeUnit.ToLower() == "hour")
-            {
-                grosswageEarnedPerService = petService.EmployeeRate * petService.Duration;
-            }
-            else if (petService.TimeUnit.ToLower() == "minutes")
-            {
-                var time = Math.Round((decimal)petService.Duration / 60, 2); //gets how many of an hour
-
-                grosswageEarnedPerService = petService.EmployeeRate * time;
-            }
-
-            return grosswageEarnedPerService;
         }
 
         protected async Task AddJobExecutionHistory(string jobType, DateTime lastDatePulled)

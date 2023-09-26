@@ -30,7 +30,7 @@ namespace DatamartManagementService.Domain
         {
             try
             {
-                var lastExecution = await GetJobExecutionHistory();
+                var lastExecution = await GetJobExecutionHistory("payroll");
 
                 var yesterday = DateTime.Today.AddDays(-1);
 
@@ -81,14 +81,12 @@ namespace DatamartManagementService.Domain
                 await UpdateToHolidayPayRate(petServiceInfo);
             }
 
-            var employeePay = CalculatePayForCompletedService(petServiceInfo);
-
             var payrollDetail = new EmployeePayrollDetail()
             {
                 EmployeeId = employeeInfo.Id,
                 FirstName = employeeInfo.FirstName,
                 LastName = employeeInfo.LastName,
-                EmployeePayForService = employeePay,
+                EmployeePayForService = petServiceInfo.EmployeeRate,
                 PetServiceId = petServiceInfo.Id,
                 PetServiceName = petServiceInfo.ServiceName,
                 ServiceDuration = petServiceInfo.Duration,

@@ -30,7 +30,7 @@ namespace DatamartManagementService.Domain
         {
             try
             {
-                var lastExecution = await GetJobExecutionHistory();
+                var lastExecution = await GetJobExecutionHistory("revenue");
 
                 var yesterday = DateTime.Today.AddDays(-1);
 
@@ -102,9 +102,7 @@ namespace DatamartManagementService.Domain
 
         private decimal CalculateNetRevenueForCompletedService(PetServices petService)
         {
-            var pay = CalculatePayForCompletedService(petService);
-
-            return petService.Price - pay;
+            return petService.Price - petService.EmployeeRate;
         }
     }
 }
