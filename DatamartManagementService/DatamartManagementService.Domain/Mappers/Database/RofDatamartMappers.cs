@@ -50,6 +50,7 @@ namespace DatamartManagementService.Domain.Mappers.Database
                     PetServiceName = corePayroll.PetServiceName,
                     ServiceDuration = corePayroll.ServiceDuration,
                     ServiceDurationTimeUnit = corePayroll.ServiceDurationTimeUnit,
+                    JobEventId = corePayroll.JobEventId,
                     IsHolidayPay = corePayroll.IsHolidayPay,
                     ServiceStartDateTime = corePayroll.ServiceStartDateTime,
                     ServiceEndDateTime = corePayroll.ServiceEndDateTime
