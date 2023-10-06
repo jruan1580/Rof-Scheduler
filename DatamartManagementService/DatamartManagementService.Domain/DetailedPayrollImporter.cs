@@ -32,9 +32,7 @@ namespace DatamartManagementService.Domain
             {
                 var lastExecution = await GetJobExecutionHistory("payroll");
 
-                var yesterday = DateTime.Today.AddDays(-1);
-
-                var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, yesterday);
+                var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, DateTime.Today);
 
                 var listOfPayrollDetails = await GetListOfEmployeePayrollDetails(completedEvents);
 
@@ -43,7 +41,7 @@ namespace DatamartManagementService.Domain
 
                 await _payrollDetailUpsertRepo.AddEmployeePayrollDetail(listOfDbPayrollDetails);
 
-                await AddJobExecutionHistory("Payroll", yesterday);
+                await AddJobExecutionHistory("Payroll", DateTime.Today);
             }
             catch (Exception ex)
             {
