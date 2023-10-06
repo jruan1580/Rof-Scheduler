@@ -1,19 +1,27 @@
 ﻿using DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DatamartManagementService.Test
 {
     public static class EntityCreator
     {
-        public static JobExecutionHistory GetDbJobExecutionHistory()
+        public static JobExecutionHistory GetDbJobExecutionHistoryRevenue()
         {
             return new JobExecutionHistory()
             {
                 Id = 1,
                 JobType = "Revenue",
+                LastDatePulled = new DateTime(2023, 9, 15)
+            };
+        }
+
+        public static JobExecutionHistory GetDbJobExecutionHistoryPayroll()
+        {
+            return new JobExecutionHistory()
+            {
+                Id = 1,
+                JobType = "Payroll",
                 LastDatePulled = new DateTime(2023, 9, 15)
             };
         }

@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 namespace DatamartManagementService.Test.Importer
 {
     [TestFixture]
-    public class DetailedRevenueImporterTest
+    public class DetailedPayrollImporterTest
     {
         [Test]
-        public async Task ImportRevenueData_NoExecutionHistory()
+        public async Task ImportPayrollData_NoExecutionHistory()
         {
             var rofSchedulerRepo = new Mock<IRofSchedRepo>();
-            var detailedRevenueRepo = new Mock<IRevenueFromServicesUpsertRepository>();
+            var detailedPayrollRepo = new Mock<IPayrollDetailUpsertRepository>();
             var jobExecutionHistoryRepo = new Mock<IJobExecutionHistoryRepository>();
 
             var jobEvents = new List<JobEvent>()
@@ -44,42 +44,43 @@ namespace DatamartManagementService.Test.Importer
             rofSchedulerRepo.Setup(r => r.CheckIfJobDateIsHoliday(It.IsAny<DateTime>()))
                 .ReturnsAsync((Holidays)null);
 
-            detailedRevenueRepo.Setup(d => d.AddRevenueFromServices(It.IsAny<List<RofRevenueFromServicesCompletedByDate>>()))
+            detailedPayrollRepo.Setup(d => d.AddEmployeePayrollDetail(It.IsAny<List<EmployeePayrollDetail>>()))
                 .Returns(Task.CompletedTask);
 
             jobExecutionHistoryRepo.Setup(j => j.AddJobExecutionHistory(It.IsAny<JobExecutionHistory>()))
                 .Returns(Task.CompletedTask);
 
-            var detailedRevenueImporter = new DetailedRevenueImporter(rofSchedulerRepo.Object, detailedRevenueRepo.Object, jobExecutionHistoryRepo.Object);
+            var detailedPayrollImporter = new DetailedPayrollImporter(rofSchedulerRepo.Object, detailedPayrollRepo.Object, jobExecutionHistoryRepo.Object);
 
-            await detailedRevenueImporter.ImportRevenueData();
+            await detailedPayrollImporter.ImportPayrollData();
 
-            detailedRevenueRepo.Verify(d => 
-                d.AddRevenueFromServices(It.Is<List<RofRevenueFromServicesCompletedByDate>>(lr => 
-                    lr[0].EmployeeId == 1 &&
-                    lr[0].EmployeeFirstName == "John" && 
-                    lr[0].EmployeeLastName == "Doe" && 
-                    lr[0].EmployeePay == 15 &&
-                    lr[0].PetServiceId == 1 && 
-                    lr[0].PetServiceName == "Walking" && 
-                    lr[0].PetServiceRate == 25 && 
-                    lr[0].IsHolidayRate == false && 
-                    lr[0].NetRevenuePostEmployeeCut == 10 && 
-                    lr[0].RevenueDate == new DateTime(2023, 9, 16, 8, 30, 0))), 
+            detailedPayrollRepo.Verify(d =>
+                d.AddEmployeePayrollDetail(It.Is<List<EmployeePayrollDetail>>(p =>
+                    p[0].EmployeeId == 1 &&
+                    p[0].FirstName == "John" &&
+                    p[0].LastName == "Doe" &&
+                    p[0].EmployeePayForService == 15 &&
+                    p[0].PetServiceId == 1 &&
+                    p[0].PetServiceName == "Walking" &&
+                    p[0].ServiceDuration == 1 &&
+                    p[0].ServiceDurationTimeUnit == "Hour" &&
+                    p[0].IsHolidayPay == false &&
+                    p[0].ServiceStartDateTime == new DateTime(2023, 9, 16, 7, 30, 0) &&
+                    p[0].ServiceEndDateTime == new DateTime(2023, 9, 16, 8, 30, 0))),
             Times.Once);
 
-            jobExecutionHistoryRepo.Verify(j => 
-                j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j => 
-                    j.JobType == "Revenue" &&
-                    j.LastDatePulled == DateTime.Today.AddDays(-1))), 
+            jobExecutionHistoryRepo.Verify(j =>
+                j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j =>
+                    j.JobType == "Payroll" &&
+                    j.LastDatePulled == DateTime.Today.AddDays(-1))),
             Times.Once);
         }
 
         [Test]
-        public async Task ImportRevenueData_HasExecutionHistory()
+        public async Task ImportPayrollData_HasExecutionHistory()
         {
             var rofSchedulerRepo = new Mock<IRofSchedRepo>();
-            var detailedRevenueRepo = new Mock<IRevenueFromServicesUpsertRepository>();
+            var detailedPayrollRepo = new Mock<IPayrollDetailUpsertRepository>();
             var jobExecutionHistoryRepo = new Mock<IJobExecutionHistoryRepository>();
 
             var jobEvents = new List<JobEvent>()
@@ -89,9 +90,7 @@ namespace DatamartManagementService.Test.Importer
 
             var employee = EntityCreator.GetDbEmployee();
             var petService = EntityCreator.GetDbPetService();
-            var lastExecution = EntityCreator.GetDbJobExecutionHistoryRevenue();
-            var holiday = EntityCreator.GetDbHoliday();
-            var holidayRate = EntityCreator.GetDbHolidayRates();
+            var lastExecution = EntityCreator.GetDbJobExecutionHistoryPayroll();
 
             jobExecutionHistoryRepo.Setup(j => j.GetJobExecutionHistoryByJobType(It.IsAny<string>()))
                 .ReturnsAsync(lastExecution);
@@ -106,38 +105,36 @@ namespace DatamartManagementService.Test.Importer
                 .ReturnsAsync(petService);
 
             rofSchedulerRepo.Setup(r => r.CheckIfJobDateIsHoliday(It.IsAny<DateTime>()))
-                .ReturnsAsync(holiday);
+                .ReturnsAsync((Holidays)null);
 
-            rofSchedulerRepo.Setup(r => r.GetHolidayRateByPetServiceId(It.IsAny<short>()))
-                .ReturnsAsync(holidayRate);
-
-            detailedRevenueRepo.Setup(d => d.AddRevenueFromServices(It.IsAny<List<RofRevenueFromServicesCompletedByDate>>()))
+            detailedPayrollRepo.Setup(d => d.AddEmployeePayrollDetail(It.IsAny<List<EmployeePayrollDetail>>()))
                 .Returns(Task.CompletedTask);
 
             jobExecutionHistoryRepo.Setup(j => j.AddJobExecutionHistory(It.IsAny<JobExecutionHistory>()))
                 .Returns(Task.CompletedTask);
 
-            var detailedRevenueImporter = new DetailedRevenueImporter(rofSchedulerRepo.Object, detailedRevenueRepo.Object, jobExecutionHistoryRepo.Object);
+            var detailedPayrollImporter = new DetailedPayrollImporter(rofSchedulerRepo.Object, detailedPayrollRepo.Object, jobExecutionHistoryRepo.Object);
 
-            await detailedRevenueImporter.ImportRevenueData();
+            await detailedPayrollImporter.ImportPayrollData();
 
-            detailedRevenueRepo.Verify(d =>
-                d.AddRevenueFromServices(It.Is<List<RofRevenueFromServicesCompletedByDate>>(lr => 
-                    lr[0].EmployeeId == 1 &&
-                    lr[0].EmployeeFirstName == "John" &&
-                    lr[0].EmployeeLastName == "Doe" &&
-                    lr[0].EmployeePay == 23 &&
-                    lr[0].PetServiceId == 1 &&
-                    lr[0].PetServiceName == "Walking" &&
-                    lr[0].PetServiceRate == 25 &&
-                    lr[0].IsHolidayRate == true &&
-                    lr[0].NetRevenuePostEmployeeCut == 2 &&
-                    lr[0].RevenueDate == new DateTime(2023, 9, 16, 8, 30, 0))),
+            detailedPayrollRepo.Verify(d =>
+                d.AddEmployeePayrollDetail(It.Is<List<EmployeePayrollDetail>>(p =>
+                    p[0].EmployeeId == 1 &&
+                    p[0].FirstName == "John" &&
+                    p[0].LastName == "Doe" &&
+                    p[0].EmployeePayForService == 15 &&
+                    p[0].PetServiceId == 1 &&
+                    p[0].PetServiceName == "Walking" &&
+                    p[0].ServiceDuration == 1 &&
+                    p[0].ServiceDurationTimeUnit == "Hour" &&
+                    p[0].IsHolidayPay == false &&
+                    p[0].ServiceStartDateTime == new DateTime(2023, 9, 16, 7, 30, 0) &&
+                    p[0].ServiceEndDateTime == new DateTime(2023, 9, 16, 8, 30, 0))),
             Times.Once);
 
             jobExecutionHistoryRepo.Verify(j =>
-                j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j => 
-                    j.JobType == "Revenue" &&
+                j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j =>
+                    j.JobType == "Payroll" &&
                     j.LastDatePulled == DateTime.Today.AddDays(-1))),
             Times.Once);
         }

@@ -11,6 +11,7 @@ namespace DataMart
             services.AddSingleton<IRofSchedRepo, RofSchedRepo>();
             services.AddSingleton<IRevenueFromServicesUpsertRepository, RevenueFromServicesUpsertRepository>();
             services.AddSingleton<IJobExecutionHistoryRepository, JobExecutionHistoryRepository>();
+            services.AddSingleton<IPayrollDetailUpsertRepository, PayrollDetailUpsertRepository>();
 
             return services;
         }

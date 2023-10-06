@@ -1,6 +1,8 @@
-﻿using CoreSingleRevenue = DatamartManagementService.Domain.Models.RofRevenueFromServicesCompletedByDate;
+﻿using System.Collections.Generic;
+using CoreSingleRevenue = DatamartManagementService.Domain.Models.RofRevenueFromServicesCompletedByDate;
 using DbSingleRevenue = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate;
-using System.Collections.Generic;
+using CorePayrollDetail = DatamartManagementService.Domain.Models.EmployeePayrollDetail;
+using DbPayrollDetail = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.EmployeePayrollDetail;
 using DbJobExecutionHistory = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.JobExecutionHistory;
 using CoreJobExecutionHistory = DatamartManagementService.Domain.Models.JobExecutionHistory;
 
@@ -30,6 +32,32 @@ namespace DatamartManagementService.Domain.Mappers.Database
             }
 
             return dbSingleRevs;
+        }
+
+        public static List<DbPayrollDetail> FromCoreEmployeePayrollDetail(List<CorePayrollDetail> corePayrollDetail)
+        {
+            var dbPayrollDetail = new List<DbPayrollDetail>();
+
+            foreach (var corePayroll in corePayrollDetail)
+            {
+                dbPayrollDetail.Add(new DbPayrollDetail()
+                {
+                    EmployeeId = corePayroll.EmployeeId,
+                    FirstName = corePayroll.FirstName,
+                    LastName = corePayroll.LastName,
+                    EmployeePayForService = corePayroll.EmployeePayForService,
+                    PetServiceId = corePayroll.PetServiceId,
+                    PetServiceName = corePayroll.PetServiceName,
+                    ServiceDuration = corePayroll.ServiceDuration,
+                    ServiceDurationTimeUnit = corePayroll.ServiceDurationTimeUnit,
+                    JobEventId = corePayroll.JobEventId,
+                    IsHolidayPay = corePayroll.IsHolidayPay,
+                    ServiceStartDateTime = corePayroll.ServiceStartDateTime,
+                    ServiceEndDateTime = corePayroll.ServiceEndDateTime
+                });
+            }
+
+            return dbPayrollDetail;
         }
 
         public static CoreJobExecutionHistory ToCoreJobExecutionHistory(DbJobExecutionHistory dbHistory)
