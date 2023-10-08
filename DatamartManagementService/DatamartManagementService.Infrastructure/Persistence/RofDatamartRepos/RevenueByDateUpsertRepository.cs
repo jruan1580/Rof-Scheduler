@@ -6,17 +6,17 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
 {
     public interface IRevenueByDateUpsertRepository
     {
-        Task AddRevenue(List<RofRevenueByDate> newRevenueByDate);
+        Task AddRevenue(RofRevenueByDate newRevenueByDate);
         Task UpdateRevenue(RofRevenueByDate updateRevenueByDate);
     }
 
     public class RevenueByDateUpsertRepository : IRevenueByDateUpsertRepository
     {
-        public async Task AddRevenue(List<RofRevenueByDate> newRevenueByDate)
+        public async Task AddRevenue(RofRevenueByDate newRevenueByDate)
         {
             using var context = new RofDatamartContext();
 
-            context.RofRevenueByDate.AddRange(newRevenueByDate);
+            context.RofRevenueByDate.Add(newRevenueByDate);
 
             await context.SaveChangesAsync();
         }
