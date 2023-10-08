@@ -5,6 +5,10 @@ using CorePayrollDetail = DatamartManagementService.Domain.Models.EmployeePayrol
 using DbPayrollDetail = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.EmployeePayrollDetail;
 using DbJobExecutionHistory = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.JobExecutionHistory;
 using CoreJobExecutionHistory = DatamartManagementService.Domain.Models.JobExecutionHistory;
+using DbDetailedRevenue = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate;
+using CoreDetailedRevenue = DatamartManagementService.Domain.Models.RofRevenueFromServicesCompletedByDate;
+using DbRevenueSummary = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueByDate;
+using CoreRevenueSummary = DatamartManagementService.Domain.Models.RofRevenueByDate;
 
 namespace DatamartManagementService.Domain.Mappers.Database
 {
@@ -80,6 +84,38 @@ namespace DatamartManagementService.Domain.Mappers.Database
             dbHistory.LastDatePulled = coreHistory.LastDatePulled;
 
             return dbHistory;
+        }
+
+        public static List<CoreDetailedRevenue> ToCoreDetailedRevenue(List<DbDetailedRevenue> dbDetailedRevenues)
+        {
+            var coreDetailedRevenues = new List<CoreDetailedRevenue>();
+
+            foreach(var dbDetailedRevenue in dbDetailedRevenues)
+            {
+                coreDetailedRevenues.Add(new CoreDetailedRevenue
+                {
+                    Id = dbDetailedRevenue.Id,
+                    RevenueDate = dbDetailedRevenue.RevenueDate,
+                    PetServiceRate = dbDetailedRevenue.PetServiceRate,
+                    NetRevenuePostEmployeeCut = dbDetailedRevenue.NetRevenuePostEmployeeCut
+                });
+            } 
+
+            return coreDetailedRevenues;
+        }
+
+        public static DbRevenueSummary FromCoreRevenueSummary(CoreRevenueSummary coreRevenueSummary)
+        {
+            var dbRevenueSummary = new DbRevenueSummary();
+
+            dbRevenueSummary.Id = coreRevenueSummary.Id;
+            dbRevenueSummary.RevenueDate = coreRevenueSummary.RevenueDate;
+            dbRevenueSummary.RevenueMonth = coreRevenueSummary.RevenueMonth;
+            dbRevenueSummary.RevenueYear = coreRevenueSummary.RevenueYear;
+            dbRevenueSummary.GrossRevenue = coreRevenueSummary.GrossRevenue;
+            dbRevenueSummary.NetRevenuePostEmployeePay = coreRevenueSummary.NetRevenuePostEmployeePay;
+
+            return dbRevenueSummary;
         }
     }
 }
