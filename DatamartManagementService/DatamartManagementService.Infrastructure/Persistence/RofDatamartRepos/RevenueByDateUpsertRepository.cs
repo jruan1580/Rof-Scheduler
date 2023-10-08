@@ -1,5 +1,4 @@
 ﻿using DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos

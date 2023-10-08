@@ -1,16 +1,18 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
 using DatamartManagementService.Domain.Models;
-using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
-using DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public class RevenueSummaryImporter
+    public interface IRevenueSummaryImporter
+    {
+        Task ImportRevenueSummary();
+    }
+
+    public class RevenueSummaryImporter : IRevenueSummaryImporter
     {
         private readonly IRevenueByDateUpsertRepository _revenueSummaryUpsertRepo;
         private readonly IJobExecutionHistoryRepository _jobExecutionHistoryRepo;
@@ -35,7 +37,7 @@ namespace DatamartManagementService.Domain
 
                 var detailedRevenues = await GetDetailedRevenueBetweenDates(lastExecution, DateTime.Today);
 
-                var revenueSummary = 
+                var revenueSummary =
                     RofDatamartMappers.FromCoreRevenueSummary(GetRofRevenueByDate(detailedRevenues));
 
                 await _revenueSummaryUpsertRepo.AddRevenue(revenueSummary);
