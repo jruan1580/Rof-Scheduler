@@ -114,5 +114,52 @@ namespace DatamartManagementService.Test.Mapper
             Assert.AreEqual(entity.JobType, core.JobType);
             Assert.AreEqual(entity.LastDatePulled, core.LastDatePulled);
         }
+
+        [Test]
+        public void ToCoreDetailedRevenue()
+        {
+            var entities = new List<Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate>()
+            {
+                new Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate()
+                {
+                    Id = 1,
+                    RevenueDate = DateTime.Today,
+                    PetServiceRate = 20,
+                    NetRevenuePostEmployeeCut = 5
+                }
+            };
+
+            var core = RofDatamartMappers.ToCoreDetailedRevenue(entities);
+
+            Assert.IsNotNull(entities[0]);
+            Assert.AreEqual(entities[0].Id, core[0].Id);
+            Assert.AreEqual(entities[0].RevenueDate, core[0].RevenueDate);
+            Assert.AreEqual(entities[0].PetServiceRate, core[0].PetServiceRate);
+            Assert.AreEqual(entities[0].NetRevenuePostEmployeeCut, core[0].NetRevenuePostEmployeeCut);
+        }
+
+        [Test]
+        public void FromCoreRevenueSummary()
+        {
+            var core = new RofRevenueByDate()
+            {
+                Id = 1,
+                RevenueDate = DateTime.Today,
+                RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
+                RevenueYear = Convert.ToInt16(DateTime.Today.Year),
+                GrossRevenue = 2000,
+                NetRevenuePostEmployeePay = 1500
+            };
+
+            var entity = RofDatamartMappers.FromCoreRevenueSummary(core);
+
+            Assert.IsNotNull(entity);
+            Assert.AreEqual(entity.Id, core.Id);
+            Assert.AreEqual(entity.RevenueDate, core.RevenueDate);
+            Assert.AreEqual(entity.RevenueMonth, core.RevenueMonth);
+            Assert.AreEqual(entity.RevenueYear, core.RevenueYear);
+            Assert.AreEqual(entity.GrossRevenue, core.GrossRevenue);
+            Assert.AreEqual(entity.NetRevenuePostEmployeePay, core.NetRevenuePostEmployeePay);
+        }
     }
 }
