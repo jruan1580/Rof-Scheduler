@@ -31,9 +31,7 @@ namespace DatamartManagementService.Domain
         {
             try
             {
-                var history = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType("revenue summary");
-
-                var lastExecution = RofDatamartMappers.ToCoreJobExecutionHistory(history);
+                var lastExecution = await GetJobExecutionHistory("revenue summary");
 
                 var detailedRevenues = await GetDetailedRevenueBetweenDates(lastExecution, DateTime.Today);
 
@@ -105,6 +103,18 @@ namespace DatamartManagementService.Domain
             }
 
             return totalNetRevenue;
+        }
+
+        private async Task<JobExecutionHistory> GetJobExecutionHistory(string jobType)
+        {
+            var executionHistory = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType(jobType);
+
+            if (executionHistory == null)
+            {
+                return null;
+            }
+
+            return RofDatamartMappers.ToCoreJobExecutionHistory(executionHistory);
         }
 
         private async Task AddJobExecutionHistory(string jobType, DateTime lastDatePulled)

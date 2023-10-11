@@ -84,5 +84,16 @@ namespace DatamartManagementService.Test
                 HolidayRate = 23
             };
         }
+
+        public static RofRevenueFromServicesCompletedByDate GetDbDetailedRevenue()
+        {
+            return new RofRevenueFromServicesCompletedByDate()
+            {
+                Id = 1,
+                PetServiceRate = 20,
+                NetRevenuePostEmployeeCut = 5,
+                RevenueDate = new DateTime(2023, 10, 09)
+            };
+        }
     }
 }
