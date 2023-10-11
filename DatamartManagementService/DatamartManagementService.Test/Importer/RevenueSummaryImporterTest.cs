@@ -1,13 +1,10 @@
 ﻿using DatamartManagementService.Domain;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
-using DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities;
-using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Test.Importer
