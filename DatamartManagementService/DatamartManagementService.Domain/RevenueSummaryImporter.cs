@@ -1,6 +1,8 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
 using DatamartManagementService.Domain.Models;
+using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
+using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,19 +14,16 @@ namespace DatamartManagementService.Domain
         Task ImportRevenueSummary();
     }
 
-    public class RevenueSummaryImporter : IRevenueSummaryImporter
+    public class RevenueSummaryImporter : DetailedDataImporter, IRevenueSummaryImporter
     {
         private readonly IRevenueByDateUpsertRepository _revenueSummaryUpsertRepo;
-        private readonly IJobExecutionHistoryRepository _jobExecutionHistoryRepo;
-        private readonly IRevenueFromServicesRetrievalRepository _detailedRevenueRetrievalRepo;
 
-        public RevenueSummaryImporter(IRevenueByDateUpsertRepository revenueSummaryUpsertRepo,
-            IJobExecutionHistoryRepository jobExecutionHistoryRepo,
-            IRevenueFromServicesRetrievalRepository detailedRevenueRetrievalRepo)
+        public RevenueSummaryImporter(IRofSchedRepo rofSchedRepo,
+            IRevenueByDateUpsertRepository revenueSummaryUpsertRepo,
+            IJobExecutionHistoryRepository jobExecutionHistoryRepo)
+        : base(rofSchedRepo, jobExecutionHistoryRepo)
         {
             _revenueSummaryUpsertRepo = revenueSummaryUpsertRepo;
-            _jobExecutionHistoryRepo = jobExecutionHistoryRepo;
-            _detailedRevenueRetrievalRepo = detailedRevenueRetrievalRepo;
         }
 
         public async Task ImportRevenueSummary()
@@ -33,12 +32,13 @@ namespace DatamartManagementService.Domain
             {
                 var lastExecution = await GetJobExecutionHistory("revenue summary");
 
-                var detailedRevenues = await GetDetailedRevenueBetweenDates(lastExecution, DateTime.Today);
+                var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, DateTime.Today);
 
-                var revenueSummary =
-                    RofDatamartMappers.FromCoreRevenueSummary(GetRofRevenueByDate(detailedRevenues));
+                var revenueSummary = await GetRofRevenueByDate(completedEvents);
+                    
+                var dbRevSummary = RofDatamartMappers.FromCoreRevenueSummary(revenueSummary);
 
-                await _revenueSummaryUpsertRepo.AddRevenue(revenueSummary);
+                await _revenueSummaryUpsertRepo.AddRevenue(dbRevSummary);
 
                 await AddJobExecutionHistory("Revenue Summary", DateTime.Today);
             }
@@ -48,10 +48,12 @@ namespace DatamartManagementService.Domain
             }
         }
 
-        private RofRevenueByDate GetRofRevenueByDate(List<RofRevenueFromServicesCompletedByDate> detailedRevenues)
+        private async Task<RofRevenueByDate> GetRofRevenueByDate(List<JobEvent> jobEvents)
         {
-            var totalGrossRevenue = CalculateTotalGrossRevenue(detailedRevenues);
-            var totalNetRevenue = CalculateTotalNetRevenue(detailedRevenues);
+            var petServiceInfo = await GetPetServiceInfo(jobEvents);
+
+            var totalGrossRevenue = CalculateTotalGrossRevenue(petServiceInfo);
+            var totalNetRevenue = CalculateTotalNetRevenue(petServiceInfo);
 
             var rofRevenue = new RofRevenueByDate()
             {
@@ -65,68 +67,52 @@ namespace DatamartManagementService.Domain
             return rofRevenue;
         }
 
-        private async Task<List<RofRevenueFromServicesCompletedByDate>> GetDetailedRevenueBetweenDates(JobExecutionHistory jobExecution, DateTime endDate)
+        private async Task<List<PetServices>> GetPetServiceInfo(List<JobEvent> jobEvents)
         {
-            var detailedRevenue = new List<Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate>();
+            var petServiceInfo = new List<PetServices>();
 
-            if (jobExecution == null)
+            foreach(var job in jobEvents)
             {
-                detailedRevenue = await _detailedRevenueRetrievalRepo.GetDetailedRevenueUpUntilDate(endDate);
+                var dbService = await _rofSchedRepo.GetPetServiceById(job.PetServiceId);
 
-                return RofDatamartMappers.ToCoreDetailedRevenue(detailedRevenue);
+                var petService = RofSchedulerMappers.ToCorePetService(dbService);
+
+                var isHolidayRate = await CheckIfHolidayRate(job.EventEndTime);
+
+                if (isHolidayRate)
+                {
+                    await UpdateToHolidayPayRate(petService);
+                }
+
+                petServiceInfo.Add(petService);
             }
 
-            detailedRevenue = await _detailedRevenueRetrievalRepo.GetDetailedRevenueBetweenDates(jobExecution.LastDatePulled, endDate);
-
-            return RofDatamartMappers.ToCoreDetailedRevenue(detailedRevenue);
+            return petServiceInfo;
         }
 
-        private decimal CalculateTotalGrossRevenue(List<RofRevenueFromServicesCompletedByDate> detailedRevenues)
+        private decimal CalculateTotalGrossRevenue(List<PetServices> petServices)
         {
             var totalGrossRevenue = 0m;
 
-            foreach (var revenue in detailedRevenues)
+            foreach (var service in petServices)
             {
-                totalGrossRevenue += revenue.PetServiceRate;
+                totalGrossRevenue += service.Price;
             }
 
             return totalGrossRevenue;
         }
 
-        private decimal CalculateTotalNetRevenue(List<RofRevenueFromServicesCompletedByDate> detailedRevenues)
+        private decimal CalculateTotalNetRevenue(List<PetServices> petServices)
         {
             var totalNetRevenue = 0m;
 
-            foreach (var revenue in detailedRevenues)
+            foreach (var service in petServices)
             {
-                totalNetRevenue += revenue.NetRevenuePostEmployeeCut;
+                var netRev = service.Price - service.EmployeeRate;
+                totalNetRevenue += netRev;
             }
 
             return totalNetRevenue;
-        }
-
-        private async Task<JobExecutionHistory> GetJobExecutionHistory(string jobType)
-        {
-            var executionHistory = await _jobExecutionHistoryRepo.GetJobExecutionHistoryByJobType(jobType);
-
-            if (executionHistory == null)
-            {
-                return null;
-            }
-
-            return RofDatamartMappers.ToCoreJobExecutionHistory(executionHistory);
-        }
-
-        private async Task AddJobExecutionHistory(string jobType, DateTime lastDatePulled)
-        {
-            var newExecution = new JobExecutionHistory()
-            {
-                JobType = jobType,
-                LastDatePulled = lastDatePulled
-            };
-
-            await _jobExecutionHistoryRepo.AddJobExecutionHistory(
-                RofDatamartMappers.FromCoreJobExecutionHistory(newExecution));
         }
     }
 }
