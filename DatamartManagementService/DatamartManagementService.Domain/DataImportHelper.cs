@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public class DetailedDataImporter
+    public class DataImportHelper
     {
         protected readonly IRofSchedRepo _rofSchedRepo;
         protected readonly IJobExecutionHistoryRepository _jobExecutionHistoryRepo;
 
-        public DetailedDataImporter(IRofSchedRepo rofSchedRepo,
+        public DataImportHelper(IRofSchedRepo rofSchedRepo,
             IJobExecutionHistoryRepository jobExecutionHistoryRepo)
         {
             _rofSchedRepo = rofSchedRepo;

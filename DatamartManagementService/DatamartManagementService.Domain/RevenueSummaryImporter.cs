@@ -14,7 +14,7 @@ namespace DatamartManagementService.Domain
         Task ImportRevenueSummary();
     }
 
-    public class RevenueSummaryImporter : DetailedDataImporter, IRevenueSummaryImporter
+    public class RevenueSummaryImporter : DataImportHelper, IRevenueSummaryImporter
     {
         private readonly IRevenueByDateUpsertRepository _revenueSummaryUpsertRepo;
 

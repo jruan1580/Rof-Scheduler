@@ -14,7 +14,7 @@ namespace DatamartManagementService.Domain
         Task ImportPayrollData();
     }
 
-    public class DetailedPayrollImporter : DetailedDataImporter, IDetailedPayrollImporter
+    public class DetailedPayrollImporter : DataImportHelper, IDetailedPayrollImporter
     {
         private readonly IPayrollDetailUpsertRepository _payrollDetailUpsertRepo;
 

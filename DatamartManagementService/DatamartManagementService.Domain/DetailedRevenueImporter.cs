@@ -14,7 +14,7 @@ namespace DatamartManagementService.Domain
         Task ImportRevenueData();
     }
 
-    public class DetailedRevenueImporter : DetailedDataImporter, IDetailedRevenueImporter
+    public class DetailedRevenueImporter : DataImportHelper, IDetailedRevenueImporter
     {
         private readonly IRevenueFromServicesUpsertRepository _detailedRevenueUpsertRepo;
 

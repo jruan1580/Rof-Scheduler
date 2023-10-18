@@ -26,6 +26,16 @@ namespace DatamartManagementService.Test
             };
         }
 
+        public static JobExecutionHistory GetDbJobExecutionHistoryRevenueSummary()
+        {
+            return new JobExecutionHistory()
+            {
+                Id = 1,
+                JobType = "Revenue Summary",
+                LastDatePulled = new DateTime(2023, 9, 15)
+            };
+        }
+
         public static JobEvent GetDbJobEvent()
         {
             return new JobEvent()
