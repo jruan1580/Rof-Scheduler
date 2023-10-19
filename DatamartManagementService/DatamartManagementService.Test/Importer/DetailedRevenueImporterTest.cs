@@ -71,7 +71,7 @@ namespace DatamartManagementService.Test.Importer
             jobExecutionHistoryRepo.Verify(j => 
                 j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j => 
                     j.JobType == "Revenue" &&
-                    j.LastDatePulled == DateTime.Today.AddDays(-1))), 
+                    j.LastDatePulled == DateTime.Today)), 
             Times.Once);
         }
 
@@ -138,7 +138,7 @@ namespace DatamartManagementService.Test.Importer
             jobExecutionHistoryRepo.Verify(j =>
                 j.AddJobExecutionHistory(It.Is<JobExecutionHistory>(j => 
                     j.JobType == "Revenue" &&
-                    j.LastDatePulled == DateTime.Today.AddDays(-1))),
+                    j.LastDatePulled == DateTime.Today)),
             Times.Once);
         }
     }

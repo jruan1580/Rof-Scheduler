@@ -14,7 +14,7 @@ namespace DatamartManagementService.Domain
         Task ImportRevenueData();
     }
 
-    public class DetailedRevenueImporter : DetailedDataImporter, IDetailedRevenueImporter
+    public class DetailedRevenueImporter : DataImportHelper, IDetailedRevenueImporter
     {
         private readonly IRevenueFromServicesUpsertRepository _detailedRevenueUpsertRepo;
 
@@ -32,9 +32,7 @@ namespace DatamartManagementService.Domain
             {
                 var lastExecution = await GetJobExecutionHistory("revenue");
 
-                var yesterday = DateTime.Today.AddDays(-1);
-
-                var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, yesterday);
+                var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, DateTime.Today);
 
                 var listOfDetailedRofRev = await GetListOfRofRevenueOfCompletedServiceByDate(completedEvents);
 
@@ -43,7 +41,7 @@ namespace DatamartManagementService.Domain
 
                 await _detailedRevenueUpsertRepo.AddRevenueFromServices(revenueForServicesByDateDbEntity);
 
-                await AddJobExecutionHistory("Revenue", yesterday);
+                await AddJobExecutionHistory("Revenue", DateTime.Today);
             }
             catch(Exception ex)
             {

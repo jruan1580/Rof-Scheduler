@@ -26,6 +26,16 @@ namespace DatamartManagementService.Test
             };
         }
 
+        public static JobExecutionHistory GetDbJobExecutionHistoryRevenueSummary()
+        {
+            return new JobExecutionHistory()
+            {
+                Id = 1,
+                JobType = "Revenue Summary",
+                LastDatePulled = new DateTime(2023, 9, 15)
+            };
+        }
+
         public static JobEvent GetDbJobEvent()
         {
             return new JobEvent()
@@ -82,6 +92,17 @@ namespace DatamartManagementService.Test
                 HolidayId = 1,
                 PetServiceId = 1,
                 HolidayRate = 23
+            };
+        }
+
+        public static RofRevenueFromServicesCompletedByDate GetDbDetailedRevenue()
+        {
+            return new RofRevenueFromServicesCompletedByDate()
+            {
+                Id = 1,
+                PetServiceRate = 20,
+                NetRevenuePostEmployeeCut = 5,
+                RevenueDate = new DateTime(2023, 10, 09)
             };
         }
     }
