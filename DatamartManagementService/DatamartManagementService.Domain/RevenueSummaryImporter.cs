@@ -48,9 +48,9 @@ namespace DatamartManagementService.Domain
             }
         }
 
-        private async Task<RofRevenueByDate> GetRofRevenueByDate(List<JobEvent> jobEvents)
+        private async Task<RofRevenueByDate> GetRofRevenueByDate(List<JobEvent> completedEvents)
         {
-            var petServiceInfo = await GetPetServiceInfo(jobEvents);
+            var petServiceInfo = await GetPetServiceInfo(completedEvents);
 
             var totalGrossRevenue = CalculateTotalGrossRevenue(petServiceInfo);
             var totalNetRevenue = CalculateTotalNetRevenue(petServiceInfo);
