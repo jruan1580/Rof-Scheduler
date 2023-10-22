@@ -5,6 +5,7 @@ using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,47 +39,60 @@ namespace DatamartManagementService.Domain
             }
         }
 
-        private async Task<List<EmployeePayroll>> GetListOfEmployeePayroll(List<JobEvent> completedEvents)
+        private async Task<List<Employee>> GetUniqueEmployeeFromCompletedEvents(List<JobEvent> completedEvents)
         {
+            var uniqueEmployees = new List<Employee>();
 
-        }
-
-        private async Task<EmployeePayroll> GetEmployeePayroll(JobEvent jobEvent)
-        {
-
-        }
-
-        private async Task<List<long>> GetUniqueEmployeeIdsFromCompletedEvents(List<JobEvent> completedEvents)
-        {
-
-        }
-
-        private async Task<List<PetServices>> GetPetServiceInfo(List<JobEvent> jobEvents)
-        {
-            var petServiceInfo = new List<PetServices>();
-
-            foreach (var job in jobEvents)
+            for(int i = 0; i < completedEvents.Count; i++)
             {
-                var dbService = await _rofSchedRepo.GetPetServiceById(job.PetServiceId);
+                var dbEmployee = await _rofSchedRepo.GetEmployeeById(completedEvents[i].EmployeeId);
 
-                var petService = RofSchedulerMappers.ToCorePetService(dbService);
+                var employee = RofSchedulerMappers.ToCoreEmployee(dbEmployee);
 
-                var isHolidayRate = await CheckIfHolidayRate(job.EventEndTime);
-
-                if (isHolidayRate)
+                if (!uniqueEmployees.Contains(employee))
                 {
-                    await UpdateToHolidayPayRate(petService);
+                    uniqueEmployees.Add(employee);
                 }
-
-                petServiceInfo.Add(petService);
             }
 
-            return petServiceInfo;
+            return uniqueEmployees;
         }
 
-        private decimal CalculateEmployeeTotalPay()
+        private async Task GetPayroll(List<Employee> employeeInfos, List<JobEvent> completedEvents, DateTime startDate, DateTime endDate)
         {
+            for(int i = 0; i < employeeInfos.Count; i++)
+            {
+                var totalPay = 0m;
 
+                var employeeEvents = completedEvents.Where(e => e.EmployeeId == employeeInfos[i].Id);
+
+                foreach(var completed in employeeEvents)
+                {
+                    var petServiceInfo = RofSchedulerMappers.ToCorePetService(
+                        await _rofSchedRepo.GetPetServiceById(completed.PetServiceId));
+
+                    var isHolidayRate = await CheckIfHolidayRate(completed.EventEndTime);
+
+                    if (isHolidayRate)
+                    {
+                        await UpdateToHolidayPayRate(petServiceInfo);
+                    }
+
+                    totalPay += petServiceInfo.EmployeeRate;
+                }
+
+                var payrollSummary = new List<EmployeePayroll>();
+
+                payrollSummary.Add(new EmployeePayroll()
+                {
+                    EmployeeId = employeeInfos[i].Id,
+                    FirstName = employeeInfos[i].FirstName,
+                    LastName = employeeInfos[i].LastName,
+                    EmployeeTotalPay = totalPay,
+                    PayPeriodStartDate = startDate,
+                    PayPeriodEndDate = endDate
+                });
+            }
         }
 
         //public long Id { get; set; }
