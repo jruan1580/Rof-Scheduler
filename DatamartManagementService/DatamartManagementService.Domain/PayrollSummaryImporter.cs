@@ -93,25 +93,19 @@ namespace DatamartManagementService.Domain
         {   
             var totalPay = 0m;
 
-            var petServiceInfo = await GetPetServiceInfo(jobEvents[i]);
+            var petServiceInfo = new PetServices();
 
             while (i != jobEvents.Count - 1
                     && jobEvents[i].EmployeeId == jobEvents[i + 1].EmployeeId)
             {
-                if (jobEvents[i].PetServiceId != petServiceInfo.Id)
-                {
-                    petServiceInfo = await GetPetServiceInfo(jobEvents[i]);
-                }
+                petServiceInfo = await GetPetServiceInfo(jobEvents[i]);
 
                 totalPay += petServiceInfo.EmployeeRate;
 
                 i++;
             }
 
-            if (jobEvents[i].PetServiceId != petServiceInfo.Id)
-            {
-                petServiceInfo = await GetPetServiceInfo(jobEvents[i]);
-            }
+            petServiceInfo = await GetPetServiceInfo(jobEvents[i]);
 
             totalPay += petServiceInfo.EmployeeRate;
 
