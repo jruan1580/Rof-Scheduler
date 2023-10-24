@@ -31,7 +31,9 @@ namespace DatamartManagementService.Domain
 
                 var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, DateTime.Today);
 
-                
+
+
+                await AddJobExecutionHistory("Payroll Summary", DateTime.Today);
             }
             catch (Exception ex)
             {
@@ -39,39 +41,28 @@ namespace DatamartManagementService.Domain
             }
         }
 
-        private async Task<List<Employee>> GetUniqueEmployeeFromCompletedEvents(List<JobEvent> completedEvents)
+        private async Task<List<EmployeePayroll>> GetPayroll(List<JobEvent> jobEvents)
         {
-            var uniqueEmployees = new List<Employee>();
+            var payrollSummary = new List<EmployeePayroll>();
 
-            for(int i = 0; i < completedEvents.Count; i++)
-            {
-                var dbEmployee = await _rofSchedRepo.GetEmployeeById(completedEvents[i].EmployeeId);
-
-                var employee = RofSchedulerMappers.ToCoreEmployee(dbEmployee);
-
-                if (!uniqueEmployees.Contains(employee))
-                {
-                    uniqueEmployees.Add(employee);
-                }
-            }
-
-            return uniqueEmployees;
-        }
-
-        private async Task GetPayroll(List<Employee> employeeInfos, List<JobEvent> completedEvents, DateTime startDate, DateTime endDate)
-        {
-            for(int i = 0; i < employeeInfos.Count; i++)
+            //completedEvents in order from EE id and then event start time
+            for(int i = 0; i < jobEvents.Count; i++)
             {
                 var totalPay = 0m;
+                var petServiceInfo = new PetServices();
+                var isHolidayRate = false;
+                var startDate = jobEvents[i].EventStartTime;
 
-                var employeeEvents = completedEvents.Where(e => e.EmployeeId == employeeInfos[i].Id);
+                var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
+                    await _rofSchedRepo.GetEmployeeById(jobEvents[i].EmployeeId));
 
-                foreach(var completed in employeeEvents)
+                while (i != jobEvents.Count - 1
+                    && jobEvents[i].EmployeeId == jobEvents[i + 1].EmployeeId)
                 {
-                    var petServiceInfo = RofSchedulerMappers.ToCorePetService(
-                        await _rofSchedRepo.GetPetServiceById(completed.PetServiceId));
+                    petServiceInfo = RofSchedulerMappers.ToCorePetService(
+                        await _rofSchedRepo.GetPetServiceById(jobEvents[i].PetServiceId));
 
-                    var isHolidayRate = await CheckIfHolidayRate(completed.EventEndTime);
+                    isHolidayRate = await CheckIfHolidayRate(jobEvents[i].EventEndTime);
 
                     if (isHolidayRate)
                     {
@@ -79,28 +70,36 @@ namespace DatamartManagementService.Domain
                     }
 
                     totalPay += petServiceInfo.EmployeeRate;
+
+                    i++;
                 }
 
-                var payrollSummary = new List<EmployeePayroll>();
+                petServiceInfo = RofSchedulerMappers.ToCorePetService(
+                        await _rofSchedRepo.GetPetServiceById(jobEvents[i].PetServiceId));
+
+                isHolidayRate = await CheckIfHolidayRate(jobEvents[i].EventEndTime);
+
+                if (isHolidayRate)
+                {
+                    await UpdateToHolidayPayRate(petServiceInfo);
+                }
+
+                totalPay += petServiceInfo.EmployeeRate;
+
+                var endDate = jobEvents[i].EventEndTime;
 
                 payrollSummary.Add(new EmployeePayroll()
                 {
-                    EmployeeId = employeeInfos[i].Id,
-                    FirstName = employeeInfos[i].FirstName,
-                    LastName = employeeInfos[i].LastName,
+                    EmployeeId = employeeInfo.Id,
+                    FirstName = employeeInfo.FirstName,
+                    LastName = employeeInfo.LastName,
                     EmployeeTotalPay = totalPay,
                     PayPeriodStartDate = startDate,
                     PayPeriodEndDate = endDate
                 });
             }
-        }
 
-        //public long Id { get; set; }
-        //public long EmployeeId { get; set; }
-        //public string FirstName { get; set; }
-        //public string LastName { get; set; }
-        //public decimal EmployeeTotalPay { get; set; }
-        //public DateTime PayPeriodStartDate { get; set; }
-        //public DateTime PayPeriodEndDate { get; set; }
+            return payrollSummary;
+        }
     }
 }
