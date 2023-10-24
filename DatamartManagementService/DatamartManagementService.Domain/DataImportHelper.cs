@@ -33,6 +33,18 @@ namespace DatamartManagementService.Domain
             return RofDatamartMappers.ToCoreJobExecutionHistory(executionHistory);
         }
 
+        protected async Task AddJobExecutionHistory(string jobType, DateTime lastDatePulled)
+        {
+            var newExecution = new JobExecutionHistory()
+            {
+                JobType = jobType,
+                LastDatePulled = lastDatePulled
+            };
+
+            await _jobExecutionHistoryRepo.AddJobExecutionHistory(
+                RofDatamartMappers.FromCoreJobExecutionHistory(newExecution));
+        }
+
         protected async Task<List<JobEvent>> GetCompletedJobEventsBetweenDate(JobExecutionHistory jobExecution, DateTime endDate)
         {
             var jobEvents = new List<Infrastructure.Persistence.RofSchedulerEntities.JobEvent>();
@@ -61,18 +73,6 @@ namespace DatamartManagementService.Domain
                     await _rofSchedRepo.GetHolidayRateByPetServiceId(petService.Id));
 
             petService.EmployeeRate = holidayRate.HolidayRate;
-        }
-
-        protected async Task AddJobExecutionHistory(string jobType, DateTime lastDatePulled)
-        {
-            var newExecution = new JobExecutionHistory()
-            {
-                JobType = jobType,
-                LastDatePulled = lastDatePulled
-            };
-
-            await _jobExecutionHistoryRepo.AddJobExecutionHistory(
-                RofDatamartMappers.FromCoreJobExecutionHistory(newExecution));
         }
     }
 }
