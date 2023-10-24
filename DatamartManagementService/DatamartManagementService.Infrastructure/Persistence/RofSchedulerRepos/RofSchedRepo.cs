@@ -25,6 +25,8 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
                 .Where(j => j.EventStartTime > startDate
                     && j.EventEndTime <= endDate
                     && j.Completed == true)
+                .OrderBy(j => j.EmployeeId)
+                .ThenBy(j => j.EventStartTime)
                 .ToListAsync();
         }
 
@@ -35,6 +37,8 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
             return await context.JobEvent
                 .Where(j => j.EventEndTime <= date
                     && j.Completed == true)
+                .OrderBy(j => j.EmployeeId)
+                .ThenBy(j => j.EventStartTime)
                 .ToListAsync();
         }
 
