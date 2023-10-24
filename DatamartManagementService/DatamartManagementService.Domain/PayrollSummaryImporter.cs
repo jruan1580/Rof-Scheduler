@@ -5,8 +5,6 @@ using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
@@ -31,7 +29,11 @@ namespace DatamartManagementService.Domain
 
                 var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, DateTime.Today);
 
+                var payrollSummary = await GetPayrollSummary(completedEvents);
 
+                var dbPayrollSummary = RofDatamartMappers.FromCorePayrollSummary(payrollSummary);
+
+                await _payrollSummaryUpsertRepo.AddEmployeePayroll(dbPayrollSummary);
 
                 await AddJobExecutionHistory("Payroll Summary", DateTime.Today);
             }
@@ -41,20 +43,19 @@ namespace DatamartManagementService.Domain
             }
         }
 
-        private async Task<List<EmployeePayroll>> GetPayroll(List<JobEvent> jobEvents)
+        private async Task<List<EmployeePayroll>> GetPayrollSummary(List<JobEvent> jobEvents)
         {
             var payrollSummary = new List<EmployeePayroll>();
 
-            //completedEvents in order from EE id and then event start time
             for(int i = 0; i < jobEvents.Count; i++)
             {
                 var totalPay = 0m;
-                var petServiceInfo = new PetServices();
-                var isHolidayRate = false;
                 var startDate = jobEvents[i].EventStartTime;
-
                 var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
                     await _rofSchedRepo.GetEmployeeById(jobEvents[i].EmployeeId));
+
+                var petServiceInfo = new PetServices();
+                var isHolidayRate = false;
 
                 while (i != jobEvents.Count - 1
                     && jobEvents[i].EmployeeId == jobEvents[i + 1].EmployeeId)

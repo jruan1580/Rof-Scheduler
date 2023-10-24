@@ -28,7 +28,7 @@ namespace DatamartManagementService.Test.Mapper
                 }
             };
 
-            var entity = RofDatamartMappers.FromCoreRofRevenueFromServicesCompletedByDate(core);
+            var entity = RofDatamartMappers.FromCoreDetailRevenue(core);
 
             Assert.IsNotNull(entity);
             Assert.AreEqual(entity[0].EmployeeId, core[0].EmployeeId);
