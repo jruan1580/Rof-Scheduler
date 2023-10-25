@@ -161,5 +161,32 @@ namespace DatamartManagementService.Test.Mapper
             Assert.AreEqual(entity.GrossRevenue, core.GrossRevenue);
             Assert.AreEqual(entity.NetRevenuePostEmployeePay, core.NetRevenuePostEmployeePay);
         }
+
+        [Test]
+        public void FromCorePayrollSummary()
+        {
+            var core = new List<EmployeePayroll>()
+            {
+                new EmployeePayroll()
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmployeeTotalPay = 100,
+                    PayPeriodStartDate = DateTime.Today,
+                    PayPeriodEndDate = DateTime.Today
+                }
+            };
+
+            var entity = RofDatamartMappers.FromCorePayrollSummary(core);
+
+            Assert.IsNotNull(entity[0]);
+            Assert.AreEqual(entity[0].Id, core[0].Id);
+            Assert.AreEqual(entity[0].FirstName, core[0].FirstName);
+            Assert.AreEqual(entity[0].LastName, core[0].LastName);
+            Assert.AreEqual(entity[0].EmployeeTotalPay, core[0].EmployeeTotalPay);
+            Assert.AreEqual(entity[0].PayPeriodStartDate, core[0].PayPeriodStartDate);
+            Assert.AreEqual(entity[0].PayPeriodEndDate, core[0].PayPeriodEndDate);
+        }
     }
 }

@@ -100,6 +100,7 @@ namespace DatamartManagementService.Domain.Mappers.Database
             {
                 dbPayrollSummary.Add(new DbPayrollSummary()
                 {
+                    Id = corePayroll.Id,
                     EmployeeId = corePayroll.EmployeeId,
                     FirstName = corePayroll.FirstName,
                     LastName = corePayroll.LastName,
