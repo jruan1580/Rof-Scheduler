@@ -53,8 +53,7 @@ namespace DatamartManagementService.Domain
                 var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
                     await _rofSchedRepo.GetEmployeeById(jobEvents[i].EmployeeId));
 
-                var petServiceInfo = await GetPetServiceInfo(jobEvents[i]);
-                var totalPay = await CalculateTotalEmployeePay(jobEvents, petServiceInfo, i);
+                var totalPay = await CalculateTotalEmployeePay(jobEvents, i);
                 
                 i = totalPay.Item2;
 
@@ -89,7 +88,7 @@ namespace DatamartManagementService.Domain
             return petServiceInfo;
         }
 
-        private async Task<(decimal, int)> CalculateTotalEmployeePay(List<JobEvent> jobEvents, PetServices petServices,int i)
+        private async Task<(decimal, int)> CalculateTotalEmployeePay(List<JobEvent> jobEvents, int i)
         {   
             var totalPay = 0m;
 
