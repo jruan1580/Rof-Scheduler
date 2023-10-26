@@ -9,11 +9,14 @@ namespace DatamartManagementService.Domain
     {
         private readonly int _hoursInBetweenRun = 24;
         private readonly IDetailedPayrollImporter _detailedPayrollImporter;
+        private readonly IPayrollSummaryImporter _payrollSummaryImporter;
 
         public ImportPayrollDataBackgroundService(
-            IDetailedPayrollImporter detailedPayrollImporter)
+            IDetailedPayrollImporter detailedPayrollImporter,
+            IPayrollSummaryImporter payrollSummaryImporter)
         {
             _detailedPayrollImporter = detailedPayrollImporter;
+            _payrollSummaryImporter = payrollSummaryImporter;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -25,6 +28,7 @@ namespace DatamartManagementService.Domain
                 Console.WriteLine("hello from payroll job");
 
                 await _detailedPayrollImporter.ImportPayrollData();
+                await _payrollSummaryImporter.ImportPayrollSummary();
 
                 await Task.Delay(TimeSpan.FromHours(_hoursInBetweenRun), stoppingToken);
             }

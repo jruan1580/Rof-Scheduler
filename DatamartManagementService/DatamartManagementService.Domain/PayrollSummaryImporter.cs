@@ -9,13 +9,18 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public class PayrollSummaryImporter : DataImportHelper
+    public interface IPayrollSummaryImporter
+    {
+        Task ImportPayrollSummary();
+    }
+
+    public class PayrollSummaryImporter : DataImportHelper, IPayrollSummaryImporter
     {
         private readonly IPayrollUpsertRepository _payrollSummaryUpsertRepo;
 
-        public PayrollSummaryImporter(IRofSchedRepo rofSchedRepo, 
+        public PayrollSummaryImporter(IRofSchedRepo rofSchedRepo,
             IPayrollUpsertRepository payrollSummaryUpsertRepo,
-            IJobExecutionHistoryRepository jobExecutionHistoryRepo) 
+            IJobExecutionHistoryRepository jobExecutionHistoryRepo)
         : base(rofSchedRepo, jobExecutionHistoryRepo)
         {
             _payrollSummaryUpsertRepo = payrollSummaryUpsertRepo;
@@ -47,14 +52,14 @@ namespace DatamartManagementService.Domain
         {
             var payrollSummary = new List<EmployeePayroll>();
 
-            for(int i = 0; i < jobEvents.Count; i++)
+            for (int i = 0; i < jobEvents.Count; i++)
             {
                 var startDate = jobEvents[i].EventStartTime;
                 var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
                     await _rofSchedRepo.GetEmployeeById(jobEvents[i].EmployeeId));
 
                 var totalPay = await CalculateTotalEmployeePay(jobEvents, i);
-                
+
                 i = totalPay.Item2;
 
                 var endDate = jobEvents[i].EventEndTime;
@@ -73,23 +78,8 @@ namespace DatamartManagementService.Domain
             return payrollSummary;
         }
 
-        private async Task<PetServices> GetPetServiceInfo(JobEvent jobEvent)
-        {
-            var petServiceInfo = RofSchedulerMappers.ToCorePetService(
-                        await _rofSchedRepo.GetPetServiceById(jobEvent.PetServiceId));
-
-            var isHolidayRate = await CheckIfHolidayRate(jobEvent.EventEndTime);
-
-            if (isHolidayRate)
-            {
-                await UpdateToHolidayPayRate(petServiceInfo);
-            }
-
-            return petServiceInfo;
-        }
-
         private async Task<(decimal, int)> CalculateTotalEmployeePay(List<JobEvent> jobEvents, int i)
-        {   
+        {
             var totalPay = 0m;
 
             var petServiceInfo = new PetServices();
@@ -109,6 +99,21 @@ namespace DatamartManagementService.Domain
             totalPay += petServiceInfo.EmployeeRate;
 
             return (totalPay, i);
+        }
+
+        private async Task<PetServices> GetPetServiceInfo(JobEvent jobEvent)
+        {
+            var petServiceInfo = RofSchedulerMappers.ToCorePetService(
+                        await _rofSchedRepo.GetPetServiceById(jobEvent.PetServiceId));
+
+            var isHolidayRate = await CheckIfHolidayRate(jobEvent.EventEndTime);
+
+            if (isHolidayRate)
+            {
+                await UpdateToHolidayPayRate(petServiceInfo);
+            }
+
+            return petServiceInfo;
         }
     }
 }

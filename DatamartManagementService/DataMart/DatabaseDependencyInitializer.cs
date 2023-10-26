@@ -12,6 +12,7 @@ namespace DataMart
             services.AddSingleton<IRevenueFromServicesUpsertRepository, RevenueFromServicesUpsertRepository>();
             services.AddSingleton<IJobExecutionHistoryRepository, JobExecutionHistoryRepository>();
             services.AddSingleton<IPayrollDetailUpsertRepository, PayrollDetailUpsertRepository>();
+            services.AddSingleton<IPayrollUpsertRepository, PayrollUpsertRepository>();
             services.AddSingleton<IRevenueFromServicesRetrievalRepository, RevenueFromServicesRetrievalRepository>();
             services.AddSingleton<IRevenueByDateUpsertRepository, RevenueByDateUpsertRepository>();
 
