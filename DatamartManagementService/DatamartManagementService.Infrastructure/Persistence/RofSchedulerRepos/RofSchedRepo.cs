@@ -22,11 +22,9 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
             using var context = new RofSchedulerContext();
 
             return await context.JobEvent
-                .Where(j => j.EventStartTime > startDate
-                    && j.EventEndTime <= endDate
+                .Where(j => j.EventStartTime >= startDate
+                    && j.EventEndTime < endDate
                     && j.Completed == true)
-                .OrderBy(j => j.EmployeeId)
-                .ThenBy(j => j.EventStartTime)
                 .ToListAsync();
         }
 
@@ -35,10 +33,8 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
             using var context = new RofSchedulerContext();
 
             return await context.JobEvent
-                .Where(j => j.EventEndTime <= date
+                .Where(j => j.EventEndTime < date
                     && j.Completed == true)
-                .OrderBy(j => j.EmployeeId)
-                .ThenBy(j => j.EventStartTime)
                 .ToListAsync();
         }
 
