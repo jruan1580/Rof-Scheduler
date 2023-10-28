@@ -5,6 +5,7 @@ using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
@@ -52,68 +53,30 @@ namespace DatamartManagementService.Domain
         {
             var payrollSummary = new List<EmployeePayroll>();
 
-            for (int i = 0; i < jobEvents.Count; i++)
+            var employeeIdToJobEvents = jobEvents
+                .GroupBy(jobs => jobs.EmployeeId)
+                .ToDictionary(jobGroups => jobGroups.Key, jobGroups => jobGroups.ToList());
+
+            foreach (var employee in employeeIdToJobEvents)
             {
-                var startDate = jobEvents[i].EventStartTime;
-                var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
-                    await _rofSchedRepo.GetEmployeeById(jobEvents[i].EmployeeId));
-
-                var totalPay = await CalculateTotalEmployeePay(jobEvents, i);
-
-                i = totalPay.Item2;
-
-                var endDate = jobEvents[i].EventEndTime;
+                var jobsCompletedByEmployee = employee.Value; 
+                var employeeInfo = await _rofSchedRepo.GetEmployeeById(employee.Key); 
+                var petServiceInfo = await GetPetServiceInfoAssociatedWithJobEvent(employee.Value); 
+                var totalPay = petServiceInfo.Sum(pet => pet.EmployeeRate);
 
                 payrollSummary.Add(new EmployeePayroll()
                 {
                     EmployeeId = employeeInfo.Id,
                     FirstName = employeeInfo.FirstName,
                     LastName = employeeInfo.LastName,
-                    EmployeeTotalPay = totalPay.Item1,
-                    PayPeriodStartDate = startDate,
-                    PayPeriodEndDate = endDate
+                    EmployeeTotalPay = totalPay,
+                    RevenueDate = DateTime.Today.AddDays(-1),
+                    RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
+                    RevenueYear = Convert.ToInt16(DateTime.Today.Year)
                 });
             }
 
             return payrollSummary;
-        }
-
-        private async Task<(decimal, int)> CalculateTotalEmployeePay(List<JobEvent> jobEvents, int i)
-        {
-            var totalPay = 0m;
-
-            var petServiceInfo = new PetServices();
-
-            while (i != jobEvents.Count - 1
-                    && jobEvents[i].EmployeeId == jobEvents[i + 1].EmployeeId)
-            {
-                petServiceInfo = await GetPetServiceInfo(jobEvents[i]);
-
-                totalPay += petServiceInfo.EmployeeRate;
-
-                i++;
-            }
-
-            petServiceInfo = await GetPetServiceInfo(jobEvents[i]);
-
-            totalPay += petServiceInfo.EmployeeRate;
-
-            return (totalPay, i);
-        }
-
-        private async Task<PetServices> GetPetServiceInfo(JobEvent jobEvent)
-        {
-            var petServiceInfo = RofSchedulerMappers.ToCorePetService(
-                        await _rofSchedRepo.GetPetServiceById(jobEvent.PetServiceId));
-
-            var isHolidayRate = await CheckIfHolidayRate(jobEvent.EventEndTime);
-
-            if (isHolidayRate)
-            {
-                await UpdateToHolidayPayRate(petServiceInfo);
-            }
-
-            return petServiceInfo;
         }
     }
 }
