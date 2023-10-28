@@ -5,6 +5,7 @@ using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
@@ -58,6 +59,38 @@ namespace DatamartManagementService.Domain
             jobEvents = await _rofSchedRepo.GetCompletedServicesBetweenDates(jobExecution.LastDatePulled, endDate);
 
             return RofSchedulerMappers.ToCoreJobEvents(jobEvents);
+        }
+
+        protected async Task<List<PetServices>> GetPetServiceInfoAssociatedWithJobEvent(List<JobEvent> jobEvents)
+        {
+            var petServiceInfo = new List<PetServices>();
+
+            var petServiceIdToPetService = await GetPetServiceInfo();
+
+            foreach (var job in jobEvents)
+            {
+                var petService = petServiceIdToPetService[job.PetServiceId];
+
+                var isHolidayRate = await CheckIfHolidayRate(job.EventEndTime);
+
+                if (isHolidayRate)
+                {
+                    await UpdateToHolidayPayRate(petService);
+                }
+
+                petServiceInfo.Add(petService);
+            }
+
+            return petServiceInfo;
+        }
+
+        protected async Task<Dictionary<short, PetServices>> GetPetServiceInfo()
+        {
+            var dbPetServices = await _rofSchedRepo.GetAllPetServices();
+
+            return dbPetServices
+                .Select(dbService => RofSchedulerMappers.ToCorePetService(dbService))
+                .ToDictionary(coreService => coreService.Id, coreService => coreService);
         }
 
         protected async Task<bool> CheckIfHolidayRate(DateTime revenueDate)

@@ -38,6 +38,13 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
                 .ToListAsync();
         }
 
+        public async Task<List<PetServices>> GetAllPetServices()
+        {
+            using var context = new RofSchedulerContext();
+
+            return await context.PetServices.ToListAsync();
+        }
+
         public async Task<PetServices> GetPetServiceById(short id)
         {
             using var context = new RofSchedulerContext();
