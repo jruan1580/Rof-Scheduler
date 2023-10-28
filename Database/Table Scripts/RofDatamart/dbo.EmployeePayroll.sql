@@ -13,6 +13,7 @@ CREATE TABLE dbo.EmployeePayroll
 	FirstName VARCHAR(25) NOT NULL,
 	LastName VARCHAR(25) NOT NULL,
 	EmployeeTotalPay DECIMAL(10,2) NOT NULL,
-	PayPeriodStartDate DATE NOT NULL,
-	PayPeriodEndDate DATE NOT NULL
+	RevenueDate DATE NOT NULL,
+	RevenueMonth SMALLINT NOT NULL,
+	RevenueYear SMALLINT NOT NULL
 );
