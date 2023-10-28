@@ -5,6 +5,7 @@ using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
@@ -48,12 +49,13 @@ namespace DatamartManagementService.Domain
             }
         }
 
-        private async Task<RofRevenueByDate> GetRofRevenueByDate(List<JobEvent> jobEvents)
+        private async Task<RofRevenueByDate> GetRofRevenueByDate(List<JobEvent> completedEvents)
         {
-            var petServiceInfo = await GetPetServiceInfo(jobEvents);
+            var petServiceInfo = await GetPetServiceInfoAssociatedWithJobEvent(completedEvents);
 
-            var totalGrossRevenue = CalculateTotalGrossRevenue(petServiceInfo);
-            var totalNetRevenue = CalculateTotalNetRevenue(petServiceInfo);
+            var totalGrossRevenue = petServiceInfo.Sum(petService => petService.Price);
+            var totalNetRevenue = totalGrossRevenue - 
+                (petServiceInfo.Sum(petService => petService.EmployeeRate));
 
             var rofRevenue = new RofRevenueByDate()
             {
@@ -65,54 +67,6 @@ namespace DatamartManagementService.Domain
             };
 
             return rofRevenue;
-        }
-
-        private async Task<List<PetServices>> GetPetServiceInfo(List<JobEvent> jobEvents)
-        {
-            var petServiceInfo = new List<PetServices>();
-
-            foreach(var job in jobEvents)
-            {
-                var dbService = await _rofSchedRepo.GetPetServiceById(job.PetServiceId);
-
-                var petService = RofSchedulerMappers.ToCorePetService(dbService);
-
-                var isHolidayRate = await CheckIfHolidayRate(job.EventEndTime);
-
-                if (isHolidayRate)
-                {
-                    await UpdateToHolidayPayRate(petService);
-                }
-
-                petServiceInfo.Add(petService);
-            }
-
-            return petServiceInfo;
-        }
-
-        private decimal CalculateTotalGrossRevenue(List<PetServices> petServices)
-        {
-            var totalGrossRevenue = 0m;
-
-            foreach (var service in petServices)
-            {
-                totalGrossRevenue += service.Price;
-            }
-
-            return totalGrossRevenue;
-        }
-
-        private decimal CalculateTotalNetRevenue(List<PetServices> petServices)
-        {
-            var totalNetRevenue = 0m;
-
-            foreach (var service in petServices)
-            {
-                var netRev = service.Price - service.EmployeeRate;
-                totalNetRevenue += netRev;
-            }
-
-            return totalNetRevenue;
         }
     }
 }

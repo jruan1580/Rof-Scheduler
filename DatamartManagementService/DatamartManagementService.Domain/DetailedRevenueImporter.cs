@@ -37,7 +37,7 @@ namespace DatamartManagementService.Domain
                 var listOfDetailedRofRev = await GetListOfRofRevenueOfCompletedServiceByDate(completedEvents);
 
                 var revenueForServicesByDateDbEntity =
-                    RofDatamartMappers.FromCoreRofRevenueFromServicesCompletedByDate(listOfDetailedRofRev);
+                    RofDatamartMappers.FromCoreDetailRevenue(listOfDetailedRofRev);
 
                 await _detailedRevenueUpsertRepo.AddRevenueFromServices(revenueForServicesByDateDbEntity);
 

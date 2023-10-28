@@ -16,6 +16,7 @@ namespace DataMart
             services.AddSingleton<IDetailedRevenueImporter, DetailedRevenueImporter>();
             services.AddSingleton<IDetailedPayrollImporter, DetailedPayrollImporter>();
             services.AddSingleton<IRevenueSummaryImporter, RevenueSummaryImporter>();
+            services.AddSingleton<IPayrollSummaryImporter, PayrollSummaryImporter>();
             services.AddDatabaseDependencies();
 
             services.AddHostedService<ImportRevenueDataBackgroundService>();

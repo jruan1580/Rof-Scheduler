@@ -12,6 +12,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos
         Task<List<JobEvent>> GetCompletedServicesUpUntilDate(DateTime date);
         Task<Employee> GetEmployeeById(long id);
         Task<HolidayRates> GetHolidayRateByPetServiceId(short petServiceId);
+        Task<List<PetServices>> GetAllPetServices();
         Task<PetServices> GetPetServiceById(short id);
     }
 }

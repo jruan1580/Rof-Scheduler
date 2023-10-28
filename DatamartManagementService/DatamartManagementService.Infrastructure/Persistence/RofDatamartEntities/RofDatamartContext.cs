@@ -50,9 +50,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartEntiti
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                entity.Property(e => e.PayPeriodEndDate).HasColumnType("date");
-
-                entity.Property(e => e.PayPeriodStartDate).HasColumnType("date");
+                entity.Property(e => e.PayrollDate).HasColumnType("date");
             });
 
             modelBuilder.Entity<EmployeePayrollDetail>(entity =>

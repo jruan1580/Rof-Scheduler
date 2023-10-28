@@ -28,7 +28,7 @@ namespace DatamartManagementService.Test.Mapper
                 }
             };
 
-            var entity = RofDatamartMappers.FromCoreRofRevenueFromServicesCompletedByDate(core);
+            var entity = RofDatamartMappers.FromCoreDetailRevenue(core);
 
             Assert.IsNotNull(entity);
             Assert.AreEqual(entity[0].EmployeeId, core[0].EmployeeId);
@@ -160,6 +160,35 @@ namespace DatamartManagementService.Test.Mapper
             Assert.AreEqual(entity.RevenueYear, core.RevenueYear);
             Assert.AreEqual(entity.GrossRevenue, core.GrossRevenue);
             Assert.AreEqual(entity.NetRevenuePostEmployeePay, core.NetRevenuePostEmployeePay);
+        }
+
+        [Test]
+        public void FromCorePayrollSummary()
+        {
+            var core = new List<EmployeePayroll>()
+            {
+                new EmployeePayroll()
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    EmployeeTotalPay = 100,
+                    PayrollDate = DateTime.Today,
+                    PayrollMonth = Convert.ToInt16(DateTime.Today.Month),
+                    PayrollYear = Convert.ToInt16(DateTime.Today.Year)
+                }
+            };
+
+            var entity = RofDatamartMappers.FromCorePayrollSummary(core);
+
+            Assert.IsNotNull(entity[0]);
+            Assert.AreEqual(entity[0].Id, core[0].Id);
+            Assert.AreEqual(entity[0].FirstName, core[0].FirstName);
+            Assert.AreEqual(entity[0].LastName, core[0].LastName);
+            Assert.AreEqual(entity[0].EmployeeTotalPay, core[0].EmployeeTotalPay);
+            Assert.AreEqual(entity[0].PayrollDate, core[0].PayrollDate);
+            Assert.AreEqual(entity[0].PayrollMonth, core[0].PayrollMonth);
+            Assert.AreEqual(entity[0].PayrollYear, core[0].PayrollYear);
         }
     }
 }

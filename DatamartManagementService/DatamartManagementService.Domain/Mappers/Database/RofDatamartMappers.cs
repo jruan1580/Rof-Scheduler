@@ -1,69 +1,19 @@
 ﻿using System.Collections.Generic;
-using CoreSingleRevenue = DatamartManagementService.Domain.Models.RofRevenueFromServicesCompletedByDate;
-using DbSingleRevenue = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate;
-using CorePayrollDetail = DatamartManagementService.Domain.Models.EmployeePayrollDetail;
-using DbPayrollDetail = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.EmployeePayrollDetail;
-using DbJobExecutionHistory = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.JobExecutionHistory;
-using CoreJobExecutionHistory = DatamartManagementService.Domain.Models.JobExecutionHistory;
 using DbDetailedRevenue = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate;
 using CoreDetailedRevenue = DatamartManagementService.Domain.Models.RofRevenueFromServicesCompletedByDate;
+using DbDetailedPayroll = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.EmployeePayrollDetail;
+using CoreDetailedPayroll = DatamartManagementService.Domain.Models.EmployeePayrollDetail;
+using DbJobExecutionHistory = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.JobExecutionHistory;
+using CoreJobExecutionHistory = DatamartManagementService.Domain.Models.JobExecutionHistory;
 using DbRevenueSummary = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueByDate;
 using CoreRevenueSummary = DatamartManagementService.Domain.Models.RofRevenueByDate;
+using DbPayrollSummary = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.EmployeePayroll;
+using CorePayrollSummary = DatamartManagementService.Domain.Models.EmployeePayroll;
 
 namespace DatamartManagementService.Domain.Mappers.Database
 {
     public static class RofDatamartMappers
     {
-        public static List<DbSingleRevenue> FromCoreRofRevenueFromServicesCompletedByDate(List<CoreSingleRevenue> coreSingleRevs)
-        {
-            var dbSingleRevs = new List<DbSingleRevenue>();
-
-            foreach (var coreSingleRev in coreSingleRevs)
-            {
-                dbSingleRevs.Add(new DbSingleRevenue()
-                {
-                   EmployeeId = coreSingleRev.EmployeeId,
-                   EmployeeFirstName = coreSingleRev.EmployeeFirstName,
-                   EmployeeLastName = coreSingleRev.EmployeeLastName,
-                   EmployeePay = coreSingleRev.EmployeePay,
-                   PetServiceId = coreSingleRev.PetServiceId,
-                   PetServiceName = coreSingleRev.PetServiceName,
-                   PetServiceRate = coreSingleRev.PetServiceRate,
-                   IsHolidayRate = coreSingleRev.IsHolidayRate,
-                   NetRevenuePostEmployeeCut = coreSingleRev.NetRevenuePostEmployeeCut,
-                   RevenueDate = coreSingleRev.RevenueDate
-                });
-            }
-
-            return dbSingleRevs;
-        }
-
-        public static List<DbPayrollDetail> FromCoreEmployeePayrollDetail(List<CorePayrollDetail> corePayrollDetail)
-        {
-            var dbPayrollDetail = new List<DbPayrollDetail>();
-
-            foreach (var corePayroll in corePayrollDetail)
-            {
-                dbPayrollDetail.Add(new DbPayrollDetail()
-                {
-                    EmployeeId = corePayroll.EmployeeId,
-                    FirstName = corePayroll.FirstName,
-                    LastName = corePayroll.LastName,
-                    EmployeePayForService = corePayroll.EmployeePayForService,
-                    PetServiceId = corePayroll.PetServiceId,
-                    PetServiceName = corePayroll.PetServiceName,
-                    ServiceDuration = corePayroll.ServiceDuration,
-                    ServiceDurationTimeUnit = corePayroll.ServiceDurationTimeUnit,
-                    JobEventId = corePayroll.JobEventId,
-                    IsHolidayPay = corePayroll.IsHolidayPay,
-                    ServiceStartDateTime = corePayroll.ServiceStartDateTime,
-                    ServiceEndDateTime = corePayroll.ServiceEndDateTime
-                });
-            }
-
-            return dbPayrollDetail;
-        }
-
         public static CoreJobExecutionHistory ToCoreJobExecutionHistory(DbJobExecutionHistory dbHistory)
         {
             var coreHistory = new CoreJobExecutionHistory();
@@ -90,7 +40,7 @@ namespace DatamartManagementService.Domain.Mappers.Database
         {
             var coreDetailedRevenues = new List<CoreDetailedRevenue>();
 
-            foreach(var dbDetailedRevenue in dbDetailedRevenues)
+            foreach (var dbDetailedRevenue in dbDetailedRevenues)
             {
                 coreDetailedRevenues.Add(new CoreDetailedRevenue
                 {
@@ -99,9 +49,33 @@ namespace DatamartManagementService.Domain.Mappers.Database
                     PetServiceRate = dbDetailedRevenue.PetServiceRate,
                     NetRevenuePostEmployeeCut = dbDetailedRevenue.NetRevenuePostEmployeeCut
                 });
-            } 
+            }
 
             return coreDetailedRevenues;
+        }
+
+        public static List<DbDetailedRevenue> FromCoreDetailRevenue(List<CoreDetailedRevenue> coreDetailedRevenue)
+        {
+            var dbDetailedRevenue = new List<DbDetailedRevenue>();
+
+            foreach (var coreRevenue in coreDetailedRevenue)
+            {
+                dbDetailedRevenue.Add(new DbDetailedRevenue()
+                {
+                   EmployeeId = coreRevenue.EmployeeId,
+                   EmployeeFirstName = coreRevenue.EmployeeFirstName,
+                   EmployeeLastName = coreRevenue.EmployeeLastName,
+                   EmployeePay = coreRevenue.EmployeePay,
+                   PetServiceId = coreRevenue.PetServiceId,
+                   PetServiceName = coreRevenue.PetServiceName,
+                   PetServiceRate = coreRevenue.PetServiceRate,
+                   IsHolidayRate = coreRevenue.IsHolidayRate,
+                   NetRevenuePostEmployeeCut = coreRevenue.NetRevenuePostEmployeeCut,
+                   RevenueDate = coreRevenue.RevenueDate
+                });
+            }
+
+            return dbDetailedRevenue;
         }
 
         public static DbRevenueSummary FromCoreRevenueSummary(CoreRevenueSummary coreRevenueSummary)
@@ -116,6 +90,54 @@ namespace DatamartManagementService.Domain.Mappers.Database
             dbRevenueSummary.NetRevenuePostEmployeePay = coreRevenueSummary.NetRevenuePostEmployeePay;
 
             return dbRevenueSummary;
+        }
+
+        public static List<DbPayrollSummary> FromCorePayrollSummary(List<CorePayrollSummary> corePayrollSummary)
+        {
+            var dbPayrollSummary = new List<DbPayrollSummary>();
+
+            foreach (var corePayroll in corePayrollSummary)
+            {
+                dbPayrollSummary.Add(new DbPayrollSummary()
+                {
+                    Id = corePayroll.Id,
+                    EmployeeId = corePayroll.EmployeeId,
+                    FirstName = corePayroll.FirstName,
+                    LastName = corePayroll.LastName,
+                    EmployeeTotalPay = corePayroll.EmployeeTotalPay,
+                    PayrollDate = corePayroll.PayrollDate,
+                    PayrollMonth = corePayroll.PayrollMonth,
+                    PayrollYear = corePayroll.PayrollYear
+                });
+            }
+
+            return dbPayrollSummary;
+        }
+
+        public static List<DbDetailedPayroll> FromCoreEmployeePayrollDetail(List<CoreDetailedPayroll> corePayrollDetail)
+        {
+            var dbPayrollDetail = new List<DbDetailedPayroll>();
+
+            foreach (var corePayroll in corePayrollDetail)
+            {
+                dbPayrollDetail.Add(new DbDetailedPayroll()
+                {
+                    EmployeeId = corePayroll.EmployeeId,
+                    FirstName = corePayroll.FirstName,
+                    LastName = corePayroll.LastName,
+                    EmployeePayForService = corePayroll.EmployeePayForService,
+                    PetServiceId = corePayroll.PetServiceId,
+                    PetServiceName = corePayroll.PetServiceName,
+                    ServiceDuration = corePayroll.ServiceDuration,
+                    ServiceDurationTimeUnit = corePayroll.ServiceDurationTimeUnit,
+                    JobEventId = corePayroll.JobEventId,
+                    IsHolidayPay = corePayroll.IsHolidayPay,
+                    ServiceStartDateTime = corePayroll.ServiceStartDateTime,
+                    ServiceEndDateTime = corePayroll.ServiceEndDateTime
+                });
+            }
+
+            return dbPayrollDetail;
         }
     }
 }
