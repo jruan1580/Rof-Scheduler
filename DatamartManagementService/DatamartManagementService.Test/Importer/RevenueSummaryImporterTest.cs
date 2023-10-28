@@ -26,7 +26,10 @@ namespace DatamartManagementService.Test.Importer
                 EntityCreator.GetDbJobEvent()
             };
 
-            var petService = EntityCreator.GetDbPetService();
+            var petServices = new List<PetServices>()
+            {
+                EntityCreator.GetDbPetService()
+            };
 
             jobExecutionHistoryRepo.Setup(j => j.GetJobExecutionHistoryByJobType(It.IsAny<string>()))
                 .ReturnsAsync((JobExecutionHistory)null);
@@ -34,8 +37,8 @@ namespace DatamartManagementService.Test.Importer
             rofSchedulerRepo.Setup(r => r.GetCompletedServicesUpUntilDate(It.IsAny<DateTime>()))
                .ReturnsAsync(jobEvents);
 
-            rofSchedulerRepo.Setup(r => r.GetPetServiceById(It.IsAny<short>()))
-                .ReturnsAsync(petService);
+            rofSchedulerRepo.Setup(r => r.GetAllPetServices())
+                .ReturnsAsync(petServices);
 
             rofSchedulerRepo.Setup(r => r.CheckIfJobDateIsHoliday(It.IsAny<DateTime>()))
                 .ReturnsAsync((Holidays)null);
@@ -79,7 +82,10 @@ namespace DatamartManagementService.Test.Importer
             };
 
             var lastExecution = EntityCreator.GetDbJobExecutionHistoryRevenueSummary();
-            var petService = EntityCreator.GetDbPetService();
+            var petServices = new List<PetServices>()
+            {
+                EntityCreator.GetDbPetService()
+            };
 
             jobExecutionHistoryRepo.Setup(j => j.GetJobExecutionHistoryByJobType(It.IsAny<string>()))
                 .ReturnsAsync(lastExecution);
@@ -87,8 +93,8 @@ namespace DatamartManagementService.Test.Importer
             rofSchedulerRepo.Setup(r => r.GetCompletedServicesBetweenDates(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                .ReturnsAsync(jobEvents);
 
-            rofSchedulerRepo.Setup(r => r.GetPetServiceById(It.IsAny<short>()))
-                .ReturnsAsync(petService);
+            rofSchedulerRepo.Setup(r => r.GetAllPetServices())
+                .ReturnsAsync(petServices);
 
             rofSchedulerRepo.Setup(r => r.CheckIfJobDateIsHoliday(It.IsAny<DateTime>()))
                 .ReturnsAsync((Holidays)null);

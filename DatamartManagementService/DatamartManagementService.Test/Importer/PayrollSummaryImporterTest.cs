@@ -27,7 +27,10 @@ namespace DatamartManagementService.Test.Importer
             };
 
             var employee = EntityCreator.GetDbEmployee();
-            var petService = EntityCreator.GetDbPetService();
+            var petServices = new List<PetServices>()
+            {
+                EntityCreator.GetDbPetService()
+            };
 
             jobExecutionHistoryRepo.Setup(j => j.GetJobExecutionHistoryByJobType(It.IsAny<string>()))
                 .ReturnsAsync((JobExecutionHistory)null);
@@ -38,8 +41,8 @@ namespace DatamartManagementService.Test.Importer
             rofSchedulerRepo.Setup(r => r.GetEmployeeById(It.IsAny<long>()))
                 .ReturnsAsync(employee);
 
-            rofSchedulerRepo.Setup(r => r.GetPetServiceById(It.IsAny<short>()))
-                .ReturnsAsync(petService);
+            rofSchedulerRepo.Setup(r => r.GetAllPetServices())
+                .ReturnsAsync(petServices);
 
             rofSchedulerRepo.Setup(r => r.CheckIfJobDateIsHoliday(It.IsAny<DateTime>()))
                 .ReturnsAsync((Holidays)null);
@@ -59,8 +62,9 @@ namespace DatamartManagementService.Test.Importer
                     ps[0].FirstName == "John" &&
                     ps[0].LastName == "Doe" &&
                     ps[0].EmployeeTotalPay == 15  &&
-                    ps[0].PayPeriodStartDate == new DateTime(2023, 9, 16, 7, 30, 0) &&
-                    ps[0].PayPeriodEndDate == new DateTime(2023, 9, 16, 8, 30, 0))),
+                    ps[0].RevenueDate == DateTime.Today.AddDays(-1) &&
+                    ps[0].RevenueMonth == DateTime.Today.Month && 
+                    ps[0].RevenueYear == DateTime.Today.Year)),
             Times.Once);
 
             jobExecutionHistoryRepo.Verify(j =>
@@ -84,7 +88,10 @@ namespace DatamartManagementService.Test.Importer
 
             var lastExecution = EntityCreator.GetDbJobExecutionHistoryRevenueSummary();
             var employee = EntityCreator.GetDbEmployee();
-            var petService = EntityCreator.GetDbPetService();
+            var petServices = new List<PetServices>()
+            {
+                EntityCreator.GetDbPetService()
+            };
 
             jobExecutionHistoryRepo.Setup(j => j.GetJobExecutionHistoryByJobType(It.IsAny<string>()))
                 .ReturnsAsync(lastExecution);
@@ -95,8 +102,8 @@ namespace DatamartManagementService.Test.Importer
             rofSchedulerRepo.Setup(r => r.GetEmployeeById(It.IsAny<long>()))
                 .ReturnsAsync(employee);
 
-            rofSchedulerRepo.Setup(r => r.GetPetServiceById(It.IsAny<short>()))
-                .ReturnsAsync(petService);
+            rofSchedulerRepo.Setup(r => r.GetAllPetServices())
+                .ReturnsAsync(petServices);
 
             rofSchedulerRepo.Setup(r => r.CheckIfJobDateIsHoliday(It.IsAny<DateTime>()))
                 .ReturnsAsync((Holidays)null);
@@ -116,8 +123,9 @@ namespace DatamartManagementService.Test.Importer
                     ps[0].FirstName == "John" &&
                     ps[0].LastName == "Doe" &&
                     ps[0].EmployeeTotalPay == 15 &&
-                    ps[0].PayPeriodStartDate == new DateTime(2023, 9, 16, 7, 30, 0) &&
-                    ps[0].PayPeriodEndDate == new DateTime(2023, 9, 16, 8, 30, 0))),
+                    ps[0].RevenueDate == DateTime.Today.AddDays(-1) &&
+                    ps[0].RevenueMonth == DateTime.Today.Month &&
+                    ps[0].RevenueYear == DateTime.Today.Year)),
             Times.Once);
 
             jobExecutionHistoryRepo.Verify(j =>
