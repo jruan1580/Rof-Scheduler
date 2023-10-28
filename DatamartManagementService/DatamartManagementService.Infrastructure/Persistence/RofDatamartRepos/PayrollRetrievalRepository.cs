@@ -29,8 +29,8 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
             using var context = new RofDatamartContext();
 
             var employeePayrollByDate = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id
-                && ep.PayPeriodStartDate >= startDate
-                && ep.PayPeriodEndDate <= endDate).ToListAsync();
+                && ep.RevenueDate >= startDate
+                && ep.RevenueDate <= endDate).ToListAsync();
 
             return employeePayrollByDate;
         }
