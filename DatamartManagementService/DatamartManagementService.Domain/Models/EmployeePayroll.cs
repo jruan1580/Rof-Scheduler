@@ -13,9 +13,11 @@ namespace DatamartManagementService.Domain.Models
         public string LastName { get; set; }
         
         public decimal EmployeeTotalPay { get; set; }
+
+        public DateTime RevenueDate { get; set; }
+
+        public short RevenueMonth { get; set; }
         
-        public DateTime PayPeriodStartDate { get; set; }
-        
-        public DateTime PayPeriodEndDate { get; set; }
+        public short RevenueYear { get; set; }
     }
 }
