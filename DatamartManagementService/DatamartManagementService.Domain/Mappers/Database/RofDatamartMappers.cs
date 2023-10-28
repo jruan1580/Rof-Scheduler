@@ -105,9 +105,9 @@ namespace DatamartManagementService.Domain.Mappers.Database
                     FirstName = corePayroll.FirstName,
                     LastName = corePayroll.LastName,
                     EmployeeTotalPay = corePayroll.EmployeeTotalPay,
-                    RevenueDate = corePayroll.RevenueDate,
-                    RevenueMonth = corePayroll.RevenueMonth,
-                    RevenueYear = corePayroll.RevenueYear
+                    PayrollDate = corePayroll.PayrollDate,
+                    PayrollMonth = corePayroll.PayrollMonth,
+                    PayrollYear = corePayroll.PayrollYear
                 });
             }
 

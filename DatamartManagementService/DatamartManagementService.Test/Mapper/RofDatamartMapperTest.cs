@@ -173,9 +173,9 @@ namespace DatamartManagementService.Test.Mapper
                     FirstName = "John",
                     LastName = "Doe",
                     EmployeeTotalPay = 100,
-                    RevenueDate = DateTime.Today,
-                    RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
-                    RevenueYear = Convert.ToInt16(DateTime.Today.Year)
+                    PayrollDate = DateTime.Today,
+                    PayrollMonth = Convert.ToInt16(DateTime.Today.Month),
+                    PayrollYear = Convert.ToInt16(DateTime.Today.Year)
                 }
             };
 
@@ -186,9 +186,9 @@ namespace DatamartManagementService.Test.Mapper
             Assert.AreEqual(entity[0].FirstName, core[0].FirstName);
             Assert.AreEqual(entity[0].LastName, core[0].LastName);
             Assert.AreEqual(entity[0].EmployeeTotalPay, core[0].EmployeeTotalPay);
-            Assert.AreEqual(entity[0].RevenueDate, core[0].RevenueDate);
-            Assert.AreEqual(entity[0].RevenueMonth, core[0].RevenueMonth);
-            Assert.AreEqual(entity[0].RevenueYear, core[0].RevenueYear);
+            Assert.AreEqual(entity[0].PayrollDate, core[0].PayrollDate);
+            Assert.AreEqual(entity[0].PayrollMonth, core[0].PayrollMonth);
+            Assert.AreEqual(entity[0].PayrollYear, core[0].PayrollYear);
         }
     }
 }

@@ -70,9 +70,9 @@ namespace DatamartManagementService.Domain
                     FirstName = employeeInfo.FirstName,
                     LastName = employeeInfo.LastName,
                     EmployeeTotalPay = totalPay,
-                    RevenueDate = DateTime.Today.AddDays(-1),
-                    RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
-                    RevenueYear = Convert.ToInt16(DateTime.Today.Year)
+                    PayrollDate = DateTime.Today.AddDays(-1),
+                    PayrollMonth = Convert.ToInt16(DateTime.Today.Month),
+                    PayrollYear = Convert.ToInt16(DateTime.Today.Year)
                 });
             }
 

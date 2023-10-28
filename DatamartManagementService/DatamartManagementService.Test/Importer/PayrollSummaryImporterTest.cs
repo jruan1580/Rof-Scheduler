@@ -62,9 +62,9 @@ namespace DatamartManagementService.Test.Importer
                     ps[0].FirstName == "John" &&
                     ps[0].LastName == "Doe" &&
                     ps[0].EmployeeTotalPay == 15  &&
-                    ps[0].RevenueDate == DateTime.Today.AddDays(-1) &&
-                    ps[0].RevenueMonth == DateTime.Today.Month && 
-                    ps[0].RevenueYear == DateTime.Today.Year)),
+                    ps[0].PayrollDate == DateTime.Today.AddDays(-1) &&
+                    ps[0].PayrollMonth == DateTime.Today.Month && 
+                    ps[0].PayrollYear == DateTime.Today.Year)),
             Times.Once);
 
             jobExecutionHistoryRepo.Verify(j =>
@@ -123,9 +123,9 @@ namespace DatamartManagementService.Test.Importer
                     ps[0].FirstName == "John" &&
                     ps[0].LastName == "Doe" &&
                     ps[0].EmployeeTotalPay == 15 &&
-                    ps[0].RevenueDate == DateTime.Today.AddDays(-1) &&
-                    ps[0].RevenueMonth == DateTime.Today.Month &&
-                    ps[0].RevenueYear == DateTime.Today.Year)),
+                    ps[0].PayrollDate == DateTime.Today.AddDays(-1) &&
+                    ps[0].PayrollMonth == DateTime.Today.Month &&
+                    ps[0].PayrollYear == DateTime.Today.Year)),
             Times.Once);
 
             jobExecutionHistoryRepo.Verify(j =>
