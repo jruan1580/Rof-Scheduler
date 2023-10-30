@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DatamartManagementService.Domain
+namespace DatamartManagementService.Domain.Importer
 {
     public class ImportRevenueDataBackgroundService : BackgroundService
     {
@@ -12,7 +12,7 @@ namespace DatamartManagementService.Domain
         private readonly IRevenueSummaryImporter _revenueSummaryImporter;
 
         public ImportRevenueDataBackgroundService(
-            IDetailedRevenueImporter detailedRevenueImporter, 
+            IDetailedRevenueImporter detailedRevenueImporter,
             IRevenueSummaryImporter revenueSummaryImporter)
         {
             _detailedRevenueImporter = detailedRevenueImporter;
@@ -29,9 +29,9 @@ namespace DatamartManagementService.Domain
 
                 await _detailedRevenueImporter.ImportRevenueData();
                 await _revenueSummaryImporter.ImportRevenueSummary();
-             
+
                 await Task.Delay(TimeSpan.FromHours(_hoursInBetweenRun), stoppingToken);
-            }       
+            }
         }
     }
 }

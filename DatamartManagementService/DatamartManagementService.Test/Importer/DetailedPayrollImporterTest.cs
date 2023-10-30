@@ -1,4 +1,4 @@
-﻿using DatamartManagementService.Domain;
+﻿using DatamartManagementService.Domain.Importer;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerEntities;

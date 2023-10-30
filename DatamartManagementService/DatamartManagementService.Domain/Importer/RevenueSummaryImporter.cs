@@ -1,5 +1,5 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
-using DatamartManagementService.Domain.Models;
+using DatamartManagementService.Domain.Models.RofDatamartModels;
 using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DatamartManagementService.Domain
+namespace DatamartManagementService.Domain.Importer
 {
     public interface IRevenueSummaryImporter
     {
@@ -36,7 +36,7 @@ namespace DatamartManagementService.Domain
                 var completedEvents = await GetCompletedJobEventsBetweenDate(lastExecution, DateTime.Today);
 
                 var revenueSummary = await GetRofRevenueByDate(completedEvents);
-                    
+
                 var dbRevSummary = RofDatamartMappers.FromCoreRevenueSummary(revenueSummary);
 
                 await _revenueSummaryUpsertRepo.AddRevenue(dbRevSummary);
@@ -54,8 +54,8 @@ namespace DatamartManagementService.Domain
             var petServiceInfo = await GetPetServiceInfoAssociatedWithJobEvent(completedEvents);
 
             var totalGrossRevenue = petServiceInfo.Sum(petService => petService.Price);
-            var totalNetRevenue = totalGrossRevenue - 
-                (petServiceInfo.Sum(petService => petService.EmployeeRate));
+            var totalNetRevenue = totalGrossRevenue -
+                petServiceInfo.Sum(petService => petService.EmployeeRate);
 
             var rofRevenue = new RofRevenueByDate()
             {
