@@ -1,4 +1,4 @@
-using DatamartManagementService.Domain;
+using DatamartManagementService.Domain.Importer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

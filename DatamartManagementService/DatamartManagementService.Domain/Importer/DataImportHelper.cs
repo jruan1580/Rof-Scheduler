@@ -1,5 +1,5 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
-using DatamartManagementService.Domain.Models;
+using DatamartManagementService.Domain.Models.RofDatamartModels;
 using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DatamartManagementService.Domain
+namespace DatamartManagementService.Domain.Importer
 {
     public class DataImportHelper
     {

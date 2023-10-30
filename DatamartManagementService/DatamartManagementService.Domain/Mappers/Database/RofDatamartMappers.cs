@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using DbDetailedRevenue = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate;
-using CoreDetailedRevenue = DatamartManagementService.Domain.Models.RofRevenueFromServicesCompletedByDate;
+using CoreDetailedRevenue = DatamartManagementService.Domain.Models.RofDatamartModels.RofRevenueFromServicesCompletedByDate;
 using DbDetailedPayroll = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.EmployeePayrollDetail;
-using CoreDetailedPayroll = DatamartManagementService.Domain.Models.EmployeePayrollDetail;
+using CoreDetailedPayroll = DatamartManagementService.Domain.Models.RofDatamartModels.EmployeePayrollDetail;
 using DbJobExecutionHistory = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.JobExecutionHistory;
-using CoreJobExecutionHistory = DatamartManagementService.Domain.Models.JobExecutionHistory;
+using CoreJobExecutionHistory = DatamartManagementService.Domain.Models.RofDatamartModels.JobExecutionHistory;
 using DbRevenueSummary = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueByDate;
-using CoreRevenueSummary = DatamartManagementService.Domain.Models.RofRevenueByDate;
+using CoreRevenueSummary = DatamartManagementService.Domain.Models.RofDatamartModels.RofRevenueByDate;
 using DbPayrollSummary = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.EmployeePayroll;
-using CorePayrollSummary = DatamartManagementService.Domain.Models.EmployeePayroll;
+using CorePayrollSummary = DatamartManagementService.Domain.Models.RofDatamartModels.EmployeePayroll;
 
 namespace DatamartManagementService.Domain.Mappers.Database
 {
