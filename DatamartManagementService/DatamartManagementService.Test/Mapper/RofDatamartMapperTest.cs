@@ -1,5 +1,5 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
-using DatamartManagementService.Domain.Models;
+using DatamartManagementService.Domain.Models.RofDatamartModels;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

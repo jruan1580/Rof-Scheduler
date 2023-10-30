@@ -1,5 +1,5 @@
 ﻿using DatamartManagementService.Domain.Mappers.Database;
-using DatamartManagementService.Domain.Models;
+using DatamartManagementService.Domain.Models.RofDatamartModels;
 using DatamartManagementService.Domain.Models.RofSchedulerModels;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using DatamartManagementService.Infrastructure.Persistence.RofSchedulerRepos;
@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DatamartManagementService.Domain
+namespace DatamartManagementService.Domain.Importer
 {
     public interface IDetailedRevenueImporter
     {
@@ -43,10 +43,10 @@ namespace DatamartManagementService.Domain
 
                 await AddJobExecutionHistory("Revenue", DateTime.Today);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Exception: " + ex.Message);
-            }           
+            }
         }
 
         private async Task<List<RofRevenueFromServicesCompletedByDate>> GetListOfRofRevenueOfCompletedServiceByDate(
@@ -54,18 +54,18 @@ namespace DatamartManagementService.Domain
         {
             var revenueForServiceCompleted = new List<RofRevenueFromServicesCompletedByDate>();
 
-            foreach(var completed in completedEvents)
+            foreach (var completed in completedEvents)
             {
                 var revenue = await GetRofRevenueForServicesCompletedByDate(completed);
 
                 revenueForServiceCompleted.Add(revenue);
             }
-            
+
             return revenueForServiceCompleted;
         }
 
         private async Task<RofRevenueFromServicesCompletedByDate> GetRofRevenueForServicesCompletedByDate(JobEvent jobEvent)
-        {           
+        {
             var employeeInfo = RofSchedulerMappers.ToCoreEmployee(
                 await _rofSchedRepo.GetEmployeeById(jobEvent.EmployeeId));
 

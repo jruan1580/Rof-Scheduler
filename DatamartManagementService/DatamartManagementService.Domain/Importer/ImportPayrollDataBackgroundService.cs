@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DatamartManagementService.Domain
+namespace DatamartManagementService.Domain.Importer
 {
     public class ImportPayrollDataBackgroundService : BackgroundService
     {

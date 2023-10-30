@@ -1,5 +1,6 @@
 ﻿using DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
     {
         Task<List<RofRevenueByDate>> GetRevenueForTheMonthOfCertainYear(short month, short year);
         Task<List<RofRevenueByDate>> GetRevenueForTheYear(short year);
+        Task<List<RofRevenueByDate>> GetRevenueBetweenDates(DateTime startDate, DateTime endDate);
     }
 
     public class RevenueByDateRetrievalRepository : IRevenueByDateRetrievalRepository
@@ -30,6 +32,16 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
             var monthlyRevenue = await context.RofRevenueByDate.Where(r => r.RevenueMonth == month && r.RevenueYear == year).ToListAsync();
 
             return monthlyRevenue;
+        }
+
+        public async Task<List<RofRevenueByDate>> GetRevenueBetweenDates(DateTime startDate, DateTime endDate)
+        {
+            using var context = new RofDatamartContext();
+
+            var revenue = await context.RofRevenueByDate.Where(r => r.RevenueDate >= startDate 
+                && r.RevenueDate <= endDate).ToListAsync();
+
+            return revenue;
         }
     }
 }
