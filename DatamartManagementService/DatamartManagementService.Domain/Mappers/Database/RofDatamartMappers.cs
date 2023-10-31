@@ -78,6 +78,26 @@ namespace DatamartManagementService.Domain.Mappers.Database
             return dbDetailedRevenue;
         }
 
+        public static List<CoreRevenueSummary> ToCoreRevenueSummary(List<DbRevenueSummary> dbRevenueSummary)
+        {
+            var coreRevenueSummary = new List<CoreRevenueSummary>();
+
+            foreach(var dbRevenue in dbRevenueSummary)
+            {
+                coreRevenueSummary.Add(new CoreRevenueSummary()
+                {
+                    Id = dbRevenue.Id,
+                    RevenueDate = dbRevenue.RevenueDate,
+                    RevenueMonth = dbRevenue.RevenueMonth,
+                    RevenueYear = dbRevenue.RevenueYear,
+                    GrossRevenue = dbRevenue.GrossRevenue,
+                    NetRevenuePostEmployeePay = dbRevenue.NetRevenuePostEmployeePay
+                });
+            }
+
+            return coreRevenueSummary;
+        }
+
         public static DbRevenueSummary FromCoreRevenueSummary(CoreRevenueSummary coreRevenueSummary)
         {
             var dbRevenueSummary = new DbRevenueSummary();
