@@ -45,11 +45,13 @@ namespace DatamartManagementService.Test.Service
             var results = await revenueSummaryService.GetRevenueBetweenDates(DateTime.Today.AddDays(-1), DateTime.Today);
 
             Assert.IsNotNull(results);
-            Assert.AreEqual(DateTime.Today, results[0].RevenueDate);
-            Assert.AreEqual(DateTime.Today.Month, results[0].RevenueMonth);
-            Assert.AreEqual(DateTime.Today.Year, results[0].RevenueYear);
-            Assert.AreEqual(20, results[0].GrossRevenue);
-            Assert.AreEqual(5, results[0].NetRevenuePostEmployeePay);
+            Assert.AreEqual(1, results.Count);
+            Assert.AreEqual(1, results[DateTime.Today].Count);
+            Assert.AreEqual(DateTime.Today, results[DateTime.Today][0].RevenueDate);
+            Assert.AreEqual(DateTime.Today.Month, results[DateTime.Today][0].RevenueMonth);
+            Assert.AreEqual(DateTime.Today.Year, results[DateTime.Today][0].RevenueYear);
+            Assert.AreEqual(20, results[DateTime.Today][0].GrossRevenue);
+            Assert.AreEqual(5, results[DateTime.Today][0].NetRevenuePostEmployeePay);
         }
     }
 }

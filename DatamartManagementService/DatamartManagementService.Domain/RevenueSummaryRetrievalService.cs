@@ -3,13 +3,14 @@ using DatamartManagementService.Domain.Models.RofDatamartModels;
 using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
     public interface IRevenueSummaryRetrievalService
     {
-        Task<List<RofRevenueByDate>> GetRevenueBetweenDates(DateTime startDate, DateTime endDate);
+        Task<Dictionary<DateTime, List<RofRevenueByDate>>> GetRevenueBetweenDates(DateTime startDate, DateTime endDate);
     }
 
     public class RevenueSummaryRetrievalService : IRevenueSummaryRetrievalService
@@ -21,13 +22,16 @@ namespace DatamartManagementService.Domain
             _revenueByDateRetrievalRepo = revenueByDateRetrievalRepo;
         }
 
-        public async Task<List<RofRevenueByDate>> GetRevenueBetweenDates(DateTime startDate, DateTime endDate)
+        public async Task<Dictionary<DateTime, List<RofRevenueByDate>>> GetRevenueBetweenDates(DateTime startDate, DateTime endDate)
         {
             var dbRevenue = await _revenueByDateRetrievalRepo.GetRevenueBetweenDates(startDate, endDate);
 
-            var revenueBtwnDates = RofDatamartMappers.ToCoreRevenueSummary(dbRevenue);
+            var revenue = RofDatamartMappers.ToCoreRevenueSummary(dbRevenue);
 
-            return revenueBtwnDates;
+            var revenueByDates = revenue.GroupBy(r => r.RevenueDate)
+                .ToDictionary(r => r.Key, r => r.ToList());
+
+            return revenueByDates;
         }
     }
 }
