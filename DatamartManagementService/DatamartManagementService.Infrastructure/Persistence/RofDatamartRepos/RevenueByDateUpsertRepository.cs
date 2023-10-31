@@ -1,21 +1,22 @@
 ﻿using DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
 {
     public interface IRevenueByDateUpsertRepository
     {
-        Task AddRevenue(RofRevenueByDate newRevenueByDate);
+        Task AddRevenue(List<RofRevenueByDate> newRevenueByDate);
         Task UpdateRevenue(RofRevenueByDate updateRevenueByDate);
     }
 
     public class RevenueByDateUpsertRepository : IRevenueByDateUpsertRepository
     {
-        public async Task AddRevenue(RofRevenueByDate newRevenueByDate)
+        public async Task AddRevenue(List<RofRevenueByDate> newRevenueByDate)
         {
             using var context = new RofDatamartContext();
 
-            context.RofRevenueByDate.Add(newRevenueByDate);
+            context.RofRevenueByDate.AddRange(newRevenueByDate);
 
             await context.SaveChangesAsync();
         }
