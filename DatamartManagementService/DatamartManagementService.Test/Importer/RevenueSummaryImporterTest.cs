@@ -43,7 +43,7 @@ namespace DatamartManagementService.Test.Importer
             rofSchedulerRepo.Setup(r => r.CheckIfJobDateIsHoliday(It.IsAny<DateTime>()))
                 .ReturnsAsync((Holidays)null);
 
-            revenueSummaryRepo.Setup(r => r.AddRevenue(It.IsAny<RofRevenueByDate>()))
+            revenueSummaryRepo.Setup(r => r.AddRevenue(It.IsAny<List<RofRevenueByDate>>()))
                 .Returns(Task.CompletedTask);
 
             jobExecutionHistoryRepo.Setup(j => j.AddJobExecutionHistory(It.IsAny<JobExecutionHistory>()))
@@ -54,12 +54,13 @@ namespace DatamartManagementService.Test.Importer
             await revenueSummaryImporter.ImportRevenueSummary();
 
             revenueSummaryRepo.Verify(r =>
-                r.AddRevenue(It.Is<RofRevenueByDate>(rs =>
-                    rs.RevenueDate == DateTime.Today.AddDays(-1) &&
-                    rs.RevenueMonth == 10 &&
-                    rs.RevenueYear == 2023 &&
-                    rs.GrossRevenue == 25 &&
-                    rs.NetRevenuePostEmployeePay == 10)),
+                r.AddRevenue(It.Is<List<RofRevenueByDate>>(rs =>
+                    rs[0].PetServiceId == 1 &&
+                    rs[0].RevenueDate == DateTime.Today.AddDays(-1) &&
+                    rs[0].RevenueMonth == 10 &&
+                    rs[0].RevenueYear == 2023 &&
+                    rs[0].GrossRevenue == 25 &&
+                    rs[0].NetRevenuePostEmployeePay == 10)),
             Times.Once);
 
             jobExecutionHistoryRepo.Verify(j =>
@@ -99,7 +100,7 @@ namespace DatamartManagementService.Test.Importer
             rofSchedulerRepo.Setup(r => r.CheckIfJobDateIsHoliday(It.IsAny<DateTime>()))
                 .ReturnsAsync((Holidays)null);
 
-            revenueSummaryRepo.Setup(r => r.AddRevenue(It.IsAny<RofRevenueByDate>()))
+            revenueSummaryRepo.Setup(r => r.AddRevenue(It.IsAny<List<RofRevenueByDate>>()))
                 .Returns(Task.CompletedTask);
 
             jobExecutionHistoryRepo.Setup(j => j.AddJobExecutionHistory(It.IsAny<JobExecutionHistory>()))
@@ -110,12 +111,13 @@ namespace DatamartManagementService.Test.Importer
             await revenueSummaryImporter.ImportRevenueSummary();
 
             revenueSummaryRepo.Verify(r =>
-                r.AddRevenue(It.Is<RofRevenueByDate>(rs =>
-                    rs.RevenueDate == DateTime.Today.AddDays(-1) &&
-                    rs.RevenueMonth == 10 &&
-                    rs.RevenueYear == 2023 &&
-                    rs.GrossRevenue == 25 &&
-                    rs.NetRevenuePostEmployeePay == 10)),
+                r.AddRevenue(It.Is<List<RofRevenueByDate>>(rs =>
+                    rs[0].PetServiceId == 1 &&
+                    rs[0].RevenueDate == DateTime.Today.AddDays(-1) &&
+                    rs[0].RevenueMonth == 10 &&
+                    rs[0].RevenueYear == 2023 &&
+                    rs[0].GrossRevenue == 25 &&
+                    rs[0].NetRevenuePostEmployeePay == 10)),
             Times.Once);
 
             jobExecutionHistoryRepo.Verify(j =>
