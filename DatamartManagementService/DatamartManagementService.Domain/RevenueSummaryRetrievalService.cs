@@ -7,7 +7,12 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public class RevenueSummaryRetrievalService
+    public interface IRevenueSummaryRetrievalService
+    {
+        Task<List<RofRevenueByDate>> GetRevenueBetweenDates(DateTime startDate, DateTime endDate);
+    }
+
+    public class RevenueSummaryRetrievalService : IRevenueSummaryRetrievalService
     {
         private readonly IRevenueByDateRetrievalRepository _revenueByDateRetrievalRepo;
 

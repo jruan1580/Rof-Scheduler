@@ -95,6 +95,19 @@ namespace DatamartManagementService.Test
             };
         }
 
+        public static RofRevenueByDate GetDbRevenueSummary()
+        {
+            return new RofRevenueByDate()
+            {
+                Id = 1,
+                RevenueDate = DateTime.Today,
+                RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
+                RevenueYear = Convert.ToInt16(DateTime.Today.Year),
+                GrossRevenue = 20,
+                NetRevenuePostEmployeePay = 5
+            };
+        }
+
         public static RofRevenueFromServicesCompletedByDate GetDbDetailedRevenue()
         {
             return new RofRevenueFromServicesCompletedByDate()
