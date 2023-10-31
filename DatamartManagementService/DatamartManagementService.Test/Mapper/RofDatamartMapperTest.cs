@@ -131,11 +131,38 @@ namespace DatamartManagementService.Test.Mapper
 
             var core = RofDatamartMappers.ToCoreDetailedRevenue(entities);
 
-            Assert.IsNotNull(entities[0]);
-            Assert.AreEqual(entities[0].Id, core[0].Id);
-            Assert.AreEqual(entities[0].RevenueDate, core[0].RevenueDate);
-            Assert.AreEqual(entities[0].PetServiceRate, core[0].PetServiceRate);
-            Assert.AreEqual(entities[0].NetRevenuePostEmployeeCut, core[0].NetRevenuePostEmployeeCut);
+            Assert.IsNotNull(core[0]);
+            Assert.AreEqual(core[0].Id, entities[0].Id);
+            Assert.AreEqual(core[0].RevenueDate, entities[0].RevenueDate);
+            Assert.AreEqual(core[0].PetServiceRate, entities[0].PetServiceRate);
+            Assert.AreEqual(core[0].NetRevenuePostEmployeeCut, entities[0].NetRevenuePostEmployeeCut);
+        }
+
+        [Test]
+        public void ToCoreRevenueSummary()
+        {
+            var entities = new List<Infrastructure.Persistence.RofDatamartEntities.RofRevenueByDate>()
+            {
+                new Infrastructure.Persistence.RofDatamartEntities.RofRevenueByDate()
+                {
+                    Id = 1,
+                    RevenueDate = DateTime.Today,
+                    RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
+                    RevenueYear = Convert.ToInt16(DateTime.Today.Year),
+                    GrossRevenue = 2000,
+                    NetRevenuePostEmployeePay = 1500
+                }
+            };
+
+            var core = RofDatamartMappers.ToCoreRevenueSummary(entities);
+
+            Assert.IsNotNull(core[0]);
+            Assert.AreEqual(core[0].Id, entities[0].Id);
+            Assert.AreEqual(core[0].RevenueDate, entities[0].RevenueDate);
+            Assert.AreEqual(core[0].RevenueMonth, entities[0].RevenueMonth);
+            Assert.AreEqual(core[0].RevenueYear, entities[0].RevenueYear);
+            Assert.AreEqual(core[0].GrossRevenue, entities[0].GrossRevenue);
+            Assert.AreEqual(core[0].NetRevenuePostEmployeePay, entities[0].NetRevenuePostEmployeePay);
         }
 
         [Test]
