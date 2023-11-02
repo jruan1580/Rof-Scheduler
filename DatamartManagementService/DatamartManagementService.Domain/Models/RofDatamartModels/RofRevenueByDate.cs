@@ -6,6 +6,8 @@ namespace DatamartManagementService.Domain.Models.RofDatamartModels
     {
         public long Id { get; set; }
 
+        public short PetServiceId { get; set; }
+
         public DateTime RevenueDate { get; set; }
 
         public short RevenueMonth { get; set; }

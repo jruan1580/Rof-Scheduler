@@ -141,25 +141,29 @@ namespace DatamartManagementService.Test.Mapper
         [Test]
         public void FromCoreRevenueSummary()
         {
-            var core = new RofRevenueByDate()
+            var core = new List<RofRevenueByDate>()
             {
-                Id = 1,
-                RevenueDate = DateTime.Today,
-                RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
-                RevenueYear = Convert.ToInt16(DateTime.Today.Year),
-                GrossRevenue = 2000,
-                NetRevenuePostEmployeePay = 1500
+                new RofRevenueByDate()
+                {
+                    Id = 1,
+                    PetServiceId = 1,
+                    RevenueDate = DateTime.Today,
+                    RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
+                    RevenueYear = Convert.ToInt16(DateTime.Today.Year),
+                    GrossRevenue = 200,
+                    NetRevenuePostEmployeePay = 90
+                }
             };
 
             var entity = RofDatamartMappers.FromCoreRevenueSummary(core);
 
             Assert.IsNotNull(entity);
-            Assert.AreEqual(entity.Id, core.Id);
-            Assert.AreEqual(entity.RevenueDate, core.RevenueDate);
-            Assert.AreEqual(entity.RevenueMonth, core.RevenueMonth);
-            Assert.AreEqual(entity.RevenueYear, core.RevenueYear);
-            Assert.AreEqual(entity.GrossRevenue, core.GrossRevenue);
-            Assert.AreEqual(entity.NetRevenuePostEmployeePay, core.NetRevenuePostEmployeePay);
+            Assert.AreEqual(entity[0].Id, core[0].Id);
+            Assert.AreEqual(entity[0].RevenueDate, core[0].RevenueDate);
+            Assert.AreEqual(entity[0].RevenueMonth, core[0].RevenueMonth);
+            Assert.AreEqual(entity[0].RevenueYear, core[0].RevenueYear);
+            Assert.AreEqual(entity[0].GrossRevenue, core[0].GrossRevenue);
+            Assert.AreEqual(entity[0].NetRevenuePostEmployeePay, core[0].NetRevenuePostEmployeePay);
         }
 
         [Test]

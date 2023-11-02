@@ -49,22 +49,30 @@ namespace DatamartManagementService.Domain.Importer
             }
         }
 
-        private async Task<RofRevenueByDate> GetRofRevenueByDate(List<JobEvent> completedEvents)
+        private async Task<List<RofRevenueByDate>> GetRofRevenueByDate(List<JobEvent> completedEvents)
         {
-            var petServiceInfo = await GetPetServiceInfoAssociatedWithJobEvent(completedEvents);
+            var rofRevenue = new List<RofRevenueByDate>();
 
-            var totalGrossRevenue = petServiceInfo.Sum(petService => petService.Price);
-            var totalNetRevenue = totalGrossRevenue -
-                petServiceInfo.Sum(petService => petService.EmployeeRate);
+            var eventsByPetService = completedEvents.GroupBy(e => e.PetServiceId)
+                .ToDictionary(e => e.Key, e => e.ToList());
 
-            var rofRevenue = new RofRevenueByDate()
+            foreach(var jobToPetService in eventsByPetService)
             {
-                RevenueDate = DateTime.Today.AddDays(-1),
-                RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
-                RevenueYear = Convert.ToInt16(DateTime.Today.Year),
-                GrossRevenue = totalGrossRevenue,
-                NetRevenuePostEmployeePay = totalNetRevenue
-            };
+                var petServiceInfo = await GetPetServiceInfoAssociatedWithJobEvent(jobToPetService.Value);
+                var totalGrossRevenue = petServiceInfo.Sum(petService => petService.Price);
+                var totalNetRevenue = totalGrossRevenue -
+                    petServiceInfo.Sum(petService => petService.EmployeeRate);
+
+                rofRevenue.Add(new RofRevenueByDate()
+                {
+                    PetServiceId = jobToPetService.Key,
+                    RevenueDate = DateTime.Today.AddDays(-1),
+                    RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
+                    RevenueYear = Convert.ToInt16(DateTime.Today.Year),
+                    GrossRevenue = totalGrossRevenue,
+                    NetRevenuePostEmployeePay = totalNetRevenue
+                });
+            }
 
             return rofRevenue;
         }
