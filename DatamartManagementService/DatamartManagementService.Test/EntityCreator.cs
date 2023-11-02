@@ -100,6 +100,7 @@ namespace DatamartManagementService.Test
             return new RofRevenueByDate()
             {
                 Id = 1,
+                PetServiceId = 1,
                 RevenueDate = DateTime.Today,
                 RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
                 RevenueYear = Convert.ToInt16(DateTime.Today.Year),

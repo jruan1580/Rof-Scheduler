@@ -87,6 +87,7 @@ namespace DatamartManagementService.Domain.Mappers.Database
                 coreRevenueSummary.Add(new CoreRevenueSummary()
                 {
                     Id = dbRevenue.Id,
+                    PetServiceId = dbRevenue.PetServiceId,
                     RevenueDate = dbRevenue.RevenueDate,
                     RevenueMonth = dbRevenue.RevenueMonth,
                     RevenueYear = dbRevenue.RevenueYear,

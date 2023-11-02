@@ -22,7 +22,7 @@ namespace DatamartManagementService.Test.Service
 
             var revenueSummaryService = new RevenueSummaryRetrievalService(revenueByDateRetrievalRepo.Object);
 
-            var results = await revenueSummaryService.GetRevenueBetweenDates(DateTime.Today.AddDays(-1), DateTime.Today);
+            var results = await revenueSummaryService.GetRevenueBetweenDatesByPetService(DateTime.Today.AddDays(-1), DateTime.Today);
 
             Assert.IsEmpty(results);
         }
@@ -42,16 +42,16 @@ namespace DatamartManagementService.Test.Service
 
             var revenueSummaryService = new RevenueSummaryRetrievalService(revenueByDateRetrievalRepo.Object);
 
-            var results = await revenueSummaryService.GetRevenueBetweenDates(DateTime.Today.AddDays(-1), DateTime.Today);
+            var results = await revenueSummaryService.GetRevenueBetweenDatesByPetService(DateTime.Today.AddDays(-1), DateTime.Today);
 
             Assert.IsNotNull(results);
             Assert.AreEqual(1, results.Count);
-            Assert.AreEqual(1, results[DateTime.Today].Count);
-            Assert.AreEqual(DateTime.Today, results[DateTime.Today][0].RevenueDate);
-            Assert.AreEqual(DateTime.Today.Month, results[DateTime.Today][0].RevenueMonth);
-            Assert.AreEqual(DateTime.Today.Year, results[DateTime.Today][0].RevenueYear);
-            Assert.AreEqual(20, results[DateTime.Today][0].GrossRevenue);
-            Assert.AreEqual(5, results[DateTime.Today][0].NetRevenuePostEmployeePay);
+            Assert.AreEqual(1, results[1].Count);
+            Assert.AreEqual(DateTime.Today, results[1][0].RevenueDate);
+            Assert.AreEqual(DateTime.Today.Month, results[1][0].RevenueMonth);
+            Assert.AreEqual(DateTime.Today.Year, results[1][0].RevenueYear);
+            Assert.AreEqual(20, results[1][0].GrossRevenue);
+            Assert.AreEqual(5, results[1][0].NetRevenuePostEmployeePay);
         }
     }
 }

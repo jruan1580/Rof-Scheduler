@@ -57,8 +57,8 @@ namespace DatamartManagementService.Test.Importer
                 r.AddRevenue(It.Is<List<RofRevenueByDate>>(rs =>
                     rs[0].PetServiceId == 1 &&
                     rs[0].RevenueDate == DateTime.Today.AddDays(-1) &&
-                    rs[0].RevenueMonth == 10 &&
-                    rs[0].RevenueYear == 2023 &&
+                    rs[0].RevenueMonth == Convert.ToInt16(DateTime.Today.AddDays(-1).Month) &&
+                    rs[0].RevenueYear == Convert.ToInt16(DateTime.Today.AddDays(-1).Year) &&
                     rs[0].GrossRevenue == 25 &&
                     rs[0].NetRevenuePostEmployeePay == 10)),
             Times.Once);
@@ -114,8 +114,8 @@ namespace DatamartManagementService.Test.Importer
                 r.AddRevenue(It.Is<List<RofRevenueByDate>>(rs =>
                     rs[0].PetServiceId == 1 &&
                     rs[0].RevenueDate == DateTime.Today.AddDays(-1) &&
-                    rs[0].RevenueMonth == 10 &&
-                    rs[0].RevenueYear == 2023 &&
+                    rs[0].RevenueMonth == Convert.ToInt16(DateTime.Today.AddDays(-1).Month) &&
+                    rs[0].RevenueYear == Convert.ToInt16(DateTime.Today.AddDays(-1).Year) &&
                     rs[0].GrossRevenue == 25 &&
                     rs[0].NetRevenuePostEmployeePay == 10)),
             Times.Once);

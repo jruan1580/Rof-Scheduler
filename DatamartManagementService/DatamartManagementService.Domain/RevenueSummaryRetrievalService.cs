@@ -10,7 +10,7 @@ namespace DatamartManagementService.Domain
 {
     public interface IRevenueSummaryRetrievalService
     {
-        Task<Dictionary<DateTime, List<RofRevenueByDate>>> GetRevenueBetweenDates(DateTime startDate, DateTime endDate);
+        Task<Dictionary<short, List<RofRevenueByDate>>> GetRevenueBetweenDatesByPetService(DateTime startDate, DateTime endDate);
     }
 
     public class RevenueSummaryRetrievalService : IRevenueSummaryRetrievalService
@@ -22,13 +22,13 @@ namespace DatamartManagementService.Domain
             _revenueByDateRetrievalRepo = revenueByDateRetrievalRepo;
         }
 
-        public async Task<Dictionary<DateTime, List<RofRevenueByDate>>> GetRevenueBetweenDates(DateTime startDate, DateTime endDate)
+        public async Task<Dictionary<short, List<RofRevenueByDate>>> GetRevenueBetweenDatesByPetService(DateTime startDate, DateTime endDate)
         {
             var dbRevenue = await _revenueByDateRetrievalRepo.GetRevenueBetweenDates(startDate, endDate);
 
             var revenue = RofDatamartMappers.ToCoreRevenueSummary(dbRevenue);
 
-            var revenueByDates = revenue.GroupBy(r => r.RevenueDate)
+            var revenueByDates = revenue.GroupBy(r => r.PetServiceId)
                 .ToDictionary(r => r.Key, r => r.ToList());
 
             return revenueByDates;
