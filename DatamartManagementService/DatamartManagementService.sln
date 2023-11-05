@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatamartManagementService.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataMart", "DataMart\DataMart.csproj", "{9D481914-5B7A-469D-84F4-BF7F3E3AC88B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatamartManagementService.Test", "DatamartManagementService.Test\DatamartManagementService.Test.csproj", "{6E774E52-2218-42BE-9FFD-CF645989A53D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatamartManagementService.Test", "DatamartManagementService.Test\DatamartManagementService.Test.csproj", "{6E774E52-2218-42BE-9FFD-CF645989A53D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatamartManagementService.DTO", "DatamartManagementService.DTO\DatamartManagementService.DTO.csproj", "{F76756F3-409D-4FF7-AC42-F39F9A178613}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{6E774E52-2218-42BE-9FFD-CF645989A53D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E774E52-2218-42BE-9FFD-CF645989A53D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E774E52-2218-42BE-9FFD-CF645989A53D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F76756F3-409D-4FF7-AC42-F39F9A178613}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F76756F3-409D-4FF7-AC42-F39F9A178613}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F76756F3-409D-4FF7-AC42-F39F9A178613}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F76756F3-409D-4FF7-AC42-F39F9A178613}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
