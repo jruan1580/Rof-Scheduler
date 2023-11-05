@@ -11,10 +11,6 @@ namespace DatamartManagementService.Domain.Mappers.DTO
 
             dtoPetService.Id = corePetService.Id;
             dtoPetService.ServiceName = corePetService.ServiceName;
-            dtoPetService.EmployeeRate = corePetService.EmployeeRate;
-            dtoPetService.Price = corePetService.Price;
-            dtoPetService.Duration = corePetService.Duration;
-            dtoPetService.TimeUnit = corePetService.TimeUnit;
 
             return dtoPetService;
         }
@@ -25,10 +21,6 @@ namespace DatamartManagementService.Domain.Mappers.DTO
 
             corePetService.Id = dtoPetService.Id;
             corePetService.ServiceName = dtoPetService.ServiceName;
-            corePetService.EmployeeRate = dtoPetService.EmployeeRate;
-            corePetService.Price = dtoPetService.Price;
-            corePetService.Duration = dtoPetService.Duration;
-            corePetService.TimeUnit = dtoPetService.TimeUnit;
 
             return corePetService;
         }
