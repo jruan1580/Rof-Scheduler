@@ -67,8 +67,8 @@ namespace DatamartManagementService.Domain.Importer
                 {
                     PetServiceId = jobToPetService.Key,
                     RevenueDate = DateTime.Today.AddDays(-1),
-                    RevenueMonth = Convert.ToInt16(DateTime.Today.Month),
-                    RevenueYear = Convert.ToInt16(DateTime.Today.Year),
+                    RevenueMonth = Convert.ToInt16(DateTime.Today.AddDays(-1).Month),
+                    RevenueYear = Convert.ToInt16(DateTime.Today.AddDays(-1).Year),
                     GrossRevenue = totalGrossRevenue,
                     NetRevenuePostEmployeePay = totalNetRevenue
                 });

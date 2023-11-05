@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using DbDetailedRevenue = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.RofRevenueFromServicesCompletedByDate;
 using CoreDetailedRevenue = DatamartManagementService.Domain.Models.RofDatamartModels.RofRevenueFromServicesCompletedByDate;
 using DbDetailedPayroll = DatamartManagementService.Infrastructure.Persistence.RofDatamartEntities.EmployeePayrollDetail;
@@ -76,6 +76,27 @@ namespace DatamartManagementService.Domain.Mappers.Database
             }
 
             return dbDetailedRevenue;
+        }
+
+        public static List<CoreRevenueSummary> ToCoreRevenueSummary(List<DbRevenueSummary> dbRevenueSummary)
+        {
+            var coreRevenueSummary = new List<CoreRevenueSummary>();
+
+            foreach(var dbRevenue in dbRevenueSummary)
+            {
+                coreRevenueSummary.Add(new CoreRevenueSummary()
+                {
+                    Id = dbRevenue.Id,
+                    PetServiceId = dbRevenue.PetServiceId,
+                    RevenueDate = dbRevenue.RevenueDate,
+                    RevenueMonth = dbRevenue.RevenueMonth,
+                    RevenueYear = dbRevenue.RevenueYear,
+                    GrossRevenue = dbRevenue.GrossRevenue,
+                    NetRevenuePostEmployeePay = dbRevenue.NetRevenuePostEmployeePay
+                });
+            }
+
+            return coreRevenueSummary;
         }
 
         public static List<DbRevenueSummary> FromCoreRevenueSummary(List<CoreRevenueSummary> coreRevenueSummary)

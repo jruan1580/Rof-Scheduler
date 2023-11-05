@@ -1,3 +1,4 @@
+using DatamartManagementService.Domain;
 using DatamartManagementService.Domain.Importer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,10 +18,15 @@ namespace DataMart
             services.AddSingleton<IDetailedPayrollImporter, DetailedPayrollImporter>();
             services.AddSingleton<IRevenueSummaryImporter, RevenueSummaryImporter>();
             services.AddSingleton<IPayrollSummaryImporter, PayrollSummaryImporter>();
+            
             services.AddDatabaseDependencies();
+
+            services.AddTransient<IRevenueSummaryRetrievalService, RevenueSummaryRetrievalService>();
+            
 
             services.AddHostedService<ImportRevenueDataBackgroundService>();
             services.AddHostedService<ImportPayrollDataBackgroundService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
