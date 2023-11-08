@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DatamartManagementService.DTO\DatamartManagementService.DTO.csproj" />
     <ProjectReference Include="..\DatamartManagementService.Infrastructure\DatamartManagementService.Infrastructure.csproj" />
   </ItemGroup>
 
