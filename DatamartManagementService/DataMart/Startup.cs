@@ -1,15 +1,28 @@
 using DatamartManagementService.Domain;
 using DatamartManagementService.Domain.Importer;
+using DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DataMart
 {
     public class Startup
     {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -18,14 +31,58 @@ namespace DataMart
             services.AddSingleton<IDetailedPayrollImporter, DetailedPayrollImporter>();
             services.AddSingleton<IRevenueSummaryImporter, RevenueSummaryImporter>();
             services.AddSingleton<IPayrollSummaryImporter, PayrollSummaryImporter>();
+
+            services.AddSingleton<IRevenueByDateRetrievalRepository, RevenueByDateRetrievalRepository>();
             
             services.AddDatabaseDependencies();
 
             services.AddTransient<IRevenueSummaryRetrievalService, RevenueSummaryRetrievalService>();
-            
+
+            services.AddControllers();
 
             services.AddHostedService<ImportRevenueDataBackgroundService>();
             services.AddHostedService<ImportPayrollDataBackgroundService>();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = Configuration.GetSection("Jwt:Issuer").Value,
+                    ValidAudience = Configuration.GetSection("Jwt:Audience").Value,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("Jwt:Key").Value))
+                };
+                options.Events = new JwtBearerEvents()
+                {
+                    OnMessageReceived = context =>
+                    {
+                        //no auth header, get it out of cookie, otw, it is in auth header
+                        if (!context.Request.Headers.ContainsKey("Authorization"))
+                        {
+                            if (context.Request.Cookies.ContainsKey("X-Access-Token-Client"))
+                            {
+                                context.Token = context.Request.Cookies["X-Access-Token-Client"];
+                            }
+
+                            if (context.Request.Cookies.ContainsKey("X-Access-Token-Admin"))
+                            {
+                                context.Token = context.Request.Cookies["X-Access-Token-Admin"];
+                            }
+
+                            if (context.Request.Cookies.ContainsKey("X-Access-Token-Employee"))
+                            {
+                                context.Token = context.Request.Cookies["X-Access-Token-Employee"];
+                            }
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
+            });
 
         }
 
@@ -37,7 +94,19 @@ namespace DataMart
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
+
             app.UseRouting();
+
+            app.UseCors(x => x
+                .WithOrigins("http://localhost:3000", "https://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -45,6 +114,8 @@ namespace DataMart
                 {
                     await context.Response.WriteAsync("Hello World!");
                 });
+
+                endpoints.MapControllers();
             });
         }
     }

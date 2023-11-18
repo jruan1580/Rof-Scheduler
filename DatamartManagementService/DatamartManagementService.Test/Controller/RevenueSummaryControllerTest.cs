@@ -30,7 +30,7 @@ namespace DatamartManagementService.Test.Controller
 
             var controller = new RevenueSummaryController(revenueSummaryRetrievalService.Object);
 
-            var response = await controller.GetRevenueBetweenDatesByPetService(DateTime.Today.AddDays(-1), DateTime.Today);
+            var response = await controller.GetRevenueBetweenDatesByPetService(DateTime.Today.AddDays(-1).ToString(), DateTime.Today.ToString());
 
             Assert.NotNull(response);
             Assert.AreEqual(response.GetType(), typeof(OkObjectResult));

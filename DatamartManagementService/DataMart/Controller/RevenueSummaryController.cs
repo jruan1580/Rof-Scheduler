@@ -1,10 +1,7 @@
 ﻿using DatamartManagementService.Domain;
 using DatamartManagementService.Domain.Mappers.DTO;
-using DatamartManagementService.Domain.Models.RofDatamartModels;
 using DatamartManagementService.DTO;
-using DatamartManagementService.DTO.RofSchedulerDTO;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -26,11 +23,17 @@ namespace DataMart.Controller
 
         [Authorize(Roles = "Administrator")]
         [HttpGet]
-        public async Task<IActionResult> GetRevenueBetweenDatesByPetService([FromBody] DateTime startDate, [FromBody] DateTime endDate)
+        public async Task<IActionResult> GetRevenueBetweenDatesByPetService([FromQuery] string startDate, [FromQuery] string endDate)
         {
             var revenuePerServiceDTO = new List<RevenueSummaryPerPetServiceDTO>();
 
-            var revenuePerService = await _revenueSummaryRetrievalService.GetRevenueBetweenDatesByPetService(startDate, endDate);
+            var start = new DateTime();
+            var end = new DateTime();
+
+            DateTime.TryParse(startDate, out start);
+            DateTime.TryParse(endDate, out end);
+
+            var revenuePerService = await _revenueSummaryRetrievalService.GetRevenueBetweenDatesByPetService(start, end);
 
             foreach(var service in revenuePerService)
             {
