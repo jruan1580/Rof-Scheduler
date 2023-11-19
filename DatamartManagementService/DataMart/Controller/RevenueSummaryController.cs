@@ -30,8 +30,16 @@ namespace DataMart.Controller
             var start = new DateTime();
             var end = new DateTime();
 
-            DateTime.TryParse(startDate, out start);
-            DateTime.TryParse(endDate, out end);
+
+            if (!DateTime.TryParse(startDate, out start))
+            {
+                throw new ArgumentException("Start date is not a date.");
+            }
+
+            if(!DateTime.TryParse(endDate, out end))
+            {
+                throw new ArgumentException("End date is not a date.");
+            }
 
             var revenuePerService = await _revenueSummaryRetrievalService.GetRevenueBetweenDatesByPetService(start, end);
 
