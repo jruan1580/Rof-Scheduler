@@ -42,7 +42,7 @@ function App() {
             <Route exact path="/petmanagement" element={!isLogin ? <Navigate to="/" /> : <PetManagement setLoginState={setLogin} />} />
             <Route exact path="/holidaymanagement" element={!isLogin ? <Navigate to="/" /> : <Holidaymanagement setLoginState={setLogin} />} />
             <Route exact path="/petservicemanagement" element={!isLogin ? <Navigate to="/" /> : <PetService setLoginState={setLogin} />} />
-            <Route exact path="/revenue" element={!isLogin ? <Navigate to="/" /> : <RevenueSummary setLoginState={setLogin} />} />
+            <Route exact path="/revenuesummary" element={!isLogin ? <Navigate to="/" /> : <RevenueSummary setLoginState={setLogin} />} />
           </Routes>
         </Container>
       </BrowserRouter>
