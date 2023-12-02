@@ -412,3 +412,17 @@ export const ensureUpdateEventInformationProvided = function (employeeId, petId,
 
   return validationErrors;
 };
+
+export const ensureDateSearchInformationProvided = function (startDate, endDate) {
+  var validationErrors = new Map();
+
+  if (startDate === undefined || startDate === "") {
+    validationErrors.set("startDate", "Please choose a start date.");
+  }
+
+  if (endDate === undefined || endDate === "") {
+    validationErrors.set("endDate", "Please choose an end date");
+  }
+
+  return validationErrors;
+};
