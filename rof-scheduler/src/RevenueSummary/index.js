@@ -25,7 +25,6 @@ function RevenueSummary({setLoginState}){
         <>
             <h1>REVENUE SUMMARY</h1>
             <br />
-            
             <Form onSubmit={search}>
                 <Row>
                     <Form.Group as={Col} lg={6}>
