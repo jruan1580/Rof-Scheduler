@@ -4,6 +4,7 @@ import { ensureDateSearchInformationProvided } from "../SharedServices/inputVali
 
 function RevenueSummary({setLoginState}){
     const [validationMap, setValidationMap] = useState(new Map());
+    const [showTable, setShowTable] = useState(false);
 
     const search = (e) => {
         e.preventDefault();
@@ -19,6 +20,7 @@ function RevenueSummary({setLoginState}){
             }
 
         setValidationMap(new Map());
+        setShowTable(true);
     };
 
     return(
@@ -64,25 +66,27 @@ function RevenueSummary({setLoginState}){
             <hr />
             <br />
 
-            <Tabs
-                defaultActiveKey="home"
-                id="justify-tab-example"
-                className="mb-3"
-                justify
-            >
-                <Tab eventKey="pet" title="Pet">
-                    Tab content for Home
-                </Tab>
-                <Tab eventKey="numOfEvents" title="Number of Events">
-                    Tab content for Profile
-                </Tab>
-                <Tab eventKey="grossRevenue" title="Gross Revenue">
-                    Tab content for Loooonger Tab
-                </Tab>
-                <Tab eventKey="netRevenue" title="Net Revenue">
-                    Tab content for Contact
-                </Tab>
-            </Tabs>
+            {showTable && 
+                <Tabs
+                    defaultActiveKey="home"
+                    id="justify-tab-example"
+                    className="mb-3"
+                    justify
+                >
+                    <Tab eventKey="pet" title="Pet">
+                        Tab content for Home
+                    </Tab>
+                    <Tab eventKey="numOfEvents" title="Number of Events">
+                        Tab content for Profile
+                    </Tab>
+                    <Tab eventKey="grossRevenue" title="Gross Revenue">
+                        Tab content for Loooonger Tab
+                    </Tab>
+                    <Tab eventKey="netRevenue" title="Net Revenue">
+                        Tab content for Contact
+                    </Tab>
+                </Tabs>
+            }
         </>
     );
 }
