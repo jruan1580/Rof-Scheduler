@@ -1,4 +1,4 @@
-import { Row, Form, Col, Button, Spinner, Alert } from "react-bootstrap";
+import { Row, Form, Col, Button, Tabs, Tab } from "react-bootstrap";
 import { useState } from "react";
 import { ensureDateSearchInformationProvided } from "../SharedServices/inputValidationService";
 
@@ -60,6 +60,29 @@ function RevenueSummary({setLoginState}){
                 <Button type="submit" variant="primary" className="float-end ms-2">Search</Button>
             </Form>
             <br />
+            <br />
+            <hr />
+            <br />
+
+            <Tabs
+                defaultActiveKey="home"
+                id="justify-tab-example"
+                className="mb-3"
+                justify
+            >
+                <Tab eventKey="pet" title="Pet">
+                    Tab content for Home
+                </Tab>
+                <Tab eventKey="numOfEvents" title="Number of Events">
+                    Tab content for Profile
+                </Tab>
+                <Tab eventKey="grossRevenue" title="Gross Revenue">
+                    Tab content for Loooonger Tab
+                </Tab>
+                <Tab eventKey="netRevenue" title="Net Revenue">
+                    Tab content for Contact
+                </Tab>
+            </Tabs>
         </>
     );
 }
