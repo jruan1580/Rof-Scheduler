@@ -70,7 +70,7 @@ function RevenueSummary({setLoginState}){
                 <Table responsive striped bordered>
                     <thead>
                         <tr>
-                            <th>Pet</th>
+                            <th>Pet Service</th>
                             <th>Number of Events</th>
                             <th>Gross Revenue</th>
                             <th>Net Revenue</th>
