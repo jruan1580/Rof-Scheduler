@@ -1,9 +1,10 @@
-import { Row, Form, Col, Button, Spinner, Alert } from "react-bootstrap";
+import { Row, Form, Col, Button, Table } from "react-bootstrap";
 import { useState } from "react";
 import { ensureDateSearchInformationProvided } from "../SharedServices/inputValidationService";
 
 function RevenueSummary({setLoginState}){
     const [validationMap, setValidationMap] = useState(new Map());
+    const [showTable, setShowTable] = useState(false);
 
     const search = (e) => {
         e.preventDefault();
@@ -19,6 +20,7 @@ function RevenueSummary({setLoginState}){
             }
 
         setValidationMap(new Map());
+        setShowTable(true);
     };
 
     return(
@@ -60,6 +62,27 @@ function RevenueSummary({setLoginState}){
                 <Button type="submit" variant="primary" className="float-end ms-2">Search</Button>
             </Form>
             <br />
+            <br />
+            <hr />
+            <br />
+
+            {showTable && 
+                <Table responsive striped bordered>
+                    <thead>
+                        <tr>
+                            <th>Pet Service</th>
+                            <th>Number of Events</th>
+                            <th>Gross Revenue</th>
+                            <th>Net Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </Table>
+            }
         </>
     );
 }
