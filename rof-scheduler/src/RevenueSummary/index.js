@@ -1,10 +1,12 @@
 import { Row, Form, Col, Button, Table } from "react-bootstrap";
 import { useState } from "react";
 import { ensureDateSearchInformationProvided } from "../SharedServices/inputValidationService";
+import { getRevenueBetweenDatesByPetService } from "../SharedServices/datamartService";
 
 function RevenueSummary({setLoginState}){
     const [validationMap, setValidationMap] = useState(new Map());
     const [showTable, setShowTable] = useState(false);
+    const [revSummary, setRevSummary] = useState([]);
 
     const search = (e) => {
         e.preventDefault();
@@ -20,6 +22,8 @@ function RevenueSummary({setLoginState}){
             }
 
         setValidationMap(new Map());
+
+        //get request
         setShowTable(true);
     };
 
@@ -77,9 +81,16 @@ function RevenueSummary({setLoginState}){
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                        </tr>
+                        {
+                            revSummary.length != 0 &&
+                            revSummary.map((summary) => {
+                                return(
+                                    <tr key = {summary.id}>
+                                        <td></td>
+                                    </tr>
+                                )
+                            })
+                        }
                     </tbody>
                 </Table>
             }
