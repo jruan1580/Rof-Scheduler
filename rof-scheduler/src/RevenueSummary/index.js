@@ -23,8 +23,24 @@ function RevenueSummary({setLoginState}){
 
         setValidationMap(new Map());
 
-        //get request
-        setShowTable(true);
+        (async function () {
+            try {
+                const resp = await getRevenueBetweenDatesByPetService(startDate, endDate);
+                
+                if (resp.status === 401){
+                    setLoginState(false);
+                    return;
+                }
+
+                const revSum = await resp.json();
+
+                setRevSummary(revSum);
+            } catch (e) {
+                setErrorMessage(e.message);
+            }
+            })();        
+            
+            setShowTable(true);
     };
 
     return(
@@ -86,7 +102,10 @@ function RevenueSummary({setLoginState}){
                             revSummary.map((summary) => {
                                 return(
                                     <tr key = {summary.id}>
-                                        <td></td>
+                                        <td>{summary.petService.serviceName}</td>
+                                        <td>{summary.count}</td>
+                                        <td>{summary.grossRevenuePerService}</td>
+                                        <td>{summary.netRevenuePerService}</td>
                                     </tr>
                                 )
                             })
