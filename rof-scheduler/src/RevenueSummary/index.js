@@ -1,4 +1,4 @@
-import { Row, Form, Col, Button, Table } from "react-bootstrap";
+import { Row, Form, Col, Button, Table, Alert } from "react-bootstrap";
 import { useState } from "react";
 import { ensureDateSearchInformationProvided } from "../SharedServices/inputValidationService";
 import { getRevenueBetweenDatesByPetService } from "../SharedServices/datamartService";
@@ -85,6 +85,10 @@ function RevenueSummary({setLoginState}){
             <br />
             <hr />
             <br />
+
+            {errorMessage !== undefined && (
+                <Alert variant="danger">{errorMessage}</Alert>
+            )}
 
             {showTable && 
                 <Table responsive striped bordered>
