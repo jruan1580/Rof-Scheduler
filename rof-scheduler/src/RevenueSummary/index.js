@@ -7,6 +7,7 @@ function RevenueSummary({setLoginState}){
     const [validationMap, setValidationMap] = useState(new Map());
     const [showTable, setShowTable] = useState(false);
     const [revSummary, setRevSummary] = useState([]);
+    const [errorMessage, setErrorMessage] = useState(undefined);
 
     const search = (e) => {
         e.preventDefault();
@@ -101,7 +102,7 @@ function RevenueSummary({setLoginState}){
                             revSummary.length != 0 &&
                             revSummary.map((summary) => {
                                 return(
-                                    <tr key = {summary.id}>
+                                    <tr key = {summary.petService.serviceName}>
                                         <td>{summary.petService.serviceName}</td>
                                         <td>{summary.count}</td>
                                         <td>{summary.grossRevenuePerService}</td>
