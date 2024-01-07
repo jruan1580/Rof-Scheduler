@@ -40,7 +40,13 @@ function RevenueSummary({setLoginState}){
             }
             })();        
             
-            setShowTable(true);
+            if(revSummary.length === 0){
+                setErrorMessage("No revenue found for this period.");
+                setShowTable(false);
+            }else{
+                setErrorMessage(undefined);
+                setShowTable(true);
+            }
     };
 
     return(
