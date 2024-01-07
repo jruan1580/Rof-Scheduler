@@ -18,7 +18,6 @@ function RevenueSummary({setLoginState}){
         var inputValidations = ensureDateSearchInformationProvided (startDate, endDate);
             if (inputValidations.size > 0) {
                 setValidationMap(inputValidations);
-                console.log(inputValidations);
                 return;
             }
 
