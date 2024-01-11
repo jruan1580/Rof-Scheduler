@@ -1,10 +1,13 @@
-import { Row, Form, Col, Button, Table } from "react-bootstrap";
+import { Row, Form, Col, Button, Table, Alert } from "react-bootstrap";
 import { useState } from "react";
 import { ensureDateSearchInformationProvided } from "../SharedServices/inputValidationService";
+import { getRevenueBetweenDatesByPetService } from "../SharedServices/datamartService";
 
 function RevenueSummary({setLoginState}){
     const [validationMap, setValidationMap] = useState(new Map());
     const [showTable, setShowTable] = useState(false);
+    const [revSummary, setRevSummary] = useState([]);
+    const [errorMessage, setErrorMessage] = useState(undefined);
 
     const search = (e) => {
         e.preventDefault();
@@ -15,12 +18,35 @@ function RevenueSummary({setLoginState}){
         var inputValidations = ensureDateSearchInformationProvided (startDate, endDate);
             if (inputValidations.size > 0) {
                 setValidationMap(inputValidations);
-                console.log(inputValidations);
                 return;
             }
 
         setValidationMap(new Map());
-        setShowTable(true);
+
+        (async function () {
+            try {
+                const resp = await getRevenueBetweenDatesByPetService(startDate, endDate);
+                
+                if (resp.status === 401){
+                    setLoginState(false);
+                    return;
+                }
+
+                const revSum = await resp.json();
+
+                setRevSummary(revSum);
+            } catch (e) {
+                setErrorMessage(e.message);
+            }
+            })();        
+            
+            if(revSummary.length === 0){
+                setErrorMessage("No revenue found for this period.");
+                setShowTable(false);
+            }else{
+                setErrorMessage(undefined);
+                setShowTable(true);
+            }
     };
 
     return(
@@ -66,6 +92,10 @@ function RevenueSummary({setLoginState}){
             <hr />
             <br />
 
+            {errorMessage !== undefined && (
+                <Alert variant="danger">{errorMessage}</Alert>
+            )}
+
             {showTable && 
                 <Table responsive striped bordered>
                     <thead>
@@ -77,9 +107,19 @@ function RevenueSummary({setLoginState}){
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                        </tr>
+                        {
+                            revSummary.length != 0 &&
+                            revSummary.map((summary) => {
+                                return(
+                                    <tr key = {summary.petService.serviceName}>
+                                        <td>{summary.petService.serviceName}</td>
+                                        <td>{summary.count}</td>
+                                        <td>{summary.grossRevenuePerService}</td>
+                                        <td>{summary.netRevenuePerService}</td>
+                                    </tr>
+                                )
+                            })
+                        }
                     </tbody>
                 </Table>
             }
