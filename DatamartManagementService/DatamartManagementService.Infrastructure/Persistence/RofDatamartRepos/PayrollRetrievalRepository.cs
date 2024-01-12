@@ -10,7 +10,8 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
     public interface IPayrollRetrievalRepository
     {
         Task<List<EmployeePayroll>> GetEmployeePayrollByEmployeeId(long id);
-        Task<List<EmployeePayroll>> GetEmployeePayrollForCertainPeriodByEmployeeId(long id, DateTime startDate, DateTime endDate);
+        Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(long id, DateTime startDate, DateTime endDate);
+        Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDates(DateTime startDate, DateTime endDate);
     }
 
     public class PayrollRetrievalRepository : IPayrollRetrievalRepository
@@ -24,12 +25,22 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
             return employeePayroll;
         }
 
-        public async Task<List<EmployeePayroll>> GetEmployeePayrollForCertainPeriodByEmployeeId(long id, DateTime startDate, DateTime endDate)
+        public async Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(long id, DateTime startDate, DateTime endDate)
         {
             using var context = new RofDatamartContext();
 
             var employeePayrollByDate = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id
                 && ep.PayrollDate >= startDate
+                && ep.PayrollDate <= endDate).ToListAsync();
+
+            return employeePayrollByDate;
+        }
+
+        public async Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDates(DateTime startDate, DateTime endDate)
+        {
+            using var context = new RofDatamartContext();
+
+            var employeePayrollByDate = await context.EmployeePayroll.Where(ep => ep.PayrollDate >= startDate
                 && ep.PayrollDate <= endDate).ToListAsync();
 
             return employeePayrollByDate;
