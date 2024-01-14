@@ -10,9 +10,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
     public interface IPayrollRetrievalRepository
     {
         Task<List<EmployeePayroll>> GetEmployeePayrollByEmployeeId(long id);
-        Task<(List<EmployeePayroll>, int)> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, 
-            DateTime startDate, DateTime endDate, 
-            int page = 1, int offset = 10);
+        Task<(List<EmployeePayroll>, int)> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, DateTime startDate, DateTime endDate);
     }
 
     public class PayrollRetrievalRepository : IPayrollRetrievalRepository
@@ -27,8 +25,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
         }
 
         public async Task<(List<EmployeePayroll>, int)> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, 
-            DateTime startDate, DateTime endDate, 
-            int page = 1, int offset = 10)
+            DateTime startDate, DateTime endDate)
         {
             using var context = new RofDatamartContext();
 
@@ -40,18 +37,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
                 employeePayrollByDate = FilterByEmployee(employeePayrollByDate, firstName, lastName);
             }
 
-            var countByCriteria = await employeePayrollByDate.CountAsync();
-
-            var skip = (page - 1) * offset;
-
-            var totalPages = GetTotalPages(countByCriteria, offset, page);
-
-            var result = await employeePayrollByDate.OrderBy(p => p.LastName)
-                    .ThenBy(p => p.FirstName)
-                    .Skip(skip)
-                    .Take(offset).ToListAsync();
-
-            return (result, totalPages);
+            return await GetPayrollByPages(employeePayrollByDate);
         }
 
         private IQueryable<EmployeePayroll> FilterByEmployee(IQueryable<EmployeePayroll> employeePayrollByDate, string firstName, string lastName)
@@ -64,6 +50,22 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
 
             return employeePayrollByDate.Where(ep => ep.FirstName == firstName
                 && ep.LastName == lastName);
+        }
+
+        private async Task<(List<EmployeePayroll>, int)> GetPayrollByPages(IQueryable<EmployeePayroll> employeePayroll, int page = 1, int offset = 10)
+        {
+            var countByCriteria = await employeePayroll.CountAsync();
+
+            var skip = (page - 1) * offset;
+
+            var totalPages = GetTotalPages(countByCriteria, offset, page);
+
+            var result = await employeePayroll.OrderBy(p => p.LastName)
+                    .ThenBy(p => p.FirstName)
+                    .Skip(skip)
+                    .Take(offset).ToListAsync();
+
+            return (result, totalPages);
         }
 
         private int GetTotalPages(int numOfRecords, int pageSize, int pageRequested)
