@@ -42,14 +42,14 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
 
         private IQueryable<EmployeePayroll> FilterByEmployee(IQueryable<EmployeePayroll> employeePayrollByDate, string firstName, string lastName)
         {
-            if(!string.IsNullOrEmpty(firstName) || !string.IsNullOrEmpty(lastName))
+            if(!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
             {
-                return employeePayrollByDate.Where(ep => ep.FirstName.ToLower().Contains(firstName)
-                   || ep.LastName.ToLower().Contains(lastName));
+                return employeePayrollByDate.Where(ep => ep.FirstName == firstName
+                    && ep.LastName == lastName);
             }
 
-            return employeePayrollByDate.Where(ep => ep.FirstName == firstName
-                && ep.LastName == lastName);
+            return employeePayrollByDate.Where(ep => ep.FirstName.ToLower().Contains(firstName)
+                || ep.LastName.ToLower().Contains(lastName));
         }
 
         private async Task<(List<EmployeePayroll>, int)> GetPayrollByPages(IQueryable<EmployeePayroll> employeePayroll, int page = 1, int offset = 10)
