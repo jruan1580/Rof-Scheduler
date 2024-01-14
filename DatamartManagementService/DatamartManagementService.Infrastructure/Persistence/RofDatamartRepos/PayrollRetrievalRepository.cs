@@ -10,8 +10,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
     public interface IPayrollRetrievalRepository
     {
         Task<List<EmployeePayroll>> GetEmployeePayrollByEmployeeId(long id);
-        Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(long id, DateTime startDate, DateTime endDate);
-        Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDates(DateTime startDate, DateTime endDate);
+        Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, DateTime startDate, DateTime endDate);
     }
 
     public class PayrollRetrievalRepository : IPayrollRetrievalRepository
@@ -25,25 +24,26 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
             return employeePayroll;
         }
 
-        public async Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(long id, DateTime startDate, DateTime endDate)
-        {
-            using var context = new RofDatamartContext();
-
-            var employeePayrollByDate = await context.EmployeePayroll.Where(ep => ep.EmployeeId == id
-                && ep.PayrollDate >= startDate
-                && ep.PayrollDate <= endDate).ToListAsync();
-
-            return employeePayrollByDate;
-        }
-
-        public async Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDates(DateTime startDate, DateTime endDate)
+        public async Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, DateTime startDate, DateTime endDate)
         {
             using var context = new RofDatamartContext();
 
             var employeePayrollByDate = await context.EmployeePayroll.Where(ep => ep.PayrollDate >= startDate
                 && ep.PayrollDate <= endDate).ToListAsync();
 
-            return employeePayrollByDate;
+            if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
+            {
+                return employeePayrollByDate;
+            }
+
+            if(string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            {
+                return employeePayrollByDate.Where(ep => ep.FirstName.ToLower().Contains(firstName)
+                    || ep.LastName.ToLower().Contains(lastName)).ToList();
+            }
+
+            return employeePayrollByDate.Where(ep => ep.FirstName == firstName
+                && ep.LastName == lastName).ToList();
         }
     }
 }
