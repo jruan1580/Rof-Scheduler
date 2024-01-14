@@ -10,7 +10,9 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
     public interface IPayrollRetrievalRepository
     {
         Task<List<EmployeePayroll>> GetEmployeePayrollByEmployeeId(long id);
-        Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, DateTime startDate, DateTime endDate);
+        Task<(List<EmployeePayroll>, int)> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, 
+            DateTime startDate, DateTime endDate, 
+            int page = 1, int offset = 10);
     }
 
     public class PayrollRetrievalRepository : IPayrollRetrievalRepository
@@ -24,26 +26,58 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
             return employeePayroll;
         }
 
-        public async Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, DateTime startDate, DateTime endDate)
+        public async Task<(List<EmployeePayroll>, int)> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, 
+            DateTime startDate, DateTime endDate, 
+            int page = 1, int offset = 10)
         {
             using var context = new RofDatamartContext();
 
-            var employeePayrollByDate = await context.EmployeePayroll.Where(ep => ep.PayrollDate >= startDate
-                && ep.PayrollDate <= endDate).ToListAsync();
-
-            if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
-            {
-                return employeePayrollByDate;
-            }
+            var employeePayrollByDate = context.EmployeePayroll.Where(ep => ep.PayrollDate >= startDate
+                && ep.PayrollDate <= endDate).AsQueryable();
 
             if(string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
             {
+                employeePayrollByDate = FilterByEmployee(employeePayrollByDate, firstName, lastName);
+            }
+
+            var countByCriteria = await employeePayrollByDate.CountAsync();
+
+            var skip = (page - 1) * offset;
+
+            var totalPages = GetTotalPages(countByCriteria, offset, page);
+
+            var result = await employeePayrollByDate.OrderBy(p => p.LastName)
+                    .ThenBy(p => p.FirstName)
+                    .Skip(skip)
+                    .Take(offset).ToListAsync();
+
+            return (result, totalPages);
+        }
+
+        private IQueryable<EmployeePayroll> FilterByEmployee(IQueryable<EmployeePayroll> employeePayrollByDate, string firstName, string lastName)
+        {
+            if(string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            {
                 return employeePayrollByDate.Where(ep => ep.FirstName.ToLower().Contains(firstName)
-                    || ep.LastName.ToLower().Contains(lastName)).ToList();
+                   || ep.LastName.ToLower().Contains(lastName));
             }
 
             return employeePayrollByDate.Where(ep => ep.FirstName == firstName
-                && ep.LastName == lastName).ToList();
+                && ep.LastName == lastName);
+        }
+
+        private int GetTotalPages(int numOfRecords, int pageSize, int pageRequested)
+        {
+            var numOfPages = numOfRecords / pageSize;
+            int numOfExtraRecords = numOfRecords % pageSize;
+            int totalPages = ((numOfExtraRecords > 0) ? (numOfPages + 1) : numOfPages);
+
+            if (pageRequested > totalPages)
+            {
+                throw new Exception("Page requested is more than total number of pages");
+            }
+
+            return totalPages;
         }
     }
 }
