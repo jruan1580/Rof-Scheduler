@@ -32,7 +32,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
             var employeePayrollByDate = context.EmployeePayroll.Where(ep => ep.PayrollDate >= startDate
                 && ep.PayrollDate <= endDate).AsQueryable();
 
-            if(string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            if(!string.IsNullOrEmpty(firstName) || !string.IsNullOrEmpty(lastName))
             {
                 employeePayrollByDate = FilterByEmployee(employeePayrollByDate, firstName, lastName);
             }
@@ -42,7 +42,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
 
         private IQueryable<EmployeePayroll> FilterByEmployee(IQueryable<EmployeePayroll> employeePayrollByDate, string firstName, string lastName)
         {
-            if(string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            if(!string.IsNullOrEmpty(firstName) || !string.IsNullOrEmpty(lastName))
             {
                 return employeePayrollByDate.Where(ep => ep.FirstName.ToLower().Contains(firstName)
                    || ep.LastName.ToLower().Contains(lastName));
