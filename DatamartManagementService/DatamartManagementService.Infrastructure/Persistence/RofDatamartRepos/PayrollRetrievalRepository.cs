@@ -51,35 +51,5 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
             return employeePayrollByDate.Where(ep => ep.FirstName.ToLower().Contains(firstName)
                 || ep.LastName.ToLower().Contains(lastName));
         }
-
-        private async Task<(List<EmployeePayroll>, int)> GetPayrollByPages(IQueryable<EmployeePayroll> employeePayroll, int page = 1, int offset = 10)
-        {
-            var countByCriteria = await employeePayroll.CountAsync();
-
-            var skip = (page - 1) * offset;
-
-            var totalPages = GetTotalPages(countByCriteria, offset, page);
-
-            var result = await employeePayroll.OrderBy(p => p.LastName)
-                    .ThenBy(p => p.FirstName)
-                    .Skip(skip)
-                    .Take(offset).ToListAsync();
-
-            return (result, totalPages);
-        }
-
-        private int GetTotalPages(int numOfRecords, int pageSize, int pageRequested)
-        {
-            var numOfPages = numOfRecords / pageSize;
-            int numOfExtraRecords = numOfRecords % pageSize;
-            int totalPages = ((numOfExtraRecords > 0) ? (numOfPages + 1) : numOfPages);
-
-            if (pageRequested > totalPages)
-            {
-                throw new Exception("Page requested is more than total number of pages");
-            }
-
-            return totalPages;
-        }
     }
 }
