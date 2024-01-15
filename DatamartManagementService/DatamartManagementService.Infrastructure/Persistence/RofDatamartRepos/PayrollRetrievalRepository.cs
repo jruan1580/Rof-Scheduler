@@ -10,7 +10,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
     public interface IPayrollRetrievalRepository
     {
         Task<List<EmployeePayroll>> GetEmployeePayrollByEmployeeId(long id);
-        Task<(List<EmployeePayroll>, int)> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, DateTime startDate, DateTime endDate);
+        Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, DateTime startDate, DateTime endDate);
     }
 
     public class PayrollRetrievalRepository : IPayrollRetrievalRepository
@@ -24,7 +24,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
             return employeePayroll;
         }
 
-        public async Task<(List<EmployeePayroll>, int)> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, 
+        public async Task<List<EmployeePayroll>> GetEmployeePayrollBetweenDatesByEmployee(string firstName, string lastName, 
             DateTime startDate, DateTime endDate)
         {
             using var context = new RofDatamartContext();
@@ -37,7 +37,7 @@ namespace DatamartManagementService.Infrastructure.Persistence.RofDatamartRepos
                 employeePayrollByDate = FilterByEmployee(employeePayrollByDate, firstName, lastName);
             }
 
-            return await GetPayrollByPages(employeePayrollByDate);
+            return await employeePayrollByDate.ToListAsync();
         }
 
         private IQueryable<EmployeePayroll> FilterByEmployee(IQueryable<EmployeePayroll> employeePayrollByDate, string firstName, string lastName)
