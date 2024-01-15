@@ -18,9 +18,9 @@ namespace DatamartManagementService.Domain
             _payrollRetrievalRepo = payrollRetrievalRepo;
         }
 
-        public async Task<PayrollSummaryWithTotalPages> GetPayrollSummary(string firstnName, string lastName, DateTime startDate, DateTime endDate)
+        public async Task<PayrollSummaryWithTotalPages> GetPayrollSummary(string firstName, string lastName, DateTime startDate, DateTime endDate)
         {
-            var dbPayroll = await _payrollRetrievalRepo.GetEmployeePayrollBetweenDatesByEmployee(firstnName, lastName, startDate, endDate);
+            var dbPayroll = await _payrollRetrievalRepo.GetEmployeePayrollBetweenDatesByEmployee(firstName, lastName, startDate, endDate);
 
             var payroll = RofDatamartMappers.ToCorePayrollSummary(dbPayroll);
 
