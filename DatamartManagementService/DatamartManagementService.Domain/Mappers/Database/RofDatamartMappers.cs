@@ -120,6 +120,28 @@ namespace DatamartManagementService.Domain.Mappers.Database
             return dbRevenueSummary;
         }
 
+        public static List<CorePayrollSummary> ToCorePayrollSummary(List<DbPayrollSummary> dbPayrollSummary)
+        {
+            var corePayrollSummary = new List<CorePayrollSummary>();
+
+            foreach (var dbPayroll in dbPayrollSummary)
+            {
+                corePayrollSummary.Add(new CorePayrollSummary()
+                {
+                    Id = dbPayroll.Id,
+                    EmployeeId = dbPayroll.EmployeeId,
+                    FirstName = dbPayroll.FirstName,
+                    LastName = dbPayroll.LastName,
+                    EmployeeTotalPay = dbPayroll.EmployeeTotalPay,
+                    PayrollDate = dbPayroll.PayrollDate,
+                    PayrollMonth = dbPayroll.PayrollMonth,
+                    PayrollYear = dbPayroll.PayrollYear
+                });
+            }
+
+            return corePayrollSummary;
+        }
+
         public static List<DbPayrollSummary> FromCorePayrollSummary(List<CorePayrollSummary> corePayrollSummary)
         {
             var dbPayrollSummary = new List<DbPayrollSummary>();
