@@ -22,6 +22,11 @@ namespace DatamartManagementService.Domain
         {
             var dbPayroll = await _payrollRetrievalRepo.GetEmployeePayrollBetweenDatesByEmployee(firstName, lastName, startDate, endDate);
 
+            if(dbPayroll.Count == 0)
+            {
+                return new PayrollSummaryWithTotalPages(new List<PayrollSummaryPerEmployee>(), 0);
+            }
+
             var payroll = RofDatamartMappers.ToCorePayrollSummary(dbPayroll);
 
             var payrollSummary = payroll.GroupBy(p => p.EmployeeId)
@@ -41,8 +46,8 @@ namespace DatamartManagementService.Domain
             foreach (var payrollToEmployee in payrollSummary)
             {
                 payrollPerEmployee.Add(new PayrollSummaryPerEmployee(
-                    payrollToEmployee.Value.Select(p => p.FirstName).ToString(),
-                    payrollToEmployee.Value.Select(p => p.LastName).ToString(),
+                    payrollToEmployee.Value[0].FirstName,
+                    payrollToEmployee.Value[0].LastName,
                     payrollToEmployee.Value.Sum(p => p.EmployeeTotalPay)));
             }
 
