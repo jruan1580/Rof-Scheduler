@@ -9,7 +9,12 @@ using System.Threading.Tasks;
 
 namespace DatamartManagementService.Domain
 {
-    public class PayrollSummaryRetrievalService
+    public interface IPayrollSummaryRetrievalService
+    {
+        Task<PayrollSummaryWithTotalPages> GetPayrollSummaryPerEmployeeByDate(string firstName, string lastName, DateTime startDate, DateTime endDate, int page);
+    }
+
+    public class PayrollSummaryRetrievalService : IPayrollSummaryRetrievalService
     {
         private readonly IPayrollRetrievalRepository _payrollRetrievalRepo;
 
@@ -18,11 +23,12 @@ namespace DatamartManagementService.Domain
             _payrollRetrievalRepo = payrollRetrievalRepo;
         }
 
-        public async Task<PayrollSummaryWithTotalPages> GetPayrollSummary(string firstName, string lastName, DateTime startDate, DateTime endDate)
+        public async Task<PayrollSummaryWithTotalPages> GetPayrollSummaryPerEmployeeByDate(string firstName, string lastName, DateTime startDate, DateTime endDate,
+            int page)
         {
             var dbPayroll = await _payrollRetrievalRepo.GetEmployeePayrollBetweenDatesByEmployee(firstName, lastName, startDate, endDate);
 
-            if(dbPayroll.Count == 0)
+            if (dbPayroll.Count == 0)
             {
                 return new PayrollSummaryWithTotalPages(new List<PayrollSummaryPerEmployee>(), 0);
             }
@@ -34,7 +40,7 @@ namespace DatamartManagementService.Domain
 
             var payrollSummaryPerEmployee = GetListOfPayrollSummaryPerEmployee(payrollSummary);
 
-            var payrollWithPages = GetPayrollByPages(payrollSummaryPerEmployee);
+            var payrollWithPages = GetPayrollByPages(payrollSummaryPerEmployee, page);
 
             return new PayrollSummaryWithTotalPages(payrollWithPages.Item1, payrollWithPages.Item2);
         }
