@@ -119,5 +119,20 @@ namespace DatamartManagementService.Test
                 RevenueDate = new DateTime(2023, 10, 09)
             };
         }
+
+        public static EmployeePayroll GetDbPayrollSummary()
+        {
+            return new EmployeePayroll()
+            {
+                Id = 1,
+                PayrollDate = DateTime.Today,
+                PayrollMonth = Convert.ToInt16(DateTime.Today.Month),
+                PayrollYear = Convert.ToInt16(DateTime.Today.Year),
+                EmployeeId = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                EmployeeTotalPay = 20
+            };
+        }
     }
 }
