@@ -21,5 +21,10 @@ namespace DatamartManagementService.Test
                 ServiceName = "Walking"
             };
         }
+
+        public static PayrollSummaryPerEmployee GetCorePayrollSummaryPerEmployee()
+        {
+            return new PayrollSummaryPerEmployee("John", "Doe", 20);
+        }
     }
 }
