@@ -2,6 +2,7 @@
 using DatamartManagementService.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
@@ -33,7 +34,13 @@ namespace DatamartManagementService.Test.Controller
 
             var okObj = (OkObjectResult)response;
 
+            var result = JsonConvert.SerializeObject(okObj.Value);
+
             Assert.AreEqual(okObj.StatusCode, 200);
+            Assert.True(result.Contains("John"));
+            Assert.True(result.Contains("Doe"));
+            Assert.True(result.Contains("20"));
+            Assert.True(result.Contains("1"));
         }
     }
 }
