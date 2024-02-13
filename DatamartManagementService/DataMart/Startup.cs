@@ -37,6 +37,7 @@ namespace DataMart
             services.AddDatabaseDependencies();
 
             services.AddTransient<IRevenueSummaryRetrievalService, RevenueSummaryRetrievalService>();
+            services.AddTransient<IPayrollSummaryRetrievalService, PayrollSummaryRetrievalService>();
 
             services.AddControllers();
 

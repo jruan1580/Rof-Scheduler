@@ -28,7 +28,7 @@ namespace DatamartManagementService.Test.Service
 
             var payrollSummaryService = new PayrollSummaryRetrievalService(payrollRetrievalRepo.Object);
 
-            var results = await payrollSummaryService.GetPayrollSummary("Peter", "Piper", DateTime.Today.AddDays(-1), DateTime.Today);
+            var results = await payrollSummaryService.GetPayrollSummaryPerEmployeeByDate("Peter", "Piper", DateTime.Today.AddDays(-1), DateTime.Today, 1);
 
             Assert.IsEmpty(results.PayrollSummaryPerEmployee);
             Assert.AreEqual(0, results.TotalPages);
@@ -54,7 +54,7 @@ namespace DatamartManagementService.Test.Service
 
             var payrollSummaryService = new PayrollSummaryRetrievalService(payrollRetrievalRepo.Object);
 
-            var results = await payrollSummaryService.GetPayrollSummary("John", "Doe", DateTime.Today.AddDays(-1), DateTime.Today);
+            var results = await payrollSummaryService.GetPayrollSummaryPerEmployeeByDate("John", "Doe", DateTime.Today.AddDays(-1), DateTime.Today, 1);
 
             Assert.IsNotEmpty(results.PayrollSummaryPerEmployee);
             Assert.AreEqual(1, results.TotalPages);
@@ -85,7 +85,7 @@ namespace DatamartManagementService.Test.Service
 
             var payrollSummaryService = new PayrollSummaryRetrievalService(payrollRetrievalRepo.Object);
 
-            var results = await payrollSummaryService.GetPayrollSummary("", "", DateTime.Today.AddDays(-1), DateTime.Today);
+            var results = await payrollSummaryService.GetPayrollSummaryPerEmployeeByDate("", "", DateTime.Today.AddDays(-1), DateTime.Today, 1);
 
             Assert.IsNotEmpty(results.PayrollSummaryPerEmployee);
             Assert.AreEqual(1, results.TotalPages);
