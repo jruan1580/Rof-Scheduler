@@ -18,6 +18,7 @@ namespace DatamartManagementService.Test.Mapper
             Assert.AreEqual(corePetService.ServiceName, dtoPetService.ServiceName);
         }
 
+        [Test]
         public void ToDTOPayrollSummaryPerEmployee()
         {
             var corePayrollSummaryPerEmployee = ModelCreator.GetCorePayrollSummaryPerEmployee();
