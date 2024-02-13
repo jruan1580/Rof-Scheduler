@@ -9,9 +9,9 @@ namespace DatamartManagementService.Domain.Mappers.DTO
         {
             var dtoPayroll = new PayrollSummaryPerEmployeeDTO();
 
-            payrollSummaryPerEmployee.FirstName = dtoPayroll.FirstName;
-            payrollSummaryPerEmployee.LastName = dtoPayroll.LastName;
-            payrollSummaryPerEmployee.TotalPay = dtoPayroll.TotalPay;
+            dtoPayroll.FirstName = payrollSummaryPerEmployee.FirstName;
+            dtoPayroll.LastName = payrollSummaryPerEmployee.LastName;
+            dtoPayroll.TotalPay = payrollSummaryPerEmployee.TotalPay;
 
             return dtoPayroll;
         }
