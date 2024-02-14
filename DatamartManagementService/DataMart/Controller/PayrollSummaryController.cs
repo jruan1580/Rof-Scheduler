@@ -48,7 +48,7 @@ namespace DataMart.Controller
                     .ToDTOPayrollSummaryPerEmployee(payrollSummaryPerEmployee));
             }
 
-            return Ok(new { payrollPerEmployee = payrollPerEmployeeDTO, totalPages = payrollSummaryWithPages.TotalPages });
+            return Ok(new PayrollSummaryWithTotalPagesDTO(payrollPerEmployeeDTO, payrollSummaryWithPages.TotalPages));
         }
     }
 }

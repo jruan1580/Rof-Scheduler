@@ -1,5 +1,6 @@
 ﻿using DataMart.Controller;
 using DatamartManagementService.Domain;
+using DatamartManagementService.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
@@ -30,17 +31,22 @@ namespace DatamartManagementService.Test.Controller
             var response = await controller.GetPayrollBetweenDatesByEmployee(payrollSummaryDTOGetRequest);
 
             Assert.NotNull(response);
-            Assert.AreEqual(response.GetType(), typeof(OkObjectResult));
+            Assert.That(typeof(OkObjectResult), Is.EqualTo(response.GetType()));
 
             var okObj = (OkObjectResult)response;
 
-            var result = JsonConvert.SerializeObject(okObj.Value);
+            var responseBody = okObj.Value;
 
-            Assert.AreEqual(okObj.StatusCode, 200);
-            Assert.True(result.Contains("John"));
-            Assert.True(result.Contains("Doe"));
-            Assert.True(result.Contains("20"));
-            Assert.True(result.Contains("1"));
+            Assert.IsNotNull(responseBody);
+            Assert.That(responseBody.GetType(), Is.EqualTo(typeof(PayrollSummaryWithTotalPagesDTO)));
+
+            var result = (PayrollSummaryWithTotalPagesDTO)responseBody;
+
+            Assert.That(okObj.StatusCode, Is.EqualTo(200));
+            Assert.That(result.TotalPages, Is.EqualTo(1));
+            Assert.That(result.PayrollSummaryPerEmployeeDTO[0].FirstName, Is.EqualTo("John"));
+            Assert.That(result.PayrollSummaryPerEmployeeDTO[0].LastName, Is.EqualTo("Doe"));
+            Assert.That(result.PayrollSummaryPerEmployeeDTO[0].TotalPay, Is.EqualTo(20));
         }
     }
 }
