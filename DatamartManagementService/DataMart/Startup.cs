@@ -33,6 +33,7 @@ namespace DataMart
             services.AddSingleton<IPayrollSummaryImporter, PayrollSummaryImporter>();
 
             services.AddSingleton<IRevenueByDateRetrievalRepository, RevenueByDateRetrievalRepository>();
+            services.AddSingleton<IPayrollRetrievalRepository, PayrollRetrievalRepository>();
             
             services.AddDatabaseDependencies();
 
