@@ -44,6 +44,7 @@ function NavigationBar({loginState, handleLoginState}){
                             <Nav.Item><Nav.Link href="/petservicemanagement">Pet Services</Nav.Link></Nav.Item>
                             <NavDropdown title='Report'>         
                                 <NavDropdown.Item as={Link} to="/revenuesummary">Revenue Summary</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/payrollsummary">Payroll Summary</NavDropdown.Item>
                             </NavDropdown>
                         </>                        
                     }

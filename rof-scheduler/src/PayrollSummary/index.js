@@ -1,6 +1,6 @@
-function PayrollSummary(){
+function PayrollSummary({setLoginState}){
     return(
-        <></>
+        <>Payroll Summary</>
     );
 }
 
