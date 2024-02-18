@@ -1,6 +1,10 @@
 function PayrollSummary({setLoginState}){
     return(
-        <>Payroll Summary</>
+        <>
+        <h1>Payroll Summary</h1>
+        <br />
+        
+        </>
     );
 }
 
