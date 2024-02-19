@@ -1,7 +1,10 @@
-import { Row, Form, Col, Button, Table, Alert } from "react-bootstrap";
+import { Row, Form, Col, Button, Table, Alert, Pagination } from "react-bootstrap";
+import { useState } from "react";
 
 function PayrollSummary({setLoginState}){
-    
+    const [currPage, setCurrPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+
     const search = (e) => {
         e.preventDefault();        
     };
@@ -59,6 +62,35 @@ function PayrollSummary({setLoginState}){
                 <br />
                 <Button type="submit" variant="primary" className="float-end ms-2">Search</Button>
             </Form>
+            <br />
+            <br />
+            <hr />
+            <br />
+
+            <Table responsive striped bordered>
+                <thead>
+                    <tr>
+                        <th>Last Name</th>
+                        <th>First Name</th>
+                        <th>Total Pay</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John</td>
+                        <td>Doe</td>
+                        <td>20</td>
+                    </tr>
+                </tbody>
+            </Table>
+            <Pagination>
+                {currPage != 1 && (
+                <Pagination.Prev onClick={() => setCurrPage(currPage - 1)} />
+                )}
+                {currPage != totalPages && (
+                <Pagination.Next onClick={() => setCurrPage(currPage + 1)} />
+                )}
+            </Pagination>
         </>
     );
 }
