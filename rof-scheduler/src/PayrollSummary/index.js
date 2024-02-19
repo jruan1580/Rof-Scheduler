@@ -1,3 +1,5 @@
+import { Row, Form, Col, Button, Table, Alert } from "react-bootstrap";
+
 function PayrollSummary({setLoginState}){
     
     const search = (e) => {
@@ -16,7 +18,7 @@ function PayrollSummary({setLoginState}){
                             <Form.Control
                                 type="text"
                                 name="firstName"
-                                defaultValue= ""
+                                placeholder="First Name"
                             />
                         </Col>
                     </Form.Group>
@@ -26,7 +28,7 @@ function PayrollSummary({setLoginState}){
                             <Form.Control
                                 type="text"
                                 name="lastName"
-                                defaultValue= ""
+                                placeholder="Last Name"
                             />
                         </Col>
                     </Form.Group>
