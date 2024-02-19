@@ -33,6 +33,7 @@ function PayrollSummary({setLoginState}){
                         </Col>
                     </Form.Group>
                 </Row>
+                <br />
                 <Row>
                     <Form.Group as={Col} lg={6}>
                         <Form.Label>Start Date:</Form.Label>
