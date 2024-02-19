@@ -2,11 +2,13 @@ import { Row, Form, Col, Button, Table, Alert, Pagination } from "react-bootstra
 import { useState } from "react";
 
 function PayrollSummary({setLoginState}){
+    const [showTable, setShowTable] = useState(false);
     const [currPage, setCurrPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
 
     const search = (e) => {
-        e.preventDefault();        
+        e.preventDefault(); 
+        setShowTable(true);       
     };
     
     return(
@@ -67,30 +69,34 @@ function PayrollSummary({setLoginState}){
             <hr />
             <br />
 
-            <Table responsive striped bordered>
-                <thead>
-                    <tr>
-                        <th>Last Name</th>
-                        <th>First Name</th>
-                        <th>Total Pay</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>John</td>
-                        <td>Doe</td>
-                        <td>20</td>
-                    </tr>
-                </tbody>
-            </Table>
-            <Pagination>
-                {currPage != 1 && (
-                <Pagination.Prev onClick={() => setCurrPage(currPage - 1)} />
-                )}
-                {currPage != totalPages && (
-                <Pagination.Next onClick={() => setCurrPage(currPage + 1)} />
-                )}
-            </Pagination>
+            {showTable && 
+                <Table responsive striped bordered>
+                    <thead>
+                        <tr>
+                            <th>Last Name</th>
+                            <th>First Name</th>
+                            <th>Total Pay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>John</td>
+                            <td>Doe</td>
+                            <td>20</td>
+                        </tr>
+                    </tbody>
+                </Table>
+            }
+            {showTable && 
+                <Pagination>
+                    {currPage != 1 && (
+                        <Pagination.Prev onClick={() => setCurrPage(currPage - 1)} />
+                    )}
+                    {currPage != totalPages && (
+                        <Pagination.Next onClick={() => setCurrPage(currPage + 1)} />
+                    )}
+                </Pagination>
+            }
         </>
     );
 }
