@@ -1,13 +1,58 @@
 import { Row, Form, Col, Button, Table, Alert, Pagination } from "react-bootstrap";
 import { useState } from "react";
+import { ensureDateSearchInformationProvided } from "../SharedServices/inputValidationService";
+import { getPayrollBetweenDatesByEmployee } from "../SharedServices/datamartService";
 
 function PayrollSummary({setLoginState}){
+    const [validationMap, setValidationMap] = useState(new Map());
+    const [errorMessage, setErrorMessage] = useState(undefined);
     const [showTable, setShowTable] = useState(false);
     const [currPage, setCurrPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [payrollSummaryByEmployee, setPayrollSummaryByEmployee] = useState([]);
 
     const search = (e) => {
         e.preventDefault(); 
+
+        var firstName = e.target.firstName.value;
+        var lastName = e.target.lastName.value;
+        var startDate = e.target.startDate.value;
+        var endDate = e.target.endDate.value;
+
+        var inputValidations = ensureDateSearchInformationProvided (startDate, endDate);
+            if (inputValidations.size > 0) {
+                setValidationMap(inputValidations);
+                return;
+            }
+
+        setValidationMap(new Map());
+
+        (async function () {
+            try {
+                const resp = await getPayrollBetweenDatesByEmployee(firstName, lastName, startDate, endDate, currPage);
+                
+                if (resp.status === 401){
+                    setLoginState(false);
+                    return;
+                }
+
+                const payrollSumWithPage = await resp.json();
+
+                setPayrollSummaryByEmployee(payrollSumWithPage.payrollPerEmployee);
+                setTotalPages(payrollSumWithPage.totalPages);
+            } catch (e) {
+                setErrorMessage(e.message);
+            }
+            })();        
+            
+            if(payrollSumWithPage === undefined || payrollSumWithPage === null){
+                setErrorMessage("No payroll summary found for employee for this period.");
+                setShowTable(false);
+            }else{
+                setErrorMessage(undefined);
+                setShowTable(true);
+            }
+
         setShowTable(true);       
     };
     
@@ -48,6 +93,9 @@ function PayrollSummary({setLoginState}){
                                 name="startDate"
                                 defaultValue= ""
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {validationMap.get("startDate")}
+                            </Form.Control.Feedback>
                         </Col>
                     </Form.Group>
                     <Form.Group as={Col} lg={6}>
@@ -58,6 +106,9 @@ function PayrollSummary({setLoginState}){
                                 name="endDate"
                                 defaultValue= ""
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {validationMap.get("endDate")}
+                            </Form.Control.Feedback>
                         </Col>
                     </Form.Group>
                 </Row>
@@ -80,9 +131,9 @@ function PayrollSummary({setLoginState}){
                     </thead>
                     <tbody>
                         <tr>
-                            <td>John</td>
-                            <td>Doe</td>
-                            <td>20</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     </tbody>
                 </Table>
