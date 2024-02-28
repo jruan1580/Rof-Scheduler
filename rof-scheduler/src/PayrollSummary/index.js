@@ -52,8 +52,6 @@ function PayrollSummary({setLoginState}){
                 setErrorMessage(undefined);
                 setShowTable(true);
             }
-
-        setShowTable(true);       
     };
     
     return(
@@ -120,6 +118,10 @@ function PayrollSummary({setLoginState}){
             <hr />
             <br />
 
+            {errorMessage !== undefined && (
+                <Alert variant="danger">{errorMessage}</Alert>
+            )}
+            
             {showTable && 
                 <Table responsive striped bordered>
                     <thead>
@@ -130,11 +132,19 @@ function PayrollSummary({setLoginState}){
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                        {
+                            payrollSummaryByEmployee.length != 0 &&
+                            payrollSummaryByEmployee.map((summary) => {
+                                return(
+                                    <tr key = {summary.petService.serviceName}>
+                                        <td>{summary.petService.serviceName}</td>
+                                        <td>{summary.count}</td>
+                                        <td>{summary.grossRevenuePerService}</td>
+                                        <td>{summary.netRevenuePerService}</td>
+                                    </tr>
+                                )
+                            })
+                        }
                     </tbody>
                 </Table>
             }
