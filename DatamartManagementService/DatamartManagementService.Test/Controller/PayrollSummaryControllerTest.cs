@@ -26,9 +26,7 @@ namespace DatamartManagementService.Test.Controller
 
             var controller = new PayrollSummaryController(payrollSummaryRetrievalService.Object);
 
-            var payrollSummaryDTOGetRequest = DTOCreator.GetDTOPayrollSummaryGetRequest();
-
-            var response = await controller.GetPayrollBetweenDatesByEmployee(payrollSummaryDTOGetRequest);
+            var response = await controller.GetPayrollBetweenDatesByEmployee(DateTime.Today.AddDays(-1).ToString(), DateTime.Today.ToString(), "John", "Doe", 1);
 
             Assert.NotNull(response);
             Assert.That(typeof(OkObjectResult), Is.EqualTo(response.GetType()));

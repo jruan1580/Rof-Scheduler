@@ -45,7 +45,7 @@ function PayrollSummary({setLoginState}){
             }
             })();        
             
-            if(payrollSumWithPage === undefined || payrollSumWithPage === null){
+            if(payrollSummaryByEmployee === undefined || payrollSummaryByEmployee === null){
                 setErrorMessage("No payroll summary found for employee for this period.");
                 setShowTable(false);
             }else{
@@ -90,6 +90,7 @@ function PayrollSummary({setLoginState}){
                                 type="date"
                                 name="startDate"
                                 defaultValue= ""
+                                isInvalid={validationMap.has("startDate")}
                             />
                             <Form.Control.Feedback type="invalid">
                                 {validationMap.get("startDate")}
@@ -103,6 +104,7 @@ function PayrollSummary({setLoginState}){
                                 type="date"
                                 name="endDate"
                                 defaultValue= ""
+                                isInvalid={validationMap.has("endDate")}
                             />
                             <Form.Control.Feedback type="invalid">
                                 {validationMap.get("endDate")}
